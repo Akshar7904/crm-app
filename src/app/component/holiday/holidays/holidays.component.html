@@ -1,0 +1,219 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <!-- Header Section -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Holidays</h2>
+        <button class="btn btn-primary" (click)="addNewHoliday()">
+          <i class="bi bi-plus-circle me-2"></i>
+          Add Holiday
+        </button>
+      </div>
+
+      <!-- State Management -->
+      <ng-container *ngIf="holidayState$ | async as state">
+
+        <!-- Loading State -->
+        <ng-container *ngIf="state.dataState === DataState.LOADING">
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading holidays...</p>
+          </div>
+        </ng-container>
+
+        <!-- Error State -->
+        <ng-container *ngIf="state.dataState === DataState.ERROR">
+          <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ state.error }}
+          </div>
+        </ng-container>
+
+        <!-- Loaded State -->
+        <ng-container *ngIf="state.dataState === DataState.LOADED">
+          <!-- Search Section -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <form #searchForm="ngForm" (ngSubmit)="searchHolidays(searchForm)">
+                <div class="input-group">
+                  <label for="searchInput" class="visually-hidden">Search holidays</label>
+                  <input
+                    id="searchInput"
+                    type="text"
+                    class="form-control"
+                    placeholder="Search holidays..."
+                    name="searchTerm"
+                    ngModel>
+                  <button class="btn btn-outline-secondary" type="submit">
+                    <i class="bi bi-search"></i> Search
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="col-md-6 text-end">
+              <small class="text-muted">
+                Showing {{ getHolidays(state).length }} of {{ state.appData?.totalHolidays || 0 }} holidays
+              </small>
+            </div>
+          </div>
+
+          <!-- Holidays Table -->
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                  <thead class="table-light">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Holiday Day</th>
+                    <th scope="col">Holiday Date</th>
+                    <th scope="col">Holiday Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Status</th>
+                    <th scope="col" class="text-center">Action</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr
+                    *ngFor="let holiday of getHolidays(state); let i = index"
+                    [class.table-success]="isUpcoming(holiday.holidayDate)"
+                    style="cursor: pointer;"
+                    (click)="selectHoliday(holiday)">
+                    <td>{{ (state.appData?.page || 0) * (state.appData?.size || 10) + i + 1 }}</td>
+                    <td>
+                      <strong>{{ holiday.holidayDay }}</strong>
+                    </td>
+                    <td>
+                      {{ formatDate(holiday.holidayDate) }}
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="me-2">{{ holiday.holidayName }}</span>
+                        <span *ngIf="holiday.isRecurring" class="badge bg-info text-dark">
+                            <i class="bi bi-arrow-repeat"></i> Recurring
+                          </span>
+                      </div>
+                    </td>
+                    <td>
+                      <small class="text-muted">{{ holiday.description || 'N/A' }}</small>
+                    </td>
+                    <td>
+                        <span
+                          class="badge"
+                          [class.bg-success]="holiday.isActive"
+                          [class.bg-secondary]="!holiday.isActive">
+                          {{ holiday.isActive ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                    <td class="text-center">
+                      <div class="btn-group" role="group">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-primary"
+                          (click)="selectHoliday(holiday)"
+                          title="Edit">
+                          <i class="bi bi-pencil-square"></i>
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-outline-danger"
+                          (click)="deleteHoliday(holiday, $event)"
+                          title="Delete">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <!-- Empty State -->
+                  <tr *ngIf="getHolidays(state).length === 0">
+                    <td colspan="7" class="text-center py-5">
+                      <i class="bi bi-calendar-x display-1 text-muted"></i>
+                      <p class="mt-3 text-muted">No holidays found</p>
+                      <button class="btn btn-primary mt-2" (click)="addNewHoliday()">
+                        <i class="bi bi-plus-circle me-2"></i>
+                        Add Your First Holiday
+                      </button>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="row mt-4" *ngIf="getHolidays(state).length > 0">
+            <div class="col-md-12">
+              <nav aria-label="Holiday pagination">
+                <ul class="pagination justify-content-center">
+                  <!-- Previous Button -->
+                  <li class="page-item" [class.disabled]="(state.appData?.page || 0) === 0">
+                    <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="goToNextOrPreviousPage('previous', state)"
+                    aria-label="Previous page">
+                    Previous
+                    </a>
+                  </li>
+
+                  <!-- Page Numbers -->
+                  <li
+                    class="page-item"
+                    *ngFor="let pageNumber of getPageNumbers(state); let i = index"
+                    [class.active]="pageNumber === getCurrentPage(state)"
+                    [class.disabled]="pageNumber === '...'">
+                    <ng-container *ngIf="pageNumber === '...'; else pageLink">
+                      <span class="page-link">...</span>
+                    </ng-container>
+                    <ng-template #pageLink>
+                      <a
+                      class="page-link"
+                      href="javascript:void(0)"
+                      (click)="goToPage((+pageNumber) - 1, state)"
+                      [attr.aria-label]="'Go to page ' + pageNumber">
+                      {{ pageNumber }}
+                      </a>
+                    </ng-template>
+                  </li>
+
+                  <!-- Next Button -->
+                  <li
+                    class="page-item"
+                    [class.disabled]="(state.appData?.page || 0) >= getTotalPages(state) - 1">
+                    <a
+                    class="page-link"
+                    href="javascript:void(0)"
+                    (click)="goToNextOrPreviousPage('next', state)"
+                    aria-label="Next page">
+                    Next
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+
+              <!-- Pagination Info -->
+              <div class="text-center mt-2">
+                <small class="text-muted">
+                  Page {{ getCurrentPage(state) }} of {{ getTotalPages(state) }}
+                  | Total holidays: {{ state.appData?.totalHolidays || 0 }}
+                </small>
+              </div>
+            </div>
+          </div>
+
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" *ngIf="isLoading$ | async">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>

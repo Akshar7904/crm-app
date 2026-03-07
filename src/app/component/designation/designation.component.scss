@@ -1,0 +1,246 @@
+// designation Component - SCSS
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+/* Designation Component Styles */
+
+.container-fluid {
+  max-width: 1400px;
+}
+
+/* Card Styles */
+.card {
+  border: none;
+  border-radius: 8px;
+}
+
+.card-body {
+  padding: 0;
+}
+
+/* Table Styles */
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #dee2e6;
+  padding: 1rem;
+}
+
+.table tbody td {
+  vertical-align: middle;
+  padding: 1rem;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(0, 123, 255, 0.05);
+  cursor: pointer;
+}
+
+/* Badge Styles */
+.badge {
+  padding: 0.4em 0.8em;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+/* Button Styles */
+.btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Search Input */
+.input-group {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.input-group-text {
+  background-color: #fff;
+  border-right: none;
+}
+
+.input-group .form-control {
+  border-left: none;
+}
+
+.input-group .form-control:focus {
+  box-shadow: none;
+  border-color: #ced4da;
+}
+
+/* Pagination */
+.pagination {
+  margin: 0;
+}
+
+.page-link {
+  color: #007bff;
+  border-color: #dee2e6;
+}
+
+.page-link:hover {
+  background-color: #e9ecef;
+}
+
+.page-item.active .page-link {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.page-item.disabled .page-link {
+  color: #6c757d;
+  background-color: #fff;
+  border-color: #dee2e6;
+}
+
+/* Modal Styles */
+.modal-header {
+  border-bottom: 2px solid #dee2e6;
+  padding: 1.25rem 1.5rem;
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 1.5rem;
+}
+
+/* Form Styles */
+.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #495057;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.is-invalid {
+  border-color: #dc3545;
+}
+
+.invalid-feedback {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Alert Styles */
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.alert-info {
+  background-color: #e7f3ff;
+  color: #004085;
+}
+
+.alert-danger {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Empty State */
+.bi-inbox {
+  opacity: 0.3;
+}
+
+/* Loading Spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .table thead {
+    display: none;
+  }
+
+  .table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+  }
+
+  .table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .table tbody td:last-child {
+    border-bottom: none;
+  }
+
+  .table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+
+  .btn-group {
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    flex: 1;
+  }
+}
+
+/* Custom Scrollbar for Table */
+.table-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Modal Backdrop */
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+  display: block;
+}
+
+/* Transition Effects */
+.card,
+.btn,
+.badge,
+.alert {
+  transition: all 0.3s ease;
+}
+
+.table-hover tbody tr {
+  transition: background-color 0.2s ease;
+}

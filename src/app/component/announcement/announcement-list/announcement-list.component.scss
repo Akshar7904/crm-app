@@ -1,0 +1,54 @@
+// announcement-list Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.announcement-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #dee2e6;
+}
+
+.announcement-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  border-color: #0d6efd;
+}
+
+.announcement-card.pinned {
+  border-left: 3px solid #0d6efd;
+  background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+}
+
+.announcement-content {
+  line-height: 1.8;
+}
+
+.announcement-content h1,
+.announcement-content h2,
+.announcement-content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.announcement-content p {
+  margin-bottom: 1rem;
+}
+
+.announcement-content ul,
+.announcement-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}
+
+.modal {
+  z-index: 1050;
+}
+
+/* Purple badge for events */
+.bg-purple {
+  background-color: #6f42c1 !important;
+}

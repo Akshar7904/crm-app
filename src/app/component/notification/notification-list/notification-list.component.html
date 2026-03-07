@@ -1,0 +1,133 @@
+<!-- Notification List Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h4 class="mb-1">Messages</h4>
+      <p class="text-muted mb-0">View and manage your messages</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-primary btn-sm" (click)="markAllAsRead()">
+        <i class="bi bi-check2-all me-1"></i> Mark All Read
+      </button>
+      <button class="btn btn-outline-danger btn-sm" (click)="deleteAllNotifications()">
+        <i class="bi bi-trash me-1"></i> Clear All
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card mb-4">
+    <div class="card-body py-2">
+      <div class="d-flex flex-wrap gap-2">
+        <button *ngFor="let filter of filters"
+                class="btn btn-sm"
+                [class.btn-primary]="selectedFilter === filter.value"
+                [class.btn-outline-secondary]="selectedFilter !== filter.value"
+                (click)="onFilterChange(filter.value)">
+          {{ filter.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <ng-container *ngIf="state$ | async as state">
+    <!-- Loading -->
+    <div *ngIf="state.dataState === DataState.LOADING" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2 text-muted">Loading messages...</p>
+    </div>
+
+    <!-- Loaded -->
+    <div *ngIf="state.dataState === DataState.LOADED">
+      <!-- Empty State -->
+      <div *ngIf="!state.notifications?.length" class="card">
+        <div class="card-body text-center py-5">
+          <i class="bi bi-chat-left-text display-1 text-muted"></i>
+          <h5 class="mt-3">No Messages</h5>
+          <p class="text-muted">You're all caught up! No messages to display.</p>
+        </div>
+      </div>
+
+      <!-- Notification Cards -->
+      <div *ngIf="state.notifications?.length" class="notification-cards">
+        <div *ngFor="let notification of state.notifications"
+             class="card mb-2 notification-card"
+             [class.unread]="!notification.isRead">
+          <div class="card-body d-flex align-items-start py-3">
+            <!-- Icon -->
+            <div class="notification-icon me-3">
+              <i [class]="getIcon(notification.type) + ' fs-4'" [ngClass]="getPriorityClass(notification.priority)"></i>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-grow-1">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="mb-0 fw-semibold">{{ notification.title }}</h6>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge" [ngClass]="{
+                    'bg-secondary': notification.priority === 'LOW',
+                    'bg-primary': notification.priority === 'NORMAL',
+                    'bg-warning': notification.priority === 'HIGH',
+                    'bg-danger': notification.priority === 'URGENT'
+                  }">{{ notification.priority }}</span>
+                  <small class="text-muted">{{ getTimeAgo(notification.createdAt) }}</small>
+                </div>
+              </div>
+              <p class="mb-2 text-muted">{{ notification.message }}</p>
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-light text-dark">{{ notification.type }}</span>
+                <span *ngIf="!notification.isRead" class="badge bg-info">Unread</span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="ms-3 d-flex flex-column gap-1">
+              <button *ngIf="!notification.isRead"
+                      class="btn btn-sm btn-outline-primary"
+                      title="Mark as read"
+                      (click)="markAsRead(notification)">
+                <i class="bi bi-check2"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-danger"
+                      title="Delete"
+                      (click)="deleteNotification(notification.id)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="state.totalCount && state.totalCount > pageSize" class="d-flex justify-content-center mt-4">
+          <nav>
+            <ul class="pagination mb-0">
+              <li class="page-item" [class.disabled]="currentPage === 0">
+                <button class="page-link" (click)="onPageChange(currentPage - 1)">Previous</button>
+              </li>
+              <li class="page-item">
+                <span class="page-link">Page {{ currentPage + 1 }}</span>
+              </li>
+              <li class="page-item" [class.disabled]="(currentPage + 1) * pageSize >= state.totalCount">
+                <button class="page-link" (click)="onPageChange(currentPage + 1)">Next</button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="state.dataState === DataState.ERROR" class="card">
+      <div class="card-body text-center py-5 text-danger">
+        <i class="bi bi-exclamation-circle display-1"></i>
+        <h5 class="mt-3">Error Loading Messages</h5>
+        <p class="text-muted">{{ state.error }}</p>
+        <button class="btn btn-primary" (click)="refresh()">Try Again</button>
+      </div>
+    </div>
+  </ng-container>
+</div>

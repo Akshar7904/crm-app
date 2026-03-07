@@ -1,0 +1,131 @@
+<nav class="navbar">
+  <div class="navbar-container">
+
+    <!-- LEFT: Hamburger (mobile only) + Greeting -->
+    <div class="navbar-left">
+      <button
+        class="hamburger-btn d-lg-none"
+        type="button"
+        aria-label="Toggle sidebar"
+        (click)="onToggleSidebar()"
+      >
+        <div class="hamburger-icon" [class.active]="!sidebarCollapsed">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+
+      <div class="navbar-greeting d-none d-md-flex">
+        <span class="greeting-text">Welcome back,</span>
+        <span class="greeting-name">{{ user?.firstName }}</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: Actions & Profile -->
+    <div class="navbar-right">
+
+      <!-- Search Toggle -->
+      <button class="nav-action-btn" title="Search" type="button">
+        <i class="bi bi-search"></i>
+      </button>
+
+      <!-- Notifications -->
+      <app-notification-dropdown></app-notification-dropdown>
+
+      <!-- Announcements -->
+      <a
+        [routerLink]="['/announcements']"
+        class="nav-action-btn"
+        title="Announcements"
+      >
+        <i class="bi bi-megaphone"></i>
+      </a>
+
+      <!-- Theme Toggle -->
+      <button
+        class="nav-action-btn theme-toggle-btn"
+        [title]="'Theme: ' + getThemeLabel((theme$ | async) || 'system')"
+        type="button"
+        (click)="cycleTheme()"
+      >
+        <i class="bi" [ngClass]="getThemeIcon((theme$ | async) || 'system')"></i>
+      </button>
+
+      <!-- Divider -->
+      <div class="navbar-divider d-none d-lg-block"></div>
+
+      <!-- User Profile -->
+      <div class="dropdown user-dropdown">
+        <button
+          class="btn user-profile-btn dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <img
+            class="user-avatar"
+            [src]="getProfileImageUrl()"
+            (error)="onProfileImageError($event)"
+            [alt]="user?.firstName"
+          />
+
+          <div class="user-info d-none d-lg-flex">
+            <span class="user-name">
+              {{ user?.firstName }} {{ user?.lastName }}
+            </span>
+            <span class="user-role">{{ user?.roleName || 'Employee' }}</span>
+          </div>
+
+          <i class="bi bi-chevron-down dropdown-arrow d-none d-lg-block"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li class="dropdown-header">
+            <div class="user-header-info">
+              <div class="user-header-avatar-wrapper">
+                <img
+                  class="user-header-avatar"
+                  [src]="getProfileImageUrl()"
+                  (error)="onProfileImageError($event)"
+                />
+                <span class="avatar-status-dot"></span>
+              </div>
+              <div>
+                <span class="user-header-name">
+                  {{ user?.firstName }} {{ user?.lastName }}
+                </span>
+                <span class="user-header-email">
+                  {{ user?.email }}
+                </span>
+              </div>
+            </div>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
+          <li class="dropdown-section-label">Account</li>
+          <li>
+            <a class="dropdown-item" [routerLink]="['/profile']">
+              <i class="bi bi-person-circle"></i>
+              My Profile
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
+          <li>
+            <a class="dropdown-item logout-item" (click)="logOut()">
+              <i class="bi bi-box-arrow-right"></i>
+              Sign Out
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom accent line -->
+  <div class="navbar-accent"></div>
+</nav>

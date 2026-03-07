@@ -1,0 +1,46 @@
+<!-- Main App Container -->
+<div class="app-container" [class.sidebar-collapsed]="sidebarCollapsed" [class.sidebar-open]="sidebarOpen">
+  <!-- Show dashboard layout only for authenticated users on non-public routes -->
+  <ng-container *ngIf="!isPublicRoute && isAuthenticated && (user$ | async) as user; else unauthenticated">
+
+    <!-- Sidebar -->
+    <app-sidebar
+      [user]="user"
+      [collapsed]="sidebarCollapsed"
+      [mobileOpen]="sidebarOpen"
+      (closeMobileSidebar)="closeSidebar()">
+    </app-sidebar>
+
+    <!-- Mobile Overlay -->
+    <div class="sidebar-overlay"
+         *ngIf="sidebarOpen && isMobile"
+         (click)="closeSidebar()">
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content-wrapper">
+      <!-- Navbar -->
+      <app-navbar
+        [user]="user"
+        [sidebarCollapsed]="sidebarCollapsed"
+        (toggleSidebar)="toggleSidebar()">
+      </app-navbar>
+
+      <!-- Main Content -->
+      <div class="content-area">
+        <div class="container-fluid py-4">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Unauthenticated View (Login/Register pages) -->
+  <ng-template #unauthenticated>
+    <router-outlet></router-outlet>
+  </ng-template>
+</div>
+
+<!-- Toast Notifications Container -->
+<notifier-container></notifier-container>

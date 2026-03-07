@@ -1,0 +1,262 @@
+<div class="employee-leave-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>My Leave Requests</h1>
+      <p>Manage your leave applications and view your leave balance</p>
+    </div>
+    <button class="btn btn-primary" (click)="openLeaveForm()">
+      <i class="fas fa-plus"></i> Apply for Leave
+    </button>
+  </div>
+
+  <!-- Leave Balance Cards -->
+  <div class="balance-section">
+    <h2>Leave Balance - {{currentYear}}</h2>
+    <div class="balance-grid">
+      <div class="balance-card" *ngFor="let balance of leaveBalances">
+        <div class="balance-header">
+          <i class="fas fa-calendar-alt"></i>
+          <span>{{leaveTypeLabels[balance.leaveType]}}</span>
+        </div>
+        <div class="balance-stats">
+          <div class="stat">
+            <span class="stat-value">{{balance.available}}</span>
+            <span class="stat-label">Available</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{balance.used}}</span>
+            <span class="stat-label">Used</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{balance.pending}}</span>
+            <span class="stat-label">Pending</span>
+          </div>
+          <div class="stat">
+            <span class="stat-value">{{balance.totalEntitled}}</span>
+            <span class="stat-label">Entitled</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-section">
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'all'"
+        (click)="setActiveTab('all')">
+        All Requests
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'pending'"
+        (click)="setActiveTab('pending')">
+        Pending
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'approved'"
+        (click)="setActiveTab('approved')">
+        Approved
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'rejected'"
+        (click)="setActiveTab('rejected')">
+        Rejected
+      </button>
+    </div>
+  </div>
+
+  <!-- Leave Requests Table -->
+  <div class="table-section">
+    <div *ngIf="currentDataState === dataState.LOADING" class="loading">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length === 0" class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <p>No leave requests found</p>
+    </div>
+
+    <table *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="leave-table">
+      <thead>
+      <tr>
+        <th>Leave Type</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Days</th>
+        <th>Status</th>
+        <th>Reason</th>
+        <th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let leave of filteredLeaves">
+        <td>
+            <span class="leave-type-badge">
+              {{leaveTypeLabels[leave.leaveType]}}
+            </span>
+        </td>
+        <td>{{formatDate(leave.startDate)}}</td>
+        <td>{{formatDate(leave.endDate)}}</td>
+        <td>
+          <span class="days-badge">{{leave.numberOfDays}} days</span>
+        </td>
+        <td>
+            <span class="status-badge" [ngClass]="getStatusClass(leave.status)">
+              {{leaveStatusLabels[leave.status]}}
+            </span>
+        </td>
+        <td>
+          <span class="reason-text">{{leave.reason || 'N/A'}}</span>
+          <div *ngIf="leave.doctorNoteAttached" class="doctor-note-indicator mt-1">
+            <small>
+              <i class="fas fa-file-medical text-success"></i>
+              <a *ngIf="leave.doctorNoteUrl" [href]="getDoctorNoteDownloadUrl(leave)" target="_blank">
+                {{ leave.doctorNoteFilename || 'Doctor\'s note' }}
+              </a>
+              <span *ngIf="!leave.doctorNoteUrl">Doctor's note attached</span>
+            </small>
+          </div>
+          <div *ngIf="leave.rejectionReason" class="rejection-reason">
+            <small><strong>Rejection Reason:</strong> {{leave.rejectionReason}}</small>
+          </div>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <button
+              *ngIf="leave.status === LeaveStatus.PENDING"
+              class="btn-icon btn-edit"
+              (click)="editLeave(leave)"
+              title="Edit">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button
+              *ngIf="canEditOrCancel(leave)"
+              class="btn-icon btn-cancel"
+              (click)="cancelLeave(leave)"
+              title="Cancel">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Leave Form Modal -->
+  <div class="modal-overlay" *ngIf="showLeaveForm" (click)="closeLeaveForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{editMode ? 'Edit' : 'Apply for'}} Leave</h2>
+        <button class="btn-close" (click)="closeLeaveForm()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()">
+        <div class="form-grid">
+          <!-- Leave Type -->
+          <div class="form-group">
+            <label for="leaveType">Leave Type <span class="required">*</span></label>
+            <select
+              id="leaveType"
+              formControlName="leaveType"
+              class="form-control"
+              [class.is-invalid]="leaveForm.get('leaveType')?.invalid && leaveForm.get('leaveType')?.touched">
+              <option value="">Select leave type</option>
+              <option *ngFor="let type of leaveTypes" [value]="type">
+                {{leaveTypeLabels[type]}}
+              </option>
+            </select>
+            <div *ngIf="leaveForm.get('leaveType')?.value" class="balance-info">
+              Available: <strong>{{getAvailableDays(leaveForm.get('leaveType')?.value)}} days</strong>
+            </div>
+          </div>
+
+          <!-- Start Date -->
+          <div class="form-group">
+            <label for="startDate">Start Date <span class="required">*</span></label>
+            <input
+              type="date"
+              id="startDate"
+              formControlName="startDate"
+              class="form-control"
+              (change)="onDateChange()"
+              [class.is-invalid]="leaveForm.get('startDate')?.invalid && leaveForm.get('startDate')?.touched">
+          </div>
+
+          <!-- End Date -->
+          <div class="form-group">
+            <label for="endDate">End Date <span class="required">*</span></label>
+            <input
+              type="date"
+              id="endDate"
+              formControlName="endDate"
+              class="form-control"
+              (change)="onDateChange()"
+              [class.is-invalid]="leaveForm.get('endDate')?.invalid && leaveForm.get('endDate')?.touched">
+          </div>
+
+          <!-- Reason -->
+          <div class="form-group full-width">
+            <label for="reason">Reason</label>
+            <textarea
+              id="reason"
+              formControlName="reason"
+              class="form-control"
+              rows="3"
+              placeholder="Reason for leave..."></textarea>
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-group full-width">
+            <label for="remarks">Additional Remarks</label>
+            <textarea
+              id="remarks"
+              formControlName="remarks"
+              class="form-control"
+              rows="2"
+              placeholder="Any additional information..."></textarea>
+          </div>
+
+          <!-- Doctor Note File Upload -->
+          <div class="form-group full-width">
+            <label class="checkbox-label">
+              <input type="checkbox" formControlName="doctorNoteAttached">
+              <span>Attach doctor's note</span>
+            </label>
+          </div>
+
+          <div class="form-group full-width" *ngIf="leaveForm.get('doctorNoteAttached')?.value">
+            <label for="doctorNoteFile">Doctor's Note (Image/PDF)</label>
+            <input
+              type="file"
+              id="doctorNoteFile"
+              class="form-control"
+              accept="image/*,.pdf"
+              (change)="onDoctorNoteFileSelected($event)">
+            <small class="form-text text-muted">Upload a photo or PDF of the doctor's note (max 5MB)</small>
+            <div *ngIf="selectedDoctorNoteFile" class="file-info mt-1">
+              <i class="fas fa-file-medical"></i> {{ selectedDoctorNoteFile.name }}
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeLeaveForm()">
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" [disabled]="leaveForm.invalid || currentDataState === dataState.LOADING">
+            {{editMode ? 'Update' : 'Submit'}} Request
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

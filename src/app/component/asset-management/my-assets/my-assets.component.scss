@@ -1,0 +1,72 @@
+// my-assets Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// Cards with login-style shadow and hover
+.card {
+  @include card;
+  border: none;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+
+  .card-header {
+    background: $white;
+    border-bottom: $border-width solid rgba($primary, 0.1);
+  }
+
+  .card-footer {
+    background: $white;
+    border-top: $border-width solid rgba($primary, 0.1);
+  }
+}
+
+// Asset icon with primary accent background
+.asset-icon {
+  width: 60px;
+  height: 60px;
+  background: rgba($primary, 0.08);
+  border-radius: $border-radius-xl;
+  @include flex-center;
+
+  i {
+    color: $primary;
+  }
+}
+
+// Table details
+.table td:first-child {
+  width: 45%;
+}
+
+.table td.text-muted {
+  color: $gray-500;
+  font-size: $font-size-sm;
+}
+
+// Acknowledge button
+.btn-success {
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+// Primary button gradient
+.btn-primary {
+  @include btn-primary;
+}
+
+// Breadcrumb accent
+.breadcrumb-item a {
+  color: $primary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $primary-medium;
+  }
+}

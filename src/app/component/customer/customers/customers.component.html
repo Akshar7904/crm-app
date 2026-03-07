@@ -1,0 +1,250 @@
+<ng-container *ngIf="customersState$ | async as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="clients-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item active">Clients</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+          <div class="row align-items-center">
+            <div class="col">
+              <h4 class="page-title">
+                <i class="bi bi-people me-2"></i>Clients
+              </h4>
+              <p class="text-muted mb-0">Manage your clients and customers</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-outline-success me-2" title="Export to Excel">
+                <i class="bi bi-file-earmark-excel"></i>
+              </button>
+              <a [routerLink]="['/customers/new']" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add Client
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-primary-subtle">
+                <i class="bi bi-people text-primary"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ state?.appData?.data?.stats?.totalCustomers || 0 }}</h3>
+                <p class="stat-label">Total Clients</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-success-subtle">
+                <i class="bi bi-check-circle text-success"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ getActiveCount(state) }}</h3>
+                <p class="stat-label">Active</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-info-subtle">
+                <i class="bi bi-receipt text-info"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ state?.appData?.data?.stats?.totalInvoices || 0 }}</h3>
+                <p class="stat-label">Total Invoices</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-warning-subtle">
+                <i class="bi bi-cash-stack text-warning"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ formatCurrency(state?.appData?.data?.stats?.totalBilled || 0) }}</h3>
+                <p class="stat-label">Total Billed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="card search-card mb-4">
+          <div class="card-body">
+            <form #searchForm="ngForm" (ngSubmit)="searchCustomers(searchForm)" class="row g-3 align-items-center">
+              <div class="col-md-6">
+                <div class="input-group">
+                  <span class="input-group-text"><i class="bi bi-search"></i></span>
+                  <input type="text"
+                         ngModel
+                         name="name"
+                         class="form-control"
+                         placeholder="Search clients by name...">
+                </div>
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                  <i class="bi bi-search me-1"></i> Search
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Clients Grid -->
+        <div class="row">
+          <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 mb-4"
+               *ngFor="let customer of state?.appData?.data?.page?.content">
+            <div class="card client-card">
+              <!-- Card Header with Status -->
+              <div class="card-header">
+                <span class="client-type">{{ customer.type || 'Client' }}</span>
+                <span class="badge status-badge"
+                      [ngClass]="{
+                        'bg-success-subtle text-success': customer.status === 'ACTIVE',
+                        'bg-primary-subtle text-primary': customer.status === 'PENDING',
+                        'bg-danger-subtle text-danger': customer.status === 'BANNED',
+                        'bg-info-subtle text-info': customer.status === 'INACTIVE'
+                      }">
+                  <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
+                  {{ customer.status }}
+                </span>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body text-center">
+                <!-- Client Avatar -->
+                <div class="client-avatar-wrapper mb-3">
+                  <img *ngIf="customer.imageUrl"
+                       [src]="customer.imageUrl"
+                       [alt]="customer.name"
+                       class="client-avatar">
+                  <div *ngIf="!customer.imageUrl" class="client-avatar-placeholder">
+                    {{ getInitials(customer.name) }}
+                  </div>
+                </div>
+
+                <!-- Client Info -->
+                <h5 class="client-name">{{ customer.name }}</h5>
+
+                <!-- Client Details -->
+                <div class="client-details">
+                  <div class="detail-item">
+                    <i class="bi bi-envelope"></i>
+                    <span>{{ customer.email }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ customer.phone }}</span>
+                  </div>
+                  <div class="detail-item" *ngIf="customer.address">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>{{ customer.address }}</span>
+                  </div>
+                </div>
+
+                <!-- Invoices Count -->
+                <div class="invoices-badge" *ngIf="customer.invoices?.length > 0">
+                  <i class="bi bi-receipt me-1"></i>
+                  {{ customer.invoices.length }} Invoice{{ customer.invoices.length > 1 ? 's' : '' }}
+                </div>
+              </div>
+
+              <!-- Card Footer with Actions -->
+              <div class="card-footer">
+                <button class="btn btn-sm btn-light action-btn"
+                        [routerLink]="['/customers', customer.id]"
+                        title="View Client">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-light action-btn"
+                        [routerLink]="['/invoices/new']"
+                        [queryParams]="{customerId: customer.id}"
+                        title="Create Invoice">
+                  <i class="bi bi-receipt"></i>
+                </button>
+                <a class="btn btn-sm btn-light action-btn"
+                   [href]="'mailto:' + customer.email"
+                   title="Send Email">
+                  <i class="bi bi-envelope"></i>
+                </a>
+                <a class="btn btn-sm btn-light action-btn"
+                   [href]="'tel:' + customer.phone"
+                   title="Call">
+                  <i class="bi bi-telephone"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!state?.appData?.data?.page?.content?.length" class="col-12">
+            <div class="empty-state">
+              <i class="bi bi-people"></i>
+              <h5>No Clients Found</h5>
+              <p class="text-muted">Get started by adding your first client</p>
+              <a [routerLink]="['/customers/new']" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Add Client
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav *ngIf="state?.appData?.data?.page?.content?.length > 0" aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="(currentPage$ | async) === 0">
+              <a class="page-link" (click)="goToNextOrPreviousPage('backward', searchForm.value.name)">
+                <i class="bi bi-chevron-left"></i> Previous
+              </a>
+            </li>
+            <li class="page-item"
+                *ngFor="let pageNumber of [].constructor(state?.appData?.data?.page?.totalPages); let i = index"
+                [class.active]="i === (currentPage$ | async)">
+              <a class="page-link" (click)="goToPage(i, searchForm.value.name)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item"
+                [class.disabled]="(currentPage$ | async) === (state?.appData?.data?.page?.totalPages - 1)">
+              <a class="page-link" (click)="goToNextOrPreviousPage('forward', searchForm.value.name)">
+                Next <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading clients...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ state.error }}
+        <button class="btn btn-primary mt-3" (click)="ngOnInit()">
+          <i class="bi bi-arrow-clockwise me-2"></i>Retry
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

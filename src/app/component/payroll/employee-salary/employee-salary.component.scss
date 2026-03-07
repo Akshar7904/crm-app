@@ -1,0 +1,130 @@
+// employee-salary Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: none;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border-bottom: none;
+}
+
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+  background-color: #f8f9fa;
+  padding: 1rem 0.75rem;
+}
+
+.table tbody td {
+  padding: 1rem 0.75rem;
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba(40, 167, 69, 0.05);
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.badge.bg-success {
+  background-color: #28a745 !important;
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* Empty state styling */
+.bi-inbox {
+  color: #dee2e6;
+}
+
+.text-center.py-4 {
+  padding: 3rem 1rem;
+}
+
+.display-4 {
+  font-size: 3.5rem;
+}
+
+/* Currency highlighting */
+td:nth-child(5) {
+  font-weight: 600;
+  color: #28a745;
+}
+
+/* Search box styling */
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+/* Responsive table */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.875rem;
+  }
+
+  .table thead th,
+  .table tbody td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .display-4 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .card-header,
+  .form-control {
+    display: none;
+  }
+
+  .table {
+    font-size: 12px;
+  }
+
+  .table thead th {
+    background-color: #f8f9fa !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

@@ -1,0 +1,327 @@
+// payroll-detail Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+/* payroll-detail.component.css */
+
+/* Payslip Container */
+.payslip-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 11px;
+  border: 1px solid #000;
+}
+
+/* Company Header */
+.company-header {
+  text-align: center;
+  border: 1px solid #000;
+  padding: 15px;
+  margin-bottom: 10px;
+}
+
+.company-header h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #000;
+}
+
+.company-header p {
+  margin: 3px 0;
+  font-size: 10px;
+  color: #000;
+}
+
+.company-header h4 {
+  margin: 12px 0 0 0;
+  font-size: 13px;
+  font-weight: bold;
+  color: #000;
+}
+
+/* Employee Details Section */
+.employee-details {
+  border: 1px solid #000;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.details-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.details-table td {
+  padding: 3px 6px;
+  font-size: 10px;
+}
+
+.details-table .label {
+  font-weight: bold;
+  width: 25%;
+}
+
+.details-table .value {
+  width: 25%;
+}
+
+/* Earnings and Deductions Section */
+.earnings-deductions {
+  display: flex;
+  border: 1px solid #000;
+  margin-bottom: 5px;
+}
+
+.earnings-section,
+.deductions-section {
+  flex: 1;
+  border-right: 1px solid #000;
+}
+
+.deductions-section {
+  border-right: none;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #ddd;
+  padding: 6px 8px;
+  border-bottom: 1px solid #000;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.header-label {
+  flex: 1;
+}
+
+.header-amount {
+  text-align: right;
+  width: 100px;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.items-table tr {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.items-table td {
+  padding: 4px 8px;
+  font-size: 10px;
+}
+
+.item-label {
+  width: 60%;
+}
+
+.item-amount {
+  width: 40%;
+  text-align: right;
+  font-family: 'Courier New', monospace;
+}
+
+.section-total {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border-top: 1px solid #000;
+  font-weight: bold;
+  background-color: #f5f5f5;
+  font-size: 11px;
+}
+
+.total-label {
+  flex: 1;
+}
+
+.total-amount {
+  text-align: right;
+  width: 100px;
+  font-family: 'Courier New', monospace;
+}
+
+/* Net Pay Section */
+.net-pay {
+  border: 1px solid #000;
+  padding: 10px;
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* Payment Details Section */
+.payment-details {
+  border: 1px solid #000;
+  padding: 10px;
+}
+
+.payment-details h5 {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.payment-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 10px;
+}
+
+.payment-table th {
+  background-color: #fff;
+  padding: 5px;
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 1px solid #000;
+  font-size: 10px;
+}
+
+.payment-table td {
+  padding: 5px;
+  font-size: 10px;
+}
+
+/* Action Buttons */
+.no-print {
+  margin-bottom: 20px;
+}
+
+/* Print Styles - HIDE ALL UI ELEMENTS */
+@media print {
+  /* Hide everything except payslip */
+  body * {
+    visibility: hidden;
+  }
+
+  .payslip-container,
+  .payslip-container * {
+    visibility: visible;
+  }
+
+  /* Position payslip at top of page */
+  .payslip-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 10mm;
+    border: none;
+  }
+
+  /* Hide navigation, sidebar, buttons */
+  .navbar,
+  .sidebar,
+  app-navbar,
+  app-sidebar,
+  .btn,
+  button,
+  .no-print,
+  .card-header .actions,
+  nav,
+  header,
+  .breadcrumb,
+  .main-wrapper .sidebar,
+  .content-area {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* Remove page margins */
+  @page {
+    margin: 10mm;
+    size: A4;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Ensure borders print */
+  .company-header,
+  .employee-details,
+  .earnings-deductions,
+  .earnings-section,
+  .deductions-section,
+  .net-pay,
+  .payment-details {
+    border: 1px solid #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Ensure background colors print */
+  .section-header,
+  .section-total,
+  .payment-table th {
+    background-color: #ddd !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Page break control */
+  .payslip-container {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  /* Ensure flex layout works in print */
+  .earnings-deductions {
+    display: table;
+    width: 100%;
+  }
+
+  .earnings-section,
+  .deductions-section {
+    display: table-cell;
+    width: 50%;
+  }
+
+  /* Fix text colors for print */
+  * {
+    color: #000 !important;
+  }
+}
+
+/* Screen-only styles */
+@media screen {
+  .payslip-container {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+/* Responsive adjustments for small screens */
+@media screen and (max-width: 768px) {
+  .payslip-container {
+    padding: 10px;
+    font-size: 10px;
+  }
+
+  .earnings-deductions {
+    flex-direction: column;
+  }
+
+  .earnings-section {
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+  }
+
+  .details-table td {
+    font-size: 9px;
+    padding: 2px 4px;
+  }
+}

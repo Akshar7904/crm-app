@@ -1,0 +1,209 @@
+<div class="ms-calendar">
+  <!-- Calendar Header -->
+  <div class="calendar-header">
+    <div class="header-left">
+      <h2 class="month-year">{{ getMonthYearDisplay() }}</h2>
+      <button class="today-btn" (click)="goToToday()">Today</button>
+    </div>
+    <div class="header-right">
+      <button class="nav-btn" (click)="previousMonth()" title="Previous month">
+        <i class="bi bi-chevron-left"></i>
+      </button>
+      <button class="nav-btn" (click)="nextMonth()" title="Next month">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="calendar-layout">
+    <!-- Calendar Grid -->
+    <div class="calendar-grid-container">
+      <!-- Weekday Headers -->
+      <div class="weekday-header">
+        <div *ngFor="let day of weekDays" class="weekday-cell" [class.weekend]="day === 'Sun' || day === 'Sat'">
+          {{ day }}
+        </div>
+      </div>
+
+      <!-- Calendar Days Grid -->
+      <div class="calendar-grid">
+        <div
+          *ngFor="let day of calendarDays"
+          class="day-cell"
+          [class.other-month]="!day.isCurrentMonth"
+          [class.today]="day.isToday"
+          [class.selected]="isSelected(day)"
+          [class.weekend]="day.isWeekend"
+          [class.has-events]="day.events.length > 0"
+          (click)="selectDate(day, $event)">
+
+          <!-- Day Number -->
+          <div class="day-number">{{ day.dayNumber }}</div>
+
+          <!-- Event Indicators -->
+          <div class="event-indicators" *ngIf="day.events.length > 0">
+            <ng-container *ngFor="let event of day.events.slice(0, 3); let i = index">
+
+              <div
+                class="event-bar"
+                [ngClass]="getEventTypeClass(event)"
+                [style.background-color]="getEventDotColor(event)"
+                (click)="onEventClick(event, $event)"
+                [title]="event.title">
+                <span class="event-bar-text">{{ event.title }}</span>
+              </div>
+            </ng-container>
+            <div *ngIf="day.events.length > 3" class="more-events">
+              +{{ day.events.length - 3 }} more
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Sidebar -->
+    <div class="events-sidebar" *ngIf="showEventsSidebar">
+      <div class="sidebar-header">
+        <h3>Upcoming Events</h3>
+      </div>
+      <div class="sidebar-events">
+        <ng-container *ngIf="getUpcomingEvents().length > 0; else noEvents">
+          <div
+            *ngFor="let event of getUpcomingEvents()"
+            class="sidebar-event-item"
+            [ngClass]="getEventTypeClass(event)"
+            (click)="eventClick.emit(event)">
+            <div class="event-color-bar" [style.background-color]="getEventDotColor(event)"></div>
+            <div class="event-info">
+              <div class="event-title">{{ event.title }}</div>
+              <div class="event-date">
+                <i class="bi bi-calendar3 me-1"></i>
+                {{ formatDate(event.date) }}
+                <span class="days-badge" *ngIf="getDaysUntil(event.date) === 0">Today</span>
+                <span class="days-badge upcoming" *ngIf="getDaysUntil(event.date) > 0">
+                  {{ getDaysUntil(event.date) }}d
+                </span>
+              </div>
+            </div>
+            <div class="event-badge-small" [ngClass]="getEventTypeClass(event)">
+              {{ getEventBadge(event) }}
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #noEvents>
+          <div class="no-events">
+            <i class="bi bi-calendar-check"></i>
+            <p>No upcoming events</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- Click Popup for Day Events (Google Calendar Style) -->
+  <div class="day-popup" *ngIf="popupDay"
+       [ngStyle]="popupStyle"
+       (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <div class="popup-date-info">
+        <span class="popup-day-number">{{ popupDay.dayNumber }}</span>
+        <div class="popup-date-text">
+          <span class="popup-weekday">{{ popupDay.date | date:'EEEE' }}</span>
+          <span class="popup-month-year">{{ popupDay.date | date:'MMMM yyyy' }}</span>
+        </div>
+      </div>
+      <button class="popup-close" (click)="closePopup()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="popup-body">
+      <div class="popup-event-count">
+        {{ popupDay.events.length }} {{ popupDay.events.length === 1 ? 'event' : 'events' }}
+      </div>
+      <div class="popup-events-list">
+        <!-- Attendance entries -->
+        <ng-container *ngFor="let event of popupDay.events">
+          <div *ngIf="event.type === 'attendance'" class="popup-event popup-attendance" (click)="eventClick.emit(event)">
+            <div class="popup-event-color" [style.background-color]="getEventDotColor(event)"></div>
+            <div class="popup-event-content">
+              <div class="popup-event-title">
+                <i class="bi bi-person-fill me-1"></i>{{ event.metadata?.employeeName || event.title }}
+              </div>
+              <div class="popup-event-details">
+                <span *ngIf="event.metadata?.checkInTime">
+                  <i class="bi bi-box-arrow-in-right"></i> {{ event.metadata.checkInTime | date:'HH:mm' }}
+                </span>
+                <span *ngIf="event.metadata?.checkOutTime">
+                  <i class="bi bi-box-arrow-right"></i> {{ event.metadata.checkOutTime | date:'HH:mm' }}
+                </span>
+                <span *ngIf="event.metadata?.totalWorkHours" class="work-hours-badge">
+                  {{ event.metadata.totalWorkHours }}h
+                </span>
+              </div>
+              <div class="popup-event-location" *ngIf="event.metadata?.checkInLocation">
+                <i class="bi bi-geo-alt"></i> {{ event.metadata.checkInLocation }}
+              </div>
+              <span class="popup-status-badge" [ngClass]="{
+                'status-working': event.metadata?.status === 'WORKING',
+                'status-break': event.metadata?.status === 'ON_BREAK1' || event.metadata?.status === 'ON_BREAK2',
+                'status-lunch': event.metadata?.status === 'ON_LUNCH',
+                'status-out': event.metadata?.status === 'CLOCKED_OUT'
+              }">{{ getStatusLabel(event.metadata?.status) }}</span>
+            </div>
+          </div>
+
+          <!-- Leave entries -->
+          <div *ngIf="event.type === 'leave'" class="popup-event popup-leave" (click)="eventClick.emit(event)">
+            <div class="popup-event-color" [style.background-color]="getEventDotColor(event)"></div>
+            <div class="popup-event-content">
+              <div class="popup-event-title">{{ event.title }}</div>
+              <span class="popup-status-badge" [ngClass]="{
+                'leave-approved': event.status === 'APPROVED',
+                'leave-pending': event.status === 'PENDING'
+              }">{{ event.status }}</span>
+            </div>
+          </div>
+
+          <!-- Holiday entries -->
+          <div *ngIf="event.type === 'holiday'" class="popup-event popup-holiday" (click)="eventClick.emit(event)">
+            <div class="popup-event-color" [style.background-color]="getEventDotColor(event)"></div>
+            <div class="popup-event-content">
+              <div class="popup-event-title">{{ event.title }}</div>
+              <span class="popup-type-badge" [ngClass]="getEventTypeClass(event)">{{ getEventBadge(event) }}</span>
+            </div>
+          </div>
+
+          <!-- Other event types -->
+          <div *ngIf="event.type !== 'attendance' && event.type !== 'leave' && event.type !== 'holiday'"
+               class="popup-event" (click)="eventClick.emit(event)">
+            <div class="popup-event-color" [style.background-color]="getEventDotColor(event)"></div>
+            <div class="popup-event-content">
+              <div class="popup-event-title">{{ event.title }}</div>
+              <span class="popup-type-badge">{{ getEventBadge(event) }}</span>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div class="calendar-legend">
+    <div class="legend-item">
+      <span class="legend-dot" style="background: #dc3545;"></span>
+      <span>Public Holiday</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background: #7978E9;"></span>
+      <span>Company Holiday</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background: #ffc107;"></span>
+      <span>Leave</span>
+    </div>
+    <div class="legend-item">
+      <span class="legend-dot" style="background: #28a745;"></span>
+      <span>Attendance</span>
+    </div>
+  </div>
+</div>

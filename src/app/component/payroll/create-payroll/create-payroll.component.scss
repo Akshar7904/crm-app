@@ -1,0 +1,16 @@
+// create-payroll Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+h5 {
+  border-bottom: 2px solid;
+  padding-bottom: 0.5rem;
+}
+
+.text-danger {
+  font-size: 0.875rem;
+}

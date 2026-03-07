@@ -1,0 +1,135 @@
+// App Component Layout - SCSS
+@import '../styles/variables';
+@import '../styles/mixins';
+
+// App Container Layout
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  background-color: var(--bg-body, $gray-100);
+}
+
+// Main Content Wrapper
+.main-content-wrapper {
+  flex: 1;
+  @include flex-column;
+  margin-left: 260px;
+  min-height: 100vh;
+  transition: margin-left $transition-slow cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Collapsed sidebar state
+.app-container.sidebar-collapsed .main-content-wrapper {
+  margin-left: 72px;
+}
+
+// Content Area
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--bg-body, $gray-100);
+  margin-top: 70px;
+  padding: 0;
+}
+
+// Container Spacing
+.container-fluid {
+  max-width: 100%;
+  padding-left: $spacing-lg;
+  padding-right: $spacing-lg;
+}
+
+// Sidebar Overlay (Mobile)
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay-bg, rgba($black, 0.5));
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity $transition-slow, visibility $transition-slow;
+}
+
+.app-container.sidebar-open .sidebar-overlay {
+  opacity: 1;
+  visibility: visible;
+}
+
+// Responsive Breakpoints
+// Large screens (1200px and up)
+@media (min-width: $breakpoint-xl) {
+  .main-content-wrapper {
+    margin-left: 260px;
+  }
+
+  .app-container.sidebar-collapsed .main-content-wrapper {
+    margin-left: 72px;
+  }
+}
+
+// Medium screens (992px to 1199px)
+@media (min-width: $breakpoint-lg) and (max-width: 1199px) {
+  .main-content-wrapper {
+    margin-left: 260px;
+  }
+
+  .app-container.sidebar-collapsed .main-content-wrapper {
+    margin-left: 72px;
+  }
+}
+
+// Tablets and below (below 992px)
+@media (max-width: 991px) {
+  .main-content-wrapper {
+    margin-left: 0;
+  }
+
+  .app-container.sidebar-collapsed .main-content-wrapper {
+    margin-left: 0;
+  }
+
+  .sidebar-overlay {
+    display: block;
+  }
+}
+
+// Small screens (below 768px)
+@include respond-to('md') {
+  .container-fluid {
+    padding-left: $spacing-md;
+    padding-right: $spacing-md;
+  }
+
+  .content-area {
+    margin-top: 60px;
+  }
+}
+
+// Extra small screens (below 576px)
+@include respond-to('sm') {
+  .container-fluid {
+    padding-left: calc(#{$spacing-md} - 4px);
+    padding-right: calc(#{$spacing-md} - 4px);
+  }
+}
+
+// Loading & Error States
+.loading-container {
+  @include flex-center;
+  min-height: 100vh;
+  background-color: var(--bg-body, $gray-100);
+}
+
+.error-container {
+  @include flex-center;
+  min-height: 100vh;
+  padding: $spacing-xl;
+}
+
+.error-message {
+  max-width: 500px;
+  text-align: center;
+}

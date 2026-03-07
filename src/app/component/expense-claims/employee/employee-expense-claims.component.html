@@ -1,0 +1,255 @@
+<!-- employee-expense-claims.component.html -->
+
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #00bcd4; color: white;">
+          <h4 class="mb-0">
+            <i class="bi bi-receipt"></i> My Expense Claims
+          </h4>
+          <button class="btn btn-light" (click)="openCreateModal()">
+            <i class="bi bi-plus-circle"></i> New Claim
+          </button>
+        </div>
+
+        <div class="card-body">
+          <ng-container *ngIf="expenseClaimsState$ | async as state">
+            <ng-container *ngIf="state.dataState === DataState.LOADING">
+              <div class="text-center p-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="state.dataState === DataState.ERROR">
+              <div class="alert alert-danger" role="alert">
+                {{ state.error }}
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="state.dataState === DataState.LOADED">
+              <!-- Claims Table -->
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="table-light">
+                  <tr>
+                    <th>Claim Number</th>
+                    <th>Date</th>
+                    <th>Purpose</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let claim of getClaims()">
+                    <td>
+                      <strong>{{ claim.claimNumber }}</strong>
+                    </td>
+                    <td>{{ claim.claimDate | date:'mediumDate' }}</td>
+                    <td>{{ claim.purpose || '-' }}</td>
+                    <td>
+                      <strong>R {{ claim.totalAmount | number:'1.2-2' }}</strong>
+                    </td>
+                    <td>
+                        <span class="badge" [ngClass]="getStatusClass(claim.status)">
+                          {{ claim.status }}
+                        </span>
+                    </td>
+                    <td>{{ claim.createdAt | date:'short' }}</td>
+                    <td>
+                      <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-primary" (click)="viewClaimDetails(claim)">
+                          <i class="bi bi-eye"></i>
+                        </button>
+                        <button *ngIf="claim.status === ExpenseClaimStatus.PENDING"
+                                class="btn btn-outline-warning"
+                                (click)="openEditModal(claim)">
+                          <i class="bi bi-pencil"></i>
+                        </button>
+                        <button *ngIf="claim.status === ExpenseClaimStatus.PENDING"
+                                class="btn btn-outline-danger"
+                                (click)="cancelClaim(claim)">
+                          <i class="bi bi-x-circle"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr *ngIf="getClaims().length === 0">
+                    <td colspan="7" class="text-center p-4">
+                      <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+                      <p class="mt-2 text-muted">No expense claims found. Create your first claim!</p>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination -->
+              <nav *ngIf="getTotalPages() > 1" aria-label="Expense claims pagination">
+                <ul class="pagination justify-content-center">
+                  <li class="page-item" [class.disabled]="(currentPage$ | async) === 0">
+                    <a class="page-link" (click)="goToNextOrPreviousPage('backward')">Previous</a>
+                  </li>
+                  <li class="page-item"
+                      *ngFor="let page of [].constructor(getTotalPages()); let i = index"
+                      [class.active]="i === (currentPage$ | async)">
+                    <a class="page-link" (click)="goToPage(i)">{{ i + 1 }}</a>
+                  </li>
+                  <li class="page-item" [class.disabled]="(currentPage$ | async) >= getTotalPages() - 1">
+                    <a class="page-link" (click)="goToNextOrPreviousPage('forward')">Next</a>
+                  </li>
+                </ul>
+              </nav>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create/Edit Modal -->
+<div class="modal fade show d-block" *ngIf="showModal$ | async" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #00bcd4; color: white;">
+        <h5 class="modal-title">
+          <i class="bi bi-receipt"></i>
+          {{ editingClaim ? 'Edit' : 'Create' }} Expense Claim
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form #claimForm="ngForm">
+          <!-- Basic Information -->
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Claim Date *</label>
+              <input type="date"
+                     class="form-control"
+                     [(ngModel)]="editingClaim ? editingClaim.claimDate : newClaim.claimDate"
+                     name="claimDate"
+                     required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Purpose</label>
+              <input type="text"
+                     class="form-control"
+                     [(ngModel)]="editingClaim ? editingClaim.purpose : newClaim.purpose"
+                     name="purpose"
+                     placeholder="Purpose of expense">
+            </div>
+          </div>
+
+          <!-- Expense Items -->
+          <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <h6 class="mb-0">Expense Items</h6>
+              <button type="button" class="btn btn-sm btn-success" (click)="addExpenseItem()">
+                <i class="bi bi-plus"></i> Add Item
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered">
+                  <thead class="table-light">
+                  <tr>
+                    <th style="width: 15%;">Date *</th>
+                    <th style="width: 20%;">Pay To *</th>
+                    <th style="width: 35%;">Description *</th>
+                    <th style="width: 15%;">Amount *</th>
+                    <th style="width: 10%;">Receipt</th>
+                    <th style="width: 5%;"></th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let item of (editingClaim ? editingClaim.expenseItems : newClaim.expenseItems); let i = index">
+                    <td>
+                      <input type="date"
+                             class="form-control form-control-sm"
+                             [(ngModel)]="item.expenseDate"
+                             [name]="'itemDate' + i"
+                             required>
+                    </td>
+                    <td>
+                      <input type="text"
+                             class="form-control form-control-sm"
+                             [(ngModel)]="item.payTo"
+                             [name]="'payTo' + i"
+                             placeholder="Vendor/Person"
+                             required>
+                    </td>
+                    <td>
+                      <input type="text"
+                             class="form-control form-control-sm"
+                             [(ngModel)]="item.description"
+                             [name]="'description' + i"
+                             placeholder="Description"
+                             required>
+                    </td>
+                    <td>
+                      <input type="number"
+                             class="form-control form-control-sm"
+                             [(ngModel)]="item.amount"
+                             [name]="'amount' + i"
+                             step="0.01"
+                             min="0"
+                             required>
+                    </td>
+                    <td>
+                      <div class="form-check">
+                        <input type="checkbox"
+                               class="form-check-input"
+                               [(ngModel)]="item.receiptAttached"
+                               [name]="'receipt' + i">
+                      </div>
+                    </td>
+                    <td>
+                      <button type="button"
+                              class="btn btn-sm btn-danger"
+                              (click)="removeExpenseItem(i)"
+                              [disabled]="(editingClaim ? editingClaim.expenseItems : newClaim.expenseItems).length === 1">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  </tbody>
+                  <tfoot class="table-light">
+                  <tr>
+                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                    <td colspan="3"><strong>R {{ calculateTotal() | number:'1.2-2' }}</strong></td>
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Remarks -->
+          <div class="mb-3">
+            <label class="form-label">Additional Remarks</label>
+            <textarea class="form-control"
+                      [(ngModel)]="editingClaim ? editingClaim.remarks : newClaim.remarks"
+                      name="remarks"
+                      rows="3"
+                      placeholder="Any additional information"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button"
+                class="btn btn-primary"
+                (click)="onSubmit()"
+                [disabled]="isLoading$ | async">
+          <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+          {{ editingClaim ? 'Update' : 'Submit' }} Claim
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

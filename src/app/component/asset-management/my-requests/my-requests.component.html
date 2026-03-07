@@ -1,0 +1,178 @@
+<ng-container *ngIf="requestsState$ | async as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <!-- Navbar rendered by app.component -->
+    <section>
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" style="margin-top: 8px">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/']">Home</a>
+            </li>
+            <li class="breadcrumb-item active">My Requests</li>
+          </ol>
+        </nav>
+
+        <!-- Header Section -->
+        <div class="row mt-3">
+          <div class="col">
+            <h4 class="fw-bold text-start">My Asset Requests</h4>
+          </div>
+          <div class="col text-end">
+            <button class="btn btn-primary" (click)="newRequest()">
+              <i class="bi bi-plus-circle"></i> New Request
+            </button>
+          </div>
+        </div>
+
+        <!-- Requests List -->
+        <div class="row mt-4" *ngIf="hasRequests(state)">
+          <div class="col-12">
+            <div class="card mb-3" *ngFor="let request of getRequests(state)">
+              <div class="card-body">
+                <div class="row align-items-center">
+                  <div class="col-md-1 text-center">
+                    <i class="bi {{ getStatusIcon(request.status) }} fs-2" [ngClass]="{
+                      'text-warning': request.status === 'PENDING',
+                      'text-info': request.status === 'APPROVED',
+                      'text-danger': request.status === 'REJECTED',
+                      'text-secondary': request.status === 'CANCELLED',
+                      'text-success': request.status === 'FULFILLED'
+                    }"></i>
+                  </div>
+                  <div class="col-md-3">
+                    <h6 class="mb-1">{{ request.assetCategory | titlecase }}</h6>
+                    <small class="text-muted">{{ request.requestType | titlecase }} request</small>
+                  </div>
+                  <div class="col-md-2">
+                    <span class="badge {{ getStatusClass(request.status) }}">
+                      {{ request.status }}
+                    </span>
+                  </div>
+                  <div class="col-md-3">
+                    <small class="text-muted d-block">Submitted</small>
+                    {{ formatDate(request.createdAt) }}
+                  </div>
+                  <div class="col-md-3 text-end">
+                    <button
+                      class="btn btn-outline-danger btn-sm"
+                      *ngIf="request.status === 'PENDING'"
+                      (click)="cancelRequest(request)"
+                      [disabled]="isLoading$ | async"
+                    >
+                      <i class="bi bi-x-lg"></i> Cancel
+                    </button>
+                    <span *ngIf="request.status === 'FULFILLED'" class="text-success">
+                      <i class="bi bi-check-lg"></i> Asset: {{ request.assignedAssetTag }}
+                    </span>
+                    <span *ngIf="request.status === 'REJECTED'" class="text-danger">
+                      <small>{{ request.rejectionReason }}</small>
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Expanded details for approved/fulfilled -->
+                <div class="row mt-3" *ngIf="request.status === 'APPROVED' || request.status === 'FULFILLED'">
+                  <div class="col-md-11 offset-md-1">
+                    <div class="alert alert-light mb-0 py-2">
+                      <div class="row">
+                        <div class="col-md-4" *ngIf="request.approvedByName">
+                          <small class="text-muted">Approved by</small><br>
+                          {{ request.approvedByName }} on {{ formatDate(request.approvalDate) }}
+                        </div>
+                        <div class="col-md-4" *ngIf="request.fulfilledByName">
+                          <small class="text-muted">Fulfilled by</small><br>
+                          {{ request.fulfilledByName }} on {{ formatDate(request.fulfillmentDate) }}
+                        </div>
+                        <div class="col-md-4" *ngIf="request.approvalNotes">
+                          <small class="text-muted">Notes</small><br>
+                          {{ request.approvalNotes }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Justification -->
+                <div class="row mt-2">
+                  <div class="col-md-11 offset-md-1">
+                    <small class="text-muted">Justification: {{ request.justification }}</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!hasRequests(state)" class="text-center py-5">
+          <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc"></i>
+          <h4 class="mt-3">No Requests Found</h4>
+          <p class="text-muted">You haven't submitted any asset requests yet</p>
+          <button class="btn btn-primary mt-3" (click)="newRequest()">
+            <i class="bi bi-plus-circle"></i> Submit a Request
+          </button>
+        </div>
+
+        <!-- Pagination -->
+        <nav *ngIf="hasRequests(state)" aria-label="Page navigation">
+          <ul class="pagination justify-content-end">
+            <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+              <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor: pointer;">
+                &laquo; Prev
+              </a>
+            </li>
+            <li
+              *ngFor="let pageNumber of getTotalPages(state) | ExtractArrayValue:'number'; let i = index"
+              class="page-item"
+            >
+              <a
+                (click)="goToPage(i)"
+                [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
+                class="page-link"
+                style="cursor: pointer;"
+              >
+                {{ i + 1 }}
+              </a>
+            </li>
+            <li [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+              <a (click)="goToNextOrPreviousPage('forward')" class="page-link" style="cursor: pointer;">
+                Next &raquo;
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <!-- Navbar rendered by app.component -->
+    <div class="container-fluid mt-5">
+      <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading your requests...</p>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <!-- Navbar rendered by app.component -->
+    <div class="container-fluid mt-5">
+      <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">
+          <i class="bi bi-exclamation-triangle"></i> Error Loading Requests
+        </h4>
+        <p>{{ state.error }}</p>
+        <hr />
+        <button class="btn btn-primary" (click)="ngOnInit()">
+          <i class="bi bi-arrow-clockwise"></i> Retry
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

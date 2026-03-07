@@ -1,0 +1,347 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8">
+      
+      <!-- State Management -->
+      <ng-container *ngIf="holidayState$ | async as state">
+        
+        <!-- Loading State -->
+        <ng-container *ngIf="state.dataState === DataState.LOADING">
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3">Loading holiday details...</p>
+          </div>
+        </ng-container>
+
+        <!-- Error State -->
+        <ng-container *ngIf="state.dataState === DataState.ERROR">
+          <div class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            {{ state.error }}
+          </div>
+          <button class="btn btn-primary" (click)="goBack()">
+            <i class="bi bi-arrow-left me-2"></i>
+            Back to Holidays
+          </button>
+        </ng-container>
+
+        <!-- Loaded State -->
+        <ng-container *ngIf="state.dataState === DataState.LOADED && state.holiday">
+          
+          <!-- Header -->
+          <div class="mb-4">
+            <button class="btn btn-link text-decoration-none ps-0" (click)="goBack()">
+              <i class="bi bi-arrow-left me-2"></i>
+              Back to Holidays
+            </button>
+          </div>
+
+          <!-- Holiday Info Card (View Mode) -->
+          <div class="card shadow-sm mb-4" *ngIf="!isEditing">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+              <h3 class="mb-0">
+                <i class="bi bi-calendar-event me-2"></i>
+                {{ state.holiday.holidayName }}
+              </h3>
+              <div>
+                <span 
+                  class="badge me-2"
+                  [class.bg-success]="isUpcoming(state.holiday.holidayDate)"
+                  [class.bg-secondary]="isPast(state.holiday.holidayDate)">
+                  {{ isUpcoming(state.holiday.holidayDate) ? 'Upcoming' : 'Past' }}
+                </span>
+                <span 
+                  class="badge"
+                  [class.bg-light]="state.holiday.isActive"
+                  [class.bg-dark]="!state.holiday.isActive"
+                  [class.text-dark]="state.holiday.isActive">
+                  {{ state.holiday.isActive ? 'Active' : 'Inactive' }}
+                </span>
+              </div>
+            </div>
+            <div class="card-body p-4">
+              
+              <!-- Date Info -->
+              <div class="row mb-4">
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="text-muted mb-1">
+                      <i class="bi bi-calendar3 me-2"></i>
+                      Date
+                    </label>
+                    <div class="info-value">
+                      {{ formatDate(state.holiday.holidayDate) }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="info-item">
+                    <label class="text-muted mb-1">
+                      <i class="bi bi-calendar-day me-2"></i>
+                      Day
+                    </label>
+                    <div class="info-value">
+                      {{ state.holiday.holidayDay }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <div class="row mb-4">
+                <div class="col-12">
+                  <div class="info-item">
+                    <label class="text-muted mb-1">
+                      <i class="bi bi-text-paragraph me-2"></i>
+                      Description
+                    </label>
+                    <div class="info-value">
+                      {{ state.holiday.description || 'No description provided' }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Additional Info -->
+              <div class="row mb-3">
+                <div class="col-md-4">
+                  <div class="info-item">
+                    <label class="text-muted mb-1">
+                      <i class="bi bi-arrow-repeat me-2"></i>
+                      Recurring
+                    </label>
+                    <div class="info-value">
+                      <span 
+                        class="badge"
+                        [class.bg-info]="state.holiday.isRecurring"
+                        [class.bg-secondary]="!state.holiday.isRecurring">
+                        {{ state.holiday.isRecurring ? 'Yes (Annual)' : 'No' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="info-item">
+                    <label class="text-muted mb-1">
+                      <i class="bi bi-globe me-2"></i>
+                      Country
+                    </label>
+                    <div class="info-value">
+                      {{ state.holiday.countryCode }}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="info-item">
+                    <label class="text-muted mb-1">
+                      <i class="bi bi-check-circle me-2"></i>
+                      Status
+                    </label>
+                    <div class="info-value">
+                      <span 
+                        class="badge"
+                        [class.bg-success]="state.holiday.isActive"
+                        [class.bg-secondary]="!state.holiday.isActive">
+                        {{ state.holiday.isActive ? 'Active' : 'Inactive' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Timestamps -->
+              <div class="row border-top pt-3 mt-4">
+                <div class="col-md-6">
+                  <small class="text-muted">
+                    <i class="bi bi-clock-history me-1"></i>
+                    Created: {{ state.holiday.createdAt | date:'medium' }}
+                  </small>
+                </div>
+                <div class="col-md-6 text-end">
+                  <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>
+                    Updated: {{ state.holiday.updatedAt | date:'medium' }}
+                  </small>
+                </div>
+              </div>
+
+            </div>
+            <div class="card-footer bg-light d-flex justify-content-between">
+              <button 
+                class="btn btn-outline-danger"
+                (click)="deleteHoliday()"
+                [disabled]="isSubmitting">
+                <i class="bi bi-trash me-2"></i>
+                Delete Holiday
+              </button>
+              <button 
+                class="btn btn-primary"
+                (click)="enableEditMode()"
+                [disabled]="isSubmitting">
+                <i class="bi bi-pencil-square me-2"></i>
+                Edit Holiday
+              </button>
+            </div>
+          </div>
+
+          <!-- Edit Form Card (Edit Mode) -->
+          <div class="card shadow-sm" *ngIf="isEditing">
+            <div class="card-header bg-warning">
+              <h4 class="mb-0">
+                <i class="bi bi-pencil-square me-2"></i>
+                Edit Holiday
+              </h4>
+            </div>
+            <div class="card-body p-4">
+              <form [formGroup]="holidayForm" (ngSubmit)="onSubmit()">
+                
+                <!-- Holiday Name -->
+                <div class="mb-3">
+                  <label for="holidayName" class="form-label">
+                    Holiday Name <span class="text-danger">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('holidayName')"
+                    id="holidayName" 
+                    formControlName="holidayName"
+                    placeholder="e.g., Christmas Day, Workers' Day">
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('holidayName')">
+                    {{ getFieldError('holidayName') }}
+                  </div>
+                </div>
+
+                <!-- Holiday Date -->
+                <div class="mb-3">
+                  <label for="holidayDate" class="form-label">
+                    Holiday Date <span class="text-danger">*</span>
+                  </label>
+                  <input 
+                    type="date" 
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('holidayDate')"
+                    id="holidayDate" 
+                    formControlName="holidayDate"
+                    (change)="onDateChange()">
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('holidayDate')">
+                    {{ getFieldError('holidayDate') }}
+                  </div>
+                  <small class="form-text text-muted">
+                    <i class="bi bi-info-circle me-1"></i>
+                    The day of the week will be automatically calculated
+                  </small>
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+                  <label for="description" class="form-label">Description</label>
+                  <textarea 
+                    class="form-control"
+                    [class.is-invalid]="isFieldInvalid('description')"
+                    id="description" 
+                    formControlName="description"
+                    rows="3"
+                    placeholder="Brief description of the holiday (optional)"></textarea>
+                  <div class="invalid-feedback" *ngIf="isFieldInvalid('description')">
+                    {{ getFieldError('description') }}
+                  </div>
+                  <small class="form-text text-muted">
+                    {{ holidayForm.get('description')?.value?.length || 0 }} / 500 characters
+                  </small>
+                </div>
+
+                <!-- Country Code -->
+                <div class="mb-3">
+                  <label for="countryCode" class="form-label">Country</label>
+                  <select 
+                    class="form-select" 
+                    id="countryCode" 
+                    formControlName="countryCode">
+                    <option value="ZA">South Africa (ZA)</option>
+                    <option value="US">United States (US)</option>
+                    <option value="GB">United Kingdom (GB)</option>
+                    <option value="CA">Canada (CA)</option>
+                    <option value="AU">Australia (AU)</option>
+                  </select>
+                </div>
+
+                <!-- Checkboxes Row -->
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        id="isRecurring"
+                        formControlName="isRecurring">
+                      <label class="form-check-label" for="isRecurring">
+                        <i class="bi bi-arrow-repeat me-1"></i>
+                        Recurring Annually
+                      </label>
+                      <small class="form-text text-muted d-block">
+                        This holiday occurs every year
+                      </small>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input 
+                        class="form-check-input" 
+                        type="checkbox" 
+                        id="isActive"
+                        formControlName="isActive">
+                      <label class="form-check-label" for="isActive">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Active
+                      </label>
+                      <small class="form-text text-muted d-block">
+                        Holiday is currently active
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="d-flex justify-content-between align-items-center">
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-secondary"
+                    (click)="cancelEdit()"
+                    [disabled]="isSubmitting">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Cancel
+                  </button>
+                  <button 
+                    type="submit" 
+                    class="btn btn-primary"
+                    [disabled]="isSubmitting || holidayForm.invalid">
+                    <span *ngIf="!isSubmitting">
+                      <i class="bi bi-check-circle me-2"></i>
+                      Save Changes
+                    </span>
+                    <span *ngIf="isSubmitting">
+                      <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Saving...
+                    </span>
+                  </button>
+                </div>
+
+              </form>
+            </div>
+          </div>
+
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" *ngIf="isSubmitting">
+  <div class="spinner-border text-primary" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>

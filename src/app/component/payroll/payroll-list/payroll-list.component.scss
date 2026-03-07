@@ -1,0 +1,21 @@
+// payroll-list Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+.badge {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.modal.show {
+  display: block;
+}

@@ -1,0 +1,332 @@
+<ng-container *ngIf="(newInvoiceState$ | async) as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="create-invoice-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/invoices']">Invoices</a></li>
+            <li class="breadcrumb-item active">Create Invoice</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+          <div class="row align-items-center">
+            <div class="col">
+              <h4 class="page-title">
+                <i class="bi bi-receipt me-2"></i>Create Invoice
+              </h4>
+              <p class="text-muted mb-0">Create a new invoice for your customer</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-outline-secondary me-2" (click)="goToInvoices()">
+                <i class="bi bi-arrow-left me-1"></i> Back to Invoices
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <form #invoiceForm="ngForm" (ngSubmit)="newInvoice(invoiceForm)">
+          <!-- Invoice Info Card -->
+          <div class="card invoice-card mb-4">
+            <div class="card-body">
+              <div class="row mb-4">
+                <!-- From Section -->
+                <div class="col-md-6">
+                  <h6 class="section-label">From</h6>
+                  <div class="company-info">
+                    <h5 class="company-name">LKCentrix Solutions (PTY) LTD</h5>
+                    <p class="company-address">
+                      4 Skeen BLVD Bedfordview<br>
+                      Bedfordview Corporate Park, 2001<br>
+                      Phone: +27 (11) 568 8322
+                    </p>
+                  </div>
+                </div>
+
+                <!-- To Section -->
+                <div class="col-md-6">
+                  <h6 class="section-label">Bill To</h6>
+                  <div class="form-group">
+                    <select class="form-select"
+                            name="customerId"
+                            [ngModel]="selectedCustomer?.id"
+                            (ngModelChange)="onCustomerChange($event, state?.appData?.data?.customers)"
+                            required>
+                      <option value="" disabled selected>Select Customer</option>
+                      <option *ngFor="let customer of state?.appData?.data?.customers"
+                              [ngValue]="customer.id">
+                        {{ customer.name }}
+                      </option>
+                    </select>
+                  </div>
+                  <div *ngIf="selectedCustomer" class="customer-info mt-2">
+                    <p class="mb-1"><strong>{{ selectedCustomer.name }}</strong></p>
+                    <p class="mb-1 text-muted">{{ selectedCustomer.email }}</p>
+                    <p class="mb-0 text-muted">{{ selectedCustomer.phone }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <hr>
+
+              <!-- Invoice Meta -->
+              <div class="row mb-4">
+                <div class="col-md-4">
+                  <label class="form-label">Invoice Date</label>
+                  <input type="date"
+                         class="form-control"
+                         [(ngModel)]="invoiceDate"
+                         name="date"
+                         required>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" name="status" ngModel="PENDING" required>
+                    <option value="PENDING">Pending</option>
+                    <option value="PAID">Paid</option>
+                    <option value="OVERDUE">Overdue</option>
+                    <option value="CANCELED">Cancelled</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Due Date</label>
+                  <input type="text" class="form-control" value="NET 30 Days" readonly>
+                </div>
+              </div>
+
+              <hr>
+
+              <!-- Line Items Section -->
+              <h6 class="section-label mb-3">
+                <i class="bi bi-list-ul me-2"></i>Invoice Items
+              </h6>
+
+              <div class="table-responsive">
+                <table class="table line-items-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 22%;">Item</th>
+                      <th style="width: 28%;">Description</th>
+                      <th style="width: 18%;">Unit Cost</th>
+                      <th style="width: 10%;">Qty</th>
+                      <th style="width: 17%;">Price</th>
+                      <th style="width: 5%;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let item of lineItems; let i = index" class="line-item-row">
+                      <td>
+                        <input type="text"
+                               class="form-control"
+                               [(ngModel)]="item.item"
+                               [name]="'item_' + i"
+                               placeholder="Item name">
+                      </td>
+                      <td>
+                        <input type="text"
+                               class="form-control"
+                               [(ngModel)]="item.description"
+                               [name]="'desc_' + i"
+                               placeholder="Description">
+                      </td>
+                      <td>
+                        <div class="input-group unit-cost-group">
+                          <span class="input-group-text">R</span>
+                          <input type="number"
+                                 class="form-control"
+                                 [(ngModel)]="item.unitCost"
+                                 [name]="'unitCost_' + i"
+                                 (ngModelChange)="updateLineItemPrice(i)"
+                                 min="0"
+                                 step="0.01"
+                                 placeholder="0.00">
+                        </div>
+                      </td>
+                      <td>
+                        <input type="number"
+                               class="form-control text-center"
+                               [(ngModel)]="item.quantity"
+                               [name]="'qty_' + i"
+                               (ngModelChange)="updateLineItemPrice(i)"
+                               min="1"
+                               placeholder="1">
+                      </td>
+                      <td>
+                        <span class="price-display">{{ formatCurrency(item.price) }}</span>
+                      </td>
+                      <td>
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger remove-btn"
+                                (click)="removeLineItem(i)"
+                                [disabled]="lineItems.length === 1"
+                                title="Remove item">
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Add Row Button -->
+              <button type="button" class="btn btn-outline-primary add-row-btn" (click)="addLineItem()">
+                <i class="bi bi-plus-circle me-2"></i>Add Item
+              </button>
+
+              <hr class="mt-4">
+
+              <!-- Notes Section -->
+              <div class="row">
+                <div class="col-md-6">
+                  <label class="form-label">Notes</label>
+                  <textarea class="form-control"
+                            [(ngModel)]="notes"
+                            name="notes"
+                            rows="3"
+                            placeholder="Additional notes..."></textarea>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Terms & Conditions</label>
+                  <textarea class="form-control"
+                            [(ngModel)]="terms"
+                            name="terms"
+                            rows="3"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Section - Summary and Customer -->
+          <div class="row">
+            <!-- Invoice Summary -->
+            <div class="col-lg-6">
+              <div class="card summary-card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="bi bi-calculator me-2"></i>Invoice Summary
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="summary-row">
+                    <span class="summary-label">Subtotal (excl. VAT)</span>
+                    <span class="summary-value">{{ formatCurrency(subtotal) }}</span>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="summary-label">
+                      VAT
+                      <input type="number"
+                             class="tax-input"
+                             [(ngModel)]="taxRate"
+                             name="taxRate"
+                             (ngModelChange)="updateTaxRate()"
+                             min="0"
+                             max="100">%
+                    </span>
+                    <span class="summary-value">{{ formatCurrency(taxAmount) }}</span>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="summary-label">
+                      Discount
+                      <div class="input-group discount-input">
+                        <span class="input-group-text">R</span>
+                        <input type="number"
+                               class="form-control"
+                               [(ngModel)]="discount"
+                               name="discount"
+                               (ngModelChange)="updateDiscount()"
+                               min="0"
+                               step="0.01"
+                               placeholder="0.00">
+                      </div>
+                    </span>
+                    <span class="summary-value" [class.text-danger]="discount > 0">
+                      {{ discount > 0 ? '-' : '' }}{{ formatCurrency(discount) }}
+                    </span>
+                  </div>
+
+                  <hr>
+
+                  <div class="summary-row total-row">
+                    <span class="summary-label">Total (incl. VAT)</span>
+                    <span class="summary-value total-value">{{ formatCurrency(total) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Customer Preview & Actions -->
+            <div class="col-lg-6">
+              <!-- Customer Preview Card -->
+              <div *ngIf="selectedCustomer" class="card customer-preview-card mb-4">
+                <div class="card-header">
+                  <h6 class="mb-0">
+                    <i class="bi bi-person me-2"></i>Customer
+                  </h6>
+                </div>
+                <div class="card-body">
+                  <div class="d-flex align-items-center">
+                    <div class="customer-avatar me-3">
+                      {{ selectedCustomer.name?.charAt(0) || 'C' }}
+                    </div>
+                    <div>
+                      <h6 class="customer-name mb-1">{{ selectedCustomer.name }}</h6>
+                      <p class="customer-detail mb-0">
+                        <i class="bi bi-envelope me-1"></i>{{ selectedCustomer.email }}
+                      </p>
+                      <p class="customer-detail mb-0">
+                        <i class="bi bi-telephone me-1"></i>{{ selectedCustomer.phone }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="card action-card">
+                <div class="card-body">
+                  <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="resetForm()">
+                      <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
+                    </button>
+                    <button type="submit"
+                            class="btn btn-primary flex-grow-1"
+                            [disabled]="(isLoading$ | async) || !selectedCustomer || lineItems[0]?.item === ''">
+                      <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                      <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-2"></i>
+                      {{ (isLoading$ | async) ? 'Creating...' : 'Create Invoice' }}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ state.error }}
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

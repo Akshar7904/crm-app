@@ -1,0 +1,335 @@
+<div class="admin-leave-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>Leave Management</h1>
+      <p>Manage and approve employee leave requests</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-outline" (click)="exportToExcel()">
+        <i class="fas fa-download"></i> Export
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <div class="stat-card pending">
+      <div class="stat-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{pendingCount}}</span>
+        <span class="stat-label">Pending Approvals</span>
+      </div>
+    </div>
+
+    <div class="stat-card upcoming">
+      <div class="stat-icon">
+        <i class="fas fa-calendar-day"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{upcomingLeaves.length}}</span>
+        <span class="stat-label">Upcoming Leaves</span>
+      </div>
+    </div>
+
+    <div class="stat-card total">
+      <div class="stat-icon">
+        <i class="fas fa-list"></i>
+      </div>
+      <div class="stat-content">
+        <span class="stat-value">{{totalElements}}</span>
+        <span class="stat-label">Total Requests</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters and Search -->
+  <div class="filters-section">
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search by employee name or email..."
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()">
+      <button *ngIf="searchQuery" class="clear-btn" (click)="searchQuery = ''; onSearch()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="filter-select">
+      <option value="all">All Status</option>
+      <option *ngFor="let status of leaveStatuses" [value]="status">
+        {{leaveStatusLabels[status]}}
+      </option>
+    </select>
+
+    <select [(ngModel)]="selectedType" (change)="applyFilters()" class="filter-select">
+      <option value="all">All Types</option>
+      <option *ngFor="let type of leaveTypes" [value]="type">
+        {{leaveTypeLabels[type]}}
+      </option>
+    </select>
+
+    <button class="btn btn-secondary" (click)="clearFilters()">
+      <i class="fas fa-redo"></i> Reset
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-section">
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="activeTab === 'pending'"
+        (click)="setActiveTab('pending')">
+        <i class="fas fa-clock"></i>
+        Pending <span class="badge">{{pendingCount}}</span>
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'approved'"
+        (click)="setActiveTab('approved')">
+        <i class="fas fa-check-circle"></i>
+        Approved
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'rejected'"
+        (click)="setActiveTab('rejected')">
+        <i class="fas fa-times-circle"></i>
+        Rejected
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'upcoming'"
+        (click)="setActiveTab('upcoming')">
+        <i class="fas fa-calendar-alt"></i>
+        Upcoming
+      </button>
+      <button
+        class="tab"
+        [class.active]="activeTab === 'all'"
+        (click)="setActiveTab('all')">
+        <i class="fas fa-list"></i>
+        All Requests
+      </button>
+    </div>
+  </div>
+
+  <!-- Leave Requests Table -->
+  <div class="table-section">
+    <div *ngIf="currentDataState === dataState.LOADING" class="loading">
+      <i class="fas fa-spinner fa-spin"></i> Loading...
+    </div>
+
+    <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length === 0" class="empty-state">
+      <i class="fas fa-inbox"></i>
+      <p>No leave requests found</p>
+    </div>
+
+    <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="table-wrapper">
+      <table class="leave-table">
+        <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Leave Type</th>
+          <th>Duration</th>
+          <th>Days</th>
+          <th>Status</th>
+          <th>Applied On</th>
+          <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let leave of filteredLeaves" (click)="viewLeaveDetails(leave)" class="clickable-row">
+          <td>
+            <div class="employee-cell">
+              <div class="employee-avatar" *ngIf="leave.employeePhotoUrl">
+                <img [src]="leave.employeePhotoUrl" [alt]="leave.employeeName">
+              </div>
+              <div class="employee-avatar placeholder" *ngIf="!leave.employeePhotoUrl">
+                <i class="fas fa-user"></i>
+              </div>
+              <div class="employee-info">
+                <strong>{{leave.employeeName}}</strong>
+                <small>{{leave.employeeEmail}}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+              <span class="leave-type-badge" [ngClass]="getLeaveTypeClass(leave.leaveType)">
+                {{leaveTypeLabels[leave.leaveType]}}
+              </span>
+          </td>
+          <td>
+            <div class="date-range">
+              <div>{{formatDate(leave.startDate)}}</div>
+              <i class="fas fa-arrow-right"></i>
+              <div>{{formatDate(leave.endDate)}}</div>
+            </div>
+          </td>
+          <td>
+            <span class="days-badge">{{leave.numberOfDays}} days</span>
+          </td>
+          <td>
+              <span class="status-badge" [ngClass]="getStatusClass(leave.status)">
+                {{leaveStatusLabels[leave.status]}}
+              </span>
+          </td>
+          <td>
+            <small>{{formatDateTime(leave.createdAt || '')}}</small>
+          </td>
+          <td>
+            <div class="action-buttons" (click)="$event.stopPropagation()">
+              <button
+                *ngIf="canApprove(leave)"
+                class="btn-action btn-approve"
+                (click)="quickApprove(leave)"
+                title="Quick Approve">
+                <i class="fas fa-check"></i>
+              </button>
+              <button
+                *ngIf="canApprove(leave)"
+                class="btn-action btn-review"
+                (click)="openApprovalModal(leave, 'approve')"
+                title="Review & Approve">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button
+                *ngIf="canApprove(leave)"
+                class="btn-action btn-reject"
+                (click)="openApprovalModal(leave, 'reject')"
+                title="Reject">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Approval Modal -->
+  <div class="modal-overlay" *ngIf="showApprovalModal" (click)="closeApprovalModal()">
+    <div class="modal-content large" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{approvalAction === 'approve' ? 'Approve' : 'Reject'}} Leave Request</h2>
+        <button class="btn-close" (click)="closeApprovalModal()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedLeave">
+        <!-- Employee Details -->
+        <div class="detail-section">
+          <h3>Employee Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Name:</label>
+              <strong>{{selectedLeave.employeeName}}</strong>
+            </div>
+            <div class="detail-item">
+              <label>Email:</label>
+              <span>{{selectedLeave.employeeEmail}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leave Details -->
+        <div class="detail-section">
+          <h3>Leave Details</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Leave Type:</label>
+              <span class="leave-type-badge" [ngClass]="getLeaveTypeClass(selectedLeave.leaveType)">
+                {{leaveTypeLabels[selectedLeave.leaveType]}}
+              </span>
+            </div>
+            <div class="detail-item">
+              <label>Duration:</label>
+              <strong>{{selectedLeave.numberOfDays}} business days</strong>
+            </div>
+            <div class="detail-item">
+              <label>Start Date:</label>
+              <span>{{formatDate(selectedLeave.startDate)}}</span>
+            </div>
+            <div class="detail-item">
+              <label>End Date:</label>
+              <span>{{formatDate(selectedLeave.endDate)}}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reason -->
+        <div class="detail-section" *ngIf="selectedLeave.reason">
+          <h3>Reason</h3>
+          <p class="reason-text">{{selectedLeave.reason}}</p>
+        </div>
+
+        <!-- Remarks -->
+        <div class="detail-section" *ngIf="selectedLeave.remarks">
+          <h3>Additional Remarks</h3>
+          <p class="remarks-text">{{selectedLeave.remarks}}</p>
+        </div>
+
+        <!-- Doctor Note -->
+        <div class="detail-section" *ngIf="selectedLeave.doctorNoteAttached">
+          <h3>Medical Certificate</h3>
+          <div class="doctor-note-alert">
+            <i class="fas fa-file-medical"></i>
+            <span>Doctor's note is attached{{ selectedLeave.doctorNoteFilename ? ' (' + selectedLeave.doctorNoteFilename + ')' : '' }}</span>
+            <a *ngIf="selectedLeave.doctorNoteUrl" [href]="getDoctorNoteDownloadUrl(selectedLeave)" target="_blank" class="link-btn">
+              View Document <i class="fas fa-external-link-alt"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Approval Form -->
+        <form [formGroup]="approvalForm" (ngSubmit)="submitApproval()">
+          <div class="detail-section">
+            <h3>{{approvalAction === 'approve' ? 'Approval' : 'Rejection'}} Comments</h3>
+
+            <div class="form-group">
+              <label for="remarks">Remarks</label>
+              <textarea
+                id="remarks"
+                formControlName="remarks"
+                class="form-control"
+                rows="3"
+                placeholder="Add any comments or notes..."></textarea>
+            </div>
+
+            <div class="form-group" *ngIf="approvalAction === 'reject'">
+              <label for="rejectionReason">Rejection Reason <span class="required">*</span></label>
+              <textarea
+                id="rejectionReason"
+                formControlName="rejectionReason"
+                class="form-control"
+                rows="3"
+                placeholder="Please provide a reason for rejection..."
+                [class.is-invalid]="approvalForm.get('rejectionReason')?.invalid && approvalForm.get('rejectionReason')?.touched"></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeApprovalModal()">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn"
+              [ngClass]="approvalAction === 'approve' ? 'btn-success' : 'btn-danger'"
+              [disabled]="currentDataState === dataState.LOADING">
+              <i class="fas" [ngClass]="approvalAction === 'approve' ? 'fa-check' : 'fa-times'"></i>
+              {{approvalAction === 'approve' ? 'Approve' : 'Reject'}} Leave
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

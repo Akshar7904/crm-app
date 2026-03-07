@@ -1,0 +1,413 @@
+<!--<app-navbar></app-navbar>-->
+
+<section>
+  <div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" style="margin-top: 8px">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/']">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/employees']">Employees</a>
+        </li>
+        <li class="breadcrumb-item active">New Employee</li>
+      </ol>
+    </nav>
+
+    <div class="row">
+      <div class="col-12">
+        <h2 class="page-title mb-4">
+          <i class="bi bi-person-plus"></i> Add New Employee
+        </h2>
+      </div>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="bi bi-check-circle-fill me-2"></i> {{ success }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <!-- Employee Form -->
+    <form [formGroup]="employeeForm" (ngSubmit)="onSubmit()">
+
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <h5 class="section-title">
+          <i class="bi bi-person-circle"></i> Personal Information
+        </h5>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="firstName" class="form-label">
+              First Name <span class="text-danger"></span>
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              class="form-control"
+              formControlName="firstName"
+              [class.is-invalid]="isFieldInvalid('firstName')"
+              placeholder="Enter first name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('firstName')">
+              {{ getFieldError('firstName') }}
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="lastName" class="form-label">
+              Last Name <span class="text-danger"></span>
+            </label>
+            <input
+              type="text"
+              id="lastName"
+              class="form-control"
+              formControlName="lastName"
+              [class.is-invalid]="isFieldInvalid('lastName')"
+              placeholder="Enter last name"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('lastName')">
+              {{ getFieldError('lastName') }}
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="email" class="form-label">
+              Email <span class="text-danger"></span>
+            </label>
+            <input
+              type="email"
+              id="email"
+              class="form-control"
+              formControlName="email"
+              [class.is-invalid]="isFieldInvalid('email')"
+              placeholder="employee@example.com"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('email')">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="phone" class="form-label">Phone</label>
+            <input
+              type="tel"
+              id="phone"
+              class="form-control"
+              formControlName="phone"
+              placeholder="+27 12 345 6789"
+            >
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+            <input
+              type="date"
+              id="dateOfBirth"
+              class="form-control"
+              formControlName="dateOfBirth"
+            >
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <select id="gender" class="form-select" formControlName="gender">
+              <option value="">Select Gender</option>
+              <option *ngFor="let gender of genders" [value]="gender">
+                {{ gender }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Employment Details Section -->
+      <div class="form-section">
+        <h5 class="section-title">
+          <i class="bi bi-briefcase"></i> Employment Details
+        </h5>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="hireDate" class="form-label">
+              Hire Date <span class="text-danger"></span>
+            </label>
+            <input
+              type="date"
+              id="hireDate"
+              class="form-control"
+              formControlName="hireDate"
+              [class.is-invalid]="isFieldInvalid('hireDate')"
+            >
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('hireDate')">
+              {{ getFieldError('hireDate') }}
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="employmentType" class="form-label">
+              Employment Type <span class="text-danger"></span>
+            </label>
+            <select
+              id="employmentType"
+              class="form-select"
+              formControlName="employmentType"
+              [class.is-invalid]="isFieldInvalid('employmentType')"
+            >
+              <option *ngFor="let type of employmentTypes" [value]="type">
+                {{ type.replace('_', ' ') }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('employmentType')">
+              {{ getFieldError('employmentType') }}
+            </div>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="designationId" class="form-label">
+              Designation <span class="text-danger">*</span>
+            </label>
+            <select
+              id="designationId"
+              class="form-select"
+              formControlName="designationId"
+              [class.is-invalid]="isFieldInvalid('designationId')"
+              [disabled]="loadingDesignations"
+              (change)="onDesignationChange($event)"
+            >
+              <option value="">
+                {{ loadingDesignations ? 'Loading designations...' : 'Select Designation' }}
+              </option>
+              <option *ngFor="let designation of designations" [value]="designation.id">
+                {{ designation.title }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="isFieldInvalid('designationId')">
+              Please select a designation
+            </div>
+            <small class="form-text text-muted" *ngIf="loadingDesignations">
+              <span class="spinner-border spinner-border-sm me-1"></span>
+              Loading designations...
+            </small>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="departmentId" class="form-label">Department</label>
+            <select
+              id="departmentId"
+              class="form-select"
+              formControlName="departmentId"
+              [disabled]="loadingDepartments"
+            >
+              <option value="">
+                {{ loadingDepartments ? 'Loading departments...' : 'Select Department (Optional)' }}
+              </option>
+              <option *ngFor="let dept of departments" [value]="dept.id">
+                {{ dept.name }}
+              </option>
+            </select>
+            <small class="form-text text-muted" *ngIf="loadingDepartments">
+              <span class="spinner-border spinner-border-sm me-1"></span>
+              Loading departments...
+            </small>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="baseSalary" class="form-label">Base Salary (ZAR)</label>
+            <input
+              type="number"
+              id="baseSalary"
+              class="form-control"
+              formControlName="baseSalary"
+              placeholder="0"
+              min="0"
+              step="1000"
+            >
+            <small class="form-text text-muted">Monthly salary before deductions</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bank Account Details Section -->
+      <div class="col-12">
+        <h5 class="mt-3 mb-3">Bank Account Details</h5>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Bank Name</label>
+        <select class="form-select" formControlName="bankName">
+          <option value="">Select Bank</option>
+          <option value="ABSA">ABSA</option>
+          <option value="FNB">First National Bank (FNB)</option>
+          <option value="Standard Bank">Standard Bank</option>
+          <option value="Nedbank">Nedbank</option>
+          <option value="Capitec">Capitec Bank</option>
+          <option value="Discovery Bank">Discovery Bank</option>
+          <option value="TymeBank">TymeBank</option>
+          <option value="African Bank">African Bank</option>
+        </select>
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Account Number</label>
+        <input type="text" class="form-control" formControlName="accountNumber">
+      </div>
+
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Account Holder Name</label>
+        <input type="text" class="form-control" formControlName="accountHolderName">
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Branch Code</label>
+        <input type="text" class="form-control" formControlName="branchCode">
+      </div>
+
+      <div class="col-md-3 mb-3">
+        <label class="form-label">Account Type</label>
+        <select class="form-select" formControlName="accountType">
+          <option value="CHEQUE">Cheque Account</option>
+          <option value="SAVINGS">Savings Account</option>
+          <option value="TRANSMISSION">Transmission Account</option>
+        </select>
+      </div>
+
+      <!-- Address Section -->
+      <div class="form-section">
+        <h5 class="section-title">
+          <i class="bi bi-geo-alt"></i> Address Information
+        </h5>
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="address" class="form-label">Street Address</label>
+            <input
+              type="text"
+              id="address"
+              class="form-control"
+              formControlName="address"
+              placeholder="123 Main Street"
+            >
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="city" class="form-label">City</label>
+            <input
+              type="text"
+              id="city"
+              class="form-control"
+              formControlName="city"
+              placeholder="Johannesburg"
+            >
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="state" class="form-label">Province</label>
+            <input
+              type="text"
+              id="state"
+              class="form-control"
+              formControlName="state"
+              placeholder="Gauteng"
+            >
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="postalCode" class="form-label">Postal Code</label>
+            <input
+              type="text"
+              id="postalCode"
+              class="form-control"
+              formControlName="postalCode"
+              placeholder="2000"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Emergency Contact Section -->
+      <div class="form-section">
+        <h5 class="section-title">
+          <i class="bi bi-telephone"></i> Emergency Contact
+        </h5>
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="emergencyContactName" class="form-label">Contact Name</label>
+            <input
+              type="text"
+              id="emergencyContactName"
+              class="form-control"
+              formControlName="emergencyContactName"
+              placeholder="Full name"
+            >
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="emergencyContactPhone" class="form-label">Contact Phone</label>
+            <input
+              type="tel"
+              id="emergencyContactPhone"
+              class="form-control"
+              formControlName="emergencyContactPhone"
+              placeholder="+27 12 345 6789"
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information Section -->
+      <div class="form-section">
+        <h5 class="section-title">
+          <i class="bi bi-file-text"></i> Additional Information
+        </h5>
+        <div class="row">
+          <div class="col-12 mb-3">
+            <label for="bio" class="form-label">Bio / Notes</label>
+            <textarea
+              id="bio"
+              class="form-control"
+              formControlName="bio"
+              rows="4"
+              placeholder="Add any additional notes about the employee..."
+            ></textarea>
+            <small class="form-text text-muted">
+              Optional: Add a brief description or any relevant notes.
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          [disabled]="loading || employeeForm.invalid"
+        >
+          <span *ngIf="!loading">
+            <i class="bi bi-check-circle"></i> Create Employee
+          </span>
+          <span *ngIf="loading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Creating...
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-lg"
+          (click)="onCancel()"
+          [disabled]="loading"
+        >
+          <i class="bi bi-x-circle"></i> Cancel
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>

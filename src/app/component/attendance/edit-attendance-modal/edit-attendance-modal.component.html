@@ -1,0 +1,164 @@
+<div class="modal-overlay" (click)="onCancel()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <h2 class="modal-title">
+        {{ existingAttendance ? 'Edit Attendance' : 'Add Attendance' }}
+      </h2>
+      <button class="close-button" (click)="onCancel()" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="error" class="alert alert-error">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ error }}
+    </div>
+
+    <!-- Modal Body -->
+    <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <!-- Employee Selection -->
+        <div class="form-group">
+          <label for="employeeId" class="form-label">
+            Select Person <span class="required">*</span>
+          </label>
+          <select
+            id="employeeId"
+            class="form-control"
+            formControlName="employeeId"
+            (change)="onEmployeeChange($event.target.value)"
+            [class.is-invalid]="isFieldInvalid('employeeId')"
+          >
+            <option [value]="null">Select Employee</option>
+            <option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.firstName }} {{ emp.lastName }} - {{ emp.email }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('employeeId')" class="error-message">
+            {{ getFieldError('employeeId') }}
+          </div>
+        </div>
+
+        <!-- Date Selection -->
+        <div class="form-group">
+          <label for="attendanceDate" class="form-label">
+            Select Date <span class="required">*</span>
+          </label>
+          <input
+            type="date"
+            id="attendanceDate"
+            class="form-control"
+            formControlName="attendanceDate"
+            (change)="onDateChange($event.target.value)"
+            [class.is-invalid]="isFieldInvalid('attendanceDate')"
+          >
+          <div *ngIf="isFieldInvalid('attendanceDate')" class="error-message">
+            {{ getFieldError('attendanceDate') }}
+          </div>
+        </div>
+
+        <!-- Attendance Type Selection -->
+        <div class="form-group">
+          <label for="attendanceType" class="form-label">
+            Attendance Type <span class="required">*</span>
+          </label>
+          <select
+            id="attendanceType"
+            class="form-control"
+            formControlName="attendanceType"
+            [class.is-invalid]="isFieldInvalid('attendanceType')"
+          >
+            <option *ngFor="let type of attendanceTypes" [value]="type.value">
+              {{ type.icon }} {{ type.label }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('attendanceType')" class="error-message">
+            {{ getFieldError('attendanceType') }}
+          </div>
+        </div>
+
+        <!-- Check In Time (Optional) -->
+        <div class="form-group">
+          <label for="checkInTime" class="form-label">
+            Check-In Time
+          </label>
+          <input
+            type="datetime-local"
+            id="checkInTime"
+            class="form-control"
+            formControlName="checkInTime"
+          >
+          <small class="form-text">Optional: Record the exact check-in time</small>
+        </div>
+
+        <!-- Check Out Time (Optional) -->
+        <div class="form-group">
+          <label for="checkOutTime" class="form-label">
+            Check-Out Time
+          </label>
+          <input
+            type="datetime-local"
+            id="checkOutTime"
+            class="form-control"
+            formControlName="checkOutTime"
+          >
+          <small class="form-text">Optional: Record the exact check-out time</small>
+        </div>
+
+        <!-- Reason/Notes -->
+        <div class="form-group">
+          <label for="reason" class="form-label">
+            Reason / Notes
+          </label>
+          <textarea
+            id="reason"
+            class="form-control"
+            formControlName="reason"
+            rows="3"
+            placeholder="Add any notes or reasons for this attendance record..."
+          ></textarea>
+        </div>
+
+        <!-- Existing Record Info -->
+        <div *ngIf="existingAttendance" class="info-box">
+          <i class="fas fa-info-circle"></i>
+          <div>
+            <strong>Editing Existing Record</strong>
+            <p class="info-details">
+            Last updated: {{ existingAttendance.updatedAt | date:'medium' }}
+              by {{ existingAttendance.updatedBy }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="loading"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="loading || attendanceForm.invalid"
+        >
+          <span *ngIf="!loading">
+            <i class="fas fa-save"></i>
+            {{ existingAttendance ? 'Update' : 'Save' }}
+          </span>
+          <span *ngIf="loading" class="loading-text">
+            <span class="spinner-small"></span>
+            Saving...
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

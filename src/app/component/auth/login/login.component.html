@@ -1,0 +1,187 @@
+<section *ngIf="(loginState$ | async) as state" [ngSwitch]="state.dataState">
+  <!-- Login Form (Not using MFA) -->
+  <div *ngIf="!state.loginSuccess && !state.isUsingMfa" class="login-container">
+    <!-- Left Side - Branding -->
+    <div class="login-branding">
+      <div class="branding-content">
+        <img src="assets/logo.png" alt="LKCentrix" class="brand-logo">
+        <h1 class="brand-title">LKCentrix Solutions</h1>
+        <p class="brand-tagline">Payroll & HR Management System</p>
+        <div class="brand-features">
+          <div class="feature-item">
+            <i class="bi bi-shield-check"></i>
+            <span>Secure & Reliable</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>Smart Analytics</span>
+          </div>
+          <div class="feature-item">
+            <i class="bi bi-people"></i>
+            <span>Team Management</span>
+          </div>
+        </div>
+      </div>
+      <div class="branding-footer">
+        <p>&copy; 2025 LKCentrix Solutions (PTY) LTD</p>
+      </div>
+    </div>
+
+    <!-- Right Side - Login Form -->
+    <div class="login-form-container">
+      <div class="login-form-wrapper">
+        <div class="form-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue to your dashboard</p>
+        </div>
+
+        <!-- Error Alert -->
+        <div *ngIf="state.dataState === DataState.ERROR" class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-circle me-2"></i>
+          {{ state.error }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form #loginForm="ngForm" (ngSubmit)="login(loginForm)" class="login-form">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrapper">
+              <i class="bi bi-envelope"></i>
+              <input
+                [disabled]="state.dataState === DataState.LOADING"
+                ngModel
+                type="email"
+                name="email"
+                id="email"
+                class="form-control"
+                placeholder="Enter your email"
+                required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+              <i class="bi bi-lock"></i>
+              <input
+                [disabled]="state.dataState === DataState.LOADING"
+                ngModel
+                type="password"
+                name="password"
+                id="password"
+                class="form-control"
+                placeholder="Enter your password"
+                required>
+            </div>
+          </div>
+
+          <div class="form-options">
+            <label class="remember-me">
+              <input type="checkbox" name="remember">
+              <span>Remember me</span>
+            </label>
+            <a routerLink="/resetpassword" class="forgot-link" [ngStyle]="{'pointer-events': state.dataState === DataState.LOADING ? 'none': ''}">
+              Forgot Password?
+            </a>
+          </div>
+
+          <button
+            [disabled]="state.dataState === DataState.LOADING || loginForm.invalid || loginForm.pristine"
+            type="submit"
+            class="btn-login">
+            <span *ngIf="state.dataState === DataState.LOADING" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <span *ngIf="state.dataState === DataState.LOADING">Signing in...</span>
+            <span *ngIf="!(state.dataState === DataState.LOADING)">Sign In</span>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          <p>Don't have an account?
+            <a routerLink="/register" [ngStyle]="{'pointer-events': state.dataState === DataState.LOADING ? 'none': ''}">
+              Create Account
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MFA Verification Screen -->
+  <div *ngIf="state.isUsingMfa" class="login-container">
+    <!-- Left Side - Branding -->
+    <div class="login-branding">
+      <div class="branding-content">
+        <img src="assets/logo.png" alt="LKCentrix" class="brand-logo">
+        <h1 class="brand-title">LKCentrix</h1>
+        <p class="brand-tagline">Payroll & HR Management System</p>
+        <div class="mfa-illustration">
+          <i class="bi bi-shield-lock"></i>
+        </div>
+        <p class="mfa-info">Two-Factor Authentication adds an extra layer of security to your account</p>
+      </div>
+      <div class="branding-footer">
+        <p>&copy; 2025 LKCentrix Solutions (PTY) LTD</p>
+      </div>
+    </div>
+
+    <!-- Right Side - MFA Form -->
+    <div class="login-form-container">
+      <div class="login-form-wrapper">
+        <div class="form-header">
+          <div class="mfa-icon">
+            <i class="bi bi-phone"></i>
+          </div>
+          <h2>Verification Required</h2>
+          <p>We've sent a code to your phone ending in <strong>{{ state.phone }}</strong></p>
+        </div>
+
+        <!-- Error Alert -->
+        <div *ngIf="state.dataState === DataState.ERROR" class="alert alert-danger" role="alert">
+          <i class="bi bi-exclamation-circle me-2"></i>
+          {{ state.error }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <form #verifyCodeForm="ngForm" (ngSubmit)="verifyCode(verifyCodeForm)" class="login-form">
+          <div class="form-group">
+            <label for="code">Verification Code</label>
+            <div class="input-wrapper">
+              <i class="bi bi-key"></i>
+              <input
+                [disabled]="state.dataState === DataState.LOADING"
+                ngModel
+                type="text"
+                name="code"
+                id="code"
+                class="form-control code-input"
+                placeholder="Enter 6-digit code"
+                maxlength="6"
+                required>
+            </div>
+          </div>
+
+          <button
+            [disabled]="state.dataState === DataState.LOADING || verifyCodeForm.invalid || verifyCodeForm.pristine"
+            type="submit"
+            class="btn-login">
+            <span *ngIf="state.dataState === DataState.LOADING" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <span *ngIf="state.dataState === DataState.LOADING">Verifying...</span>
+            <span *ngIf="!(state.dataState === DataState.LOADING)">Verify Code</span>
+          </button>
+        </form>
+
+        <div class="form-footer">
+          <p>
+            <a (click)="loginPage()" class="back-link">
+              <i class="bi bi-arrow-left me-1"></i>
+              Back to Login
+            </a>
+          </p>
+          <p class="resend-text">
+            Didn't receive the code? <a href="javascript:void(0)">Resend</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

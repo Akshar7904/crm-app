@@ -1,0 +1,419 @@
+// newinvoice Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+/* ========== Create Invoice Page ========== */
+.create-invoice-page {
+  padding: 20px 0;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  background: transparent;
+  padding: 0;
+}
+
+.breadcrumb-item a {
+  color: #484c7f;
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  color: #7978e9;
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: 25px;
+}
+
+.page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+}
+
+.invoice-card {
+  background: white;
+}
+
+.invoice-card .card-body {
+  padding: 30px;
+}
+
+/* Section Labels */
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #484c7f;
+  margin-bottom: 15px;
+}
+
+/* Company Info */
+.company-info {
+  background: #f8f9ff;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.company-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.company-address {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 0;
+  line-height: 1.8;
+}
+
+/* Customer Info */
+.customer-info {
+  background: #f8f9ff;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.customer-info p {
+  font-size: 14px;
+}
+
+/* Form Controls */
+.form-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.form-control,
+.form-select {
+  border: 2px solid #e9ecef;
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #7978e9;
+  box-shadow: 0 0 0 3px rgba(121, 120, 233, 0.15);
+}
+
+/* Line Items Table */
+.line-items-table {
+  margin-bottom: 0;
+}
+
+.line-items-table thead th {
+  background: #f8f9ff;
+  border: none;
+  padding: 15px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #484c7f;
+}
+
+.line-items-table tbody td {
+  padding: 15px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.line-item-row:hover {
+  background: #f8f9ff;
+}
+
+.line-items-table .form-control {
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.line-items-table .input-group-text {
+  background: #f8f9ff;
+  border: 2px solid #e9ecef;
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  color: #6c757d;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.line-items-table .input-group .form-control {
+  border-radius: 0 8px 8px 0;
+}
+
+/* Unit Cost Input Group - more compact */
+.unit-cost-group {
+  min-width: 130px;
+}
+
+.unit-cost-group .input-group-text {
+  padding: 6px 8px;
+}
+
+.unit-cost-group .form-control {
+  padding: 6px 10px;
+}
+
+.price-display {
+  font-size: 15px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.remove-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.remove-btn:disabled {
+  opacity: 0.3;
+}
+
+/* Add Row Button */
+.add-row-btn {
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 600;
+  border-width: 2px;
+}
+
+.add-row-btn:hover {
+  background: #484c7f;
+  border-color: #484c7f;
+  color: white;
+}
+
+/* Summary Card */
+.summary-card {
+  height: 100%;
+}
+
+.summary-card .card-header {
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  color: white;
+  border-radius: 15px 15px 0 0;
+  padding: 18px 20px;
+}
+
+.summary-card .card-header h6 {
+  font-weight: 700;
+}
+
+.summary-card .card-body {
+  padding: 25px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-row:last-child {
+  border-bottom: none;
+}
+
+.summary-label {
+  font-size: 14px;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.summary-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.tax-input {
+  width: 50px;
+  padding: 5px 8px;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+}
+
+.discount-input {
+  width: 120px;
+}
+
+.discount-input .input-group-text {
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.discount-input .form-control {
+  padding: 5px 10px;
+  font-size: 13px;
+}
+
+.total-row {
+  padding-top: 20px;
+  margin-top: 10px;
+}
+
+.total-row .summary-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.total-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #484c7f;
+}
+
+/* Customer Preview Card */
+.customer-preview-card .card-header {
+  background: #f8f9ff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 15px 20px;
+}
+
+.customer-preview-card .card-header h6 {
+  font-weight: 700;
+  color: #484c7f;
+}
+
+.customer-preview-card .card-body {
+  padding: 20px;
+}
+
+.customer-avatar {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.customer-preview-card .customer-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.customer-detail {
+  font-size: 13px;
+  color: #6c757d;
+}
+
+.customer-detail i {
+  color: #7978e9;
+}
+
+/* Action Card */
+.action-card .card-body {
+  padding: 20px;
+}
+
+/* Buttons */
+.btn {
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 12px 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  border: none;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(72, 76, 127, 0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  transform: none;
+}
+
+.btn-outline-secondary {
+  border-width: 2px;
+}
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-container .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #484c7f !important;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .invoice-card .card-body {
+    padding: 20px;
+  }
+
+  .summary-card {
+    height: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .line-items-table {
+    font-size: 13px;
+  }
+
+  .line-items-table thead th {
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .line-items-table tbody td {
+    padding: 10px;
+  }
+
+  .price-display {
+    font-size: 13px;
+  }
+
+  .total-value {
+    font-size: 20px;
+  }
+}

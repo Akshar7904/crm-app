@@ -1,0 +1,356 @@
+<ng-container *ngIf="requestsState$ | async as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="asset-requests-page">
+      <div class="container-fluid">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="page-breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/']"><i class="bi bi-house-door"></i> Home</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/assets']">Assets</a>
+            </li>
+            <li class="breadcrumb-item active">Requests</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-header-content">
+            <div class="page-header-icon">
+              <i class="bi bi-clipboard2-check"></i>
+            </div>
+            <div>
+              <h4 class="page-title">Asset Requests</h4>
+              <p class="page-subtitle">Manage and process employee asset requests</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Status Filter Pills -->
+        <div class="filter-section">
+          <div class="filter-pills">
+            <button
+              class="filter-pill"
+              [class.active]="selectedStatus === ''"
+              (click)="filterByStatus('')"
+            >
+              <i class="bi bi-grid-3x3-gap"></i>
+              All
+            </button>
+            <button
+              class="filter-pill pill-pending"
+              [class.active]="selectedStatus === 'PENDING'"
+              (click)="filterByStatus('PENDING')"
+            >
+              <i class="bi bi-clock"></i>
+              Pending
+            </button>
+            <button
+              class="filter-pill pill-approved"
+              [class.active]="selectedStatus === 'APPROVED'"
+              (click)="filterByStatus('APPROVED')"
+            >
+              <i class="bi bi-check-circle"></i>
+              Approved
+            </button>
+            <button
+              class="filter-pill pill-rejected"
+              [class.active]="selectedStatus === 'REJECTED'"
+              (click)="filterByStatus('REJECTED')"
+            >
+              <i class="bi bi-x-circle"></i>
+              Rejected
+            </button>
+            <button
+              class="filter-pill pill-fulfilled"
+              [class.active]="selectedStatus === 'FULFILLED'"
+              (click)="filterByStatus('FULFILLED')"
+            >
+              <i class="bi bi-box-seam"></i>
+              Fulfilled
+            </button>
+            <button
+              class="filter-pill pill-cancelled"
+              [class.active]="selectedStatus === 'CANCELLED'"
+              (click)="filterByStatus('CANCELLED')"
+            >
+              <i class="bi bi-slash-circle"></i>
+              Cancelled
+            </button>
+          </div>
+        </div>
+
+        <!-- Requests Table -->
+        <div class="table-card" *ngIf="hasRequests(state)">
+          <div class="table-responsive">
+            <table class="requests-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Requester</th>
+                  <th>Category</th>
+                  <th>Type</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Requested</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let request of getRequests(state)" class="request-row">
+                  <td>
+                    <span class="request-id">#{{ request.id }}</span>
+                  </td>
+                  <td>
+                    <div class="requester-info">
+                      <div class="requester-avatar">
+                        {{ request.requesterName?.charAt(0) }}
+                      </div>
+                      <div class="requester-details">
+                        <span class="requester-name">{{ request.requesterName }}</span>
+                        <span class="requester-email">{{ request.requesterEmail }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-tag">
+                      {{ request.assetCategory | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ request.requestType | titlecase }}</td>
+                  <td>
+                    <span class="priority-badge {{ getPriorityClass(request.priority) }}">
+                      {{ request.priority }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="status-badge {{ getStatusClass(request.status) }}">
+                      {{ request.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="date-text">{{ formatDate(request.createdAt) }}</span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button
+                        class="action-btn action-approve"
+                        *ngIf="request.status === 'PENDING'"
+                        (click)="openApproveModal(request)"
+                        title="Approve"
+                      >
+                        <i class="bi bi-check-lg"></i>
+                      </button>
+                      <button
+                        class="action-btn action-reject"
+                        *ngIf="request.status === 'PENDING'"
+                        (click)="openRejectModal(request)"
+                        title="Reject"
+                      >
+                        <i class="bi bi-x-lg"></i>
+                      </button>
+                      <button
+                        class="action-btn action-fulfill"
+                        *ngIf="request.status === 'APPROVED'"
+                        (click)="openFulfillModal(request)"
+                        title="Fulfill Request"
+                      >
+                        <i class="bi bi-box-seam"></i>
+                        <span>Fulfill</span>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="table-footer">
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+                  <a (click)="goToNextOrPreviousPage('backward')" class="page-link">
+                    <i class="bi bi-chevron-left"></i>
+                  </a>
+                </li>
+                <li
+                  *ngFor="let pageNumber of getTotalPages(state) | ExtractArrayValue:'number'; let i = index"
+                  class="page-item"
+                >
+                  <a
+                    (click)="goToPage(i)"
+                    [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
+                    class="page-link"
+                  >
+                    {{ i + 1 }}
+                  </a>
+                </li>
+                <li [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+                  <a (click)="goToNextOrPreviousPage('forward')" class="page-link">
+                    <i class="bi bi-chevron-right"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!hasRequests(state)" class="empty-state">
+          <div class="empty-state-icon">
+            <i class="bi bi-clipboard2-x"></i>
+          </div>
+          <h4 class="empty-state-title">No Requests Found</h4>
+          <p class="empty-state-text">There are no asset requests matching your criteria</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Approve Modal -->
+    <div class="modal-overlay" *ngIf="showApproveModal" (click)="closeModals()">
+      <div class="modal-panel" (click)="$event.stopPropagation()">
+        <div class="modal-panel-header">
+          <div class="modal-header-icon modal-icon-success">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <h5 class="modal-panel-title">Approve Request</h5>
+          <button type="button" class="modal-close-btn" (click)="closeModals()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="modal-panel-body">
+          <p class="modal-description">
+            Approve request from <strong>{{ selectedRequest?.requesterName }}</strong>
+            for a <strong>{{ selectedRequest?.assetCategory | titlecase }}</strong>?
+          </p>
+          <div class="form-group">
+            <label class="form-label">Notes (optional)</label>
+            <textarea class="form-control" [(ngModel)]="approvalNotes" rows="3"
+                      placeholder="Add approval notes..."></textarea>
+          </div>
+        </div>
+        <div class="modal-panel-footer">
+          <button type="button" class="btn-modal btn-modal-cancel" (click)="closeModals()">Cancel</button>
+          <button type="button" class="btn-modal btn-modal-success" (click)="approveRequest()" [disabled]="isLoading$ | async">
+            <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-1"></i>
+            Approve
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" *ngIf="showRejectModal" (click)="closeModals()">
+      <div class="modal-panel" (click)="$event.stopPropagation()">
+        <div class="modal-panel-header">
+          <div class="modal-header-icon modal-icon-danger">
+            <i class="bi bi-x-circle"></i>
+          </div>
+          <h5 class="modal-panel-title">Reject Request</h5>
+          <button type="button" class="modal-close-btn" (click)="closeModals()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="modal-panel-body">
+          <p class="modal-description">
+            Reject request from <strong>{{ selectedRequest?.requesterName }}</strong>?
+          </p>
+          <div class="form-group">
+            <label class="form-label">Reason for rejection <span class="required">*</span></label>
+            <textarea class="form-control" [(ngModel)]="rejectionReason" rows="3" required
+                      placeholder="Provide a reason for rejection..."></textarea>
+          </div>
+        </div>
+        <div class="modal-panel-footer">
+          <button type="button" class="btn-modal btn-modal-cancel" (click)="closeModals()">Cancel</button>
+          <button type="button" class="btn-modal btn-modal-danger" (click)="rejectRequest()" [disabled]="(isLoading$ | async) || !rejectionReason">
+            <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!(isLoading$ | async)" class="bi bi-x-lg me-1"></i>
+            Reject
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fulfill Modal -->
+    <div class="modal-overlay" *ngIf="showFulfillModal" (click)="closeModals()">
+      <div class="modal-panel" (click)="$event.stopPropagation()">
+        <div class="modal-panel-header">
+          <div class="modal-header-icon modal-icon-primary">
+            <i class="bi bi-box-seam"></i>
+          </div>
+          <h5 class="modal-panel-title">Fulfill Request</h5>
+          <button type="button" class="modal-close-btn" (click)="closeModals()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+        <div class="modal-panel-body">
+          <p class="modal-description">
+            Assign an asset to <strong>{{ selectedRequest?.requesterName }}</strong>
+          </p>
+          <div class="form-group">
+            <label class="form-label">Select Asset <span class="required">*</span></label>
+            <select class="form-select" [(ngModel)]="selectedAssetId">
+              <option [ngValue]="null">-- Select an asset --</option>
+              <option *ngFor="let asset of availableAssets" [ngValue]="asset.id">
+                {{ asset.assetTag }} - {{ asset.name }} ({{ asset.brand }} {{ asset.model }})
+              </option>
+            </select>
+            <small class="form-hint" *ngIf="availableAssets.length === 0">
+              <i class="bi bi-info-circle"></i>
+              No available assets in this category
+            </small>
+          </div>
+        </div>
+        <div class="modal-panel-footer">
+          <button type="button" class="btn-modal btn-modal-cancel" (click)="closeModals()">Cancel</button>
+          <button type="button" class="btn-modal btn-modal-primary" (click)="fulfillRequest()" [disabled]="(isLoading$ | async) || !selectedAssetId">
+            <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!(isLoading$ | async)" class="bi bi-box-seam me-1"></i>
+            Assign Asset
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <section class="asset-requests-page">
+      <div class="container-fluid">
+        <div class="loading-state">
+          <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+          </div>
+          <p class="loading-text">Loading requests...</p>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <section class="asset-requests-page">
+      <div class="container-fluid">
+        <div class="error-state">
+          <div class="error-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+          <h4 class="error-title">Error Loading Requests</h4>
+          <p class="error-text">{{ state.error }}</p>
+          <button class="btn-retry" (click)="ngOnInit()">
+            <i class="bi bi-arrow-clockwise"></i>
+            Try Again
+          </button>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</ng-container>

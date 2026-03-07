@@ -1,0 +1,194 @@
+import { NgModule } from '@angular/core';
+import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './component/home/home/home.component';
+import { AuthenticationGuard } from './guard/authentication.guard';
+import { AttendanceListComponent } from "./component/attendance/attendance-list/attendance-list.component";
+import { MyAttendanceComponent } from "./component/attendance/my-attendance/my-attendance.component";
+import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
+import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
+
+/**
+ * Application Routes - UPDATED
+ */
+
+const routes: Routes = [
+  // =============================================
+  // HOME / DASHBOARD - MUST BE FIRST!
+  // =============================================
+  {
+    path: '',
+    component: HomeComponent,
+    canActivate: [AuthenticationGuard],
+    pathMatch: 'full',
+    data: { title: 'Dashboard' }
+  },
+
+  // =============================================
+  // EMPLOYEE SELF-SERVICE ROUTES
+  // =============================================
+  {
+    path: 'employee/my-details',
+    loadChildren: () => import('./component/employee/employee.module').then(module => module.EmployeeModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'My Details' }
+  },
+
+  // =============================================
+  // PROFILE
+  // =============================================
+  {
+    path: 'profile',
+    loadChildren: () => import('./component/profile/user.module').then(module => module.UserModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'My Profile' }
+  },
+
+  // =============================================
+  // ORGANIZATION
+  // =============================================
+  {
+    path: 'departments',
+    loadChildren: () => import('./component/department/department.module').then(m => m.DepartmentModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Departments' }
+  },
+  {
+    path: 'designations',
+    loadChildren: () => import('./component/designation/designation.module').then(m => m.DesignationModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Designations' }
+  },
+
+  // =============================================
+  // EMPLOYEES
+  // =============================================
+  {
+    path: 'employee',
+    loadChildren: () => import('./component/employee/employee.module').then(module => module.EmployeeModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Employees' }
+  },
+
+  // =============================================
+  // LEAVE MANAGEMENT
+  // =============================================
+  {
+    path: 'employee/leave',
+    component: EmployeeLeaveComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'My Leave Requests' }
+  },
+  {
+    path: 'admin/leave',
+    component: AdminLeaveComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Leave Management' }
+  },
+
+  // =============================================
+  // ATTENDANCE (includes Holidays)
+  // =============================================
+  {
+    path: 'attendance',
+    component: AttendanceListComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Attendance (Admin)' }
+  },
+  {
+    path: 'attendance/my',
+    component: MyAttendanceComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'My Attendance' }
+  },
+  {
+    path: 'holidays',
+    loadChildren: () => import('./component/holiday/holiday.module').then(m => m.HolidayModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Holidays' }
+  },
+
+  // =============================================
+  // PAYROLL
+  // =============================================
+  {
+    path: 'payroll',
+    loadChildren: () => import('./component/payroll/payroll.module').then(m => m.PayrollModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Payroll' }
+  },
+
+  // =============================================
+  // CLIENTS
+  // =============================================
+  {
+    path: 'customers',
+    loadChildren: () => import('./component/customer/customer.module').then(m => m.CustomerModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Clients' }
+  },
+
+  // =============================================
+  // INVOICES
+  // =============================================
+  {
+    path: 'invoices',
+    loadChildren: () => import('./component/invoice/invoice.module').then(m => m.InvoiceModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Invoices' }
+  },
+
+  // =============================================
+  // EXPENSE CLAIMS
+  // =============================================
+  {
+    path: 'expense-claims',
+    loadChildren: () => import('./component/expense-claims/expense-claims.module').then(m => m.ExpenseClaimsModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Expense Claims' }
+  },
+
+  // =============================================
+  // ASSET MANAGEMENT
+  // =============================================
+  {
+    path: 'assets',
+    loadChildren: () => import('./component/asset-management/asset-management.module').then(m => m.AssetManagementModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Asset Management' }
+  },
+
+  // =============================================
+  // ANNOUNCEMENTS
+  // =============================================
+  {
+    path: 'announcements',
+    loadChildren: () => import('./component/announcement/announcement.module').then(m => m.AnnouncementModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Announcements' }
+  },
+
+  // =============================================
+  // NOTIFICATIONS
+  // =============================================
+  {
+    path: 'notifications',
+    loadChildren: () => import('./component/notification/notification.module').then(m => m.UserNotificationModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Notifications' }
+  },
+
+  // =============================================
+  // FALLBACK - MUST BE LAST!
+  // =============================================
+  {
+    path: '**',
+    redirectTo: '',
+    pathMatch: 'full'
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }

@@ -1,0 +1,196 @@
+<div class="attendance-container" *ngIf="attendanceState$ | async as state">
+  <!-- Header Section -->
+  <div class="attendance-header">
+    <div class="header-left">
+      <h1 class="page-title">Attendance (Admin)</h1>
+      <div class="legend">
+        <span class="legend-item">
+          <span class="icon present">✓</span> Full Day Present
+        </span>
+        <span class="legend-item">
+          <span class="icon half-day">◐</span> Half Day Present
+        </span>
+        <span class="legend-item">
+          <span class="icon absent">✗</span> Full Day Absence
+        </span>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="btn btn-secondary" (click)="exportToExcel()">
+        <i class="fas fa-file-excel"></i> Export Excel
+      </button>
+      <button class="btn btn-secondary" (click)="exportToPDF()">
+        <i class="fas fa-file-pdf"></i> Export PDF
+      </button>
+      <button class="btn btn-primary" (click)="openAddAttendanceModal()">
+        <i class="fas fa-plus"></i> Add Attendance
+      </button>
+      <div class="filter-dropdown">
+        <button class="btn btn-secondary">
+          <i class="fas fa-filter"></i> Filter
+          <i class="fas fa-chevron-down"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Date Navigation -->
+  <div class="date-navigation">
+    <div class="nav-controls">
+      <button class="btn-icon" (click)="previousMonth()" title="Previous Month">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <div class="date-selectors">
+        <select class="form-select" [(ngModel)]="selectedMonth" (ngModelChange)="onMonthChange($event)">
+          <option *ngFor="let month of months" [value]="month.value">
+            {{ month.label }}
+          </option>
+        </select>
+
+        <select class="form-select" [(ngModel)]="selectedYear" (ngModelChange)="onYearChange($event)">
+          <option *ngFor="let year of years" [value]="year">
+            {{ year }}
+          </option>
+        </select>
+      </div>
+
+      <button class="btn-icon" (click)="nextMonth()" title="Next Month">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <button class="btn btn-secondary" (click)="goToToday()">
+        Today
+      </button>
+    </div>
+
+    <div class="search-box">
+      <i class="fas fa-search"></i>
+      <input
+        type="text"
+        placeholder="Search employees..."
+        [(ngModel)]="searchQuery"
+        class="search-input"
+      >
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="state.loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading attendance data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="state.error" class="error-container">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{ state.error }}</p>
+    <button class="btn btn-primary" (click)="loadMonthlyAttendance()">
+      Retry
+    </button>
+  </div>
+
+  <!-- Attendance Table -->
+  <div *ngIf="!state.loading && !state.error" class="attendance-table-wrapper">
+    <table class="attendance-table">
+      <thead>
+      <tr>
+        <th class="employee-column sticky-column">EMPLOYEE</th>
+        <th *ngFor="let day of daysInMonth" class="day-column">
+          {{ day }}
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let employeeAttendance of filterEmployees(state.attendances)"
+          class="employee-row">
+        <td class="employee-cell sticky-column">
+          <div class="employee-info">
+            <div class="employee-name">{{ employeeAttendance.employeeName }}</div>
+            <div class="employee-meta" *ngIf="employeeAttendance.designation">
+              {{ employeeAttendance.designation }}
+            </div>
+          </div>
+        </td>
+        <td *ngFor="let day of daysInMonth"
+            class="attendance-cell"
+            (click)="openEditModal(employeeAttendance, day)">
+          <div class="attendance-indicator"
+               [class]="getAttendanceClass(getAttendanceType(employeeAttendance, day))">
+            {{ getAttendanceIcon(getAttendanceType(employeeAttendance, day)) }}
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty State -->
+    <div *ngIf="filterEmployees(state.attendances).length === 0" class="empty-state">
+      <i class="fas fa-calendar-times"></i>
+      <h3>No Attendance Records</h3>
+      <p *ngIf="searchQuery">No employees found matching "{{ searchQuery }}"</p>
+      <p *ngIf="!searchQuery">No attendance data available for {{ getMonthName(selectedMonth) }} {{ selectedYear }}</p>
+    </div>
+  </div>
+
+  <!-- Summary Section -->
+  <div *ngIf="!state.loading && !state.error && state.attendances.length > 0" class="attendance-summary">
+    <h3>Monthly Summary</h3>
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-icon present">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Total Present Days</div>
+          <div class="summary-value">
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon half-day">
+          <i class="fas fa-adjust"></i>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Total Half Days</div>
+          <div class="summary-value">
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon absent">
+          <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Total Absences</div>
+          <div class="summary-value">
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-icon leave">
+          <i class="fas fa-umbrella-beach"></i>
+        </div>
+        <div class="summary-content">
+          <div class="summary-label">Total Leaves</div>
+          <div class="summary-value">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Attendance Modal -->
+<app-edit-attendance-modal
+  *ngIf="showEditModal"
+  [employee]="selectedEmployee"
+  [date]="selectedDate"
+  [employees]="employees"
+  (close)="closeEditModal()"
+  (saved)="onAttendanceSaved()"
+></app-edit-attendance-modal>

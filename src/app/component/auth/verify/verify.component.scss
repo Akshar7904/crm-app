@@ -1,0 +1,69 @@
+// Verify Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.invalid-feedback {
+  color: $danger;
+}
+
+.cart {
+  height: 100vh;
+}
+
+.progresses {
+  display: flex;
+  align-items: center;
+}
+
+.line {
+  width: 76px;
+  height: 6px;
+  background: #63d19e;
+}
+
+.steps {
+  display: flex;
+  background-color: #63d19e;
+  color: $white;
+  font-size: $font-size-xs;
+  width: 30px;
+  height: 30px;
+  @include flex-center;
+  border-radius: 50%;
+}
+
+.check1 {
+  display: flex;
+  background-color: #63d19e;
+  color: $white;
+  font-size: 17px;
+  width: 60px;
+  height: 60px;
+  @include flex-center;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.check2 {
+  display: flex;
+  background-color: #d40909;
+  color: $white;
+  font-size: 17px;
+  width: 60px;
+  height: 60px;
+  @include flex-center;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.invoice-link {
+  font-size: 15px;
+}
+
+.order-button {
+  height: 50px;
+}
+
+.background-muted {
+  background-color: #fafafc;
+}

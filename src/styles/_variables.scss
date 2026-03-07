@@ -1,0 +1,189 @@
+// ========================================
+// LKCentrix Payroll System - SCSS Variables
+// Centralized Theme Configuration
+// ========================================
+
+// ==================== PRIMARY COLORS ====================
+// Main brand colors (from login page)
+$primary-dark: #005c8f;
+$primary: #005c8f;
+$primary-medium: #004d7a;
+$primary-light: #003d5c;
+$primary-darker: #002a40;
+
+// Primary gradient (main brand gradient)
+$gradient-primary: linear-gradient(135deg, $primary-dark 0%, $primary-medium 100%);
+$gradient-primary-hover: linear-gradient(135deg, $primary-medium 0%, $primary-light 100%);
+$gradient-primary-dark: linear-gradient(135deg, $primary-dark 0%, $primary-light 50%, $primary-darker 100%);
+
+// ==================== SECONDARY COLORS ====================
+// Purple accent colors (used in some components)
+$secondary-dark: #484c7f;
+$secondary: #7978e9;
+$secondary-light: #9897f0;
+
+// Secondary gradient (accent gradient)
+$gradient-secondary: linear-gradient(135deg, $secondary-dark 0%, $secondary 100%);
+$gradient-secondary-hover: linear-gradient(135deg, #3a3d66 0%, #6867d8 100%);
+
+// ==================== SEMANTIC COLORS ====================
+// Success
+$success: #28a745;
+$success-light: #d4edda;
+$success-dark: #155724;
+
+// Warning
+$warning: #ffc107;
+$warning-light: #fff3cd;
+$warning-dark: #856404;
+
+// Danger/Error
+$danger: #dc3545;
+$danger-light: #f8d7da;
+$danger-dark: #721c24;
+
+// Info
+$info: #17a2b8;
+$info-light: #d1ecf1;
+$info-dark: #0c5460;
+
+// ==================== NEUTRAL COLORS ====================
+$white: #ffffff;
+$gray-50: #f9fafb;
+$gray-100: #f8f9fa;
+$gray-200: #e5e7eb;
+$gray-300: #e0e0e0;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #666666;
+$gray-700: #374151;
+$gray-800: #333333;
+$gray-900: #1e293b;
+$black: #000000;
+
+// Background colors
+$bg-body: #ecf2f5;
+$bg-card: $white;
+$bg-input: $gray-50;
+$bg-disabled: #f3f4f6;
+
+// Text colors
+$text-primary: $gray-800;
+$text-secondary: $gray-600;
+$text-muted: #64748b;
+$text-light: $gray-400;
+
+// Border colors
+$border-color: $gray-300;
+$border-light: #f0f0f0;
+$border-focus: $primary;
+
+// ==================== TYPOGRAPHY ====================
+$font-family-base: 'Open Sans', 'Nunito', 'Poppins', sans-serif;
+$font-size-base: 1rem;
+$font-size-sm: 0.875rem;
+$font-size-xs: 0.75rem;
+$font-size-lg: 1.125rem;
+$font-size-xl: 1.25rem;
+$font-size-2xl: 1.5rem;
+$font-size-3xl: 2rem;
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-base: 1.5;
+$line-height-tight: 1.25;
+$line-height-relaxed: 1.75;
+
+// ==================== SPACING ====================
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+$spacing-3xl: 4rem;
+
+// ==================== BORDERS ====================
+$border-radius-sm: 4px;
+$border-radius: 6px;
+$border-radius-md: 8px;
+$border-radius-lg: 10px;
+$border-radius-xl: 12px;
+$border-radius-full: 9999px;
+
+$border-width: 1px;
+$border-width-md: 2px;
+$border-width-lg: 3px;
+
+// ==================== SHADOWS ====================
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.15);
+$shadow-xl: 0 10px 40px rgba(0, 0, 0, 0.2);
+$shadow-primary: 0 4px 8px rgba(0, 92, 143, 0.3);
+$shadow-secondary: 0 4px 6px rgba(72, 76, 127, 0.2);
+
+// ==================== TRANSITIONS ====================
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+
+// ==================== Z-INDEX ====================
+$z-dropdown: 100;
+$z-sticky: 200;
+$z-fixed: 300;
+$z-modal-backdrop: 900;
+$z-modal: 1000;
+$z-popover: 1100;
+$z-tooltip: 1200;
+
+// ==================== BREAKPOINTS ====================
+$breakpoint-xs: 380px;
+$breakpoint-sm: 576px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 992px;
+$breakpoint-xl: 1200px;
+$breakpoint-2xl: 1400px;
+
+// ==================== COMPONENT SPECIFIC ====================
+// Buttons
+$btn-padding-y: 0.75rem;
+$btn-padding-x: 1.5rem;
+$btn-font-size: 0.95rem;
+$btn-font-weight: $font-weight-semibold;
+$btn-border-radius: $border-radius;
+
+// Cards
+$card-padding: $spacing-lg;
+$card-border-radius: $border-radius-xl;
+$card-shadow: $shadow;
+
+// Forms
+$input-padding-y: 0.75rem;
+$input-padding-x: 1rem;
+$input-font-size: 0.95rem;
+$input-border-radius: $border-radius;
+$input-border-color: #ddd;
+$input-focus-border-color: $primary;
+$input-focus-shadow: 0 0 0 3px rgba(0, 92, 143, 0.15);
+
+// Tables
+$table-header-bg: $gray-100;
+$table-border-color: $border-light;
+$table-hover-bg: $gray-100;
+
+// Badges
+$badge-padding-y: 0.35rem;
+$badge-padding-x: 0.75rem;
+$badge-font-size: 0.85rem;
+$badge-border-radius: 20px;
+
+// Modal
+$modal-max-width: 600px;
+$modal-padding: $spacing-lg;
+$modal-border-radius: $border-radius-xl;

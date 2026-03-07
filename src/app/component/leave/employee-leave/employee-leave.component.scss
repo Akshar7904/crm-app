@@ -1,0 +1,381 @@
+// Employee Leave Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// Container
+.employee-leave-container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+// Header
+.page-header {
+  @include flex-between;
+  margin-bottom: $spacing-xl;
+  padding-bottom: $spacing-md;
+  border-bottom: $border-width-md solid $border-color;
+}
+
+.header-content h1 {
+  margin: 0;
+  font-size: $font-size-3xl;
+  color: $text-primary;
+  font-weight: $font-weight-semibold;
+}
+
+.header-content p {
+  margin: $spacing-sm 0 0 0;
+  color: $text-secondary;
+  font-size: $font-size-base;
+}
+
+// Leave Balance Section
+.balance-section {
+  margin-bottom: $spacing-xl;
+
+  h2 {
+    font-size: $font-size-2xl;
+    color: $text-primary;
+    margin-bottom: $spacing-md;
+    font-weight: $font-weight-semibold;
+  }
+}
+
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: $spacing-lg;
+}
+
+.balance-card {
+  @include card-gradient($gradient-primary);
+}
+
+.balance-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+
+  i {
+    font-size: $font-size-2xl;
+  }
+}
+
+.balance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+}
+
+.stat {
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.stat-label {
+  display: block;
+  font-size: $font-size-xs;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+// Tabs
+.tabs-section {
+  margin-bottom: $spacing-lg;
+}
+
+.tabs {
+  @include tabs-container;
+}
+
+.tab {
+  @include tab-item;
+
+  &.active {
+    color: $primary;
+    border-bottom-color: $primary;
+  }
+}
+
+// Table Section
+.table-section {
+  @include card;
+}
+
+.loading {
+  @include loading-state;
+}
+
+.empty-state {
+  @include empty-state;
+}
+
+// Leave Table
+.leave-table {
+  @include table-base;
+}
+
+// Badges
+.leave-type-badge {
+  @include badge(#e3f2fd, #1976d2);
+}
+
+.days-badge {
+  @include badge(#f3e5f5, #7b1fa2);
+  font-weight: $font-weight-semibold;
+}
+
+// Status Badges
+.status-badge {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  border-radius: $badge-border-radius;
+  font-size: $badge-font-size;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-pending {
+  @include status-badge('pending');
+}
+
+.status-approved {
+  @include status-badge('approved');
+}
+
+.status-rejected {
+  @include status-badge('rejected');
+}
+
+.status-cancelled {
+  @include status-badge('cancelled');
+}
+
+// Reason Text
+.reason-text {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.rejection-reason {
+  margin-top: $spacing-sm;
+  padding: $spacing-sm;
+  background-color: $warning-light;
+  border-left: 3px solid $warning;
+  border-radius: $border-radius-sm;
+
+  small {
+    color: $warning-dark;
+    font-size: $badge-font-size;
+  }
+}
+
+// Action Buttons
+.action-buttons {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.btn-icon {
+  @include btn-icon;
+}
+
+.btn-edit {
+  color: $primary;
+  border-color: $primary;
+
+  &:hover {
+    background: $gradient-primary;
+    color: $white;
+    border-color: transparent;
+  }
+}
+
+.btn-cancel {
+  color: $danger;
+  border-color: $danger;
+
+  &:hover {
+    background-color: $danger;
+    color: $white;
+  }
+}
+
+// Modal
+.modal-overlay {
+  @include modal-overlay;
+}
+
+.modal-content {
+  @include modal-content;
+}
+
+.modal-header {
+  @include modal-header;
+}
+
+.btn-close {
+  background: none;
+  border: none;
+  font-size: $font-size-2xl;
+  color: $text-muted;
+  cursor: pointer;
+  padding: $spacing-sm;
+  line-height: 1;
+
+  &:hover {
+    color: $text-primary;
+  }
+}
+
+// Form
+.form-grid {
+  padding: $modal-padding;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.form-group {
+  @include flex-column;
+  gap: $spacing-sm;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  label {
+    @include form-label;
+  }
+}
+
+.required {
+  color: $danger;
+}
+
+.form-control {
+  @include form-control;
+}
+
+.balance-info {
+  font-size: $badge-font-size;
+  color: $primary;
+  font-weight: $font-weight-semibold;
+  margin-top: $spacing-xs;
+}
+
+// Checkbox
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  cursor: pointer;
+  user-select: none;
+
+  input[type="checkbox"] {
+    width: 1.25rem;
+    height: 1.25rem;
+    cursor: pointer;
+  }
+
+  span {
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+  }
+}
+
+// Modal Footer
+.modal-footer {
+  @include modal-footer;
+}
+
+// Buttons
+.btn {
+  padding: $btn-padding-y $btn-padding-x;
+  border: none;
+  border-radius: $btn-border-radius;
+  font-weight: $btn-font-weight;
+  cursor: pointer;
+  transition: all $transition-base;
+  font-size: $btn-font-size;
+}
+
+.btn-primary {
+  @include btn-primary;
+}
+
+.btn-secondary {
+  background-color: $gray-300;
+  color: $text-primary;
+
+  &:hover {
+    background-color: darken($gray-300, 5%);
+  }
+}
+
+// Responsive
+@include respond-to('md') {
+  .employee-leave-container {
+    padding: $spacing-md;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  .balance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .balance-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .leave-table {
+    font-size: $badge-font-size;
+
+    th, td {
+      padding: $spacing-md $spacing-sm;
+    }
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .modal-content {
+    max-width: 100%;
+  }
+}
+
+@include respond-to('sm') {
+  .header-content h1 {
+    font-size: $font-size-2xl;
+  }
+
+  .balance-card {
+    padding: $spacing-md;
+  }
+
+  .stat-value {
+    font-size: $font-size-2xl;
+  }
+}

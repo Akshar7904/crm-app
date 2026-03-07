@@ -1,0 +1,320 @@
+<ng-container *ngIf="(customerState$ | async) as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="client-detail-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/customers']">Clients</a></li>
+            <li class="breadcrumb-item active">{{ state?.appData?.data?.customer.name }}</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+          <div class="row align-items-center">
+            <div class="col">
+              <h4 class="page-title">
+                <i class="bi bi-person me-2"></i>{{ state?.appData?.data?.customer.name }}
+              </h4>
+              <p class="text-muted mb-0">Client profile and invoices</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-outline-secondary me-2" [routerLink]="['/customers']">
+                <i class="bi bi-arrow-left me-1"></i> Back
+              </button>
+              <a [routerLink]="['/invoices/new']" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Create Invoice
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Left Column - Client Info -->
+          <div class="col-lg-4 mb-4">
+            <!-- Profile Card -->
+            <div class="card profile-card mb-4">
+              <div class="card-body text-center">
+                <!-- Avatar -->
+                <div class="profile-avatar-wrapper mb-3">
+                  <img *ngIf="state?.appData?.data?.customer.imageUrl"
+                       [src]="state?.appData?.data?.customer.imageUrl"
+                       [alt]="state?.appData?.data?.customer.name"
+                       class="profile-avatar">
+                  <div *ngIf="!state?.appData?.data?.customer.imageUrl" class="profile-avatar-placeholder">
+                    {{ getInitials(state?.appData?.data?.customer.name) }}
+                  </div>
+                  <span class="status-indicator"
+                        [ngClass]="{
+                          'bg-success': state?.appData?.data?.customer.status === 'ACTIVE',
+                          'bg-primary': state?.appData?.data?.customer.status === 'PENDING',
+                          'bg-danger': state?.appData?.data?.customer.status === 'BANNED',
+                          'bg-info': state?.appData?.data?.customer.status === 'INACTIVE'
+                        }"></span>
+                </div>
+
+                <h4 class="profile-name">{{ state?.appData?.data?.customer.name }}</h4>
+                <p class="profile-type">{{ state?.appData?.data?.customer.type || 'Client' }}</p>
+
+                <span class="badge status-badge mb-3"
+                      [ngClass]="{
+                        'bg-success-subtle text-success': state?.appData?.data?.customer.status === 'ACTIVE',
+                        'bg-primary-subtle text-primary': state?.appData?.data?.customer.status === 'PENDING',
+                        'bg-danger-subtle text-danger': state?.appData?.data?.customer.status === 'BANNED',
+                        'bg-info-subtle text-info': state?.appData?.data?.customer.status === 'INACTIVE'
+                      }">
+                  <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
+                  {{ state?.appData?.data?.customer.status }}
+                </span>
+
+                <!-- Contact Info -->
+                <div class="contact-info">
+                  <div class="contact-item">
+                    <i class="bi bi-envelope"></i>
+                    <span>{{ state?.appData?.data?.customer.email }}</span>
+                  </div>
+                  <div class="contact-item">
+                    <i class="bi bi-telephone"></i>
+                    <span>{{ state?.appData?.data?.customer.phone }}</span>
+                  </div>
+                  <div class="contact-item" *ngIf="state?.appData?.data?.customer.address">
+                    <i class="bi bi-geo-alt"></i>
+                    <span>{{ state?.appData?.data?.customer.address }}</span>
+                  </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions mt-4">
+                  <a [href]="'mailto:' + state?.appData?.data?.customer.email" class="btn btn-outline-primary btn-sm me-2">
+                    <i class="bi bi-envelope me-1"></i> Email
+                  </a>
+                  <a [href]="'tel:' + state?.appData?.data?.customer.phone" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-telephone me-1"></i> Call
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="card stats-card mb-4">
+              <div class="card-body">
+                <div class="stat-row">
+                  <div class="stat-icon bg-primary-subtle">
+                    <i class="bi bi-receipt text-primary"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4 class="stat-value">{{ state?.appData?.data?.customer.invoices?.length || 0 }}</h4>
+                    <p class="stat-label">Total Invoices</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card stats-card">
+              <div class="card-body">
+                <div class="stat-row">
+                  <div class="stat-icon bg-success-subtle">
+                    <i class="bi bi-cash-stack text-success"></i>
+                  </div>
+                  <div class="stat-info">
+                    <h4 class="stat-value">R {{ state?.appData?.data?.customer.invoices | ExtractArrayValue: 'invoices' }}</h4>
+                    <p class="stat-label">Total Billed</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Edit Form & Invoices -->
+          <div class="col-lg-8">
+            <!-- Edit Profile Card -->
+            <div class="card edit-card mb-4">
+              <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Profile</h6>
+              </div>
+              <div class="card-body">
+                <form #customerForm="ngForm" (ngSubmit)="updateCustomer(customerForm)">
+                  <input type="hidden" [ngModel]="state?.appData?.data?.customer.id" name="id">
+                  <input type="hidden" [ngModel]="state?.appData?.data?.customer.createdAt" name="createdAt">
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Name</label>
+                      <input type="text"
+                             class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.name"
+                             name="name"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Email</label>
+                      <input type="email"
+                             class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.email"
+                             name="email"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Phone</label>
+                      <input type="text"
+                             class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.phone"
+                             name="phone"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Type</label>
+                      <select class="form-select"
+                              [ngModel]="state?.appData?.data?.customer.type"
+                              name="type"
+                              [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                        <option value="INDIVIDUAL">Individual</option>
+                        <option value="INSTITUTION">Institution</option>
+                        <option value="CORPORATE">Corporate</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Status</label>
+                      <select class="form-select"
+                              [ngModel]="state?.appData?.data?.customer.status"
+                              name="status"
+                              [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                        <option value="ACTIVE">Active</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="BANNED">Banned</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Image URL</label>
+                      <input type="text"
+                             class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.imageUrl"
+                             name="imageUrl"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Address</label>
+                      <textarea class="form-control"
+                                [ngModel]="state?.appData?.data?.customer.address"
+                                name="address"
+                                rows="2"
+                                [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)"></textarea>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end">
+                    <button type="submit"
+                            class="btn btn-primary"
+                            [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                      <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                      <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-1"></i>
+                      {{ (isLoading$ | async) ? 'Saving...' : 'Save Changes' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Invoices Card -->
+            <div class="card invoices-card">
+              <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-receipt me-2"></i>Invoices</h6>
+              </div>
+              <div class="card-body">
+                <div class="table-responsive" *ngIf="state?.appData?.data?.customer.invoices?.length > 0">
+                  <table class="table invoices-table">
+                    <thead>
+                      <tr>
+                        <th>Invoice #</th>
+                        <th>Services</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let invoice of state?.appData?.data?.customer.invoices">
+                        <td>
+                          <span class="invoice-number">#{{ invoice.invoiceNumber }}</span>
+                        </td>
+                        <td>
+                          <span class="services-text">{{ invoice.services?.split(',')[0] || 'Services' }}</span>
+                        </td>
+                        <td>
+                          <span class="badge status-badge"
+                                [ngClass]="{
+                                  'bg-success-subtle text-success': invoice.status === 'PAID',
+                                  'bg-primary-subtle text-primary': invoice.status === 'PENDING',
+                                  'bg-warning-subtle text-warning': invoice.status === 'OVERDUE',
+                                  'bg-danger-subtle text-danger': invoice.status === 'CANCELED'
+                                }">
+                            {{ invoice.status }}
+                          </span>
+                        </td>
+                        <td>{{ invoice.date | date: 'mediumDate' }}</td>
+                        <td class="text-end fw-bold">R {{ invoice.total?.toLocaleString() }}</td>
+                        <td class="text-center">
+                          <button class="btn btn-sm btn-light action-btn"
+                                  [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
+                                  title="View Invoice">
+                            <i class="bi bi-eye"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Empty State -->
+                <div *ngIf="!state?.appData?.data?.customer.invoices?.length" class="empty-state">
+                  <i class="bi bi-receipt"></i>
+                  <h6>No Invoices Yet</h6>
+                  <p class="text-muted mb-3">Create the first invoice for this client</p>
+                  <a [routerLink]="['/invoices/new']" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Create Invoice
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading client...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ state.error }}
+        <button class="btn btn-primary mt-3" [routerLink]="['/customers']">
+          <i class="bi bi-arrow-left me-2"></i>Back to Clients
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

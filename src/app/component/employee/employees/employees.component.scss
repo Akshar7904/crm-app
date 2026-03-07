@@ -1,0 +1,363 @@
+// employees Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+/* Member Card Styles - Clean Modern Design */
+.member-card {
+  border: none;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  background: #fff;
+  position: relative;
+}
+
+.member-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* Status Badge - Top Right Corner */
+.member-status {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+}
+
+.member-status .badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+/* Avatar Styles */
+.member-avatar {
+  margin: 25px auto 20px;
+  width: 100px;
+  height: 100px;
+  position: relative;
+}
+
+.member-avatar .avatar-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.member-card:hover .avatar-img {
+  border-color: var(--primary-color, #484c7f);
+}
+
+.member-avatar .avatar-initials {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 600;
+  text-transform: uppercase;
+  border: 4px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.member-card:hover .avatar-initials {
+  border-color: #484c7f;
+}
+
+/* Name & Title */
+.member-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 5px;
+}
+
+.member-title {
+  font-size: 14px;
+  color: #7978e9;
+  font-weight: 500;
+  margin-bottom: 15px;
+}
+
+/* Info Pills */
+.member-info {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.info-pill {
+  background: #f8f9ff;
+  color: #484c7f;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.info-pill i {
+  font-size: 12px;
+  color: #7978e9;
+}
+
+/* Contact Details */
+.member-contact {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 15px;
+  margin-bottom: 15px;
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.contact-item:last-child {
+  margin-bottom: 0;
+}
+
+.contact-item i {
+  color: #7978e9;
+  font-size: 14px;
+  width: 16px;
+  text-align: center;
+}
+
+.contact-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* Meta Info (Hire Date) */
+.member-meta {
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.member-meta small {
+  font-size: 12px;
+}
+
+.member-meta i {
+  margin-right: 5px;
+  color: #7978e9;
+}
+
+/* Card Footer */
+.member-card .card-footer {
+  background: transparent;
+  border-top: 1px solid #f0f0f0;
+  padding: 15px 20px;
+}
+
+.member-card .card-footer .btn {
+  border-radius: 25px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.member-card .card-footer .btn-outline-primary {
+  color: #484c7f;
+  border-color: #484c7f;
+}
+
+.member-card .card-footer .btn-outline-primary:hover {
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  border-color: transparent;
+  color: #fff;
+  transform: scale(1.02);
+}
+
+/* Status Badge Colors */
+.bg-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+}
+
+.bg-danger {
+  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%) !important;
+}
+
+.bg-warning {
+  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
+}
+
+.bg-info {
+  background: linear-gradient(135deg, #17a2b8 0%, #6610f2 100%) !important;
+  color: white !important;
+}
+
+.bg-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+}
+
+/* Empty State */
+.empty-state {
+  background: #f8f9ff;
+  border-radius: 15px;
+  padding: 60px 20px;
+}
+
+.empty-state i {
+  opacity: 0.5;
+  color: #484c7f !important;
+}
+
+.empty-state h4 {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.empty-state p {
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Action Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  border: none;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(72, 76, 127, 0.4);
+  background: linear-gradient(135deg, #3d4070 0%, #6867d8 100%);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  border: none;
+  border-radius: 25px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 30px;
+}
+
+.page-item.pointer {
+  cursor: pointer;
+}
+
+.page-item.disabled {
+  cursor: not-allowed;
+}
+
+.page-link {
+  color: #484c7f;
+  border-color: #dee2e6;
+  border-radius: 8px;
+  margin: 0 3px;
+}
+
+.page-link:hover {
+  color: #fff;
+  background: #7978e9;
+  border-color: #7978e9;
+}
+
+.page-item.active .page-link {
+  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
+  border-color: transparent;
+}
+
+/* Search Input */
+.form-control {
+  border-radius: 25px;
+  padding: 10px 20px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #7978e9;
+  box-shadow: 0 0 0 3px rgba(121, 120, 233, 0.15);
+}
+
+/* Breadcrumb Styling */
+.breadcrumb {
+  background-color: transparent;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.breadcrumb-item a {
+  color: #484c7f;
+  text-decoration: none;
+}
+
+.breadcrumb-item a:hover {
+  color: #7978e9;
+  text-decoration: underline;
+}
+
+.breadcrumb-item.active {
+  color: #6c757d;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .member-avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .member-avatar .avatar-img,
+  .member-avatar .avatar-initials {
+    width: 80px;
+    height: 80px;
+    font-size: 26px;
+  }
+
+  .member-name {
+    font-size: 16px;
+  }
+
+  .member-title {
+    font-size: 13px;
+  }
+
+  .info-pill {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+}
+
+/* Loading Spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+  color: #484c7f !important;
+}

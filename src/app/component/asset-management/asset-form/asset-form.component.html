@@ -1,0 +1,236 @@
+<!-- Navbar rendered by app.component -->
+<section>
+  <div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" style="margin-top: 8px">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/']">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/assets']">Assets</a>
+        </li>
+        <li class="breadcrumb-item active">{{ isEditMode ? 'Edit Asset' : 'New Asset' }}</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mt-3 mb-4">
+      <div class="col">
+        <h4 class="fw-bold">{{ isEditMode ? 'Edit Asset' : 'Add New Asset' }}</h4>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="card">
+      <div class="card-body">
+        <form [formGroup]="assetForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <!-- Basic Information -->
+            <div class="col-md-6">
+              <h5 class="mb-3">Basic Information</h5>
+
+              <div class="mb-3">
+                <label for="assetTag" class="form-label">Asset Tag *</label>
+                <input
+                  type="text"
+                  id="assetTag"
+                  formControlName="assetTag"
+                  class="form-control"
+                  [ngClass]="{'is-invalid': isFieldInvalid('assetTag')}"
+                  placeholder="e.g., LAP-001"
+                />
+                <div class="invalid-feedback">Asset tag is required (min 3 characters)</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="name" class="form-label">Asset Name *</label>
+                <input
+                  type="text"
+                  id="name"
+                  formControlName="name"
+                  class="form-control"
+                  [ngClass]="{'is-invalid': isFieldInvalid('name')}"
+                  placeholder="e.g., MacBook Pro 16"
+                />
+                <div class="invalid-feedback">Asset name is required</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Asset description..."
+                ></textarea>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="category" class="form-label">Category *</label>
+                  <select
+                    id="category"
+                    formControlName="category"
+                    class="form-select"
+                  >
+                    <option *ngFor="let cat of categories" [value]="cat">
+                      {{ cat | titlecase }}
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="status" class="form-label">Status *</label>
+                  <select
+                    id="status"
+                    formControlName="status"
+                    class="form-select"
+                  >
+                    <option *ngFor="let status of statuses" [value]="status">
+                      {{ status | titlecase }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="condition" class="form-label">Condition *</label>
+                <select
+                  id="condition"
+                  formControlName="condition"
+                  class="form-select"
+                >
+                  <option *ngFor="let cond of conditions" [value]="cond">
+                    {{ cond | titlecase }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Additional Details -->
+            <div class="col-md-6">
+              <h5 class="mb-3">Additional Details</h5>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="brand" class="form-label">Brand</label>
+                  <input
+                    type="text"
+                    id="brand"
+                    formControlName="brand"
+                    class="form-control"
+                    placeholder="e.g., Apple"
+                  />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="model" class="form-label">Model</label>
+                  <input
+                    type="text"
+                    id="model"
+                    formControlName="model"
+                    class="form-control"
+                    placeholder="e.g., A2141"
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="serialNumber" class="form-label">Serial Number</label>
+                <input
+                  type="text"
+                  id="serialNumber"
+                  formControlName="serialNumber"
+                  class="form-control"
+                  placeholder="Serial number"
+                />
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="purchaseDate" class="form-label">Purchase Date</label>
+                  <input
+                    type="date"
+                    id="purchaseDate"
+                    formControlName="purchaseDate"
+                    class="form-control"
+                  />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="purchasePrice" class="form-label">Purchase Price</label>
+                  <div class="input-group">
+                    <span class="input-group-text">R</span>
+                    <input
+                      type="number"
+                      id="purchasePrice"
+                      formControlName="purchasePrice"
+                      class="form-control"
+                      placeholder="0.00"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="warrantyExpiry" class="form-label">Warranty Expiry</label>
+                <input
+                  type="date"
+                  id="warrantyExpiry"
+                  formControlName="warrantyExpiry"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="location" class="form-label">Location</label>
+                <input
+                  type="text"
+                  id="location"
+                  formControlName="location"
+                  class="form-control"
+                  placeholder="e.g., Office A, Floor 2"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea
+                  id="notes"
+                  formControlName="notes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Additional notes..."
+                ></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="row mt-4">
+            <div class="col text-end">
+              <button
+                type="button"
+                class="btn btn-secondary me-2"
+                (click)="cancel()"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="isLoading$ | async"
+              >
+                <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                {{ isEditMode ? 'Update Asset' : 'Create Asset' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

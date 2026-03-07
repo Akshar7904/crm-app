@@ -1,0 +1,13 @@
+// process-payroll Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.form-check {
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.form-check:hover {
+  background-color: #f8f9fa;
+}

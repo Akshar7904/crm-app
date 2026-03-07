@@ -1,0 +1,73 @@
+// my-requests Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// Cards with login-style shadow and hover
+.card {
+  @include card;
+  border: none;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+// Status icons - use primary accent for info state
+.text-info {
+  color: $primary !important;
+}
+
+// Alert for expanded details
+.alert-light {
+  background-color: rgba($primary, 0.03);
+  border-color: rgba($primary, 0.1);
+  border-radius: $border-radius;
+}
+
+// Badge styling
+.badge {
+  font-weight: $font-weight-semibold;
+  padding: $badge-padding-y $badge-padding-x;
+  border-radius: $badge-border-radius;
+  font-size: $badge-font-size;
+}
+
+// Primary button gradient
+.btn-primary {
+  @include btn-primary;
+}
+
+// Breadcrumb accent
+.breadcrumb-item a {
+  color: $primary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $primary-medium;
+  }
+}
+
+// Pagination with primary accent
+.page-link {
+  color: $primary;
+  transition: all $transition-base;
+
+  &:hover {
+    background-color: rgba($primary, 0.08);
+    color: $primary-dark;
+  }
+
+  &.active {
+    background: $gradient-primary;
+    border-color: $primary;
+    color: $white;
+  }
+}
+
+// Category header in each card
+h6 {
+  color: $gray-900;
+  font-weight: $font-weight-semibold;
+}

@@ -1,0 +1,213 @@
+<ng-container *ngIf="(invoicesState$ | async) as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="invoices-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item active">Invoices</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+          <div class="row align-items-center">
+            <div class="col">
+              <h4 class="page-title">
+                <i class="bi bi-receipt me-2"></i>Invoices
+              </h4>
+              <p class="text-muted mb-0">Manage your invoices and billing</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-outline-success me-2" title="Export to Excel">
+                <i class="bi bi-file-earmark-excel"></i>
+              </button>
+              <a [routerLink]="['/invoices/new']" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create Invoice
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row mb-4">
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-primary-subtle">
+                <i class="bi bi-receipt text-primary"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ state?.appData?.data?.page?.totalElements || 0 }}</h3>
+                <p class="stat-label">Total Invoices</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-success-subtle">
+                <i class="bi bi-check-circle text-success"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ getPaidCount(state) }}</h3>
+                <p class="stat-label">Paid</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-warning-subtle">
+                <i class="bi bi-clock text-warning"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ getPendingCount(state) }}</h3>
+                <p class="stat-label">Pending</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 col-sm-6 mb-3">
+            <div class="stat-card">
+              <div class="stat-icon bg-danger-subtle">
+                <i class="bi bi-exclamation-circle text-danger"></i>
+              </div>
+              <div class="stat-info">
+                <h3 class="stat-value">{{ getOverdueCount(state) }}</h3>
+                <p class="stat-label">Overdue</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Invoice Cards Grid -->
+        <div class="row">
+          <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 mb-4"
+               *ngFor="let invoice of state?.appData?.data?.page?.content">
+            <div class="card invoice-card">
+              <!-- Card Header with Status -->
+              <div class="card-header">
+                <span class="invoice-number">#{{ invoice.invoiceNumber }}</span>
+                <span class="badge status-badge"
+                      [ngClass]="{
+                        'bg-success-subtle text-success': invoice.status === 'PAID',
+                        'bg-primary-subtle text-primary': invoice.status === 'PENDING',
+                        'bg-danger-subtle text-danger': invoice.status === 'CANCELED',
+                        'bg-warning-subtle text-warning': invoice.status === 'OVERDUE'
+                      }">
+                  <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
+                  {{ invoice.status }}
+                </span>
+              </div>
+
+              <!-- Card Body -->
+              <div class="card-body">
+                <!-- Customer Info -->
+                <div class="customer-section">
+                  <div class="customer-avatar">
+                    {{ getCustomerInitial(invoice) }}
+                  </div>
+                  <div class="customer-details">
+                    <h6 class="customer-name">{{ getCustomerName(invoice) }}</h6>
+                    <p class="invoice-service">{{ invoice.services?.split(',')[0] || 'Services' }}</p>
+                  </div>
+                </div>
+
+                <!-- Invoice Details -->
+                <div class="invoice-details">
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <i class="bi bi-calendar3 me-2"></i>Date
+                    </span>
+                    <span class="detail-value">{{ invoice.date | date: 'mediumDate' }}</span>
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">
+                      <i class="bi bi-cash-stack me-2"></i>Total (incl. VAT)
+                    </span>
+                    <span class="detail-value amount">{{ formatCurrency(invoice.total) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Card Footer with Actions -->
+              <div class="card-footer">
+                <button class="btn btn-sm btn-light action-btn"
+                        [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
+                        title="View Invoice">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-light action-btn"
+                        [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
+                        [queryParams]="{edit: true}"
+                        title="Edit Invoice">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm btn-light action-btn"
+                        (click)="sendInvoice(invoice, $event)"
+                        title="Send Invoice to {{ invoice.customerName }}">
+                  <i class="bi bi-send"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="!state?.appData?.data?.page?.content?.length" class="col-12">
+            <div class="empty-state">
+              <i class="bi bi-receipt"></i>
+              <h5>No Invoices Found</h5>
+              <p class="text-muted">Get started by creating your first invoice</p>
+              <a [routerLink]="['/invoices/new']" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Create Invoice
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav *ngIf="state?.appData?.data?.page?.content?.length > 0" aria-label="Page navigation">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" [class.disabled]="(currentPage$ | async) === 0">
+              <a class="page-link" (click)="goToNextOrPreviousPage('backward')">
+                <i class="bi bi-chevron-left"></i> Previous
+              </a>
+            </li>
+            <li class="page-item"
+                *ngFor="let pageNumber of [].constructor(state?.appData?.data?.page?.totalPages); let i = index"
+                [class.active]="i === (currentPage$ | async)">
+              <a class="page-link" (click)="goToPage(i)">{{ i + 1 }}</a>
+            </li>
+            <li class="page-item"
+                [class.disabled]="(currentPage$ | async) === (state?.appData?.data?.page?.totalPages - 1)">
+              <a class="page-link" (click)="goToNextOrPreviousPage('forward')">
+                Next <i class="bi bi-chevron-right"></i>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading invoices...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ state.error }}
+        <button class="btn btn-primary mt-3" (click)="ngOnInit()">
+          <i class="bi bi-arrow-clockwise me-2"></i>Retry
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

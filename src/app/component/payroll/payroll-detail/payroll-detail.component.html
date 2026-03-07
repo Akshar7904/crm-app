@@ -1,0 +1,205 @@
+<!-- payroll-detail.component.html -->
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12">
+      <!-- Action Buttons - Hidden when printing -->
+      <div class="no-print mb-3">
+        <button class="btn btn-secondary me-2" (click)="back()">
+          <i class="bi bi-arrow-left"></i> Back
+        </button>
+        <button class="btn btn-primary me-2" (click)="print()">
+          <i class="bi bi-printer"></i> Print
+        </button>
+        <button class="btn btn-success me-2" (click)="downloadPayslip()">
+          <i class="bi bi-download"></i> Download PDF
+        </button>
+      </div>
+
+      <!-- Payslip Content -->
+      <div class="payslip-container" *ngIf="payroll">
+
+        <!-- Company Header -->
+        <div class="company-header">
+          <h3>LKCentrix Solutions (PTY) LTD</h3>
+          <p>Bedfordview Corporate park, 4 Skeen BLVD, Bedfordview, 2001</p>
+          <p>+27 (11) 568 8322 | info@lkcentrix.co.za</p>
+          <h4>Payslip for the month of {{ getPayPeriod() }}</h4>
+        </div>
+
+        <!-- Employee Details Section -->
+        <div class="employee-details">
+          <table class="details-table">
+            <tr>
+              <td class="label">Emp Code :</td>
+              <td class="value">{{ employee?.employeeId || 'N/A' }}</td>
+              <td class="label">Name :</td>
+              <td class="value">{{ employee?.firstName }} {{ employee?.lastName }}</td>
+            </tr>
+            <tr>
+              <td class="label">Department :</td>
+              <td class="value">{{ employee?.departmentName || 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td class="label">Designation :</td>
+              <td class="value">{{ employee?.designationTitle || 'N/A' }}</td>
+            </tr>
+<!--            <tr>-->
+<!--              <td class="label">PF No. :</td>-->
+<!--              <td class="value">1</td>-->
+<!--              <td class="label">Days paid :</td>-->
+<!--              <td class="value">{{ payroll.daysWorked || 30.0 }}</td>-->
+<!--            </tr>-->
+<!--            <tr>-->
+<!--              <td class="label">Days present :</td>-->
+<!--              <td class="value">{{ payroll.daysWorked || 30.0 }}</td>-->
+<!--              <td class="label">Paid Holidays :</td>-->
+<!--              <td class="value">0.00</td>-->
+<!--            </tr>-->
+<!--            <tr>-->
+<!--              <td class="label">Sick Leave :</td>-->
+<!--              <td class="value">0.00</td>-->
+<!--              <td class="label">Annual Leave :</td>-->
+<!--              <td class="value">0.00</td>-->
+<!--            </tr>-->
+<!--            <tr>-->
+<!--              <td class="label">LWP/Absent :</td>-->
+<!--              <td class="value">{{ payroll.daysAbsent || 0.0 }}</td>-->
+<!--              <td class="label">Compensatory Leave :</td>-->
+<!--              <td class="value">0.00</td>-->
+<!--            </tr>-->
+          </table>
+        </div>
+
+        <!-- Earnings and Deductions Section -->
+        <div class="earnings-deductions">
+          <!-- Earnings Column -->
+          <div class="earnings-section">
+            <div class="section-header">
+              <span class="header-label">Earnings</span>
+              <span class="header-amount">Amount (R)</span>
+            </div>
+            <table class="items-table">
+              <tr>
+                <td class="item-label">Basic Salary</td>
+                <td class="item-amount">{{ formatAmount(payroll.basicSalary) }}</td>
+              </tr>
+              <tr>
+                <td class="item-label">Allowance</td>
+                <td class="item-amount">{{ formatAmount(payroll.allowances) }}</td>
+              </tr>
+              <tr>
+                <td class="item-label">Transport Allowance</td>
+                <td class="item-amount">0.00</td>
+              </tr>
+              <tr>
+                <td class="item-label">Medical Reimbursement</td>
+                <td class="item-amount">0.00</td>
+              </tr>
+              <tr>
+                <td class="item-label">Special Allowance</td>
+                <td class="item-amount">{{ formatAmount(payroll.bonus) }}</td>
+              </tr>
+              <tr>
+                <td class="item-label">Bonus</td>
+                <td class="item-amount">0.00</td>
+              </tr>
+              <tr>
+                <td class="item-label">Overtime</td>
+                <td class="item-amount">{{ formatAmount(payroll.overtimePay) }}</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+            </table>
+            <div class="section-total">
+              <span class="total-label">Total Earnings :</span>
+              <span class="total-amount">{{ formatAmount(payroll.grossSalary) }}</span>
+            </div>
+          </div>
+
+          <!-- Deductions Column -->
+          <div class="deductions-section">
+            <div class="section-header">
+              <span class="header-label">Deductions</span>
+              <span class="header-amount">Amount (R)</span>
+            </div>
+            <table class="items-table">
+              <tr>
+                <td class="item-label">Loan</td>
+                <td class="item-amount">0.00</td>
+              </tr>
+              <tr>
+                <td class="item-label">Provident Fund</td>
+                <td class="item-amount">{{ formatAmount(payroll.pensionFund) }}</td>
+              </tr>
+              <tr>
+                <td class="item-label">PAYE tax deduction</td>
+                <td class="item-amount">{{ formatAmount(payroll.payeTax) }}</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+              <tr>
+                <td class="item-label">&nbsp;</td>
+                <td class="item-amount">&nbsp;</td>
+              </tr>
+            </table>
+            <div class="section-total">
+              <span class="total-label">Total Deductions :</span>
+              <span class="total-amount">{{ formatAmount(payroll.totalDeductions) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Net Pay Section -->
+        <div class="net-pay">
+          <strong>Net Pay : R {{ formatAmount(payroll.netSalary) }}</strong>
+        </div>
+
+        <!-- Payment Details Section -->
+        <div class="payment-details">
+          <h5>Payment Details :</h5>
+          <table class="payment-table">
+            <thead>
+            <tr>
+              <th>Mode of Payment</th>
+              <th>Disbursement Date</th>
+              <th>Amount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td>{{ payroll.paymentMethod || 'BANK TRANSFER' }}</td>
+              <td>{{ formatDate(payroll.paymentDate) }}</td>
+              <td>{{ formatAmount(payroll.netSalary) }}</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

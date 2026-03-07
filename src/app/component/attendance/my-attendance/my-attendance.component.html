@@ -1,0 +1,313 @@
+<div class="my-attendance-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1>My Attendance</h1>
+      <p class="subtitle" *ngIf="currentUser">
+        {{ getUserFullName() }} | {{ getEmployeeCode() }} | {{ getDepartmentName() }}
+      </p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="markTodayAttendance(AttendanceType.FULL_DAY_PRESENT)" [disabled]="loading">
+        <span class="btn-icon">✓</span> Clock In Today
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading && !currentUser">
+    <div class="spinner"></div>
+    <p>Loading your attendance data...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error && !loading">
+    <div class="error-icon">!</div>
+    <p>{{ error }}</p>
+    <button class="btn btn-secondary" (click)="loadCurrentUser()">Retry</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="attendance-content" *ngIf="currentUser && !error">
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card present">
+        <div class="card-icon">✓</div>
+        <div class="card-content">
+          <span class="card-value">{{ summary.totalPresent }}</span>
+          <span class="card-label">Present</span>
+        </div>
+      </div>
+      <div class="summary-card absent">
+        <div class="card-icon">✗</div>
+        <div class="card-content">
+          <span class="card-value">{{ summary.totalAbsent }}</span>
+          <span class="card-label">Absent</span>
+        </div>
+      </div>
+      <div class="summary-card half-day">
+        <div class="card-icon">◐</div>
+        <div class="card-content">
+          <span class="card-value">{{ summary.totalHalfDay }}</span>
+          <span class="card-label">Half Day</span>
+        </div>
+      </div>
+      <div class="summary-card leave">
+        <div class="card-icon">L</div>
+        <div class="card-content">
+          <span class="card-value">{{ summary.totalLeave }}</span>
+          <span class="card-label">On Leave</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calendar Navigation -->
+    <div class="calendar-nav">
+      <div class="nav-controls">
+        <button class="btn btn-icon" (click)="previousMonth()" title="Previous Month">
+          &lt;
+        </button>
+        <div class="month-year-selectors">
+          <select [(ngModel)]="selectedMonth" (change)="onMonthChange(selectedMonth)" class="form-select">
+            <option *ngFor="let month of months" [value]="month.value">{{ month.label }}</option>
+          </select>
+          <select [(ngModel)]="selectedYear" (change)="onYearChange(selectedYear)" class="form-select">
+            <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+          </select>
+        </div>
+        <button class="btn btn-icon" (click)="nextMonth()" title="Next Month">
+          &gt;
+        </button>
+      </div>
+      <button class="btn btn-outline" (click)="goToToday()">Today</button>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="calendar-container" [class.loading]="loading">
+      <div class="calendar-header">
+        <div class="calendar-day-name">Sun</div>
+        <div class="calendar-day-name">Mon</div>
+        <div class="calendar-day-name">Tue</div>
+        <div class="calendar-day-name">Wed</div>
+        <div class="calendar-day-name">Thu</div>
+        <div class="calendar-day-name">Fri</div>
+        <div class="calendar-day-name">Sat</div>
+      </div>
+
+      <div class="calendar-grid">
+        <!-- Empty cells for days before the first day of the month -->
+        <ng-container *ngFor="let empty of [].constructor(getFirstDayOffset())">
+          <div class="calendar-day empty"></div>
+        </ng-container>
+
+        <!-- Days of the month -->
+        <div
+          *ngFor="let day of daysInMonth"
+          class="calendar-day"
+          [class.today]="isToday(day)"
+          [class.weekend]="isWeekend(day)"
+          [class.future]="isFutureDate(day)"
+          [class.has-attendance]="getAttendanceForDay(day)"
+          (click)="!isFutureDate(day) && openAttendanceModal(day)"
+        >
+          <span class="day-number">{{ day }}</span>
+          <div class="attendance-indicator" *ngIf="getAttendanceForDay(day) as attendance">
+            <span
+              class="attendance-icon"
+              [class]="getAttendanceClass(attendance.attendanceType)"
+            >
+              {{ getAttendanceIcon(attendance.attendanceType) }}
+            </span>
+          </div>
+          <div class="no-attendance" *ngIf="!getAttendanceForDay(day) && !isFutureDate(day) && !isWeekend(day)">
+            <span class="add-icon">+</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item">
+        <span class="legend-icon present">✓</span>
+        <span>Present</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-icon half-day">◐</span>
+        <span>Half Day</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-icon absent">✗</span>
+        <span>Absent</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-icon late">⏰</span>
+        <span>Late</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-icon early">⏱</span>
+        <span>Early Departure</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-icon leave">L</span>
+        <span>On Leave</span>
+      </div>
+    </div>
+
+    <!-- Recent Attendance List -->
+    <div class="recent-attendance">
+      <h3>Recent Attendance Records</h3>
+      <div class="attendance-list" *ngIf="attendances.length > 0; else noRecords">
+        <div class="attendance-item" *ngFor="let attendance of attendances | slice:0:10">
+          <div class="attendance-date">
+            {{ attendance.attendanceDate | date:'EEE, MMM d, yyyy' }}
+          </div>
+          <div class="attendance-status" [class]="getAttendanceClass(attendance.attendanceType)">
+            <span class="status-icon">{{ getAttendanceIcon(attendance.attendanceType) }}</span>
+            {{ attendanceService.getAttendanceTypeLabel(attendance.attendanceType) }}
+          </div>
+          <div class="attendance-times" *ngIf="hasValidTime(attendance.checkInTime) || hasValidTime(attendance.checkOutTime)">
+            <span *ngIf="hasValidTime(attendance.checkInTime)">In: {{ attendance.checkInTime | date:'HH:mm' }}</span>
+            <span *ngIf="hasValidTime(attendance.checkOutTime)">Out: {{ attendance.checkOutTime | date:'HH:mm' }}</span>
+          </div>
+          <!-- Break/Lunch Times -->
+          <div class="attendance-breaks" *ngIf="attendance.break1Start || attendance.lunchStart || attendance.break2Start">
+            <span *ngIf="attendance.break1Start" class="break-tag" title="Tea Break 1">
+              <i class="bi bi-cup-hot"></i>
+              {{ attendance.break1Start | date:'HH:mm' }}<span *ngIf="attendance.break1End"> - {{ attendance.break1End | date:'HH:mm' }}</span>
+            </span>
+            <span *ngIf="attendance.lunchStart" class="break-tag lunch-tag" title="Lunch">
+              <i class="bi bi-egg-fried"></i>
+              {{ attendance.lunchStart | date:'HH:mm' }}<span *ngIf="attendance.lunchEnd"> - {{ attendance.lunchEnd | date:'HH:mm' }}</span>
+            </span>
+            <span *ngIf="attendance.break2Start" class="break-tag" title="Tea Break 2">
+              <i class="bi bi-cup-hot"></i>
+              {{ attendance.break2Start | date:'HH:mm' }}<span *ngIf="attendance.break2End"> - {{ attendance.break2End | date:'HH:mm' }}</span>
+            </span>
+          </div>
+          <!-- Total Work Hours -->
+          <div class="attendance-hours" *ngIf="attendance.totalWorkHours">
+            <i class="bi bi-clock-history"></i>
+            <span>{{ attendance.totalWorkHours | number:'1.1-2' }}h</span>
+          </div>
+          <div class="attendance-method" *ngIf="attendance.clockInMethod">
+            <span class="method-badge" [class.method-whatsapp]="attendance.clockInMethod === 'WHATSAPP'" [class.method-web]="attendance.clockInMethod === 'WEB'">
+              <i class="bi" [ngClass]="attendance.clockInMethod === 'WHATSAPP' ? 'bi-whatsapp' : 'bi-globe'"></i>
+              {{ attendance.clockInMethod }}
+            </span>
+          </div>
+          <!-- Location Names -->
+          <div class="attendance-location" *ngIf="attendance.checkInLocation || attendance.checkOutLocation">
+            <i class="bi bi-geo-alt"></i>
+            <span *ngIf="attendance.checkInLocation">{{ attendance.checkInLocation }}</span>
+            <span *ngIf="attendance.checkInLocation && attendance.checkOutLocation"> → </span>
+            <span *ngIf="attendance.checkOutLocation">{{ attendance.checkOutLocation }}</span>
+          </div>
+          <div class="attendance-location" *ngIf="!attendance.checkInLocation && attendance.checkInLatitude">
+            <i class="bi bi-geo-alt"></i>
+            <span>{{ attendance.checkInLatitude | number:'1.4-4' }}, {{ attendance.checkInLongitude | number:'1.4-4' }}</span>
+          </div>
+          <div class="attendance-reason" *ngIf="attendance.reason">
+            {{ attendance.reason }}
+          </div>
+        </div>
+      </div>
+      <ng-template #noRecords>
+        <div class="no-records">
+          <p>No attendance records for this month.</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<!-- Attendance Modal -->
+<div class="modal-overlay" *ngIf="showAttendanceModal" (click)="closeAttendanceModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ existingAttendance ? 'Edit Attendance' : 'Add Attendance' }}</h2>
+      <button class="close-btn" (click)="closeAttendanceModal()">&times;</button>
+    </div>
+
+    <form [formGroup]="attendanceForm" (ngSubmit)="submitAttendance()">
+      <div class="modal-body">
+        <!-- Date Display -->
+        <div class="form-group">
+          <label>Date</label>
+          <div class="date-display">{{ selectedDate | date:'EEEE, MMMM d, yyyy' }}</div>
+          <input type="hidden" formControlName="attendanceDate">
+        </div>
+
+        <!-- Attendance Type -->
+        <div class="form-group">
+          <label for="attendanceType">Attendance Type *</label>
+          <select id="attendanceType" formControlName="attendanceType" class="form-control">
+            <option *ngFor="let type of attendanceTypes" [value]="type.value">
+              {{ type.icon }} {{ type.label }}
+            </option>
+          </select>
+          <span class="error-message" *ngIf="isFieldInvalid('attendanceType')">
+            Attendance type is required
+          </span>
+        </div>
+
+        <!-- Check-in / Check-out Times - Side by Side -->
+        <div class="form-row time-row">
+          <div class="form-group half">
+            <label for="checkInTime">Check-in Time</label>
+            <input
+              type="datetime-local"
+              id="checkInTime"
+              formControlName="checkInTime"
+              class="form-control"
+            >
+          </div>
+          <div class="form-group half">
+            <label for="checkOutTime">Check-out Time</label>
+            <input
+              type="datetime-local"
+              id="checkOutTime"
+              formControlName="checkOutTime"
+              class="form-control"
+            >
+          </div>
+        </div>
+
+        <!-- Reason/Notes -->
+        <div class="form-group">
+          <label for="reason">Reason / Notes (Optional)</label>
+          <textarea
+            id="reason"
+            formControlName="reason"
+            class="form-control"
+            rows="3"
+            placeholder="Add any notes or reason for this attendance record..."
+          ></textarea>
+        </div>
+
+        <!-- Error Message -->
+        <div class="form-error" *ngIf="formError">
+          {{ formError }}
+        </div>
+
+        <!-- Existing Record Info -->
+        <div class="existing-info" *ngIf="existingAttendance">
+          <small>
+            Last updated: {{ existingAttendance.updatedAt | date:'medium' }}
+            <span *ngIf="existingAttendance.updatedBy">by {{ existingAttendance.updatedBy }}</span>
+          </small>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAttendanceModal()" [disabled]="formLoading">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="formLoading || attendanceForm.invalid">
+          <span *ngIf="formLoading" class="spinner-small"></span>
+          {{ existingAttendance ? 'Update' : 'Save' }} Attendance
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

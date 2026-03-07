@@ -1,0 +1,843 @@
+// ========================================
+// ASSET REQUESTS - Refined Enterprise Style
+// ========================================
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.asset-requests-page {
+  padding-top: 8px;
+}
+
+// ========================================
+// BREADCRUMB
+// ========================================
+.page-breadcrumb {
+  margin-bottom: $spacing-md;
+
+  .breadcrumb {
+    margin: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .breadcrumb-item a {
+    color: $primary;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    transition: color $transition-base;
+
+    i {
+      font-size: 0.85rem;
+      margin-right: 2px;
+    }
+
+    &:hover {
+      color: $primary-medium;
+    }
+  }
+
+  .breadcrumb-item.active {
+    color: $text-muted;
+    font-size: $font-size-sm;
+  }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    color: $gray-400;
+  }
+}
+
+// ========================================
+// PAGE HEADER
+// ========================================
+.page-header {
+  margin-bottom: $spacing-lg;
+}
+
+.page-header-content {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.page-header-icon {
+  @include flex-center;
+  width: 44px;
+  height: 44px;
+  border-radius: $border-radius-lg;
+  background: linear-gradient(135deg, rgba($primary, 0.1) 0%, rgba($secondary, 0.08) 100%);
+  color: $primary;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.3rem;
+  }
+}
+
+.page-title {
+  font-size: 1.35rem;
+  font-weight: $font-weight-bold;
+  color: $gray-900;
+  margin: 0;
+  line-height: 1.3;
+}
+
+.page-subtitle {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin: 2px 0 0 0;
+}
+
+// ========================================
+// FILTER PILLS
+// ========================================
+.filter-section {
+  margin-bottom: $spacing-lg;
+}
+
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  border: $border-width solid $gray-200;
+  border-radius: $border-radius-full;
+  background: $white;
+  color: $gray-600;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.85rem;
+  }
+
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+    background: rgba($primary, 0.03);
+  }
+
+  &.active {
+    background: $gradient-primary;
+    color: $white;
+    border-color: transparent;
+    box-shadow: 0 2px 6px rgba($primary, 0.25);
+  }
+
+  // Status-specific active colors
+  &.pill-pending.active {
+    background: $warning;
+    color: $warning-dark;
+    box-shadow: 0 2px 6px rgba($warning, 0.3);
+  }
+
+  &.pill-approved.active {
+    background: $info;
+    color: $white;
+    box-shadow: 0 2px 6px rgba($info, 0.3);
+  }
+
+  &.pill-rejected.active {
+    background: $danger;
+    color: $white;
+    box-shadow: 0 2px 6px rgba($danger, 0.3);
+  }
+
+  &.pill-fulfilled.active {
+    background: $success;
+    color: $white;
+    box-shadow: 0 2px 6px rgba($success, 0.3);
+  }
+
+  &.pill-cancelled.active {
+    background: $gray-500;
+    color: $white;
+    box-shadow: 0 2px 6px rgba($gray-500, 0.3);
+  }
+}
+
+// ========================================
+// TABLE CARD
+// ========================================
+.table-card {
+  @include card;
+  border: $border-width solid $gray-200;
+}
+
+.requests-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: $gray-50;
+    border-bottom: $border-width-md solid $gray-200;
+  }
+
+  th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: $font-weight-semibold;
+    color: $gray-700;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 14px 16px;
+    border-bottom: $border-width solid $gray-100;
+    font-size: $font-size-sm;
+    color: $gray-700;
+    vertical-align: middle;
+  }
+}
+
+.request-row {
+  transition: background-color $transition-base;
+
+  &:hover {
+    background-color: rgba($primary, 0.02);
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+}
+
+.request-id {
+  font-weight: $font-weight-semibold;
+  color: $primary;
+  font-size: $font-size-sm;
+}
+
+// Requester with avatar
+.requester-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.requester-avatar {
+  @include flex-center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba($primary, 0.12) 0%, rgba($secondary, 0.1) 100%);
+  color: $primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-bold;
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.requester-details {
+  @include flex-column;
+}
+
+.requester-name {
+  font-weight: $font-weight-semibold;
+  color: $gray-900;
+  font-size: $font-size-sm;
+  line-height: 1.3;
+}
+
+.requester-email {
+  font-size: $font-size-xs;
+  color: $text-muted;
+  line-height: 1.3;
+}
+
+.category-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  background: $gray-100;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  color: $gray-700;
+  font-weight: $font-weight-medium;
+}
+
+.date-text {
+  color: $text-muted;
+  font-size: $font-size-sm;
+  white-space: nowrap;
+}
+
+// Status & Priority badges
+.status-badge,
+.priority-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: $border-radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+// ========================================
+// ACTION BUTTONS
+// ========================================
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.action-btn {
+  @include flex-center;
+  gap: 5px;
+  border: none;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: all $transition-base;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  padding: 6px 10px;
+
+  i {
+    font-size: 0.9rem;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+}
+
+.action-approve {
+  background: rgba($success, 0.08);
+  color: $success;
+  border: $border-width solid rgba($success, 0.2);
+
+  &:hover {
+    background: $success;
+    color: $white;
+    border-color: $success;
+    box-shadow: 0 2px 6px rgba($success, 0.25);
+  }
+}
+
+.action-reject {
+  background: rgba($danger, 0.08);
+  color: $danger;
+  border: $border-width solid rgba($danger, 0.2);
+
+  &:hover {
+    background: $danger;
+    color: $white;
+    border-color: $danger;
+    box-shadow: 0 2px 6px rgba($danger, 0.25);
+  }
+}
+
+.action-fulfill {
+  background: rgba($primary, 0.08);
+  color: $primary;
+  border: $border-width solid rgba($primary, 0.2);
+
+  &:hover {
+    background: $primary;
+    color: $white;
+    border-color: $primary;
+    box-shadow: 0 2px 6px rgba($primary, 0.25);
+  }
+}
+
+// ========================================
+// TABLE FOOTER & PAGINATION
+// ========================================
+.table-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  border-top: $border-width solid $gray-100;
+}
+
+.pagination {
+  margin: 0;
+  gap: 4px;
+}
+
+.page-item {
+  .page-link {
+    @include flex-center;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 8px;
+    border: $border-width solid $gray-200;
+    border-radius: $border-radius;
+    color: $gray-600;
+    font-size: $font-size-sm;
+    cursor: pointer;
+    transition: all $transition-base;
+    text-decoration: none;
+
+    i {
+      font-size: 0.75rem;
+    }
+
+    &:hover {
+      background-color: rgba($primary, 0.06);
+      border-color: $primary;
+      color: $primary;
+    }
+
+    &.active {
+      background: $gradient-primary;
+      border-color: $primary;
+      color: $white;
+    }
+  }
+
+  &.disabled .page-link {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+// ========================================
+// EMPTY STATE
+// ========================================
+.empty-state {
+  @include card;
+  text-align: center;
+  padding: $spacing-3xl $spacing-xl;
+  border: $border-width solid $gray-200;
+}
+
+.empty-state-icon {
+  @include flex-center;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto $spacing-lg;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba($primary, 0.08) 0%, rgba($secondary, 0.06) 100%);
+
+  i {
+    font-size: 2.5rem;
+    color: $gray-400;
+  }
+}
+
+.empty-state-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $gray-700;
+  margin: 0 0 $spacing-sm;
+}
+
+.empty-state-text {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin: 0;
+}
+
+// ========================================
+// LOADING STATE
+// ========================================
+.loading-state {
+  @include card;
+  text-align: center;
+  padding: $spacing-3xl $spacing-xl;
+  border: $border-width solid $gray-200;
+  margin-top: $spacing-xl;
+}
+
+.loading-spinner {
+  @include flex-center;
+  margin-bottom: $spacing-lg;
+}
+
+.spinner-ring {
+  width: 40px;
+  height: 40px;
+  border: 3px solid $gray-200;
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin: 0;
+}
+
+// ========================================
+// ERROR STATE
+// ========================================
+.error-state {
+  @include card;
+  text-align: center;
+  padding: $spacing-3xl $spacing-xl;
+  border: $border-width solid rgba($danger, 0.15);
+  margin-top: $spacing-xl;
+}
+
+.error-icon {
+  @include flex-center;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto $spacing-md;
+  border-radius: 50%;
+  background: rgba($danger, 0.08);
+
+  i {
+    font-size: 1.8rem;
+    color: $danger;
+  }
+}
+
+.error-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $gray-900;
+  margin: 0 0 $spacing-sm;
+}
+
+.error-text {
+  font-size: $font-size-sm;
+  color: $text-muted;
+  margin: 0 0 $spacing-lg;
+}
+
+.btn-retry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  background: $gradient-primary;
+  color: $white;
+  border: none;
+  border-radius: $border-radius;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: $gradient-primary-hover;
+    transform: translateY(-1px);
+    box-shadow: $shadow-primary;
+  }
+}
+
+// ========================================
+// MODALS
+// ========================================
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 15, 30, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-modal;
+  padding: $spacing-md;
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-panel {
+  background: $white;
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.08);
+  animation: modalSlideUp 0.25s ease-out;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: $spacing-lg $spacing-lg $spacing-md;
+}
+
+.modal-header-icon {
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border-radius: $border-radius-lg;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.modal-icon-success {
+  background: rgba($success, 0.1);
+  color: $success;
+}
+
+.modal-icon-danger {
+  background: rgba($danger, 0.1);
+  color: $danger;
+}
+
+.modal-icon-primary {
+  background: rgba($primary, 0.1);
+  color: $primary;
+}
+
+.modal-panel-title {
+  flex: 1;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $gray-900;
+  margin: 0;
+}
+
+.modal-close-btn {
+  @include flex-center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: $gray-100;
+  border-radius: $border-radius;
+  color: $gray-500;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  i {
+    font-size: 0.75rem;
+  }
+
+  &:hover {
+    background: $gray-200;
+    color: $gray-700;
+  }
+}
+
+.modal-panel-body {
+  padding: 0 $spacing-lg $spacing-md;
+}
+
+.modal-description {
+  font-size: $font-size-sm;
+  color: $gray-600;
+  margin: 0 0 $spacing-lg;
+  line-height: $line-height-relaxed;
+}
+
+.form-group {
+  margin-bottom: $spacing-md;
+}
+
+.form-label {
+  display: block;
+  font-weight: $font-weight-semibold;
+  color: $gray-800;
+  font-size: $font-size-sm;
+  margin-bottom: 6px;
+}
+
+.required {
+  color: $danger;
+}
+
+.form-control,
+.form-select {
+  width: 100%;
+  padding: 10px 14px;
+  border: $border-width-md solid $gray-200;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  color: $gray-800;
+  background: $gray-50;
+  transition: all $transition-base;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    background: $white;
+  }
+
+  &::placeholder {
+    color: $gray-400;
+  }
+}
+
+.form-hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: $font-size-xs;
+  color: $text-muted;
+
+  i {
+    font-size: 0.8rem;
+  }
+}
+
+.modal-panel-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: $spacing-md $spacing-lg $spacing-lg;
+  border-top: $border-width solid $gray-100;
+}
+
+.btn-modal {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 9px 20px;
+  border: none;
+  border-radius: $border-radius-md;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+}
+
+.btn-modal-cancel {
+  background: $gray-100;
+  color: $gray-600;
+  border: $border-width solid $gray-200;
+
+  &:hover:not(:disabled) {
+    background: $gray-200;
+    color: $gray-700;
+  }
+}
+
+.btn-modal-success {
+  background: $success;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: darken($success, 5%);
+    box-shadow: 0 2px 8px rgba($success, 0.3);
+  }
+}
+
+.btn-modal-danger {
+  background: $danger;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: darken($danger, 5%);
+    box-shadow: 0 2px 8px rgba($danger, 0.3);
+  }
+}
+
+.btn-modal-primary {
+  background: $gradient-primary;
+  color: $white;
+
+  &:hover:not(:disabled) {
+    background: $gradient-primary-hover;
+    box-shadow: 0 2px 8px rgba($primary, 0.3);
+  }
+}
+
+// ========================================
+// RESPONSIVE
+// ========================================
+@include respond-to('md') {
+  .page-header-icon {
+    width: 38px;
+    height: 38px;
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+
+  .page-title {
+    font-size: 1.15rem;
+  }
+
+  .filter-pills {
+    gap: 6px;
+  }
+
+  .filter-pill {
+    padding: 6px 12px;
+    font-size: $font-size-xs;
+  }
+
+  .requests-table {
+    th, td {
+      padding: 10px 12px;
+    }
+  }
+
+  .requester-avatar {
+    display: none;
+  }
+
+  .modal-panel {
+    max-width: 95vw;
+  }
+}
+
+@include respond-to('sm') {
+  .filter-pills {
+    gap: 4px;
+  }
+
+  .filter-pill {
+    padding: 5px 10px;
+
+    i {
+      display: none;
+    }
+  }
+
+  .requests-table {
+    th, td {
+      padding: 8px 10px;
+      font-size: $font-size-xs;
+    }
+  }
+}

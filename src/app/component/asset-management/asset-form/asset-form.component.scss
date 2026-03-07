@@ -1,0 +1,81 @@
+// asset-form Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// Card styling matching login aesthetic
+.card {
+  @include card;
+  border: none;
+}
+
+// Form labels - matching login style
+.form-label {
+  @include form-label;
+}
+
+// Section headings with primary accent (replacing #2c3e50 and #3498db)
+h5 {
+  color: $primary-dark;
+  border-bottom: $border-width-md solid $primary;
+  padding-bottom: $spacing-sm;
+  font-weight: $font-weight-semibold;
+}
+
+// Form controls - matching login input styling
+.form-control,
+.form-select {
+  padding: $input-padding-y $input-padding-x;
+  font-size: $input-font-size;
+  border: $border-width-md solid $gray-200;
+  border-radius: $border-radius;
+  background: $gray-50;
+  transition: all $transition-base;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 4px rgba($primary, 0.1);
+    background: $white;
+    outline: none;
+  }
+
+  &.is-invalid {
+    border-color: $danger;
+
+    &:focus {
+      box-shadow: 0 0 0 4px rgba($danger, 0.1);
+    }
+  }
+}
+
+// Input group addon
+.input-group-text {
+  background: $gray-100;
+  border: $border-width-md solid $gray-200;
+  border-radius: $border-radius 0 0 $border-radius;
+  color: $gray-600;
+  font-weight: $font-weight-medium;
+}
+
+// Primary submit button - matching login button gradient
+.btn-primary {
+  @include btn-primary;
+}
+
+// Secondary/cancel button
+.btn-secondary {
+  padding: $btn-padding-y $btn-padding-x;
+  font-size: $btn-font-size;
+  font-weight: $font-weight-medium;
+  border-radius: $btn-border-radius;
+  transition: all $transition-base;
+}
+
+// Breadcrumb accent
+.breadcrumb-item a {
+  color: $primary;
+  transition: color $transition-base;
+
+  &:hover {
+    color: $primary-medium;
+  }
+}

@@ -1,0 +1,276 @@
+<ng-container *ngIf="assetState$ | async as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <!-- Navbar rendered by app.component -->
+    <section>
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" style="margin-top: 8px">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/']">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/assets']">Assets</a>
+            </li>
+            <li class="breadcrumb-item active">{{ state.appData?.data?.asset?.assetTag }}</li>
+          </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="row mt-3 mb-4">
+          <div class="col">
+            <button class="btn btn-outline-secondary me-2" (click)="goBack()">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+          </div>
+          <div class="col text-end">
+            <button class="btn btn-primary me-2" (click)="editAsset()">
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+            <button
+              class="btn btn-success me-2"
+              *ngIf="state.appData?.data?.asset?.status === 'AVAILABLE'"
+              (click)="assignAsset()"
+            >
+              <i class="bi bi-person-plus"></i> Assign
+            </button>
+            <button class="btn btn-danger" (click)="deleteAsset()">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Asset Info Card -->
+          <div class="col-md-8">
+            <div class="card mb-4">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                  <div class="asset-icon me-3">
+                    <i class="bi {{ getCategoryIcon(state.appData?.data?.asset?.category) }} fs-1"></i>
+                  </div>
+                  <div>
+                    <h4 class="mb-1">{{ state.appData?.data?.asset?.name }}</h4>
+                    <span class="badge bg-dark me-2">{{ state.appData?.data?.asset?.assetTag }}</span>
+                    <span class="badge {{ getStatusClass(state.appData?.data?.asset?.status) }}">
+                      {{ state.appData?.data?.asset?.status | titlecase }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <h6 class="text-muted">Basic Information</h6>
+                    <table class="table table-sm">
+                      <tbody>
+                        <tr>
+                          <td class="text-muted">Category</td>
+                          <td>{{ state.appData?.data?.asset?.category | titlecase }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Condition</td>
+                          <td>{{ state.appData?.data?.asset?.condition | titlecase }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Brand</td>
+                          <td>{{ state.appData?.data?.asset?.brand || 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Model</td>
+                          <td>{{ state.appData?.data?.asset?.model || 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Serial Number</td>
+                          <td>{{ state.appData?.data?.asset?.serialNumber || 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Location</td>
+                          <td>{{ state.appData?.data?.asset?.location || 'N/A' }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="text-muted">Purchase & Warranty</h6>
+                    <table class="table table-sm">
+                      <tbody>
+                        <tr>
+                          <td class="text-muted">Purchase Date</td>
+                          <td>{{ formatDate(state.appData?.data?.asset?.purchaseDate) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Purchase Price</td>
+                          <td>{{ formatCurrency(state.appData?.data?.asset?.purchasePrice) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Warranty Expiry</td>
+                          <td>{{ formatDate(state.appData?.data?.asset?.warrantyExpiry) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Created At</td>
+                          <td>{{ formatDate(state.appData?.data?.asset?.createdAt) }}</td>
+                        </tr>
+                        <tr>
+                          <td class="text-muted">Updated At</td>
+                          <td>{{ formatDate(state.appData?.data?.asset?.updatedAt) }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div *ngIf="state.appData?.data?.asset?.description" class="mt-3">
+                  <h6 class="text-muted">Description</h6>
+                  <p>{{ state.appData?.data?.asset?.description }}</p>
+                </div>
+
+                <div *ngIf="state.appData?.data?.asset?.notes" class="mt-3">
+                  <h6 class="text-muted">Notes</h6>
+                  <p>{{ state.appData?.data?.asset?.notes }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Assignment History -->
+            <div class="card">
+              <div class="card-header">
+                <h5 class="mb-0">Assignment History</h5>
+              </div>
+              <div class="card-body">
+                <ng-container *ngIf="assignmentsState$ | async as assignState">
+                  <table class="table table-sm" *ngIf="getAssignments(assignState).length > 0">
+                    <thead>
+                      <tr>
+                        <th>Employee</th>
+                        <th>Assigned By</th>
+                        <th>Assignment Date</th>
+                        <th>Return Date</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let assignment of getAssignments(assignState)">
+                        <td>{{ assignment.employeeName }}</td>
+                        <td>{{ assignment.assignedByName }}</td>
+                        <td>{{ formatDate(assignment.assignmentDate) }}</td>
+                        <td>{{ formatDate(assignment.actualReturnDate) || '-' }}</td>
+                        <td>
+                          <span
+                            class="badge"
+                            [ngClass]="{
+                              'bg-success': assignment.status === 'ACTIVE',
+                              'bg-secondary': assignment.status === 'RETURNED',
+                              'bg-warning': assignment.status === 'OVERDUE',
+                              'bg-danger': assignment.status === 'LOST'
+                            }"
+                          >
+                            {{ assignment.status }}
+                          </span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p *ngIf="getAssignments(assignState).length === 0" class="text-muted text-center">
+                    No assignment history found
+                  </p>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Sidebar -->
+          <div class="col-md-4">
+            <!-- Current Assignment -->
+            <div class="card mb-4" *ngIf="state.appData?.data?.asset?.currentAssigneeName">
+              <div class="card-header bg-primary text-white">
+                <h6 class="mb-0"><i class="bi bi-person-check"></i> Currently Assigned To</h6>
+              </div>
+              <div class="card-body">
+                <h5>{{ state.appData?.data?.asset?.currentAssigneeName }}</h5>
+                <p class="text-muted mb-1">
+                  <small>Assigned by: {{ state.appData?.data?.asset?.assignedByName }}</small>
+                </p>
+                <p class="text-muted">
+                  <small>Date: {{ formatDate(state.appData?.data?.asset?.assignedDate) }}</small>
+                </p>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+              <div class="card-header">
+                <h6 class="mb-0">Quick Actions</h6>
+              </div>
+              <div class="card-body">
+                <div class="d-grid gap-2">
+                  <button
+                    class="btn btn-outline-warning"
+                    *ngIf="state.appData?.data?.asset?.status !== 'UNDER_MAINTENANCE'"
+                    (click)="updateStatus('UNDER_MAINTENANCE')"
+                    [disabled]="isLoading$ | async"
+                  >
+                    <i class="bi bi-tools"></i> Mark as Under Maintenance
+                  </button>
+                  <button
+                    class="btn btn-outline-success"
+                    *ngIf="state.appData?.data?.asset?.status === 'UNDER_MAINTENANCE'"
+                    (click)="updateStatus('AVAILABLE')"
+                    [disabled]="isLoading$ | async"
+                  >
+                    <i class="bi bi-check-circle"></i> Mark as Available
+                  </button>
+                  <button
+                    class="btn btn-outline-secondary"
+                    *ngIf="state.appData?.data?.asset?.status !== 'RETIRED'"
+                    (click)="updateStatus('RETIRED')"
+                    [disabled]="isLoading$ | async"
+                  >
+                    <i class="bi bi-archive"></i> Retire Asset
+                  </button>
+                  <button
+                    class="btn btn-outline-danger"
+                    *ngIf="state.appData?.data?.asset?.status !== 'LOST'"
+                    (click)="updateStatus('LOST')"
+                    [disabled]="isLoading$ | async"
+                  >
+                    <i class="bi bi-exclamation-triangle"></i> Report as Lost
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <!-- Navbar rendered by app.component -->
+    <div class="container-fluid mt-5">
+      <div class="text-center">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3">Loading asset details...</p>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <!-- Navbar rendered by app.component -->
+    <div class="container-fluid mt-5">
+      <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">
+          <i class="bi bi-exclamation-triangle"></i> Error Loading Asset
+        </h4>
+        <p>{{ state.error }}</p>
+        <hr />
+        <button class="btn btn-primary" (click)="goBack()">
+          <i class="bi bi-arrow-left"></i> Back to Assets
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

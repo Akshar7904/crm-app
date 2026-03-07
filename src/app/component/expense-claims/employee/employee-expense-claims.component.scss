@@ -1,0 +1,182 @@
+// employee-expense-claims Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+/* expense-claims.component.css */
+
+/* Badge styles for claim status */
+.badge-warning {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.badge-danger {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.badge-info {
+  background-color: #17a2b8;
+  color: #fff;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+/* Modal styling */
+.modal.show {
+  display: block;
+}
+
+.modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Table responsive */
+.table-responsive {
+  overflow-x: auto;
+}
+
+/* Card styling */
+.card {
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Button group */
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+
+/* Pagination */
+.pagination {
+  margin-top: 1rem;
+}
+
+.page-link {
+  cursor: pointer;
+  color: #00bcd4;
+}
+
+.page-link:hover {
+  color: #0097a7;
+  background-color: #e0f7fa;
+}
+
+.page-item.active .page-link {
+  background-color: #00bcd4;
+  border-color: #00bcd4;
+}
+
+/* Form styling */
+.form-control:focus,
+.form-select:focus {
+  border-color: #00bcd4;
+  box-shadow: 0 0 0 0.2rem rgba(0, 188, 212, 0.25);
+}
+
+/* Input group */
+.input-group .btn {
+  border-color: #ced4da;
+}
+
+/* Alert styling */
+.alert {
+  border-radius: 6px;
+}
+
+/* Table */
+.table thead th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Empty state */
+.bi-inbox {
+  font-size: 3rem;
+  color: #ccc;
+}
+
+/* Loading spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Status badge in table */
+td .badge {
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Expense items table in modal */
+.table-bordered {
+  border: 1px solid #dee2e6;
+}
+
+.table-bordered th,
+.table-bordered td {
+  border: 1px solid #dee2e6;
+}
+
+/* Footer total row */
+tfoot tr {
+  font-weight: 600;
+}
+
+/* Action buttons */
+.btn-group .btn {
+  margin: 0 2px;
+}
+
+/* Small text in table */
+small.text-muted {
+  font-size: 0.75rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card-header h4 {
+    font-size: 1.2rem;
+  }
+
+  .btn-group {
+    flex-direction: column;
+  }
+
+  .btn-group .btn {
+    margin: 2px 0;
+    width: 100%;
+  }
+
+  .table {
+    font-size: 0.875rem;
+  }
+}
+
+/* Modal z-index fix */
+.modal {
+  z-index: 1050;
+}
+
+.modal-backdrop {
+  z-index: 1040;
+}

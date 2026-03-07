@@ -1,0 +1,86 @@
+<aside class="sidebar"
+       [class.collapsed]="collapsed"
+       [class.mobile-open]="mobileOpen">
+
+  <!-- Logo Section -->
+  <div class="sidebar-header">
+    <a routerLink="/" class="logo-link">
+      <img src="../../../assets/logo.png" alt="LKCentrix" class="logo-image">
+      <!-- Logo text hidden - using only the company logo image -->
+      <!-- <span class="logo-text">LKCentrix</span> -->
+    </a>
+  </div>
+
+  <!-- User Profile Section -->
+  <div class="sidebar-user">
+    <div class="sidebar-user-avatar-wrap">
+      <img class="sidebar-user-avatar"
+           [src]="getAvatarUrl()"
+           (error)="onAvatarError($event)"
+           [alt]="user?.firstName" />
+      <span class="sidebar-user-online"></span>
+    </div>
+    <div class="sidebar-user-details">
+      <span class="sidebar-user-name">{{ user?.firstName }} {{ user?.lastName }}</span>
+      <span class="sidebar-user-role">{{ getUserRoleName() }}</span>
+    </div>
+  </div>
+
+  <!-- Menu Items -->
+  <nav class="sidebar-menu">
+    <ul class="menu-list">
+      <li *ngFor="let item of filteredMenuItems" class="menu-item-wrapper">
+        <!-- Parent Menu Item -->
+        <a class="menu-item"
+           [class.active]="isActive(item.route)"
+           [class.has-children]="item.children"
+           [class.expanded]="item.expanded"
+           (click)="toggleMenu(item)"
+           [attr.title]="collapsed ? item.label : null">
+          <span class="menu-icon">
+            <i class="bi" [ngClass]="item.icon"></i>
+          </span>
+          <span class="menu-label">{{ item.label }}</span>
+
+          <!-- Badge -->
+          <span *ngIf="item.badge?.count" class="menu-badge" [ngClass]="'badge-' + item.badge.type">
+            {{ item.badge.count }}
+          </span>
+
+          <!-- Expand/Collapse Icon -->
+          <span *ngIf="item.children" class="expand-icon">
+            <i class="bi" [ngClass]="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+          </span>
+        </a>
+
+        <!-- Submenu Items -->
+        <ul class="submenu" *ngIf="item.children" [class.show]="item.expanded">
+          <li *ngFor="let child of item.children" class="submenu-item-wrapper">
+            <a class="submenu-item"
+               [class.active]="isActive(child.route)"
+               (click)="onChildClick($event, child)"
+               [attr.title]="collapsed ? child.label : null">
+              <span class="menu-icon">
+                <i class="bi" [ngClass]="child.icon"></i>
+              </span>
+              <span class="menu-label">{{ child.label }}</span>
+              <span *ngIf="child.badge?.count" class="menu-badge" [ngClass]="'badge-' + child.badge.type">
+                {{ child.badge.count }}
+              </span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Footer with Logout -->
+  <div class="sidebar-footer">
+    <a class="logout-btn" (click)="onLogout()" [attr.title]="collapsed ? 'Logout' : null">
+      <span class="menu-icon">
+        <i class="bi bi-box-arrow-left"></i>
+      </span>
+      <span class="menu-label">Logout</span>
+    </a>
+  </div>
+</aside>

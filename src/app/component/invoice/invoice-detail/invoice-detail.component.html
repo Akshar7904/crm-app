@@ -1,0 +1,442 @@
+<ng-container *ngIf="(invoiceState$ | async) as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="invoice-detail-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3 no-print">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/invoices']">Invoices</a></li>
+            <li class="breadcrumb-item active">#{{ state?.appData?.data?.invoice.invoiceNumber }}</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header mb-4 no-print">
+          <div class="row align-items-center">
+            <div class="col">
+              <h4 class="page-title">
+                <i class="bi bi-receipt me-2"></i>Invoice #{{ state?.appData?.data?.invoice.invoiceNumber }}
+              </h4>
+              <p class="text-muted mb-0">{{ isEditMode ? 'Edit invoice details' : 'View invoice details' }}</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-outline-secondary me-2" [routerLink]="['/invoices']">
+                <i class="bi bi-arrow-left me-1"></i> Back
+              </button>
+              <ng-container *ngIf="!isEditMode">
+                <button class="btn btn-outline-primary me-2" (click)="toggleEditMode()">
+                  <i class="bi bi-pencil me-1"></i> Edit
+                </button>
+                <button class="btn btn-outline-success me-2"
+                        (click)="sendInvoice()"
+                        [disabled]="isSending$ | async">
+                  <span *ngIf="isSending$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                  <i *ngIf="!(isSending$ | async)" class="bi bi-send me-1"></i>
+                  {{ (isSending$ | async) ? 'Sending...' : 'Send to ' + state?.appData?.data?.customer.name }}
+                </button>
+                <button class="btn btn-outline-secondary me-2" (click)="printInvoice()">
+                  <i class="bi bi-printer me-1"></i> Print
+                </button>
+                <button class="btn btn-primary" (click)="exportAsPDF()">
+                  <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+                </button>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+
+        <!-- Edit Mode Form -->
+        <div *ngIf="isEditMode" class="no-print">
+          <form #editForm="ngForm" (ngSubmit)="updateInvoice(editForm)">
+            <div class="card edit-card mb-4">
+              <div class="card-body">
+                <!-- From / To Section -->
+                <div class="row mb-4">
+                  <div class="col-md-6">
+                    <h6 class="section-label">From</h6>
+                    <div class="company-info">
+                      <h5 class="company-name">LKCentrix Solutions (PTY) LTD</h5>
+                      <p class="company-address">
+                        4 Skeen BLVD Bedfordview<br>
+                        Bedfordview Corporate Park, 2001<br>
+                        Phone: +27 (11) 568 8322
+                      </p>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="section-label">Bill To</h6>
+                    <div class="customer-info">
+                      <h5 class="customer-name">{{ state?.appData?.data?.customer.name }}</h5>
+                      <p class="mb-1 text-muted">{{ state?.appData?.data?.customer.email }}</p>
+                      <p class="mb-0 text-muted">{{ state?.appData?.data?.customer.phone }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <hr>
+
+                <!-- Invoice Meta -->
+                <div class="row mb-4">
+                  <div class="col-md-4">
+                    <label class="form-label">Invoice Number</label>
+                    <input type="text" class="form-control" [value]="'#' + editInvoice.invoiceNumber" readonly>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" name="status" [ngModel]="editInvoice.status" required>
+                      <option value="PENDING">Pending</option>
+                      <option value="PAID">Paid</option>
+                      <option value="OVERDUE">Overdue</option>
+                      <option value="CANCELED">Cancelled</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">Invoice Date</label>
+                    <input type="text" class="form-control" [value]="editInvoice.date | date:'mediumDate'" readonly>
+                  </div>
+                </div>
+
+                <hr>
+
+                <!-- Line Items Table -->
+                <h6 class="section-label mb-3">
+                  <i class="bi bi-list-ul me-2"></i>Invoice Items
+                </h6>
+
+                <div class="table-responsive">
+                  <table class="table line-items-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 22%;">Item</th>
+                        <th style="width: 28%;">Description</th>
+                        <th style="width: 18%;">Unit Cost</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 17%;">Price</th>
+                        <th style="width: 5%;"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of editLineItems; let i = index" class="line-item-row">
+                        <td>
+                          <input type="text"
+                                 class="form-control"
+                                 [(ngModel)]="item.item"
+                                 [name]="'edit_item_' + i"
+                                 placeholder="Item name">
+                        </td>
+                        <td>
+                          <input type="text"
+                                 class="form-control"
+                                 [(ngModel)]="item.description"
+                                 [name]="'edit_desc_' + i"
+                                 placeholder="Description">
+                        </td>
+                        <td>
+                          <div class="input-group unit-cost-group">
+                            <span class="input-group-text">R</span>
+                            <input type="number"
+                                   class="form-control"
+                                   [(ngModel)]="item.unitCost"
+                                   [name]="'edit_unitCost_' + i"
+                                   (ngModelChange)="updateEditLineItemPrice(i)"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="0.00">
+                          </div>
+                        </td>
+                        <td>
+                          <input type="number"
+                                 class="form-control text-center"
+                                 [(ngModel)]="item.quantity"
+                                 [name]="'edit_qty_' + i"
+                                 (ngModelChange)="updateEditLineItemPrice(i)"
+                                 min="1"
+                                 placeholder="1">
+                        </td>
+                        <td>
+                          <span class="price-display">{{ formatCurrency(item.price) }}</span>
+                        </td>
+                        <td>
+                          <button type="button"
+                                  class="btn btn-sm btn-outline-danger remove-btn"
+                                  (click)="removeEditLineItem(i)"
+                                  [disabled]="editLineItems.length === 1"
+                                  title="Remove item">
+                            <i class="bi bi-x-lg"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <button type="button" class="btn btn-outline-primary add-row-btn" (click)="addEditLineItem()">
+                  <i class="bi bi-plus-circle me-2"></i>Add Item
+                </button>
+              </div>
+            </div>
+
+            <!-- Summary and Actions -->
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="card summary-card mb-4">
+                  <div class="card-header">
+                    <h6 class="mb-0">
+                      <i class="bi bi-calculator me-2"></i>Invoice Summary
+                    </h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="summary-row">
+                      <span class="summary-label">Subtotal (excl. VAT)</span>
+                      <span class="summary-value">{{ formatCurrency(editSubtotal) }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">
+                        VAT
+                        <input type="number"
+                               class="tax-input"
+                               [(ngModel)]="editTaxRate"
+                               name="editTaxRate"
+                               (ngModelChange)="updateEditTaxRate()"
+                               min="0"
+                               max="100">%
+                      </span>
+                      <span class="summary-value">{{ formatCurrency(editTaxAmount) }}</span>
+                    </div>
+                    <div class="summary-row">
+                      <span class="summary-label">
+                        Discount
+                        <div class="input-group discount-input">
+                          <span class="input-group-text">R</span>
+                          <input type="number"
+                                 class="form-control"
+                                 [(ngModel)]="editDiscount"
+                                 name="editDiscount"
+                                 (ngModelChange)="updateEditDiscount()"
+                                 min="0"
+                                 step="0.01"
+                                 placeholder="0.00">
+                        </div>
+                      </span>
+                      <span class="summary-value" [class.text-danger]="editDiscount > 0">
+                        {{ editDiscount > 0 ? '-' : '' }}{{ formatCurrency(editDiscount) }}
+                      </span>
+                    </div>
+                    <hr>
+                    <div class="summary-row total-row">
+                      <span class="summary-label">Total (incl. VAT)</span>
+                      <span class="summary-value total-value">{{ formatCurrency(editTotal) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-6">
+                <!-- Customer Preview Card -->
+                <div class="card customer-preview-card mb-4">
+                  <div class="card-header">
+                    <h6 class="mb-0">
+                      <i class="bi bi-person me-2"></i>Customer
+                    </h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="d-flex align-items-center">
+                      <div class="customer-avatar me-3">
+                        {{ state?.appData?.data?.customer.name?.charAt(0) || 'C' }}
+                      </div>
+                      <div>
+                        <h6 class="customer-name-preview mb-1">{{ state?.appData?.data?.customer.name }}</h6>
+                        <p class="customer-detail mb-0">
+                          <i class="bi bi-envelope me-1"></i>{{ state?.appData?.data?.customer.email }}
+                        </p>
+                        <p class="customer-detail mb-0">
+                          <i class="bi bi-telephone me-1"></i>{{ state?.appData?.data?.customer.phone }}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="card action-card">
+                  <div class="card-body">
+                    <div class="d-flex gap-2">
+                      <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="cancelEdit()">
+                        <i class="bi bi-x-lg me-2"></i>Cancel
+                      </button>
+                      <button type="submit"
+                              class="btn btn-primary flex-grow-1"
+                              [disabled]="isLoading$ | async">
+                        <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                        <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-2"></i>
+                        {{ (isLoading$ | async) ? 'Saving...' : 'Save Changes' }}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Invoice Card (View Mode) - Stylish Template -->
+        <div class="invoice-page" id="invoice" [class.d-none]="isEditMode">
+          <!-- Top gradient background -->
+          <div class="invoice-bg-top"></div>
+
+          <!-- Bottom corner decoration -->
+          <div class="invoice-bg-bottom"></div>
+
+          <div class="invoice-content">
+            <!-- Header: Logo + Invoice Title -->
+            <div class="invoice-header">
+              <div class="header-left">
+                <img src="assets/logo.png" alt="LKCentrix Solutions" class="company-logo">
+              </div>
+              <div class="header-right">
+                <h1 class="invoice-title">INVOICE</h1>
+                <p class="invoice-number">Invoice #: {{ state?.appData?.data?.invoice.invoiceNumber }}</p>
+              </div>
+            </div>
+
+            <!-- From / Date Section -->
+            <div class="info-section">
+              <div class="info-left">
+                <h6 class="info-label">FROM</h6>
+                <p class="info-text">
+                  <strong>LKCentrix Solutions (PTY) LTD</strong><br>
+                  info@lkcentrix.co.za<br>
+                  +27 (11) 568 8322
+                </p>
+              </div>
+              <div class="info-right">
+                <div class="date-row">
+                  <span class="info-label">DATE</span>
+                  <span class="info-value">{{ state?.appData?.data?.invoice.date | date: 'mediumDate' }}</span>
+                </div>
+                <div class="date-row">
+                  <span class="info-label">DUE ON</span>
+                  <span class="info-value">NET 30 Days</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bill To / Balance Due -->
+            <div class="info-section">
+              <div class="info-left">
+                <h6 class="info-label">BILL TO</h6>
+                <p class="info-text">
+                  <strong>{{ state?.appData?.data?.customer.name }}</strong><br>
+                  {{ state?.appData?.data?.customer.email }}<br>
+                  {{ state?.appData?.data?.customer.phone }}
+                  <span *ngIf="state?.appData?.data?.customer.address"><br>{{ state?.appData?.data?.customer.address }}</span>
+                </p>
+              </div>
+              <div class="info-right">
+                <span class="info-label">BALANCE DUE</span>
+                <span class="balance-due">{{ formatCurrency(state?.appData?.data?.invoice.total) }}</span>
+                <span class="badge status-badge mt-2"
+                      [ngClass]="{
+                        'badge-paid': state?.appData?.data?.invoice.status === 'PAID',
+                        'badge-pending': state?.appData?.data?.invoice.status === 'PENDING',
+                        'badge-canceled': state?.appData?.data?.invoice.status === 'CANCELED',
+                        'badge-overdue': state?.appData?.data?.invoice.status === 'OVERDUE'
+                      }">
+                  {{ state?.appData?.data?.invoice.status }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Line Items Table -->
+            <div class="items-table-wrapper">
+              <table class="items-table">
+                <thead>
+                  <tr>
+                    <th class="col-desc">DESCRIPTION</th>
+                    <th class="col-qty">QUANTITY</th>
+                    <th class="col-price">UNIT PRICE</th>
+                    <th class="col-total">TOTAL</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let service of state?.appData?.data?.invoice.services?.split(','); let i = index"
+                      [class.row-alt]="i % 2 === 1">
+                    <td class="col-desc">{{ getServiceName(service) }}</td>
+                    <td class="col-qty">1</td>
+                    <td class="col-price">{{ formatCurrency(getServiceAmount(service)) }}</td>
+                    <td class="col-total">{{ formatCurrency(getServiceAmount(service)) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Summary -->
+            <div class="invoice-totals">
+              <div class="totals-table">
+                <div class="totals-row">
+                  <span class="totals-label">SUBTOTAL</span>
+                  <span class="totals-value">{{ formatCurrency(getSubtotal(state?.appData?.data?.invoice)) }}</span>
+                </div>
+                <div class="totals-row">
+                  <span class="totals-label">VAT ({{ getVatRate(state?.appData?.data?.invoice) }}%)</span>
+                  <span class="totals-value">{{ formatCurrency(getVatAmount(state?.appData?.data?.invoice)) }}</span>
+                </div>
+                <div class="totals-row" *ngIf="state?.appData?.data?.invoice.discount > 0">
+                  <span class="totals-label">DISCOUNT</span>
+                  <span class="totals-value totals-discount">-{{ formatCurrency(state?.appData?.data?.invoice.discount) }}</span>
+                </div>
+                <div class="totals-row totals-final">
+                  <span class="totals-label">TOTAL</span>
+                  <span class="totals-value">{{ formatCurrency(state?.appData?.data?.invoice.total) }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Payment Info & Notes -->
+            <div class="invoice-footer">
+              <div class="footer-left">
+                <h6 class="info-label">Payment Information</h6>
+                <p class="info-text">
+                  Bank: First National Bank<br>
+                  Account Name: LKCentrix Solutions<br>
+                  Account Number: 123456789<br>
+                  Branch Code: 250655
+                </p>
+              </div>
+              <div class="footer-right">
+                <h6 class="notes-title">Notes</h6>
+                <p class="notes-text">Thank you for your business.</p>
+                <p class="notes-text">Payment is due within 30 days of invoice date.<br>
+                Please include invoice number with payment.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading invoice...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ state.error }}
+        <button class="btn btn-primary mt-3" [routerLink]="['/invoices']">
+          <i class="bi bi-arrow-left me-2"></i>Back to Invoices
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

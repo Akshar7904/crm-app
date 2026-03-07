@@ -1,0 +1,146 @@
+<!-- Navbar rendered by app.component -->
+<section>
+  <div class="container-fluid">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" style="margin-top: 8px">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/']">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/assets']">Assets</a>
+        </li>
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/assets', assetId]">{{ asset?.assetTag }}</a>
+        </li>
+        <li class="breadcrumb-item active">Assign</li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="row mt-3 mb-4">
+      <div class="col">
+        <h4 class="fw-bold">Assign Asset</h4>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Asset Info -->
+      <div class="col-md-4">
+        <div class="card mb-4" *ngIf="asset">
+          <div class="card-header">
+            <h6 class="mb-0">Asset Information</h6>
+          </div>
+          <div class="card-body">
+            <h5>{{ asset.name }}</h5>
+            <p class="mb-1"><span class="badge bg-dark">{{ asset.assetTag }}</span></p>
+            <table class="table table-sm mt-3">
+              <tbody>
+                <tr>
+                  <td class="text-muted">Category</td>
+                  <td>{{ asset.category | titlecase }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Brand</td>
+                  <td>{{ asset.brand || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Model</td>
+                  <td>{{ asset.model || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Serial</td>
+                  <td>{{ asset.serialNumber || 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td class="text-muted">Condition</td>
+                  <td>{{ asset.condition | titlecase }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Assignment Form -->
+      <div class="col-md-8">
+        <div class="card">
+          <div class="card-header">
+            <h6 class="mb-0">Assignment Details</h6>
+          </div>
+          <div class="card-body">
+            <form [formGroup]="assignmentForm" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                <label for="employeeId" class="form-label">Assign To *</label>
+                <select
+                  id="employeeId"
+                  formControlName="employeeId"
+                  class="form-select"
+                  [ngClass]="{'is-invalid': isFieldInvalid('employeeId')}"
+                >
+                  <option [ngValue]="null">-- Select Employee --</option>
+                  <option *ngFor="let emp of employees" [ngValue]="emp.id">
+                    {{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId }})
+                  </option>
+                </select>
+                <div class="invalid-feedback">Please select an employee</div>
+              </div>
+
+              <div class="mb-3">
+                <label for="conditionOnAssignment" class="form-label">Condition on Assignment *</label>
+                <select
+                  id="conditionOnAssignment"
+                  formControlName="conditionOnAssignment"
+                  class="form-select"
+                >
+                  <option *ngFor="let cond of conditions" [value]="cond">
+                    {{ cond | titlecase }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="expectedReturnDate" class="form-label">Expected Return Date (if temporary)</label>
+                <input
+                  type="date"
+                  id="expectedReturnDate"
+                  formControlName="expectedReturnDate"
+                  class="form-control"
+                />
+              </div>
+
+              <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea
+                  id="notes"
+                  formControlName="notes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="Assignment notes..."
+                ></textarea>
+              </div>
+
+              <div class="text-end">
+                <button
+                  type="button"
+                  class="btn btn-secondary me-2"
+                  (click)="cancel()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="isLoading$ | async"
+                >
+                  <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                  Assign Asset
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

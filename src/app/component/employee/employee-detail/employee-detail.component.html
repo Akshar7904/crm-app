@@ -1,0 +1,670 @@
+<ng-container
+  *ngIf="employeeState$ | async as state"
+  [ngSwitch]="state.dataState"
+>
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="employee-profile-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/']">Home</a>
+            </li>
+            <li class="breadcrumb-item">
+              <a [routerLink]="['/employee']">Employees</a>
+            </li>
+            <li class="breadcrumb-item active">
+              {{ state?.appData?.data?.employee.firstName }}
+              {{ state?.appData?.data?.employee.lastName }}
+            </li>
+          </ol>
+        </nav>
+
+        <div class="row">
+          <!-- Left Column - Profile Card -->
+          <div class="col-xxl-4 col-xl-4 col-lg-4 col-md-12">
+            <!-- Profile Card -->
+            <div class="card profile-card mb-4">
+              <div class="card-body text-center">
+                <!-- Avatar -->
+                <div class="profile-avatar-wrapper">
+                  <img
+                    [src]="getProfileImageUrl(state?.appData?.data?.employee.id)"
+                    (error)="onProfileImageError($event)"
+                    [alt]="state?.appData?.data?.employee.firstName"
+                    class="profile-avatar-lg"
+                  />
+                  <label for="photoInput" class="avatar-edit-btn">
+                    <i class="bi bi-camera-fill"></i>
+                  </label>
+                  <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                    style="display: none"
+                    (change)="updatePhoto($event)"
+                  />
+                </div>
+
+                <!-- Name & Title -->
+                <h4 class="profile-name mt-3">
+                  {{ state?.appData?.data?.employee.firstName }}
+                  {{ state?.appData?.data?.employee.lastName }}
+                </h4>
+                <p class="profile-designation">
+                  {{ state?.appData?.data?.employee.designationTitle || 'No Designation' }}
+                </p>
+
+                <!-- Status & Employee ID -->
+                <div class="profile-badges mb-3">
+                  <span class="badge bg-primary-subtle text-primary me-2">
+                    <i class="bi bi-person-badge me-1"></i>
+                    {{ state?.appData?.data?.employee.employeeId || 'N/A' }}
+                  </span>
+                  <span
+                    class="badge"
+                    [ngClass]="{
+                      'bg-success-subtle text-success': state?.appData?.data?.employee.status === 'ACTIVE' || state?.appData?.data?.employee.status === 'Active',
+                      'bg-danger-subtle text-danger': state?.appData?.data?.employee.status === 'TERMINATED' || state?.appData?.data?.employee.status === 'Terminated',
+                      'bg-warning-subtle text-warning': state?.appData?.data?.employee.status === 'ON_LEAVE' || state?.appData?.data?.employee.status === 'On Leave',
+                      'bg-secondary-subtle text-secondary': state?.appData?.data?.employee.status === 'INACTIVE' || state?.appData?.data?.employee.status === 'Inactive',
+                      'bg-info-subtle text-info': state?.appData?.data?.employee.status === 'PENDING' || state?.appData?.data?.employee.status === 'Pending' || state?.appData?.data?.employee.status === 'PROBATION' || state?.appData?.data?.employee.status === 'Probation'
+                    }"
+                  >
+                    <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
+                    {{ state?.appData?.data?.employee.status }}
+                  </span>
+                </div>
+
+                <!-- Bio -->
+                <p *ngIf="state?.appData?.data?.employee.bio" class="profile-bio">
+                  {{ state?.appData?.data?.employee.bio }}
+                </p>
+              </div>
+
+              <!-- Contact Info List -->
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex align-items-center">
+                  <div class="contact-icon">
+                    <i class="bi bi-envelope"></i>
+                  </div>
+                  <div class="contact-info">
+                    <small class="text-muted">Email</small>
+                    <p>{{ state?.appData?.data?.employee.email }}</p>
+                  </div>
+                </li>
+                <li class="list-group-item d-flex align-items-center">
+                  <div class="contact-icon">
+                    <i class="bi bi-telephone"></i>
+                  </div>
+                  <div class="contact-info">
+                    <small class="text-muted">Phone</small>
+                    <p>{{ state?.appData?.data?.employee.phone || 'N/A' }}</p>
+                  </div>
+                </li>
+                <li class="list-group-item d-flex align-items-center">
+                  <div class="contact-icon">
+                    <i class="bi bi-calendar-event"></i>
+                  </div>
+                  <div class="contact-info">
+                    <small class="text-muted">Date of Birth</small>
+                    <p>{{ formatDate(state?.appData?.data?.employee.dateOfBirth) }}</p>
+                  </div>
+                </li>
+                <li class="list-group-item d-flex align-items-center">
+                  <div class="contact-icon">
+                    <i class="bi bi-geo-alt"></i>
+                  </div>
+                  <div class="contact-info">
+                    <small class="text-muted">Address</small>
+                    <p>
+                      {{ state?.appData?.data?.employee.address || '' }}
+                      {{ state?.appData?.data?.employee.city ? ', ' + state?.appData?.data?.employee.city : '' }}
+                      {{ state?.appData?.data?.employee.state ? ', ' + state?.appData?.data?.employee.state : '' }}
+                      <span *ngIf="!state?.appData?.data?.employee.address && !state?.appData?.data?.employee.city">N/A</span>
+                    </p>
+                  </div>
+                </li>
+              </ul>
+
+              <!-- Action Buttons -->
+              <div class="card-footer bg-transparent">
+                <div class="d-grid gap-2">
+                  <button class="btn btn-outline-danger btn-sm" (click)="deleteEmployee()">
+                    <i class="bi bi-trash me-2"></i>Delete Employee
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Details -->
+          <div class="col-xxl-8 col-xl-8 col-lg-8 col-md-12">
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs profile-tabs" id="profileTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                  <i class="bi bi-person me-2"></i>Overview
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab">
+                  <i class="bi bi-pencil-square me-2"></i>Edit
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab">
+                  <i class="bi bi-folder me-2"></i>Documents
+                  <span *ngIf="documents.length > 0" class="badge bg-primary ms-2">{{ documents.length }}</span>
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content" id="profileTabsContent">
+              <!-- Overview Tab -->
+              <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <div class="row">
+                  <!-- Employment Information -->
+                  <div class="col-md-6 mb-4">
+                    <div class="card info-card h-100">
+                      <div class="card-header">
+                        <h6 class="card-title mb-0">
+                          <i class="bi bi-briefcase me-2 text-primary"></i>Employment Information
+                        </h6>
+                      </div>
+                      <div class="card-body">
+                        <div class="info-row">
+                          <span class="info-label">Department</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.departmentName || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Designation</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.designationTitle || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Hire Date</span>
+                          <span class="info-value">{{ formatDate(state?.appData?.data?.employee.hireDate) }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Employment Type</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.employmentType || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Base Salary</span>
+                          <span class="info-value text-success fw-bold">
+                            R {{ state?.appData?.data?.employee.baseSalary?.toLocaleString() || '0.00' }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Personal Information -->
+                  <div class="col-md-6 mb-4">
+                    <div class="card info-card h-100">
+                      <div class="card-header">
+                        <h6 class="card-title mb-0">
+                          <i class="bi bi-person-vcard me-2 text-primary"></i>Personal Information
+                        </h6>
+                      </div>
+                      <div class="card-body">
+                        <div class="info-row">
+                          <span class="info-label">Full Name</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.firstName }} {{ state?.appData?.data?.employee.lastName }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Gender</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.gender || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Country</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.country || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Postal Code</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.postalCode || 'N/A' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Bank Information -->
+                  <div class="col-md-6 mb-4">
+                    <div class="card info-card h-100">
+                      <div class="card-header">
+                        <h6 class="card-title mb-0">
+                          <i class="bi bi-bank me-2 text-primary"></i>Bank Information
+                        </h6>
+                      </div>
+                      <div class="card-body">
+                        <div class="info-row">
+                          <span class="info-label">Bank Name</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.bankName || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Account Holder</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.accountHolderName || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Account Number</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.bankAccountNumber || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Branch Code</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.branchCode || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Account Type</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.accountType || 'N/A' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Emergency Contact -->
+                  <div class="col-md-6 mb-4">
+                    <div class="card info-card h-100">
+                      <div class="card-header">
+                        <h6 class="card-title mb-0">
+                          <i class="bi bi-heart-pulse me-2 text-danger"></i>Emergency Contact
+                        </h6>
+                      </div>
+                      <div class="card-body">
+                        <div class="info-row">
+                          <span class="info-label">Contact Name</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.emergencyContactName || 'N/A' }}</span>
+                        </div>
+                        <div class="info-row">
+                          <span class="info-label">Contact Phone</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.emergencyContactPhone || 'N/A' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Edit Tab -->
+              <div class="tab-pane fade" id="edit" role="tabpanel">
+                <div class="card">
+                  <div class="card-body">
+                    <form #employeeForm="ngForm" (ngSubmit)="isMyDetailsPage ? updateMyDetails(employeeForm) : updateEmployee(employeeForm)">
+                      <!-- Employment Information Section -->
+                      <div class="form-section">
+                        <h6 class="section-title">
+                          <i class="bi bi-briefcase me-2"></i>Employment Information
+                        </h6>
+                        <div class="row">
+                          <div class="col-md-4 mb-3">
+                            <label for="employeeId" class="form-label">Employee ID</label>
+                            <input type="text" class="form-control" id="employeeId" name="employeeId"
+                                   [(ngModel)]="state.appData.data.employee.employeeId"
+                                   placeholder="e.g., LKC0001" />
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select class="form-select" id="status" name="status"
+                                    [(ngModel)]="state.appData.data.employee.status">
+                              <option *ngFor="let status of statusOptions" [value]="status.value">
+                                {{ status.label }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="hireDate" class="form-label">Hire Date</label>
+                            <input type="date" class="form-control" id="hireDate" name="hireDate"
+                                   [(ngModel)]="state.appData.data.employee.hireDate" />
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="departmentId" class="form-label">Department</label>
+                            <select class="form-select" id="departmentId" name="departmentId"
+                                    [(ngModel)]="state.appData.data.employee.departmentId">
+                              <option value="">Select Department</option>
+                              <option *ngFor="let dept of departments" [value]="dept.id">
+                                {{ dept.name }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="designationId" class="form-label">Designation</label>
+                            <select class="form-select" id="designationId" name="designationId"
+                                    [(ngModel)]="state.appData.data.employee.designationId"
+                                    (change)="onDesignationChange($event)">
+                              <option value="">Select Designation</option>
+                              <option *ngFor="let des of designations" [value]="des.id">
+                                {{ des.title }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="employmentType" class="form-label">Employment Type</label>
+                            <select class="form-select" id="employmentType" name="employmentType"
+                                    [(ngModel)]="state.appData.data.employee.employmentType">
+                              <option value="">Select Type</option>
+                              <option *ngFor="let type of employmentTypes" [value]="type.value">
+                                {{ type.label }}
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-md-4 mb-3">
+                            <label for="baseSalary" class="form-label">Base Salary (R)</label>
+                            <input type="number" class="form-control" id="baseSalary" name="baseSalary"
+                                   [(ngModel)]="state.appData.data.employee.baseSalary"
+                                   placeholder="0.00" min="0" step="0.01" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Personal Information Section -->
+                      <div class="form-section">
+                        <h6 class="section-title">
+                          <i class="bi bi-person me-2"></i>Personal Information
+                        </h6>
+                        <div class="row">
+                          <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">First Name *</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName"
+                                   [(ngModel)]="state.appData.data.employee.firstName" required />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">Last Name *</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName"
+                                   [(ngModel)]="state.appData.data.employee.lastName" required />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   [ngModel]="state.appData.data.employee.email" readonly
+                                   class="form-control-plaintext bg-light" />
+                            <small class="text-muted">Email cannot be changed</small>
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" class="form-control" id="phone" name="phone"
+                                   [(ngModel)]="state.appData.data.employee.phone" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                            <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth"
+                                   [(ngModel)]="state.appData.data.employee.dateOfBirth" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender"
+                                    [(ngModel)]="state.appData.data.employee.gender">
+                              <option value="">Select Gender</option>
+                              <option value="MALE">Male</option>
+                              <option value="FEMALE">Female</option>
+                              <option value="OTHER">Other</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Address Information Section -->
+                      <div class="form-section">
+                        <h6 class="section-title">
+                          <i class="bi bi-geo-alt me-2"></i>Address Information
+                        </h6>
+                        <div class="row">
+                          <div class="col-12 mb-3">
+                            <label for="address" class="form-label">Street Address</label>
+                            <input type="text" class="form-control" id="address" name="address"
+                                   [(ngModel)]="state.appData.data.employee.address" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" name="city"
+                                   [(ngModel)]="state.appData.data.employee.city" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="state" class="form-label">State/Province</label>
+                            <input type="text" class="form-control" id="state" name="state"
+                                   [(ngModel)]="state.appData.data.employee.state" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="country" name="country"
+                                   [(ngModel)]="state.appData.data.employee.country" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="postalCode" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="postalCode" name="postalCode"
+                                   [(ngModel)]="state.appData.data.employee.postalCode" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Emergency Contact Section -->
+                      <div class="form-section">
+                        <h6 class="section-title">
+                          <i class="bi bi-heart-pulse me-2"></i>Emergency Contact
+                        </h6>
+                        <div class="row">
+                          <div class="col-md-6 mb-3">
+                            <label for="emergencyContactName" class="form-label">Contact Name</label>
+                            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName"
+                                   [(ngModel)]="state.appData.data.employee.emergencyContactName" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="emergencyContactPhone" class="form-label">Contact Phone</label>
+                            <input type="tel" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone"
+                                   [(ngModel)]="state.appData.data.employee.emergencyContactPhone" />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Bank Information Section -->
+                      <div class="form-section">
+                        <h6 class="section-title">
+                          <i class="bi bi-bank me-2"></i>Bank Information
+                        </h6>
+                        <div class="row">
+                          <div class="col-md-6 mb-3">
+                            <label for="bankName" class="form-label">Bank Name</label>
+                            <input type="text" class="form-control" id="bankName" name="bankName"
+                                   [(ngModel)]="state.appData.data.employee.bankName" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="accountHolderName" class="form-label">Account Holder Name</label>
+                            <input type="text" class="form-control" id="accountHolderName" name="accountHolderName"
+                                   [(ngModel)]="state.appData.data.employee.accountHolderName" />
+                          </div>
+                          <div class="col-md-6 mb-3">
+                            <label for="bankAccountNumber" class="form-label">Account Number</label>
+                            <input type="text" class="form-control" id="bankAccountNumber" name="bankAccountNumber"
+                                   [(ngModel)]="state.appData.data.employee.bankAccountNumber" />
+                          </div>
+                          <div class="col-md-3 mb-3">
+                            <label for="branchCode" class="form-label">Branch Code</label>
+                            <input type="text" class="form-control" id="branchCode" name="branchCode"
+                                   [(ngModel)]="state.appData.data.employee.branchCode" />
+                          </div>
+                          <div class="col-md-3 mb-3">
+                            <label for="accountType" class="form-label">Account Type</label>
+                            <select class="form-select" id="accountType" name="accountType"
+                                    [(ngModel)]="state.appData.data.employee.accountType">
+                              <option value="">Select Type</option>
+                              <option value="SAVINGS">Savings</option>
+                              <option value="CHEQUE">Cheque</option>
+                              <option value="CURRENT">Current</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Bio Section -->
+                      <div class="form-section">
+                        <h6 class="section-title">
+                          <i class="bi bi-file-text me-2"></i>Bio
+                        </h6>
+                        <div class="row">
+                          <div class="col-12 mb-3">
+                            <textarea class="form-control" id="bio" name="bio" rows="3"
+                                      [(ngModel)]="state.appData.data.employee.bio"
+                                      placeholder="Write a short bio..."></textarea>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Form Actions -->
+                      <div class="form-actions">
+                        <button type="button" class="btn btn-light me-2" (click)="goBack()">
+                          <i class="bi bi-x-lg me-2"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary"
+                                [disabled]="!employeeForm.valid || (isLoading$ | async)">
+                          <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                          <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-2"></i>
+                          Save Changes
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Documents Tab -->
+              <div class="tab-pane fade" id="documents" role="tabpanel">
+                <div class="card">
+                  <div class="card-body">
+                    <!-- Upload Section -->
+                    <div class="upload-section mb-4">
+                      <h6 class="mb-3">
+                        <i class="bi bi-cloud-upload me-2"></i>Upload New Document
+                      </h6>
+                      <div class="row align-items-end">
+                        <div class="col-md-3 mb-3">
+                          <label for="documentType" class="form-label">Document Type *</label>
+                          <select class="form-select" id="documentType" [(ngModel)]="selectedDocumentType" [disabled]="isUploadingDocument">
+                            <option value="">Select type...</option>
+                            <option *ngFor="let type of documentTypes" [value]="type.value">{{ type.label }}</option>
+                          </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                          <label for="documentFile" class="form-label">Select File *</label>
+                          <input type="file" class="form-control" id="documentFile" (change)="onFileSelected($event)"
+                                 [disabled]="isUploadingDocument" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                          <label for="description" class="form-label">Description</label>
+                          <input type="text" class="form-control" id="description" [(ngModel)]="documentDescription"
+                                 [disabled]="isUploadingDocument" placeholder="Optional description...">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                          <button class="btn btn-primary w-100" (click)="uploadDocument()"
+                                  [disabled]="!selectedFile || !selectedDocumentType || isUploadingDocument">
+                            <i class="bi bi-upload me-1"></i> Upload
+                          </button>
+                        </div>
+                      </div>
+
+                      <div *ngIf="selectedFile" class="selected-file-info">
+                        <i class="bi bi-file-earmark me-2"></i>
+                        <strong>{{ selectedFile.name }}</strong>
+                        <span class="text-muted ms-2">({{ formatFileSize(selectedFile.size) }})</span>
+                      </div>
+
+                      <div *ngIf="isUploadingDocument" class="upload-progress mt-3">
+                        <div class="progress">
+                          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                               [style.width.%]="uploadProgress">{{ uploadProgress }}%</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Documents Grid -->
+                    <h6 class="mb-3">
+                      <i class="bi bi-folder2-open me-2"></i>Uploaded Documents ({{ documents.length }})
+                    </h6>
+
+                    <div *ngIf="documents.length === 0" class="empty-documents">
+                      <i class="bi bi-folder-x"></i>
+                      <p>No documents uploaded yet</p>
+                      <small class="text-muted">Upload your first document using the form above</small>
+                    </div>
+
+                    <div class="row">
+                      <div *ngFor="let doc of documents" class="col-md-6 col-lg-4 mb-3">
+                        <div class="document-card">
+                          <div class="document-icon-wrapper">
+                            <i [class]="getDocumentIcon(doc.fileExtension)"></i>
+                            <span *ngIf="doc.isVerified" class="verified-badge">
+                              <i class="bi bi-check-circle-fill"></i>
+                            </span>
+                          </div>
+                          <div class="document-details">
+                            <h6 class="document-name" [title]="doc.documentName">{{ doc.documentName }}</h6>
+                            <p class="document-meta">
+                              <span class="badge bg-light text-dark">{{ doc.documentType }}</span>
+                              <span class="text-muted">{{ formatFileSize(doc.fileSize) }}</span>
+                            </p>
+                            <small class="text-muted">Uploaded {{ formatDate(doc.createdAt) }}</small>
+                          </div>
+                          <div class="document-actions">
+                            <button class="btn btn-sm btn-light" (click)="downloadDocument(doc.id)" title="Download">
+                              <i class="bi bi-download"></i>
+                            </button>
+                            <button class="btn btn-sm btn-light text-danger" (click)="deleteDocument(doc.id)" title="Delete">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Required Documents Info -->
+                    <div class="required-docs-info mt-4">
+                      <h6><i class="bi bi-info-circle me-2"></i>Required Documents</h6>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <ul class="required-list">
+                            <li><strong>CV:</strong> Professional resume</li>
+                            <li><strong>ID:</strong> Certified copy of SA ID or passport</li>
+                          </ul>
+                        </div>
+                        <div class="col-md-6">
+                          <ul class="required-list">
+                            <li><strong>Work Permit:</strong> For foreign nationals</li>
+                            <li><strong>Qualifications:</strong> Certificates & diplomas</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading employee profile...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>Error Loading Profile
+        </h4>
+        <p>{{ state.error }}</p>
+        <hr />
+        <button class="btn btn-primary" [routerLink]="['/employee']">
+          <i class="bi bi-arrow-left me-2"></i>Back to Employees
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

@@ -1,0 +1,38 @@
+// asset-assignments Component - SCSS
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.table th {
+  font-weight: 600;
+  color: #495057;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.badge {
+  font-weight: 500;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal {
+  z-index: 1050;
+}

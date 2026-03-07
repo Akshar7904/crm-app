@@ -1,0 +1,412 @@
+// ========================================
+// LKCentrix Payroll System - Main Styles
+// ========================================
+
+// Import theme configuration
+@import 'styles/variables';
+@import 'styles/mixins';
+
+// Import external fonts and icons
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i");
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.2/font/bootstrap-icons.css");
+@import "node_modules/angular-notifier/styles";
+
+// ========================================
+// THEME SYSTEM - CSS Custom Properties
+// ========================================
+
+// Light Theme (default)
+[data-theme="light"] {
+  // Backgrounds
+  --bg-body: #ecf2f5;
+  --bg-card: #ffffff;
+  --bg-input: #{$gray-50};
+  --bg-disabled: #f3f4f6;
+
+  // Sidebar
+  --bg-sidebar: #ffffff;
+  --sidebar-border: #{$gray-200};
+  --sidebar-text: #{$gray-600};
+  --sidebar-text-hover: #{$gray-900};
+  --sidebar-text-active: #{$primary};
+  --sidebar-icon: #{$gray-400};
+  --sidebar-icon-active: #{$primary};
+  --sidebar-hover: rgba(0, 92, 143, 0.05);
+  --sidebar-active-bg: rgba(0, 92, 143, 0.08);
+  --sidebar-active-border: #{$primary};
+  --sidebar-header-border: #{$gray-200};
+  --sidebar-scrollbar: #{$gray-300};
+  --sidebar-scrollbar-hover: #{$gray-400};
+  --sidebar-footer-border: #{$gray-200};
+
+  // Navbar
+  --bg-navbar: #ffffff;
+  --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --navbar-text: #{$gray-800};
+  --navbar-text-muted: #{$text-muted};
+  --navbar-icon: #{$gray-500};
+  --navbar-icon-hover: #{$primary};
+  --navbar-divider: #{$gray-200};
+  --navbar-btn-hover: rgba(0, 92, 143, 0.06);
+
+  // Text
+  --text-primary: #{$gray-800};
+  --text-secondary: #{$gray-600};
+  --text-muted: #64748b;
+  --text-light: #{$gray-400};
+
+  // Borders
+  --border-color: #{$gray-300};
+  --border-light: #f0f0f0;
+
+  // Cards & Surfaces
+  --card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --card-border: #{$gray-200};
+
+  // Tables
+  --table-header-bg: #{$gray-100};
+  --table-border: #f0f0f0;
+  --table-hover: #{$gray-100};
+  --table-stripe: #{$gray-50};
+
+  // Dropdowns
+  --dropdown-bg: #ffffff;
+  --dropdown-border: #{$gray-200};
+  --dropdown-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --dropdown-hover: rgba(0, 92, 143, 0.05);
+
+  // Forms
+  --input-bg: #{$gray-50};
+  --input-border: #ddd;
+  --input-text: #{$gray-800};
+
+  // Logo
+  --logo-filter: none;
+  --logo-text-color: #{$primary-dark};
+
+  // Misc
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+  --badge-muted-bg: #{$gray-100};
+  --badge-muted-text: #{$gray-600};
+}
+
+// Dark Theme
+[data-theme="dark"] {
+  // Backgrounds
+  --bg-body: #0d1b2a;
+  --bg-card: #112240;
+  --bg-input: #0f2744;
+  --bg-disabled: #1a3050;
+
+  // Sidebar
+  --bg-sidebar: #0a1929;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-text: rgba(255, 255, 255, 0.65);
+  --sidebar-text-hover: rgba(255, 255, 255, 0.9);
+  --sidebar-text-active: #ffffff;
+  --sidebar-icon: rgba(255, 255, 255, 0.4);
+  --sidebar-icon-active: #{$secondary-light};
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+  --sidebar-active-bg: rgba(0, 92, 143, 0.2);
+  --sidebar-active-border: #{$secondary-light};
+  --sidebar-header-border: rgba(255, 255, 255, 0.06);
+  --sidebar-scrollbar: rgba(255, 255, 255, 0.1);
+  --sidebar-scrollbar-hover: rgba(255, 255, 255, 0.2);
+  --sidebar-footer-border: rgba(255, 255, 255, 0.06);
+
+  // Navbar
+  --bg-navbar: #112240;
+  --navbar-shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --navbar-text: rgba(255, 255, 255, 0.9);
+  --navbar-text-muted: rgba(255, 255, 255, 0.5);
+  --navbar-icon: rgba(255, 255, 255, 0.5);
+  --navbar-icon-hover: #{$secondary-light};
+  --navbar-divider: rgba(255, 255, 255, 0.1);
+  --navbar-btn-hover: rgba(255, 255, 255, 0.08);
+
+  // Text
+  --text-primary: rgba(255, 255, 255, 0.9);
+  --text-secondary: rgba(255, 255, 255, 0.65);
+  --text-muted: rgba(255, 255, 255, 0.45);
+  --text-light: rgba(255, 255, 255, 0.3);
+
+  // Borders
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(255, 255, 255, 0.06);
+
+  // Cards & Surfaces
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --card-border: rgba(255, 255, 255, 0.08);
+
+  // Tables
+  --table-header-bg: rgba(255, 255, 255, 0.04);
+  --table-border: rgba(255, 255, 255, 0.06);
+  --table-hover: rgba(255, 255, 255, 0.04);
+  --table-stripe: rgba(255, 255, 255, 0.02);
+
+  // Dropdowns
+  --dropdown-bg: #112240;
+  --dropdown-border: rgba(255, 255, 255, 0.1);
+  --dropdown-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --dropdown-hover: rgba(255, 255, 255, 0.06);
+
+  // Forms
+  --input-bg: #0f2744;
+  --input-border: rgba(255, 255, 255, 0.12);
+  --input-text: rgba(255, 255, 255, 0.9);
+
+  // Logo
+  --logo-filter: brightness(0) invert(1);
+  --logo-text-color: #ffffff;
+
+  // Misc
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+  --badge-muted-bg: rgba(255, 255, 255, 0.08);
+  --badge-muted-text: rgba(255, 255, 255, 0.65);
+}
+
+// ==================== GLOBAL ANIMATIONS ====================
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-14px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+// ==================== BASE STYLES ====================
+
+body {
+  background-color: var(--bg-body, $bg-body);
+  font-family: $font-family-base;
+  color: var(--text-primary, $text-primary);
+  line-height: $line-height-base;
+}
+
+// ==================== UTILITIES ====================
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+// ==================== USER AVATARS ====================
+
+.user-avatar-xxl {
+  height: 128px;
+  width: 128px;
+}
+
+.user-avatar-xl {
+  height: 90px;
+  width: 90px;
+}
+
+.user-avatar-lg {
+  height: 48px;
+  width: 48px;
+}
+
+.user-avatar-md {
+  height: 32px;
+  width: 32px;
+}
+
+.user-avatar-sm {
+  height: 24px;
+  width: 24px;
+}
+
+.user-avatar-xs {
+  height: 18px;
+  width: 18px;
+}
+
+// ==================== CARDS ====================
+
+.card {
+  box-shadow: var(--card-shadow, $shadow);
+  margin-bottom: 24px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  word-wrap: break-word;
+  background-color: var(--bg-card, $bg-card);
+  background-clip: border-box;
+  border: 0 solid var(--border-light, $bg-body);
+  border-radius: $border-radius;
+}
+
+.avatar-lg {
+  height: 4.5rem;
+  width: 4.5rem;
+}
+
+.font-13 {
+  font-size: 13px !important;
+}
+
+// ==================== FORM ELEMENTS ====================
+
+input[type="text"]:disabled {
+  border: 0;
+  outline: 0;
+  background-color: var(--bg-disabled, $bg-body);
+}
+
+// ==================== TABLE STYLES ====================
+
+.cell-1 {
+  border-collapse: separate;
+  border-spacing: 0 4em;
+  background: $white;
+  border-bottom: 5px solid transparent;
+  background-clip: padding-box;
+}
+
+thead {
+  background: var(--table-header-bg, #dddcdc);
+}
+
+// ==================== PRIMARY BUTTON GLOBAL ====================
+
+.btn-primary {
+  @include btn-primary;
+}
+
+.btn-secondary {
+  background-color: $gray-300;
+  color: $text-primary;
+  padding: $btn-padding-y $btn-padding-x;
+  font-size: $btn-font-size;
+  font-weight: $btn-font-weight;
+  border: none;
+  border-radius: $btn-border-radius;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background-color: darken($gray-300, 5%);
+  }
+}
+
+// ==================== STATUS BADGES ====================
+
+.status-pending {
+  @include status-badge('pending');
+}
+
+.status-approved {
+  @include status-badge('approved');
+}
+
+.status-rejected {
+  @include status-badge('rejected');
+}
+
+.status-cancelled {
+  @include status-badge('cancelled');
+}
+
+// ==================== PRINT STYLES ====================
+
+@media print {
+  // Hide navigation and sidebar
+  app-navbar,
+  app-sidebar,
+  .sidebar,
+  .navbar,
+  .nav,
+  nav:not([aria-label="breadcrumb"]),
+  .breadcrumb,
+  header,
+  footer,
+  .notifier__container,
+  .no-print {
+    display: none !important;
+  }
+
+  // Reset body and html - prevent extra pages
+  html, body {
+    background-color: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  // Reset app layout wrappers that cause extra pages
+  .app-container {
+    min-height: 0 !important;
+    height: auto !important;
+    display: block !important;
+  }
+
+  .main-content-wrapper {
+    margin-left: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  .content-area {
+    margin-top: 0 !important;
+    min-height: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  // Ensure main content takes full width
+  .main-content,
+  .content-wrapper,
+  .container-fluid,
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+
+  // Hide buttons and interactive elements
+  .btn,
+  button:not([type="submit"]) {
+    display: none !important;
+  }
+
+  // Prevent page breaks inside cards
+  .card {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  // Reset loading/error containers
+  .loading-container,
+  .error-container {
+    min-height: 0 !important;
+  }
+
+  // Sidebar overlay
+  .sidebar-overlay {
+    display: none !important;
+  }
+}

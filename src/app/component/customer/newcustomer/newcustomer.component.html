@@ -1,0 +1,187 @@
+<ng-container *ngIf="(newCustomerState$ | async) as state" [ngSwitch]="state.dataState">
+  <ng-container *ngSwitchCase="DataState.LOADED">
+    <section class="new-client-page">
+      <div class="container-fluid">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
+            <li class="breadcrumb-item"><a [routerLink]="['/customers']">Clients</a></li>
+            <li class="breadcrumb-item active">New Client</li>
+          </ol>
+        </nav>
+
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+          <div class="row align-items-center">
+            <div class="col">
+              <h4 class="page-title">
+                <i class="bi bi-person-plus me-2"></i>New Client
+              </h4>
+              <p class="text-muted mb-0">Add a new client to your database</p>
+            </div>
+            <div class="col-auto">
+              <button class="btn btn-outline-secondary" [routerLink]="['/customers']">
+                <i class="bi bi-arrow-left me-1"></i> Back to Clients
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="row justify-content-center">
+          <div class="col-lg-8">
+            <div class="card form-card">
+              <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Client Information</h6>
+              </div>
+              <div class="card-body">
+                <!-- Error Alert -->
+                <div *ngIf="state.error"
+                     class="alert alert-danger alert-dismissible fade show"
+                     role="alert">
+                  <i class="bi bi-exclamation-triangle me-2"></i>
+                  {{ state.error }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <form #newCustomerForm="ngForm" (ngSubmit)="createCustomer(newCustomerForm)">
+                  <div class="row">
+                    <!-- Name -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Full Name <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        <input type="text"
+                               ngModel
+                               name="name"
+                               class="form-control"
+                               placeholder="Enter full name"
+                               required>
+                      </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Email Address <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                        <input type="email"
+                               ngModel
+                               name="email"
+                               class="form-control"
+                               placeholder="Enter email address"
+                               required>
+                      </div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Phone Number <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                        <input type="text"
+                               ngModel
+                               name="phone"
+                               class="form-control"
+                               placeholder="Enter phone number"
+                               required>
+                      </div>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Client Type <span class="text-danger">*</span></label>
+                      <select name="type" ngModel="INDIVIDUAL" class="form-select" required>
+                        <option value="INDIVIDUAL">Individual</option>
+                        <option value="INSTITUTION">Institution</option>
+                        <option value="CORPORATE">Corporate</option>
+                      </select>
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Status <span class="text-danger">*</span></label>
+                      <select name="status" ngModel="ACTIVE" class="form-select" required>
+                        <option value="ACTIVE">Active</option>
+                        <option value="PENDING">Pending</option>
+                        <option value="INACTIVE">Inactive</option>
+                        <option value="BANNED">Banned</option>
+                      </select>
+                    </div>
+
+                    <!-- Image URL -->
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">Profile Image URL</label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-image"></i></span>
+                        <input type="text"
+                               ngModel
+                               name="imageUrl"
+                               class="form-control"
+                               placeholder="https://example.com/image.jpg">
+                      </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="col-12 mb-3">
+                      <label class="form-label">Address <span class="text-danger">*</span></label>
+                      <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                        <textarea ngModel
+                                  name="address"
+                                  class="form-control"
+                                  placeholder="Enter full address"
+                                  rows="2"
+                                  required></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Form Actions -->
+                  <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            [routerLink]="['/customers']">
+                      <i class="bi bi-x-lg me-1"></i> Cancel
+                    </button>
+                    <button type="submit"
+                            class="btn btn-primary"
+                            [disabled]="state.dataState === DataState.LOADING || newCustomerForm.invalid || newCustomerForm.pristine || (isLoading$ | async)">
+                      <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                      <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-1"></i>
+                      {{ (isLoading$ | async) ? 'Creating...' : 'Create Client' }}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+
+  <!-- Loading State -->
+  <ng-container *ngSwitchCase="DataState.LOADING">
+    <div class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading...</p>
+    </div>
+  </ng-container>
+
+  <!-- Error State -->
+  <ng-container *ngSwitchCase="DataState.ERROR">
+    <div class="container mt-5">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ state.error }}
+        <button class="btn btn-primary mt-3" [routerLink]="['/customers']">
+          <i class="bi bi-arrow-left me-2"></i>Back to Clients
+        </button>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

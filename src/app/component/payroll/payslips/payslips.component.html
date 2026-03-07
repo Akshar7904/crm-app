@@ -1,0 +1,176 @@
+<!-- payslips.component.html -->
+<div class="container-fluid mt-4">
+
+  <!-- ── Admin: Send Payslip Emails ─────────────────────────────────────── -->
+  <div class="card trigger-card mb-4">
+    <div class="card-header trigger-header d-flex align-items-center gap-2">
+      <i class="bi bi-envelope-arrow-up-fill fs-5"></i>
+      <span>Send Payslip Emails</span>
+    </div>
+    <div class="card-body">
+
+      <!-- Period picker + Load button -->
+      <div class="row g-3 align-items-end mb-3">
+        <div class="col-auto">
+          <label class="form-label fw-semibold">Month</label>
+          <select class="form-select trigger-select"
+                  [(ngModel)]="triggerMonth"
+                  (ngModelChange)="onPeriodChange()">
+            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <label class="form-label fw-semibold">Year</label>
+          <input type="number" class="form-control trigger-year"
+                 [(ngModel)]="triggerYear"
+                 (ngModelChange)="onPeriodChange()"
+                 min="2020" max="2099" />
+        </div>
+        <div class="col-auto">
+          <button class="btn btn-load"
+                  (click)="loadPeriodPayrolls()"
+                  [disabled]="isLoadingPeriod">
+            <span *ngIf="isLoadingPeriod" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isLoadingPeriod" class="bi bi-search me-2"></i>
+            {{ isLoadingPeriod ? 'Loading…' : 'Load Employees' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Employee selection list -->
+      <ng-container *ngIf="periodLoaded">
+
+        <div *ngIf="periodPayrolls.length === 0" class="text-muted small fst-italic mb-3">
+          No PROCESSED or PAID payrolls found for this period.
+        </div>
+
+        <div *ngIf="periodPayrolls.length > 0">
+
+          <!-- Select All / Deselect All -->
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <span class="fw-semibold small">
+              {{ selectedIds.size }} of {{ periodPayrolls.length }} selected
+            </span>
+            <button class="btn btn-sm btn-outline-secondary" (click)="selectAll()"   [disabled]="allSelected">Select All</button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="deselectAll()" [disabled]="noneSelected">Deselect All</button>
+          </div>
+
+          <!-- Employee rows -->
+          <div class="employee-list mb-3">
+            <div *ngFor="let p of periodPayrolls"
+                 class="employee-row"
+                 [class.selected]="isSelected(p.id!)"
+                 (click)="toggle(p.id!)">
+              <div class="d-flex align-items-center gap-3">
+                <input type="checkbox"
+                       class="form-check-input emp-check"
+                       [checked]="isSelected(p.id!)"
+                       (click)="$event.stopPropagation()"
+                       (change)="toggle(p.id!)" />
+                <div class="emp-avatar">
+                  {{ p.employeeName?.charAt(0) | uppercase }}
+                </div>
+                <div class="flex-grow-1">
+                  <div class="fw-semibold">{{ p.employeeName }}</div>
+                  <div class="text-muted small">{{ p.employeeNumber }}</div>
+                </div>
+                <div class="text-end">
+                  <div class="small text-muted">{{ formatDate(p.payPeriodStart) }} – {{ formatDate(p.payPeriodEnd) }}</div>
+                  <span class="badge" [class]="p.status === 'PAID' ? 'bg-success' : 'bg-info'">{{ p.status }}</span>
+                </div>
+                <div class="net-amount fw-semibold">{{ formatCurrency(p.netSalary) }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Send button -->
+          <button class="btn btn-send"
+                  (click)="sendToSelected()"
+                  [disabled]="isSending || noneSelected">
+            <span *ngIf="isSending" class="spinner-border spinner-border-sm me-2"></span>
+            <i *ngIf="!isSending" class="bi bi-send-fill me-2"></i>
+            {{ isSending ? 'Sending…' : 'Send to Selected (' + selectedIds.size + ')' }}
+          </button>
+
+        </div>
+      </ng-container>
+
+      <!-- Result alert -->
+      <div *ngIf="triggerMessage" class="mt-3">
+        <div [class]="triggerSuccess ? 'alert alert-success mb-0' : 'alert alert-danger mb-0'" role="alert">
+          <i [class]="triggerSuccess ? 'bi bi-check-circle-fill me-2' : 'bi bi-exclamation-triangle-fill me-2'"></i>
+          {{ triggerMessage }}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="mb-0">
+            <i class="bi bi-file-earmark-text me-2"></i>All Payslips
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Filter by Status</label>
+              <select class="form-select" [(ngModel)]="selectedStatus" (change)="onStatusChange()">
+                <option value="">All Statuses</option>
+                <option value="DRAFT">Draft</option>
+                <option value="PROCESSED">Processed</option>
+                <option value="PAID">Paid</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div *ngIf="isLoading" class="text-center py-5">
+            <div class="spinner-border text-primary"></div>
+            <p class="mt-3">Loading payslips...</p>
+          </div>
+
+          <div *ngIf="!isLoading" class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Period</th>
+                <th>Payment Date</th>
+                <th>Gross Salary</th>
+                <th>Net Salary</th>
+                <th>Actions</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let payroll of payrolls">
+                <td>{{ payroll.employeeName }}</td>
+                <td>{{ formatDate(payroll.payPeriodStart) }} - {{ formatDate(payroll.payPeriodEnd) }}</td>
+                <td>{{ formatDate(payroll.paymentDate) }}</td>
+                <td>{{ formatCurrency(payroll.grossSalary) }}</td>
+                <td><strong>{{ formatCurrency(payroll.netSalary) }}</strong></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" [routerLink]="['/payroll/detail', payroll.id]">
+                      <i class="bi bi-eye me-1"></i>View
+                    </button>
+                    <button class="btn btn-success" (click)="downloadPayslip(payroll.id, payroll.employeeName)">
+                      <i class="bi bi-download me-1"></i>PDF
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="payrolls.length === 0">
+                <td colspan="6" class="text-center py-4">No payslips found</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

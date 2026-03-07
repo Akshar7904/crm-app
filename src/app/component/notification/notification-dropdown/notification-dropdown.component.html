@@ -1,0 +1,89 @@
+<!-- Notification Dropdown -->
+<div class="dropdown" ngbDropdown>
+
+  <!-- Bell icon + badge -->
+  <button class="btn btn-link nav-link position-relative p-2" ngbDropdownToggle id="notificationDropdown">
+    <i class="bi bi-bell fs-5"></i>
+    <span *ngIf="(unreadCount$ | async) as count"
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          [class.d-none]="count === 0">
+      {{ count > 99 ? '99+' : count }}
+    </span>
+  </button>
+
+  <!-- Dropdown Menu -->
+  <div ngbDropdownMenu aria-labelledby="notificationDropdown"
+       class="dropdown-menu dropdown-menu-end notification-dropdown">
+
+    <!-- Header -->
+    <div class="dropdown-header d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+      <h6 class="mb-0 fw-semibold">Messages</h6>
+      <button *ngIf="notifications.length > 0"
+              class="btn btn-sm btn-link text-primary p-0"
+              (click)="markAllAsRead()">
+        Mark all as read
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="text-center py-4">
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="hasError && !isLoading" class="text-center py-4 text-danger">
+      <i class="bi bi-exclamation-circle fs-1 d-block mb-2"></i>
+      <p class="mb-0">Failed to load messages</p>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && !hasError && notifications.length === 0"
+         class="text-center py-4 text-muted">
+      <i class="bi bi-chat-left-text fs-1 d-block mb-2"></i>
+      <p class="mb-0">No new messages</p>
+    </div>
+
+    <!-- Notification items -->
+    <div *ngIf="!isLoading && !hasError && notifications.length > 0" class="notification-list">
+      <a *ngFor="let notification of notifications.slice(0, 5)"
+         class="dropdown-item notification-item d-flex align-items-start py-3 px-3 unread"
+         (click)="onNotificationClick(notification)">
+
+        <div class="notification-icon me-3">
+          <i [class]="getIcon(notification.type) + ' fs-5'"
+             [ngClass]="getPriorityClass(notification.priority)"></i>
+        </div>
+
+        <div class="notification-content flex-grow-1">
+          <div class="d-flex justify-content-between align-items-start">
+            <p class="mb-1 fw-semibold notification-title">{{ notification.title }}</p>
+            <small class="text-muted ms-2">{{ getTimeAgo(notification.createdAt) }}</small>
+          </div>
+          <p class="mb-0 small text-muted notification-message">{{ notification.message }}</p>
+        </div>
+
+        <div class="notification-actions ms-2">
+          <button class="btn btn-sm btn-link p-0 text-primary"
+                  title="Mark as read"
+                  (click)="markAsRead(notification, $event)">
+            <i class="bi bi-check2"></i>
+          </button>
+          <button class="btn btn-sm btn-link p-0 text-danger"
+                  title="Delete"
+                  (click)="deleteNotification(notification.id, $event)">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+      </a>
+    </div>
+
+    <!-- Footer -->
+    <div class="dropdown-footer border-top">
+      <a class="dropdown-item text-center py-2 text-primary" (click)="viewAllNotifications()">
+        View All Messages
+      </a>
+    </div>
+  </div>
+</div>
