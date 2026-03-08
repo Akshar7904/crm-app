@@ -2,6 +2,7 @@
   "buildCommand": "node src/environments/set-env.js && npm run build -- --configuration production",
   "outputDirectory": "dist/payroll-app",
   "framework": null,
+  "installCommand": "npm install",
   "routes": [
     {
       "src": "/assets/(.*)",
