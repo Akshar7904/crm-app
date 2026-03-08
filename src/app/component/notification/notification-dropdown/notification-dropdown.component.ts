@@ -6,6 +6,7 @@ import { NotificationApiService } from 'src/app/service/notification-api.service
 import { Notification, getNotificationIcon, getPriorityClass } from 'src/app/interface/notification';
 
 @Component({
+  standalone: false,
   selector: 'app-notification-dropdown',
   templateUrl: './notification-dropdown.component.html',
   styleUrls: ['./notification-dropdown.component.scss']
@@ -40,7 +41,7 @@ export class NotificationDropdownComponent implements OnInit, OnDestroy {
     this.notificationService.getUnreadNotifications$()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: response => {
+        next: (response: any) => {
           this.notifications = response.data?.notifications ?? [];
           this.isLoading = false;
         },

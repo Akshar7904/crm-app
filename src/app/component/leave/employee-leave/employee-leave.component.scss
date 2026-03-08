@@ -1,381 +1,274 @@
-// Employee Leave Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-// Container
-.employee-leave-container {
-  padding: $spacing-xl;
-  max-width: 1400px;
-  margin: 0 auto;
+// ─── Outer wrapper
+.el-wrap {
+  padding: 0 0 32px;
 }
 
-// Header
-.page-header {
-  @include flex-between;
-  margin-bottom: $spacing-xl;
-  padding-bottom: $spacing-md;
-  border-bottom: $border-width-md solid $border-color;
+// ─── No employee record
+.el-no-record {
+  display: flex; align-items: center; justify-content: center; min-height: 60vh;
 }
 
-.header-content h1 {
-  margin: 0;
-  font-size: $font-size-3xl;
-  color: $text-primary;
-  font-weight: $font-weight-semibold;
+.el-no-record-card {
+  background: var(--bg-card, #fff);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow, 0 4px 20px rgba(0,0,0,.08));
+  padding: 60px 40px;
+  text-align: center;
+  max-width: 480px;
+  h4 { color: var(--text-primary, #1a2a4a); font-weight: 600; margin-bottom: 8px; }
+  p  { color: var(--text-secondary, #666); font-size: 0.9rem; margin-bottom: 6px; }
 }
 
-.header-content p {
-  margin: $spacing-sm 0 0 0;
-  color: $text-secondary;
-  font-size: $font-size-base;
+.el-no-record-icon {
+  font-size: 4rem; color: var(--text-muted, #ccc); display: block; margin-bottom: 20px;
 }
 
-// Leave Balance Section
-.balance-section {
-  margin-bottom: $spacing-xl;
-
-  h2 {
-    font-size: $font-size-2xl;
-    color: $text-primary;
-    margin-bottom: $spacing-md;
-    font-weight: $font-weight-semibold;
-  }
-}
-
-.balance-grid {
+// ─── Balance KPI grid
+.el-balance-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: $spacing-lg;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  padding: 0 24px 24px;
 }
 
-.balance-card {
-  @include card-gradient($gradient-primary);
-}
-
-.balance-header {
+// Base card
+.el-balance-card {
+  background: var(--bg-card, #fff);
+  border-radius: 14px;
+  box-shadow: var(--card-shadow, 0 2px 12px rgba(0,0,0,.07));
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: $spacing-md;
-  margin-bottom: $spacing-md;
-  font-size: $font-size-lg;
-  font-weight: $font-weight-semibold;
-
-  i {
-    font-size: $font-size-2xl;
-  }
+  gap: 16px;
+  border-left: 4px solid transparent;
+  transition: transform 0.15s, box-shadow 0.15s;
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
 }
 
-.balance-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: $spacing-md;
+// Per-type accent colors
+.el-balance-0 { border-left-color: #375fa0; .el-balance-icon-wrap { background: rgba(55,95,160,.1); color: #375fa0; } }
+.el-balance-1 { border-left-color: #27ae60; .el-balance-icon-wrap { background: rgba(39,174,96,.1); color: #27ae60; } }
+.el-balance-2 { border-left-color: #e67e22; .el-balance-icon-wrap { background: rgba(230,126,34,.1); color: #e67e22; } }
+.el-balance-3 { border-left-color: #8e44ad; .el-balance-icon-wrap { background: rgba(142,68,173,.1); color: #8e44ad; } }
+.el-balance-4 { border-left-color: #2980b9; .el-balance-icon-wrap { background: rgba(41,128,185,.1); color: #2980b9; } }
+.el-balance-5 { border-left-color: #c0392b; .el-balance-icon-wrap { background: rgba(192,57,43,.1); color: #c0392b; } }
+
+.el-balance-icon-wrap {
+  width: 46px; height: 46px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
 }
 
-.stat {
-  text-align: center;
-}
+.el-balance-info { flex: 1; min-width: 0; }
 
-.stat-value {
+.el-balance-type {
   display: block;
-  font-size: 1.75rem;
-  font-weight: $font-weight-bold;
-  margin-bottom: $spacing-xs;
-}
-
-.stat-label {
-  display: block;
-  font-size: $font-size-xs;
-  opacity: 0.9;
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
+  color: var(--text-muted, #888);
+  margin-bottom: 10px;
 }
 
-// Tabs
-.tabs-section {
-  margin-bottom: $spacing-lg;
-}
-
-.tabs {
-  @include tabs-container;
-}
-
-.tab {
-  @include tab-item;
-
-  &.active {
-    color: $primary;
-    border-bottom-color: $primary;
-  }
-}
-
-// Table Section
-.table-section {
-  @include card;
-}
-
-.loading {
-  @include loading-state;
-}
-
-.empty-state {
-  @include empty-state;
-}
-
-// Leave Table
-.leave-table {
-  @include table-base;
-}
-
-// Badges
-.leave-type-badge {
-  @include badge(#e3f2fd, #1976d2);
-}
-
-.days-badge {
-  @include badge(#f3e5f5, #7b1fa2);
-  font-weight: $font-weight-semibold;
-}
-
-// Status Badges
-.status-badge {
-  display: inline-block;
-  padding: 0.4rem 0.9rem;
-  border-radius: $badge-border-radius;
-  font-size: $badge-font-size;
-  font-weight: $font-weight-semibold;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-pending {
-  @include status-badge('pending');
-}
-
-.status-approved {
-  @include status-badge('approved');
-}
-
-.status-rejected {
-  @include status-badge('rejected');
-}
-
-.status-cancelled {
-  @include status-badge('cancelled');
-}
-
-// Reason Text
-.reason-text {
-  color: $text-secondary;
-  font-size: $font-size-sm;
-}
-
-.rejection-reason {
-  margin-top: $spacing-sm;
-  padding: $spacing-sm;
-  background-color: $warning-light;
-  border-left: 3px solid $warning;
-  border-radius: $border-radius-sm;
-
-  small {
-    color: $warning-dark;
-    font-size: $badge-font-size;
-  }
-}
-
-// Action Buttons
-.action-buttons {
+.el-balance-stats {
   display: flex;
-  gap: $spacing-sm;
+  align-items: center;
+  gap: 8px;
 }
 
-.btn-icon {
-  @include btn-icon;
+.el-stat {
+  display: flex; flex-direction: column; align-items: center; flex: 1;
 }
 
-.btn-edit {
-  color: $primary;
-  border-color: $primary;
-
-  &:hover {
-    background: $gradient-primary;
-    color: $white;
-    border-color: transparent;
-  }
+.el-stat-val {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary, #1a2a4a);
+  line-height: 1;
 }
 
-.btn-cancel {
-  color: $danger;
-  border-color: $danger;
-
-  &:hover {
-    background-color: $danger;
-    color: $white;
-  }
+.el-stat-lbl {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-muted, #aaa);
+  margin-top: 2px;
 }
 
-// Modal
-.modal-overlay {
-  @include modal-overlay;
+.el-stat-div {
+  width: 1px; height: 30px;
+  background: var(--border-color, #e5e7eb);
+  flex-shrink: 0;
 }
 
-.modal-content {
-  @include modal-content;
+// ─── Table card
+.el-table-card {
+  margin: 0 24px;
 }
 
-.modal-header {
-  @include modal-header;
+// ─── Filter tabs
+.el-tabs-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color, #eee);
 }
 
-.btn-close {
+.el-tab {
   background: none;
   border: none;
-  font-size: $font-size-2xl;
-  color: $text-muted;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted, #888);
   cursor: pointer;
-  padding: $spacing-sm;
-  line-height: 1;
+  transition: all 0.15s;
 
-  &:hover {
-    color: $text-primary;
+  &:hover { background: var(--bg-hover, #f0f4ff); color: var(--primary, #375fa0); }
+
+  &.active {
+    background: rgba(55, 95, 160, 0.12);
+    color: var(--primary, #375fa0);
   }
 }
 
-// Form
-.form-grid {
-  padding: $modal-padding;
-  display: grid;
-  gap: 1.25rem;
+// ─── Table
+.table thead th {
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted, #888);
+  background: var(--table-header-bg, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #eee);
+  padding: 10px 14px;
+  white-space: nowrap;
 }
 
-.form-group {
-  @include flex-column;
-  gap: $spacing-sm;
-
-  &.full-width {
-    grid-column: 1 / -1;
-  }
-
-  label {
-    @include form-label;
-  }
+.table tbody td {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--text-primary, #333);
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  vertical-align: middle;
 }
 
-.required {
-  color: $danger;
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr:hover td { background: var(--table-hover, #f8faff); }
+
+// ─── Leave type badge
+.el-type-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  background: rgba(55,95,160,.1);
+  color: #375fa0;
+  white-space: nowrap;
 }
 
-.form-control {
-  @include form-control;
+// ─── Days badge
+.el-days-badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(142,68,173,.1);
+  color: #8e44ad;
 }
 
-.balance-info {
-  font-size: $badge-font-size;
-  color: $primary;
-  font-weight: $font-weight-semibold;
-  margin-top: $spacing-xs;
+// ─── Status badges
+.status-pending   { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(255,193,7,.15); color: #d68910; }
+.status-approved  { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,.12); color: #27ae60; }
+.status-rejected  { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,.1);  color: #dc3545; }
+.status-cancelled { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,.1); color: #6c757d; }
+
+// ─── Action buttons (override global for edit/cancel variants)
+.action-btn-edit   { background: rgba(55,95,160,.1); color: #375fa0; &:hover { background: rgba(55,95,160,.2); } }
+.action-btn-cancel { background: rgba(220,53,69,.1);  color: #dc3545; &:hover { background: rgba(220,53,69,.2);  } }
+
+// ─── Loading state
+.el-state-cell {
+  display: flex; align-items: center; justify-content: center;
+  padding: 48px 24px; color: var(--text-muted, #888); font-size: 0.88rem;
 }
 
-// Checkbox
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  cursor: pointer;
-  user-select: none;
-
-  input[type="checkbox"] {
-    width: 1.25rem;
-    height: 1.25rem;
-    cursor: pointer;
-  }
-
-  span {
-    font-weight: $font-weight-medium;
-    color: $text-primary;
-  }
+// ─── Reason cell text
+.el-reason {
+  color: var(--text-secondary, #555);
+  font-size: 0.83rem;
 }
 
-// Modal Footer
-.modal-footer {
-  @include modal-footer;
+.el-doc-note, .el-rejection {
+  font-size: 0.75rem;
+  display: flex; align-items: center; gap: 4px;
+  color: var(--text-muted, #888);
 }
 
-// Buttons
-.btn {
-  padding: $btn-padding-y $btn-padding-x;
+.el-rejection {
+  color: #c0392b;
+  background: rgba(192,57,43,.06);
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+// ─── Modal
+.el-modal-backdrop { background: rgba(0,0,0,0.5); }
+
+.el-modal {
   border: none;
-  border-radius: $btn-border-radius;
-  font-weight: $btn-font-weight;
-  cursor: pointer;
-  transition: all $transition-base;
-  font-size: $btn-font-size;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
 }
 
-.btn-primary {
-  @include btn-primary;
+.el-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px;
+  background: linear-gradient(135deg, #1a2a4a 0%, #375fa0 100%);
 }
 
-.btn-secondary {
-  background-color: $gray-300;
-  color: $text-primary;
-
-  &:hover {
-    background-color: darken($gray-300, 5%);
-  }
+.el-modal-title {
+  color: #fff; font-size: 1rem; font-weight: 600; margin: 0;
 }
 
-// Responsive
-@include respond-to('md') {
-  .employee-leave-container {
-    padding: $spacing-md;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-md;
-  }
-
-  .balance-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .balance-stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .tabs {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .leave-table {
-    font-size: $badge-font-size;
-
-    th, td {
-      padding: $spacing-md $spacing-sm;
-    }
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .modal-content {
-    max-width: 100%;
-  }
+.el-modal-close {
+  background: rgba(255,255,255,.15); border: none; color: #fff;
+  width: 30px; height: 30px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 0.85rem; transition: background 0.15s;
+  &:hover { background: rgba(255,255,255,.28); }
 }
 
-@include respond-to('sm') {
-  .header-content h1 {
-    font-size: $font-size-2xl;
-  }
+.el-modal-body {
+  background: var(--bg-card, #fff); padding: 22px;
+}
 
-  .balance-card {
-    padding: $spacing-md;
-  }
+.el-modal-footer {
+  background: var(--bg-hover, #f8f9fa);
+  border-top: 1px solid var(--border-color, #eee);
+  padding: 14px 22px; gap: 10px;
+}
 
-  .stat-value {
-    font-size: $font-size-2xl;
-  }
+.el-balance-hint {
+  font-size: 0.78rem; color: #375fa0; font-weight: 600;
+}
+
+.el-file-info {
+  font-size: 0.8rem; color: var(--text-secondary, #555);
+}
+
+// ─── Responsive
+@media (max-width: 768px) {
+  .el-balance-grid { padding: 0 12px 16px; grid-template-columns: 1fr; }
+  .el-table-card { margin: 0 12px; }
+  .el-balance-stats { flex-wrap: wrap; gap: 6px; }
 }

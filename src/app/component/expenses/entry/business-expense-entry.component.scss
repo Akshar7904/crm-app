@@ -1,0 +1,83 @@
+// Business Expense Entry
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.expense-entry {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// ─── Form labels — uppercase small ────────────────────────────────────────────
+.form-label {
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+// ─── Inputs / Selects ─────────────────────────────────────────────────────────
+.form-control,
+.form-select {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
+  border-radius: $border-radius;
+  font-size: 0.875rem;
+  transition: border-color $transition-base, box-shadow $transition-base;
+
+  &:focus {
+    background: var(--bg-card);
+    border-color: $primary;
+    color: var(--input-text);
+    box-shadow: 0 0 0 3px rgba($primary, 0.15);
+  }
+
+  &::placeholder { color: var(--text-light); }
+
+  &.is-invalid { border-color: $danger; &:focus { box-shadow: 0 0 0 3px rgba($danger, 0.15); } }
+}
+
+// ─── VAT / total read-only display ────────────────────────────────────────────
+.total-display {
+  background: rgba($primary, 0.07) !important;
+  border-color: rgba($primary, 0.25) !important;
+  color: $primary !important;
+  font-weight: $font-weight-bold;
+  font-size: 1.05rem !important;
+  cursor: default;
+}
+
+// ─── Checkbox ─────────────────────────────────────────────────────────────────
+.form-check-input {
+  cursor: pointer;
+  &:checked { background-color: $primary; border-color: $primary; }
+  &:focus { box-shadow: 0 0 0 3px rgba($primary, 0.15); }
+}
+
+.form-check-label { font-size: 0.875rem; color: var(--text-secondary); cursor: pointer; }
+
+// ─── Form footer actions ──────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  gap: $spacing-sm;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-light);
+  padding-top: $spacing-md;
+  margin-top: $spacing-sm;
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: $font-weight-medium;
+    border-radius: $border-radius;
+    transition: all $transition-base;
+
+    &:disabled { opacity: 0.65; cursor: not-allowed; }
+    &.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: $shadow-primary; }
+    &.btn-outline-primary:hover:not(:disabled) { transform: translateY(-1px); }
+    &.btn-outline-secondary:hover:not(:disabled) { transform: translateY(-1px); }
+  }
+}

@@ -17,6 +17,7 @@ import { NotificationService } from '../../../service/notification.service';
  * @since 2025-01-10
  */
 @Component({
+  standalone: false,
   selector: 'app-holidays',
   templateUrl: './holidays.component.html',
   styleUrls: ['./holidays.component.scss']

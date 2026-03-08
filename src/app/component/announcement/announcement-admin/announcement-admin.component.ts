@@ -15,6 +15,7 @@ interface AdminState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-announcement-admin',
   templateUrl: './announcement-admin.component.html',
   styleUrls: ['./announcement-admin.component.scss']
@@ -210,6 +211,16 @@ export class AnnouncementAdminComponent implements OnInit, OnDestroy {
 
   getCategoryBadge(category: string): string {
     return getCategoryBadgeClass(category as any);
+  }
+
+  getPriorityClass(priority: string): string {
+    const map: Record<string, string> = {
+      LOW:    'ann-badge ann-badge-general',
+      NORMAL: 'ann-badge ann-badge-it',
+      HIGH:   'ann-badge ann-badge-finance',
+      URGENT: 'ann-badge ann-badge-urgent'
+    };
+    return map[priority] || 'ann-badge ann-badge-general';
   }
 
   formatDate(dateString: string): string {

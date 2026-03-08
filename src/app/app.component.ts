@@ -7,6 +7,7 @@ import { UserService } from './service/user.service';
 import { ThemeService } from './service/theme.service';
 
 @Component({
+  standalone: false,
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
@@ -35,7 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
     this.checkScreenSize();
   }
 
-  @HostListener('window:resize', ['$event'])
+  @HostListener('window:resize')
   onResize(): void {
     this.checkScreenSize();
   }
@@ -124,7 +125,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     this.userService.profile$().pipe(
       take(1), // Only take one emission
-      map(response => response.data.user),
+      map(response => response?.data?.user as UserModel),
       catchError(error => {
         console.error('Error loading profile:', error);
         this.isAuthenticated = false;

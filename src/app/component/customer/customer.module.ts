@@ -7,10 +7,15 @@ import { CustomerDetailComponent } from './customer-detail/customer-detail.compo
 import { NavBarModule } from '../navbar/navbar.module';
 
 @NgModule({
-  declarations: [ CustomersComponent, NewcustomerComponent, CustomerDetailComponent ],
-  imports: [ SharedModule,
+  declarations: [
+    CustomersComponent,
+    NewcustomerComponent,
+    CustomerDetailComponent
+  ],
+  imports: [
+    SharedModule,
     CustomerRoutingModule,
-    NavBarModule
+    NavBarModule,
   ]
 })
 export class CustomerModule {}

@@ -12,21 +12,11 @@
 }
 
 // ========================================
-// LOADING & ERROR
+// ERROR STATE
 // ========================================
-.loading-state,
 .error-state {
   @include flex-center;
   min-height: 50vh;
-}
-
-.spinner-container { text-align: center; }
-
-.loading-text {
-  margin-top: $spacing-sm;
-  color: $primary;
-  font-weight: $font-weight-medium;
-  font-size: $font-size-sm;
 }
 
 // ========================================
@@ -334,7 +324,7 @@
 
   &:hover { box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); }
 
-  &.calendar-card .chart-card-body { height: 580px; }
+  &.calendar-card .chart-card-body { height: auto; padding: 0; }
 }
 
 .chart-card-header {
@@ -650,7 +640,7 @@
 
 .quick-actions-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
 }
 
@@ -746,19 +736,23 @@
 @media (max-width: $breakpoint-2xl) {
   .stats-grid         { grid-template-columns: repeat(4, 1fr); }
   .charts-grid        { grid-template-columns: repeat(2, 1fr); }
-  .quick-actions-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-@include respond-to('xl') {
-  .stats-grid         { grid-template-columns: repeat(2, 1fr); }
-  .charts-grid        { grid-template-columns: repeat(2, 1fr); }
   .quick-actions-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+@include respond-to('xl') {
+  .stats-grid              { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid             { grid-template-columns: repeat(2, 1fr); }
+  .quick-actions-grid      { grid-template-columns: repeat(3, 1fr); }
+  .dashboard-middle-grid   { grid-template-columns: 1fr 1fr; }
+  .admin-bottom-grid       { grid-template-columns: 1fr 300px; }
+}
+
 @include respond-to('lg') {
-  .stats-grid         { grid-template-columns: repeat(2, 1fr); }
-  .charts-grid        { grid-template-columns: 1fr; }
-  .quick-actions-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-grid              { grid-template-columns: repeat(2, 1fr); }
+  .charts-grid             { grid-template-columns: 1fr; }
+  .quick-actions-grid      { grid-template-columns: repeat(2, 1fr); }
+  .dashboard-middle-grid   { grid-template-columns: 1fr; }
+  .admin-bottom-grid       { grid-template-columns: 1fr; }
 
   .dashboard-header {
     padding: $spacing-md $spacing-lg;
@@ -794,6 +788,10 @@
 
   .charts-grid        { grid-template-columns: 1fr; gap: 12px; }
   .quick-actions-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .dashboard-middle-grid { grid-template-columns: 1fr; }
+  .admin-bottom-grid  { grid-template-columns: 1fr; gap: 12px; }
+  .financial-kpis { grid-template-columns: repeat(2, 1fr); }
+  .att-snapshot-row { grid-template-columns: repeat(4, 1fr); }
 
   .quick-action-card  { padding: 12px; }
   .quick-action-icon  { width: 36px; height: 36px; font-size: $font-size-base; }
@@ -839,4 +837,284 @@
 @media (max-width: 360px) {
   .stats-grid         { grid-template-columns: 1fr; }
   .quick-actions-grid { grid-template-columns: 1fr; }
+}
+
+// ========================================
+// DASHBOARD MIDDLE GRID
+// ========================================
+.dashboard-middle-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  @include respond-to('lg') { grid-template-columns: 1fr; }
+}
+
+// ========================================
+// VIEW MORE LINK
+// ========================================
+.view-more-link {
+  font-size: 0.75rem;
+  font-weight: $font-weight-medium;
+  color: $primary;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  transition: gap $transition-fast;
+  &:hover { gap: 7px; color: darken($primary, 10%); }
+}
+
+// ========================================
+// FINANCIAL SUMMARY CARD
+// ========================================
+.financial-kpis {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+
+  @include respond-to('lg') { grid-template-columns: repeat(2, 1fr); }
+}
+
+.fin-kpi {
+  padding: 14px;
+  border-radius: $border-radius-lg;
+  text-align: center;
+  background: var(--bg-body, $gray-50);
+  border: 1px solid var(--border-light, $gray-200);
+
+  &.income       { background: rgba($success, 0.07); border-color: rgba($success, 0.2); }
+  &.expenses     { background: rgba($danger, 0.07);  border-color: rgba($danger, 0.2);  }
+  &.profit       { background: rgba($success, 0.1);  border-color: rgba($success, 0.25); }
+  &.loss         { background: rgba($danger, 0.1);   border-color: rgba($danger, 0.25);  }
+  &.pending-claims { background: rgba($warning, 0.08); border-color: rgba($warning, 0.25); }
+}
+
+.fin-kpi-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: $font-weight-semibold;
+  color: var(--text-muted, $text-muted);
+  margin-bottom: 6px;
+}
+
+.fin-kpi-value {
+  font-size: 1.05rem;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary, $gray-900);
+  line-height: 1.2;
+}
+
+// ========================================
+// ========================================
+// ADMIN BOTTOM GRID: Calendar + Clock Events
+// ========================================
+.admin-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+// ========================================
+// RECENT CLOCK EVENTS LIST
+// ========================================
+.recent-clock-body {
+  padding: 0;
+  max-height: 420px;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar { width: 3px; }
+  &::-webkit-scrollbar-thumb { background: var(--border-color, $gray-300); border-radius: 4px; }
+}
+
+.clock-event-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.clock-event-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-light, $gray-100);
+  transition: background 0.15s;
+
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--bg-hover, $gray-50); }
+}
+
+.ce-avatar {
+  font-size: 1.5rem;
+  color: var(--text-muted, $gray-400);
+  flex-shrink: 0;
+}
+
+.ce-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ce-name {
+  font-size: 0.82rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary, $gray-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ce-times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.ce-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+
+  &.ce-in  { background: rgba($success, 0.12); color: darken($success, 5%); }
+  &.ce-out { background: rgba($danger,  0.1);  color: darken($danger, 5%); }
+}
+
+.ce-status {
+  font-size: 0.68rem;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-weight: 700;
+  flex-shrink: 0;
+
+  &.ce-working { background: rgba($success, 0.12); color: darken($success, 5%); }
+  &.ce-break   { background: rgba($warning, 0.12); color: darken($warning, 15%); }
+  &.ce-done    { background: rgba($gray-400, 0.15); color: $gray-600; }
+}
+
+// ========================================
+// ATTENDANCE SNAPSHOT (inside financial card)
+// ========================================
+.attendance-snapshot {
+  border-top: 1px solid var(--border-light, $gray-200);
+  padding-top: 14px;
+}
+
+.att-snapshot-title {
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary, $gray-600);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 10px;
+}
+
+.att-snapshot-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.att-snap {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: $border-radius-md;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &.present { background: rgba($success, 0.1); }
+  &.absent  { background: rgba($danger,  0.1); }
+  &.late    { background: rgba($warning, 0.1); }
+  &.leave   { background: rgba($info,    0.1); }
+}
+
+.att-snap-val {
+  font-size: 1.35rem;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary, $gray-900);
+  line-height: 1;
+}
+
+.att-snap-lbl {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: $font-weight-semibold;
+  color: var(--text-muted, $text-muted);
+}
+
+// ========================================
+// ANNOUNCEMENTS FEED
+// ========================================
+.announcements-body { padding: 0; }
+
+.announcement-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.announcement-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px $spacing-md;
+  border-bottom: 1px solid var(--border-light, $gray-200);
+  cursor: pointer;
+  transition: background $transition-fast;
+  text-decoration: none;
+
+  &:last-child { border-bottom: 0; }
+  &:hover { background: var(--table-hover, $gray-50); }
+}
+
+.ann-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: $border-radius-md;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+
+  &.ann-primary   { background: rgba($primary, 0.1);  color: $primary; }
+  &.ann-info      { background: rgba($info, 0.1);     color: $info; }
+  &.ann-warning   { background: rgba($warning, 0.1);  color: darken($warning, 10%); }
+  &.ann-secondary { background: rgba($secondary, 0.1); color: $secondary; }
+  &.ann-success   { background: rgba($success, 0.1);  color: $success; }
+  &.ann-danger    { background: rgba($danger, 0.1);   color: $danger; }
+}
+
+.ann-content { flex: 1; min-width: 0; }
+
+.ann-title {
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary, $gray-900);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.ann-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ann-date {
+  font-size: 0.68rem;
+  color: var(--text-muted, $text-muted);
 }

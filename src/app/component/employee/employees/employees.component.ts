@@ -23,6 +23,7 @@ import { NotificationService } from 'src/app/service/notification.service';
  * Company: LKCentrix Solutions (PTY) LTD
  */
 @Component({
+  standalone: false,
   selector: 'app-employees',
   templateUrl: './employees.component.html',
   styleUrls: ['./employees.component.scss'],

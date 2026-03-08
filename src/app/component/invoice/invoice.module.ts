@@ -7,11 +7,15 @@ import { InvoiceRoutingModule } from './invoice-routing.module';
 import { NavBarModule } from '../navbar/navbar.module';
 
 @NgModule({
-  declarations: [ InvoicesComponent, NewinvoiceComponent, InvoiceDetailComponent ],
+  declarations: [
+    InvoicesComponent,
+    NewinvoiceComponent,
+    InvoiceDetailComponent
+  ],
   imports: [
     SharedModule,
     InvoiceRoutingModule,
-    NavBarModule
+    NavBarModule,
   ]
 })
 export class InvoiceModule {}

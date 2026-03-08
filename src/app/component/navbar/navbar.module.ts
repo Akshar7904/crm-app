@@ -15,7 +15,7 @@ import { NotificationDropdownComponent } from '../notification/notification-drop
   imports: [
     SharedModule,
     NgOptimizedImage,
-    NgbDropdownModule
+    NgbDropdownModule,
   ],
   exports: [
     NavbarComponent,

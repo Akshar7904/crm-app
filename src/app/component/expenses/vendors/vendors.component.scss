@@ -1,0 +1,110 @@
+// Vendors
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.vendors-page {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// ─── Vendor name + avatar cell ────────────────────────────────────────────────
+.vendor-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.vendor-initials {
+  width: 36px;
+  height: 36px;
+  border-radius: $border-radius-md;
+  background: linear-gradient(135deg, rgba($primary, 0.15), rgba($primary, 0.05));
+  color: $primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba($primary, 0.15);
+}
+
+// ─── Category badge ───────────────────────────────────────────────────────────
+.category-badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.68rem;
+  font-weight: $font-weight-bold;
+  background: rgba($secondary, 0.1);
+  color: $secondary-dark;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+// ─── Active / inactive dot indicator ─────────────────────────────────────────
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: $font-weight-semibold;
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    flex-shrink: 0;
+  }
+
+  &.active {
+    color: $success;
+    .dot { background: $success; box-shadow: 0 0 0 3px rgba($success, 0.2); }
+  }
+  &.inactive {
+    color: $gray-400;
+    .dot { background: $gray-300; }
+  }
+}
+
+// ─── Action buttons ───────────────────────────────────────────────────────────
+.action-btns {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+// ─── Modal styling ────────────────────────────────────────────────────────────
+.modal-backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); }
+
+.modal-content {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+
+  .modal-header {
+    border-bottom: 1px solid var(--border-light);
+    padding: $spacing-md $spacing-lg;
+    .modal-title { font-size: 1rem; font-weight: $font-weight-semibold; color: var(--text-primary); display: flex; align-items: center; gap: 8px; i { color: $primary; } }
+    .btn-close { opacity: 0.5; &:hover { opacity: 1; } }
+  }
+
+  .modal-body { padding: $spacing-lg; }
+
+  .modal-footer { border-top: 1px solid var(--border-light); padding: $spacing-md $spacing-lg; gap: $spacing-sm; }
+}
+
+.form-label { font-size: 0.75rem; font-weight: $font-weight-semibold; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 5px; }
+
+.form-control,
+.form-select {
+  background: var(--input-bg); border-color: var(--input-border); color: var(--input-text);
+  border-radius: $border-radius; font-size: 0.875rem;
+  &:focus { background: var(--bg-card); border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.15); }
+  &.is-invalid { border-color: $danger; }
+  &::placeholder { color: var(--text-light); }
+}

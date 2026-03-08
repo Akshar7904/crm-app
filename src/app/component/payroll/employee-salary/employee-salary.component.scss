@@ -1,130 +1,106 @@
-// employee-salary Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-.card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  border: none;
+// ─── Wrapper
+.es-wrap {
+  padding: 0 24px 32px;
 }
 
-.card-header {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
-  border-bottom: none;
+// ─── Toolbar
+.es-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color, #eee);
 }
 
-.form-control {
-  border: 1px solid #ced4da;
-  border-radius: 0.375rem;
-  padding: 0.5rem 0.75rem;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+.es-search-wrap {
+  position: relative;
+  flex: 1;
+  max-width: 360px;
 }
 
-.form-control:focus {
-  border-color: #28a745;
-  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+.es-search-icon {
+  position: absolute;
+  left: 10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted, #aaa);
+  font-size: 0.85rem;
+  pointer-events: none;
 }
 
-.table {
-  margin-bottom: 0;
+.es-search-input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-input, #f8f9fa);
+  color: var(--text-primary, #333);
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &::placeholder { color: var(--text-muted, #aaa); }
+  &:focus {
+    outline: none;
+    border-color: var(--primary, #375fa0);
+    box-shadow: 0 0 0 3px rgba(55,95,160,.12);
+    background: var(--bg-card, #fff);
+  }
 }
 
+// ─── Loading
+.es-loading {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 60px 24px; color: var(--text-muted, #888); font-size: 0.9rem;
+}
+
+// ─── Table
 .table thead th {
-  border-bottom: 2px solid #dee2e6;
-  font-weight: 600;
-  color: #495057;
-  background-color: #f8f9fa;
-  padding: 1rem 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted, #888);
+  background: var(--table-header-bg, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #eee);
+  padding: 10px 14px;
+  white-space: nowrap;
 }
 
 .table tbody td {
-  padding: 1rem 0.75rem;
-  vertical-align: middle;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--text-primary, #333);
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
 }
 
-.table-hover tbody tr:hover {
-  background-color: rgba(40, 167, 69, 0.05);
-}
+.table tbody tr:last-child td { border-bottom: none; }
+.table tbody tr:hover td { background: var(--table-hover, #f8faff); }
 
-.badge {
-  padding: 0.5em 0.75em;
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.badge.bg-success {
-  background-color: #28a745 !important;
-}
-
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
-
-.text-muted {
-  color: #6c757d !important;
-}
-
-/* Empty state styling */
-.bi-inbox {
-  color: #dee2e6;
-}
-
-.text-center.py-4 {
-  padding: 3rem 1rem;
-}
-
-.display-4 {
-  font-size: 3.5rem;
-}
-
-/* Currency highlighting */
-td:nth-child(5) {
+// ─── Employee ID
+.es-emp-id {
+  font-family: 'Courier New', monospace;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #28a745;
+  color: var(--text-muted, #777);
+  background: var(--bg-hover, #f4f6fa);
+  padding: 2px 8px;
+  border-radius: 4px;
 }
 
-/* Search box styling */
-.form-control::placeholder {
-  color: #6c757d;
-  opacity: 0.7;
+// ─── Name
+.es-name {
+  font-weight: 600;
+  color: var(--text-primary, #1a2a4a);
 }
 
-/* Responsive table */
-.table-responsive {
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+// ─── Salary
+.es-salary {
+  font-weight: 700;
+  color: #27ae60;
+  font-size: 0.9rem;
 }
 
-@media (max-width: 768px) {
-  .table {
-    font-size: 0.875rem;
-  }
-
-  .table thead th,
-  .table tbody td {
-    padding: 0.75rem 0.5rem;
-  }
-
-  .display-4 {
-    font-size: 2.5rem;
-  }
-}
-
-/* Print styles */
-@media print {
-  .card-header,
-  .form-control {
-    display: none;
-  }
-
-  .table {
-    font-size: 12px;
-  }
-
-  .table thead th {
-    background-color: #f8f9fa !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-}
+// ─── Status badges
+.badge-soft-active   { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,.12); color: #27ae60; }
+.badge-soft-inactive { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,.1); color: #6c757d; }

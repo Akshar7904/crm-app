@@ -1,363 +1,429 @@
-// employees Component - SCSS
+// Employees — Falcon UI Data Table
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-/* Member Card Styles - Clean Modern Design */
-.member-card {
-  border: none;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-  cursor: pointer;
+.container-fluid { max-width: 1400px; }
+
+// ─── Breadcrumb ───────────────────────────────────────────────────────────────
+.emp-breadcrumb {
+  margin-top: $spacing-sm;
+  margin-bottom: $spacing-md;
+
+  .breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 0.82rem;
+  }
+
+  .breadcrumb-item a {
+    color: $primary;
+    text-decoration: none;
+    &:hover { color: $primary-medium; text-decoration: underline; }
+  }
+
+  .breadcrumb-item.active { color: var(--text-muted); }
+}
+
+// ─── Falcon Banner ────────────────────────────────────────────────────────────
+.emp-page-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-xl;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 60%, $primary-light 100%);
+  border-radius: $border-radius-xl;
+  margin-bottom: $spacing-lg;
+  box-shadow: 0 6px 24px rgba($primary, 0.28);
+  position: relative;
   overflow: hidden;
-  background: #fff;
+  animation: fadeInDown 0.4s ease forwards;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 170px; height: 170px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+}
+
+.emp-banner-left  { position: relative; z-index: 1; }
+.emp-banner-title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  i { opacity: 0.85; }
+}
+.emp-banner-subtitle { color: rgba(255,255,255,0.75); font-size: $font-size-sm; margin: 4px 0 0; }
+.emp-banner-actions  { position: relative; z-index: 1; }
+
+.emp-search-wrap {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.member-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-}
-
-/* Status Badge - Top Right Corner */
-.member-status {
+.emp-search-icon {
   position: absolute;
-  top: 15px;
-  right: 15px;
-  z-index: 10;
+  left: 10px;
+  color: rgba(255,255,255,0.65);
+  font-size: 0.82rem;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.member-status .badge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 20px;
-  text-transform: capitalize;
+.emp-search {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  border-radius: $border-radius-md;
+  min-width: 220px;
+  font-size: 0.875rem;
+  padding-left: 30px;
+
+  &::placeholder { color: rgba(255,255,255,0.6); }
+  &:focus {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.55);
+    box-shadow: none;
+    color: #fff;
+    outline: none;
+  }
 }
 
-/* Avatar Styles */
-.member-avatar {
-  margin: 25px auto 20px;
-  width: 100px;
-  height: 100px;
-  position: relative;
+.btn-banner-emp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: $border-radius-md;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+
+  &:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
+
+  &.btn-banner-emp-solid {
+    background: rgba(255,255,255,0.22);
+    border-color: rgba(255,255,255,0.4);
+    font-weight: $font-weight-semibold;
+  }
 }
 
-.member-avatar .avatar-img {
-  width: 100px;
-  height: 100px;
+// ─── Table Card ───────────────────────────────────────────────────────────────
+.emp-table-card {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.emp-table {
+  thead th {
+    background: var(--table-header-bg);
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--border-light);
+    border-top: none;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 14px 16px;
+    vertical-align: middle;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  tbody tr {
+    transition: background-color $transition-base;
+    cursor: pointer;
+
+    &:hover { background: var(--table-hover); }
+    &:last-child td { border-bottom: none; }
+  }
+}
+
+// ─── Employee Identity Cell ───────────────────────────────────────────────────
+.emp-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emp-avatar-sm {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.emp-avatar-img {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 4px solid #f0f0f0;
-  transition: all 0.3s ease;
+  border: 2px solid var(--border-light);
 }
 
-.member-card:hover .avatar-img {
-  border-color: var(--primary-color, #484c7f);
-}
-
-.member-avatar .avatar-initials {
-  width: 100px;
-  height: 100px;
+.emp-avatar-initials {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
-  color: white;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 100%);
+  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  border: 4px solid #f0f0f0;
-  transition: all 0.3s ease;
+  letter-spacing: 0.5px;
 }
 
-.member-card:hover .avatar-initials {
-  border-color: #484c7f;
+.emp-name {
+  font-size: 0.9rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  line-height: 1.3;
 }
 
-/* Name & Title */
-.member-name {
-  font-size: 18px;
-  font-weight: 700;
-  color: #2c3e50;
-  margin-bottom: 5px;
+.emp-designation {
+  font-size: 0.75rem;
+  color: $primary;
+  font-weight: $font-weight-medium;
+  margin-top: 1px;
 }
 
-.member-title {
-  font-size: 14px;
-  color: #7978e9;
-  font-weight: 500;
-  margin-bottom: 15px;
-}
-
-/* Info Pills */
-.member-info {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-
-.info-pill {
-  background: #f8f9ff;
-  color: #484c7f;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
+// ─── Department ───────────────────────────────────────────────────────────────
+.emp-dept {
   display: inline-flex;
   align-items: center;
   gap: 5px;
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+
+  i { color: var(--text-muted); font-size: 0.8rem; }
 }
 
-.info-pill i {
-  font-size: 12px;
-  color: #7978e9;
+// ─── Employee ID Badge ────────────────────────────────────────────────────────
+.emp-id-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  background: rgba($primary, 0.08);
+  color: $primary;
+  border-radius: $border-radius-xl;
+  font-size: 0.72rem;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.5px;
+  font-family: monospace;
 }
 
-/* Contact Details */
-.member-contact {
-  border-top: 1px solid #f0f0f0;
-  padding-top: 15px;
-  margin-bottom: 15px;
-}
-
-.contact-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 13px;
-  color: #6c757d;
-  margin-bottom: 8px;
-}
-
-.contact-item:last-child {
-  margin-bottom: 0;
-}
-
-.contact-item i {
-  color: #7978e9;
-  font-size: 14px;
-  width: 16px;
-  text-align: center;
-}
-
-.contact-item span {
+// ─── Meta Text (email, phone) ─────────────────────────────────────────────────
+.emp-meta-text {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 200px;
+  display: block;
 }
 
-/* Meta Info (Hire Date) */
-.member-meta {
-  padding-top: 10px;
-  border-top: 1px solid #f0f0f0;
+// ─── Date ─────────────────────────────────────────────────────────────────────
+.emp-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+
+  i { color: var(--text-muted); font-size: 0.75rem; }
 }
 
-.member-meta small {
-  font-size: 12px;
+// ─── Status Badges (soft) ─────────────────────────────────────────────────────
+.emp-status-badge {
+  display: inline-block;
+  padding: 4px 11px;
+  border-radius: $border-radius-xl;
+  font-size: 0.72rem;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+
+  &.status-active     { background: rgba($success, 0.12); color: darken($success, 10%); }
+  &.status-terminated { background: rgba($danger, 0.12);  color: darken($danger, 8%); }
+  &.status-on-leave   { background: rgba($warning, 0.15); color: darken($warning, 20%); }
+  &.status-probation  { background: rgba($info, 0.15);    color: darken($info, 12%); }
+  &.status-inactive   { background: rgba($gray-500, 0.12); color: $gray-600; }
 }
 
-.member-meta i {
-  margin-right: 5px;
-  color: #7978e9;
-}
-
-/* Card Footer */
-.member-card .card-footer {
+// ─── Action Button ────────────────────────────────────────────────────────────
+.emp-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
   background: transparent;
-  border-top: 1px solid #f0f0f0;
-  padding: 15px 20px;
-}
-
-.member-card .card-footer .btn {
-  border-radius: 25px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.member-card .card-footer .btn-outline-primary {
-  color: #484c7f;
-  border-color: #484c7f;
-}
-
-.member-card .card-footer .btn-outline-primary:hover {
-  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
-  border-color: transparent;
-  color: #fff;
-  transform: scale(1.02);
-}
-
-/* Status Badge Colors */
-.bg-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
-}
-
-.bg-danger {
-  background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%) !important;
-}
-
-.bg-warning {
-  background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%) !important;
-}
-
-.bg-info {
-  background: linear-gradient(135deg, #17a2b8 0%, #6610f2 100%) !important;
-  color: white !important;
-}
-
-.bg-secondary {
-  background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
-}
-
-/* Empty State */
-.empty-state {
-  background: #f8f9ff;
-  border-radius: 15px;
-  padding: 60px 20px;
-}
-
-.empty-state i {
-  opacity: 0.5;
-  color: #484c7f !important;
-}
-
-.empty-state h4 {
-  color: #2c3e50;
-  font-weight: 600;
-}
-
-.empty-state p {
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-/* Action Buttons */
-.btn-primary {
-  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
-  border: none;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(72, 76, 127, 0.4);
-  background: linear-gradient(135deg, #3d4070 0%, #6867d8 100%);
-}
-
-.btn-success {
-  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  border: none;
-  border-radius: 25px;
-  transition: all 0.3s ease;
-}
-
-.btn-success:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
-}
-
-/* Pagination */
-.pagination {
-  margin-top: 30px;
-}
-
-.page-item.pointer {
+  border: 1px solid rgba($primary, 0.4);
+  border-radius: $border-radius;
+  color: $primary;
+  font-size: 0.8rem;
+  font-weight: $font-weight-medium;
   cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba($primary, 0.1);
+    border-color: $primary;
+    transform: translateY(-1px);
+  }
 }
 
-.page-item.disabled {
-  cursor: not-allowed;
+// ─── Empty State ──────────────────────────────────────────────────────────────
+.emp-empty {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.emp-empty-icon {
+  font-size: 3.5rem;
+  color: var(--text-muted);
+  opacity: 0.35;
+}
+
+.emp-empty h5 { color: var(--text-primary); font-weight: $font-weight-semibold; }
+
+// ─── Primary Button ───────────────────────────────────────────────────────────
+.emp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 22px;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 100%);
+  border: none;
+  border-radius: $border-radius-md;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    background: linear-gradient(135deg, darken($primary, 5%) 0%, darken($primary-medium, 5%) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba($primary, 0.35);
+    color: #fff;
+  }
+}
+
+// ─── Falcon Alert ─────────────────────────────────────────────────────────────
+.falcon-alert {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  border-radius: $border-radius-xl;
+  font-size: 0.875rem;
+  font-weight: $font-weight-medium;
+
+  i { font-size: 1.1rem; flex-shrink: 0; }
+
+  &.falcon-alert-danger {
+    background: rgba($danger, 0.1);
+    border: 1px solid rgba($danger, 0.25);
+    color: darken($danger, 8%);
+  }
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+.emp-pagination-wrap {
+  margin-top: $spacing-md;
+  margin-bottom: $spacing-lg;
 }
 
 .page-link {
-  color: #484c7f;
-  border-color: #dee2e6;
-  border-radius: 8px;
-  margin: 0 3px;
-}
+  color: $primary;
+  background: var(--bg-card);
+  border-color: var(--border-light);
+  font-size: 0.82rem;
+  padding: 6px 12px;
+  transition: all $transition-base;
 
-.page-link:hover {
-  color: #fff;
-  background: #7978e9;
-  border-color: #7978e9;
+  &:hover {
+    background: rgba($primary, 0.08);
+    border-color: rgba($primary, 0.3);
+    color: $primary;
+  }
 }
 
 .page-item.active .page-link {
-  background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%);
-  border-color: transparent;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 100%);
+  border-color: $primary;
+  color: #fff;
 }
 
-/* Search Input */
-.form-control {
-  border-radius: 25px;
-  padding: 10px 20px;
-  border: 1px solid #e0e0e0;
-  transition: all 0.3s ease;
+.page-item.disabled .page-link {
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-color: var(--border-light);
+  cursor: not-allowed;
 }
 
-.form-control:focus {
-  border-color: #7978e9;
-  box-shadow: 0 0 0 3px rgba(121, 120, 233, 0.15);
-}
-
-/* Breadcrumb Styling */
-.breadcrumb {
-  background-color: transparent;
-  padding: 0;
-  margin-bottom: 0;
-}
-
-.breadcrumb-item a {
-  color: #484c7f;
-  text-decoration: none;
-}
-
-.breadcrumb-item a:hover {
-  color: #7978e9;
-  text-decoration: underline;
-}
-
-.breadcrumb-item.active {
-  color: #6c757d;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .member-avatar {
-    width: 80px;
-    height: 80px;
+// ─── Responsive ───────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .emp-page-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
   }
 
-  .member-avatar .avatar-img,
-  .member-avatar .avatar-initials {
-    width: 80px;
-    height: 80px;
-    font-size: 26px;
+  .emp-banner-actions form {
+    flex-wrap: wrap;
+    width: 100%;
+
+    .emp-search-wrap { flex: 1; }
+    .emp-search { min-width: 0; width: 100%; }
   }
 
-  .member-name {
-    font-size: 16px;
-  }
+  .emp-meta-text { max-width: 140px; }
 
-  .member-title {
-    font-size: 13px;
+  // Hide less critical columns on mobile
+  .emp-table thead th:nth-child(4),
+  .emp-table thead th:nth-child(5),
+  .emp-table tbody td:nth-child(4),
+  .emp-table tbody td:nth-child(5) {
+    display: none;
   }
-
-  .info-pill {
-    font-size: 11px;
-    padding: 5px 10px;
-  }
-}
-
-/* Loading Spinner */
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-  color: #484c7f !important;
 }

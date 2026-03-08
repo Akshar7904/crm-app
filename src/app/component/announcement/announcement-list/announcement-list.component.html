@@ -1,173 +1,136 @@
-<!-- Announcements Page -->
-<div class="container-fluid py-4">
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h4 class="mb-1">
-        <i class="bi bi-megaphone me-2"></i>Announcements
-      </h4>
-      <p class="text-muted mb-0">Company news and updates</p>
+<div class="ann-wrap">
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-megaphone"></i> Announcements</h1>
+      <p class="banner-subtitle">Company news and updates</p>
     </div>
-    <button class="btn btn-outline-primary btn-sm" (click)="refresh()">
-      <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+    <div class="banner-actions">
+      <button class="btn-banner btn-banner-ghost" (click)="refresh()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- Category Filter Tabs -->
+  <div class="ann-filter-bar">
+    <button *ngFor="let cat of categories"
+            [class]="selectedCategory === cat.value ? 'ann-tab ann-tab-active' : 'ann-tab'"
+            (click)="onCategoryChange(cat.value)">
+      {{ cat.label }}
     </button>
   </div>
 
-  <!-- Category Filters -->
-  <div class="card mb-4">
-    <div class="card-body py-2">
-      <div class="d-flex flex-wrap gap-2">
-        <button *ngFor="let cat of categories"
-                class="btn btn-sm"
-                [class.btn-primary]="selectedCategory === cat.value"
-                [class.btn-outline-secondary]="selectedCategory !== cat.value"
-                (click)="onCategoryChange(cat.value)">
-          {{ cat.label }}
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Content -->
   <ng-container *ngIf="state$ | async as state">
+
     <!-- Loading -->
-    <div *ngIf="state.dataState === DataState.LOADING" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="mt-2 text-muted">Loading announcements...</p>
+    <div *ngIf="state.dataState === DataState.LOADING" class="ann-loading">
+      <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+      Loading announcements...
     </div>
 
     <!-- Loaded -->
-    <div *ngIf="state.dataState === DataState.LOADED">
-      <!-- Pinned Announcements -->
-      <div *ngIf="state.pinnedAnnouncements?.length" class="mb-4">
-        <h6 class="text-muted mb-3">
+    <ng-container *ngIf="state.dataState === DataState.LOADED">
+
+      <!-- Pinned -->
+      <div *ngIf="state.pinnedAnnouncements?.length" class="ann-section">
+        <div class="ann-section-label">
           <i class="bi bi-pin-angle-fill me-1"></i> Pinned
-        </h6>
-        <div class="row">
-          <div *ngFor="let announcement of state.pinnedAnnouncements" class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 announcement-card pinned" (click)="viewAnnouncement(announcement)">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="badge" [ngClass]="getCategoryBadge(announcement.category)">
-                    {{ announcement.category }}
-                  </span>
-                  <i class="bi bi-pin-fill text-primary"></i>
-                </div>
-                <h6 class="card-title mb-2">{{ announcement.title }}</h6>
-                <p class="card-text text-muted small mb-3">
-                  {{ announcement.summary || (announcement.content | slice:0:100) }}...
-                </p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">
-                    <i class="bi bi-person me-1"></i>{{ announcement.createdByName || 'Admin' }}
-                  </small>
-                  <small class="text-muted">{{ getTimeAgo(announcement.createdAt) }}</small>
-                </div>
-              </div>
+        </div>
+        <div class="ann-card-grid">
+          <div *ngFor="let a of state.pinnedAnnouncements" class="ann-card ann-card-pinned" (click)="viewAnnouncement(a)">
+            <div class="ann-card-top">
+              <span [class]="'ann-badge ann-badge-' + (a.category | lowercase)">{{ a.category }}</span>
+              <i class="bi bi-pin-fill ann-pin-icon"></i>
+            </div>
+            <h6 class="ann-card-title">{{ a.title }}</h6>
+            <p class="ann-card-summary">{{ a.summary || (a.content | slice:0:100) }}...</p>
+            <div class="ann-card-footer">
+              <span><i class="bi bi-person me-1"></i>{{ a.createdByName || 'Admin' }}</span>
+              <span>{{ getTimeAgo(a.createdAt) }}</span>
             </div>
           </div>
         </div>
       </div>
 
       <!-- All Announcements -->
-      <div *ngIf="state.announcements?.length">
-        <h6 class="text-muted mb-3">
+      <div *ngIf="state.announcements?.length" class="ann-section">
+        <div class="ann-section-label">
           <i class="bi bi-list-ul me-1"></i> Recent Announcements
-        </h6>
-        <div class="row">
-          <div *ngFor="let announcement of state.announcements" class="col-md-6 col-lg-4 mb-3">
-            <div class="card h-100 announcement-card" (click)="viewAnnouncement(announcement)">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <span class="badge" [ngClass]="getCategoryBadge(announcement.category)">
-                    {{ announcement.category }}
-                  </span>
-                  <span *ngIf="announcement.priority === 'URGENT'" class="badge bg-danger">URGENT</span>
-                </div>
-                <h6 class="card-title mb-2">{{ announcement.title }}</h6>
-                <p class="card-text text-muted small mb-3">
-                  {{ announcement.summary || (announcement.content | slice:0:100) }}...
-                </p>
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">
-                    <i class="bi bi-person me-1"></i>{{ announcement.createdByName || 'Admin' }}
-                  </small>
-                  <small class="text-muted">{{ getTimeAgo(announcement.createdAt) }}</small>
-                </div>
-              </div>
-              <div class="card-footer bg-transparent border-top-0 pt-0">
-                <div class="d-flex justify-content-between align-items-center">
-                  <small class="text-muted">
-                    <i class="bi bi-eye me-1"></i>{{ announcement.viewCount }} views
-                  </small>
-                  <button class="btn btn-sm btn-link p-0">Read more</button>
-                </div>
-              </div>
+        </div>
+        <div class="ann-card-grid">
+          <div *ngFor="let a of state.announcements" class="ann-card" (click)="viewAnnouncement(a)">
+            <div class="ann-card-top">
+              <span [class]="'ann-badge ann-badge-' + (a.category | lowercase)">{{ a.category }}</span>
+              <span *ngIf="a.priority === 'URGENT'" class="ann-badge ann-badge-urgent">URGENT</span>
+            </div>
+            <h6 class="ann-card-title">{{ a.title }}</h6>
+            <p class="ann-card-summary">{{ a.summary || (a.content | slice:0:100) }}...</p>
+            <div class="ann-card-footer">
+              <span><i class="bi bi-person me-1"></i>{{ a.createdByName || 'Admin' }}</span>
+              <span>{{ getTimeAgo(a.createdAt) }}</span>
+            </div>
+            <div class="ann-card-meta">
+              <span><i class="bi bi-eye me-1"></i>{{ a.viewCount }} views</span>
+              <span class="ann-read-more">Read more <i class="bi bi-arrow-right"></i></span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Empty State -->
-      <div *ngIf="!state.announcements?.length && !state.pinnedAnnouncements?.length" class="card">
-        <div class="card-body text-center py-5">
-          <i class="bi bi-megaphone display-1 text-muted"></i>
-          <h5 class="mt-3">No Announcements</h5>
-          <p class="text-muted">There are no announcements at this time.</p>
-        </div>
+      <!-- Empty -->
+      <div *ngIf="!state.announcements?.length && !state.pinnedAnnouncements?.length" class="ann-empty">
+        <i class="bi bi-megaphone"></i>
+        <h5>No Announcements</h5>
+        <p>There are no announcements at this time.</p>
       </div>
-    </div>
+
+    </ng-container>
 
     <!-- Error -->
-    <div *ngIf="state.dataState === DataState.ERROR" class="card">
-      <div class="card-body text-center py-5 text-danger">
-        <i class="bi bi-exclamation-circle display-1"></i>
-        <h5 class="mt-3">Error Loading Announcements</h5>
-        <p class="text-muted">{{ state.error }}</p>
-        <button class="btn btn-primary" (click)="refresh()">Try Again</button>
-      </div>
+    <div *ngIf="state.dataState === DataState.ERROR" class="ann-error">
+      <i class="bi bi-exclamation-circle"></i>
+      <h5>Error Loading Announcements</h5>
+      <p>{{ state.error }}</p>
+      <button class="btn btn-primary btn-sm" (click)="refresh()">Try Again</button>
     </div>
+
   </ng-container>
 </div>
 
-<!-- Announcement Detail Modal -->
+<!-- Detail Modal Backdrop -->
 <div *ngIf="selectedAnnouncement" class="modal-backdrop fade show" (click)="closeModal()"></div>
+
+<!-- Detail Modal -->
 <div *ngIf="selectedAnnouncement" class="modal fade show d-block" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div>
-          <span class="badge me-2" [ngClass]="getCategoryBadge(selectedAnnouncement.category)">
+    <div class="modal-content ann-modal">
+      <div class="ann-modal-header">
+        <div class="d-flex align-items-center gap-2">
+          <span [class]="'ann-badge ann-badge-' + (selectedAnnouncement.category | lowercase)">
             {{ selectedAnnouncement.category }}
           </span>
-          <span *ngIf="selectedAnnouncement.priority === 'URGENT'" class="badge bg-danger">URGENT</span>
+          <span *ngIf="selectedAnnouncement.priority === 'URGENT'" class="ann-badge ann-badge-urgent">URGENT</span>
         </div>
-        <button type="button" class="btn-close" (click)="closeModal()"></button>
+        <button type="button" class="btn-close btn-close-white" (click)="closeModal()"></button>
       </div>
-      <div class="modal-body">
-        <h4 class="mb-3">{{ selectedAnnouncement.title }}</h4>
-        <div class="d-flex align-items-center text-muted mb-4">
-          <span class="me-3">
-            <i class="bi bi-person me-1"></i>{{ selectedAnnouncement.createdByName || 'Admin' }}
-          </span>
-          <span class="me-3">
-            <i class="bi bi-calendar me-1"></i>{{ formatDate(selectedAnnouncement.createdAt) }}
-          </span>
-          <span>
-            <i class="bi bi-eye me-1"></i>{{ selectedAnnouncement.viewCount }} views
-          </span>
+      <div class="modal-body ann-modal-body">
+        <h4 class="ann-detail-title">{{ selectedAnnouncement.title }}</h4>
+        <div class="ann-detail-meta">
+          <span><i class="bi bi-person me-1"></i>{{ selectedAnnouncement.createdByName || 'Admin' }}</span>
+          <span><i class="bi bi-calendar me-1"></i>{{ formatDate(selectedAnnouncement.createdAt) }}</span>
+          <span><i class="bi bi-eye me-1"></i>{{ selectedAnnouncement.viewCount }} views</span>
         </div>
-        <div class="announcement-content" [innerHTML]="selectedAnnouncement.content"></div>
+        <div class="ann-detail-content" [innerHTML]="selectedAnnouncement.content"></div>
         <div *ngIf="selectedAnnouncement.attachmentUrl" class="mt-4">
-          <a [href]="selectedAnnouncement.attachmentUrl" target="_blank" class="btn btn-outline-primary">
+          <a [href]="selectedAnnouncement.attachmentUrl" target="_blank" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-paperclip me-1"></i> View Attachment
           </a>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeModal()">Close</button>
+      <div class="ann-modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeModal()">Close</button>
       </div>
     </div>
   </div>

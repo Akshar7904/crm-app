@@ -1,193 +1,166 @@
-// holidays Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-/* Holidays Component Styles */
+.holiday-wrap { padding: 0; }
 
-.container-fluid {
-  padding: 2rem;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-}
-
-.card {
-  border: none;
-  border-radius: 10px;
-}
-
-.table {
-  margin-bottom: 0;
-}
-
-.table thead th {
-  border-bottom: 2px solid #dee2e6;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.85rem;
-  color: #495057;
-}
-
-.table tbody tr {
-  transition: all 0.3s ease;
-}
-
-.table tbody tr:hover {
-  background-color: #f1f3f5;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.table-success {
-  background-color: #d1f4e0 !important;
-}
-
-.table-success:hover {
-  background-color: #b8ecd0 !important;
-}
-
-.btn-group .btn {
-  margin: 0 2px;
-}
-
-.badge {
-  padding: 0.4em 0.6em;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.pagination {
-  margin-top: 1rem;
-}
-
-.pagination .page-link {
-  color: #0d6efd;
-  border: 1px solid #dee2e6;
-  padding: 0.5rem 0.75rem;
-  transition: all 0.3s ease;
-}
-
-.pagination .page-link:hover {
-  background-color: #e9ecef;
-  border-color: #dee2e6;
-}
-
-.pagination .page-item.active .page-link {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.pagination .page-item.disabled .page-link {
-  color: #6c757d;
-  pointer-events: none;
-  background-color: #fff;
-  border-color: #dee2e6;
-}
-
-/* Loading Overlay */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+// ─── Search Bar
+.holiday-search-bar {
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 9999;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 0 24px 16px;
 }
 
-/* Search Section */
-.input-group {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 5px;
-  overflow: hidden;
+.holiday-search-form {
+  flex: 1;
+  max-width: 380px;
+
+  .input-group-text {
+    background: var(--bg-card, #fff);
+    border-right: none;
+    color: var(--text-muted, #888);
+  }
+
+  .form-control {
+    border-left: none;
+    background: var(--bg-card, #fff);
+    color: var(--text-primary, #333);
+    &:focus { box-shadow: none; border-color: var(--border-color, #dee2e6); }
+  }
 }
 
-.input-group .form-control {
+.holiday-count {
+  font-size: 0.82rem;
+  color: var(--text-muted, #888);
+}
+
+// ─── Table Card
+.holiday-table-card {
+  margin: 0 24px 24px;
+
+  table {
+    font-size: 0.83rem;
+
+    thead th {
+      padding: 10px 14px;
+      background: var(--table-header-bg, #f8f9fa);
+      font-size: 0.73rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-secondary, #555);
+      border-bottom: 1px solid var(--border-color, #eee);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 10px 14px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border-color, #f0f0f0);
+    }
+
+    tbody tr {
+      transition: background 0.15s;
+      &:hover { background: var(--bg-hover, #fafafa); }
+    }
+
+    // Upcoming holiday highlight
+    .row-upcoming {
+      background: rgba(46, 204, 113, 0.06);
+      &:hover { background: rgba(46, 204, 113, 0.1); }
+    }
+  }
+}
+
+// ─── Soft Badges
+.badge-soft-success {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(39, 174, 96, 0.12);
+  color: #27ae60;
+}
+.badge-soft-secondary {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(108, 117, 125, 0.12);
+  color: #6c757d;
+}
+.badge-soft-info {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+  background: rgba(13, 202, 240, 0.12);
+  color: #0891b2;
+}
+
+// ─── Action Buttons
+.action-btn-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.action-btn {
+  width: 30px; height: 30px;
+  border-radius: 7px;
   border: none;
-}
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
 
-.input-group .btn {
-  border: none;
-}
-
-/* Header */
-h2 {
-  color: #212529;
-  font-weight: 600;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .container-fluid {
-    padding: 1rem;
+  &.action-btn-edit {
+    background: rgba(55, 95, 160, 0.1);
+    color: #375fa0;
+    &:hover { background: rgba(55, 95, 160, 0.2); }
   }
-  
-  .table {
-    font-size: 0.85rem;
-  }
-  
-  .btn-group {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .btn-group .btn {
-    margin: 2px 0;
+  &.action-btn-delete {
+    background: rgba(231, 76, 60, 0.08);
+    color: #c0392b;
+    &:hover { background: rgba(231, 76, 60, 0.18); }
   }
 }
 
-/* Empty State */
-.bi-calendar-x {
-  opacity: 0.3;
+// ─── Pagination Footer
+.holiday-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-color, #eee);
+
+  .pagination .page-link {
+    color: var(--primary, #375fa0);
+    border-color: var(--border-color, #dee2e6);
+    background: var(--bg-card, #fff);
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  .pagination .page-item.active .page-link {
+    background: var(--primary, #375fa0);
+    border-color: var(--primary, #375fa0);
+    color: #fff;
+  }
+
+  .pagination .page-item.disabled .page-link {
+    color: var(--text-muted, #aaa);
+    background: var(--bg-card, #fff);
+  }
 }
 
-/* Status Badge Colors */
-.badge.bg-info {
-  background-color: #0dcaf0 !important;
-}
-
-.badge.bg-success {
-  background-color: #198754 !important;
-}
-
-.badge.bg-secondary {
-  background-color: #6c757d !important;
-}
-
-/* Button Styles */
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3);
-}
-
-.btn-outline-primary:hover {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-  color: #fff;
-}
-
-.btn-outline-danger:hover {
-  background-color: #dc3545;
-  border-color: #dc3545;
-  color: #fff;
-}
-
-/* Icon Styling */
-i.bi {
-  font-size: 1rem;
-}
-
-/* Card Shadow */
-.shadow-sm {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+// ─── Loading
+.holiday-loading {
+  text-align: center;
+  padding: 60px;
+  color: var(--text-muted, #888);
+  font-size: 0.9rem;
 }

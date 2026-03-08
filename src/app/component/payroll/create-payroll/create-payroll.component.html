@@ -1,222 +1,191 @@
-<div class="container-fluid mt-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-10">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">
-            <i class="bi bi-plus-circle me-2"></i>{{ isEditMode ? 'Edit' : 'Create' }} Payroll
-          </h4>
+<div class="ann-wrap">
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title">
+        <i [class]="'bi me-1 ' + (isEditMode ? 'bi-pencil-square' : 'bi-plus-circle')"></i>
+        {{ isEditMode ? 'Edit' : 'Create' }} Payroll
+      </h1>
+      <p class="banner-subtitle">{{ isEditMode ? 'Update payroll details' : 'Create a new payroll record' }}</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-banner btn-banner-ghost" type="button" (click)="cancel()">
+        <i class="bi bi-x-circle"></i> Cancel
+      </button>
+    </div>
+  </div>
+
+  <div class="pay-form-card table-card">
+    <form [formGroup]="payrollForm" (ngSubmit)="onSubmit()">
+
+      <!-- Employee & Method -->
+      <div class="pay-section-title">
+        <i class="bi bi-person me-2"></i>Employee Details
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Employee <span class="text-danger">*</span></label>
+          <select class="form-select" formControlName="employeeId" [attr.disabled]="isEditMode ? '' : null">
+            <option value="">Select Employee</option>
+            <option *ngFor="let emp of employees" [value]="emp.id">
+              {{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId || 'No ID' }})
+            </option>
+          </select>
+          <div class="text-danger small mt-1" *ngIf="payrollForm.get('employeeId')?.invalid && payrollForm.get('employeeId')?.touched">
+            Employee is required
+          </div>
+          <div class="text-warning small mt-1" *ngIf="employees.length === 0">No employees found. Please add employees first.</div>
+          <div class="text-success small mt-1" *ngIf="employees.length > 0">{{ employees.length }} employee(s) available</div>
         </div>
-        <div class="card-body">
-          <form [formGroup]="payrollForm" (ngSubmit)="onSubmit()">
-            <div class="row">
-              <!-- Employee Selection -->
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Employee <span class="text-danger">*</span></label>
-                <select class="form-select" formControlName="employeeId" [disabled]="isEditMode">
-                  <option value="">Select Employee</option>
-                  <option *ngFor="let emp of employees" [value]="emp.id">
-                    {{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId || 'No ID' }})
-                  </option>
-                </select>
-                <div class="text-danger" *ngIf="payrollForm.get('employeeId')?.invalid && payrollForm.get('employeeId')?.touched">
-                  Employee is required
-                </div>
-                <small class="text-muted" *ngIf="employees.length === 0">
-                  ⚠️ No employees found. Please add employees first.
-                </small>
-                <small class="text-success" *ngIf="employees.length > 0">
-                  ✓ {{ employees.length }} employee(s) available
-                </small>
-              </div>
-
-              <!-- Payment Method -->
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Payment Method</label>
-                <select class="form-select" formControlName="paymentMethod">
-                  <option value="BANK_TRANSFER">Bank Transfer</option>
-                  <option value="CASH">Cash</option>
-                  <option value="CHEQUE">Cheque</option>
-                </select>
-              </div>
-
-              <!-- Pay Period Start -->
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Pay Period Start <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" formControlName="payPeriodStart">
-              </div>
-
-              <!-- Pay Period End -->
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Pay Period End <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" formControlName="payPeriodEnd">
-              </div>
-
-              <!-- Payment Date -->
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Payment Date <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" formControlName="paymentDate">
-              </div>
-
-              <!-- Earnings Section -->
-              <div class="col-12">
-                <h5 class="mt-3 mb-3 text-primary">
-                  <i class="bi bi-cash-coin me-2"></i>Earnings
-                </h5>
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Basic Salary <span class="text-danger">*</span></label>
-                <input type="number" class="form-control" formControlName="basicSalary" step="0.01">
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Overtime Pay</label>
-                <input type="number" class="form-control" formControlName="overtimePay" step="0.01">
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Bonus</label>
-                <input type="number" class="form-control" formControlName="bonus" step="0.01">
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Allowances</label>
-                <input type="number" class="form-control" formControlName="allowances" step="0.01">
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Commission</label>
-                <input type="number" class="form-control" formControlName="commission" step="0.01">
-              </div>
-
-              <!-- Deductions Section -->
-              <div class="col-12">
-                <h5 class="mt-3 mb-3 text-danger">
-                  <i class="bi bi-dash-circle me-2"></i>Deductions
-                </h5>
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Pension Fund</label>
-                <input type="number" class="form-control" formControlName="pensionFund" step="0.01">
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Medical Aid</label>
-                <input type="number" class="form-control" formControlName="medicalAid" step="0.01">
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Other Deductions</label>
-                <input type="number" class="form-control" formControlName="otherDeductions" step="0.01">
-              </div>
-
-              <!-- Tax Calculations Section -->
-              <div class="col-12">
-                <h5 class="mt-3 mb-3 text-warning">
-                  <i class="bi bi-percent me-2"></i>Tax Calculations
-                </h5>
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">PAYE Tax</label>
-                <div class="input-group">
-                  <span class="input-group-text">R</span>
-                  <input type="number" class="form-control" formControlName="payeTax" step="0.01" readonly>
-                </div>
-                <small class="form-text text-muted">Auto-calculated based on basic salary</small>
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">UIF</label>
-                <div class="input-group">
-                  <span class="input-group-text">R</span>
-                  <input type="number" class="form-control" formControlName="uif" step="0.01" readonly>
-                </div>
-                <small class="form-text text-muted">Unemployment Insurance Fund (1% of gross)</small>
-              </div>
-
-              <div class="col-md-4 mb-3">
-                <label class="form-label">Total Deductions</label>
-                <div class="input-group">
-                  <span class="input-group-text">R</span>
-                  <input type="number" class="form-control" formControlName="totalDeductions" step="0.01" readonly>
-                </div>
-              </div>
-
-              <!-- Summary Section -->
-              <div class="col-12">
-                <h5 class="mt-3 mb-3 text-success">
-                  <i class="bi bi-calculator me-2"></i>Summary
-                </h5>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Gross Salary</label>
-                <div class="input-group">
-                  <span class="input-group-text">R</span>
-                  <input type="number" class="form-control" formControlName="grossSalary" step="0.01" readonly>
-                </div>
-              </div>
-
-              <div class="col-md-6 mb-3">
-                <label class="form-label">Net Salary</label>
-                <div class="input-group">
-                  <span class="input-group-text">R</span>
-                  <input type="number" class="form-control" formControlName="netSalary" step="0.01" readonly>
-                </div>
-              </div>
-
-              <!-- Attendance Section -->
-              <div class="col-12">
-                <h5 class="mt-3 mb-3 text-info">
-                  <i class="bi bi-calendar-check me-2"></i>Attendance
-                </h5>
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <label class="form-label">Days Worked</label>
-                <input type="number" class="form-control" formControlName="daysWorked">
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <label class="form-label">Days Absent</label>
-                <input type="number" class="form-control" formControlName="daysAbsent">
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <label class="form-label">Days on Leave</label>
-                <input type="number" class="form-control" formControlName="daysOnLeave">
-              </div>
-
-              <div class="col-md-3 mb-3">
-                <label class="form-label">Overtime Hours</label>
-                <input type="number" class="form-control" formControlName="overtimeHours" step="0.5">
-              </div>
-
-
-              <!-- Remarks -->
-              <div class="col-12 mb-3">
-                <label class="form-label">Remarks</label>
-                <textarea class="form-control" formControlName="remarks" rows="3"></textarea>
-              </div>
-
-              <!-- Action Buttons -->
-              <div class="col-12 mt-3">
-                <button type="submit" class="btn btn-primary me-2" [disabled]="isLoading || employees.length === 0">
-                  <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
-                  <i class="bi bi-check-circle me-1" *ngIf="!isLoading"></i>
-                  {{ isEditMode ? 'Update' : 'Create' }} Payroll
-                </button>
-                <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isLoading">
-                  <i class="bi bi-x-circle me-1"></i>Cancel
-                </button>
-              </div>
-            </div>
-          </form>
+        <div class="col-md-3 mb-3">
+          <label class="form-label pay-label">Payment Method</label>
+          <select class="form-select" formControlName="paymentMethod">
+            <option value="BANK_TRANSFER">Bank Transfer</option>
+            <option value="CASH">Cash</option>
+            <option value="CHEQUE">Cheque</option>
+          </select>
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label pay-label">Payment Date <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="paymentDate">
         </div>
       </div>
-    </div>
+
+      <div class="row pay-form-row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Pay Period Start <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="payPeriodStart">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Pay Period End <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="payPeriodEnd">
+        </div>
+      </div>
+
+      <!-- Earnings -->
+      <div class="pay-section-title pay-section-earnings">
+        <i class="bi bi-cash-coin me-2"></i>Earnings
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Basic Salary <span class="text-danger">*</span></label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="basicSalary" step="0.01"></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Overtime Pay</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="overtimePay" step="0.01"></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Bonus</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="bonus" step="0.01"></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Allowances</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="allowances" step="0.01"></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Commission</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="commission" step="0.01"></div>
+        </div>
+      </div>
+
+      <!-- Deductions -->
+      <div class="pay-section-title pay-section-deductions">
+        <i class="bi bi-dash-circle me-2"></i>Deductions
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Pension Fund</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="pensionFund" step="0.01"></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Medical Aid</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="medicalAid" step="0.01"></div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Other Deductions</label>
+          <div class="pay-input-prefix"><span>R</span><input type="number" class="form-control" formControlName="otherDeductions" step="0.01"></div>
+        </div>
+      </div>
+
+      <!-- Tax (read-only) -->
+      <div class="pay-section-title pay-section-tax">
+        <i class="bi bi-percent me-2"></i>Tax Calculations
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">PAYE Tax</label>
+          <div class="pay-input-prefix pay-readonly"><span>R</span><input type="number" class="form-control" formControlName="payeTax" step="0.01" readonly></div>
+          <div class="text-muted small mt-1">Auto-calculated</div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">UIF</label>
+          <div class="pay-input-prefix pay-readonly"><span>R</span><input type="number" class="form-control" formControlName="uif" step="0.01" readonly></div>
+          <div class="text-muted small mt-1">1% of gross salary</div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label pay-label">Total Deductions</label>
+          <div class="pay-input-prefix pay-readonly"><span>R</span><input type="number" class="form-control" formControlName="totalDeductions" step="0.01" readonly></div>
+        </div>
+      </div>
+
+      <!-- Summary -->
+      <div class="pay-section-title pay-section-summary">
+        <i class="bi bi-calculator me-2"></i>Summary
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Gross Salary</label>
+          <div class="pay-input-prefix pay-readonly"><span>R</span><input type="number" class="form-control" formControlName="grossSalary" step="0.01" readonly></div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Net Salary</label>
+          <div class="pay-input-prefix pay-readonly pay-net"><span>R</span><input type="number" class="form-control" formControlName="netSalary" step="0.01" readonly></div>
+        </div>
+      </div>
+
+      <!-- Attendance -->
+      <div class="pay-section-title pay-section-attendance">
+        <i class="bi bi-calendar-check me-2"></i>Attendance
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-3 mb-3">
+          <label class="form-label pay-label">Days Worked</label>
+          <input type="number" class="form-control" formControlName="daysWorked">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label pay-label">Days Absent</label>
+          <input type="number" class="form-control" formControlName="daysAbsent">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label pay-label">Days on Leave</label>
+          <input type="number" class="form-control" formControlName="daysOnLeave">
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label pay-label">Overtime Hours</label>
+          <input type="number" class="form-control" formControlName="overtimeHours" step="0.5">
+        </div>
+      </div>
+
+      <!-- Remarks -->
+      <div class="pay-form-row mb-3">
+        <label class="form-label pay-label">Remarks</label>
+        <textarea class="form-control" formControlName="remarks" rows="3" placeholder="Optional notes..."></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div class="pay-form-actions">
+        <button type="button" class="btn btn-light" (click)="cancel()" [disabled]="isLoading">
+          <i class="bi bi-x-circle me-1"></i> Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading || employees.length === 0">
+          <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+          <i class="bi bi-check-circle me-1" *ngIf="!isLoading"></i>
+          {{ isEditMode ? 'Update' : 'Create' }} Payroll
+        </button>
+      </div>
+
+    </form>
   </div>
 </div>

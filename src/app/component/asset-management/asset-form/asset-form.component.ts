@@ -7,6 +7,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-asset-form',
   templateUrl: './asset-form.component.html',
   styleUrls: ['./asset-form.component.scss'],

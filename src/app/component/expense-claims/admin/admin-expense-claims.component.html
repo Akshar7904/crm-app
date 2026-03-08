@@ -4,12 +4,13 @@
   <div class="row">
     <div class="col-md-12">
       <div class="card">
-        <div class="card-header" style="background: linear-gradient(135deg, #484c7f 0%, #7978e9 100%); color: white;">
-          <div class="d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">
-              <i class="bi bi-receipt-cutoff me-2"></i>Expense Claims Management
-            </h4>
-            <button class="btn btn-light" (click)="downloadReport()">
+        <div class="claims-banner">
+          <div class="claims-banner-left">
+            <h1 class="claims-banner-title"><i class="bi bi-receipt-cutoff"></i> Expense Claims Management</h1>
+            <p class="claims-banner-subtitle">Review and approve employee expense claims</p>
+          </div>
+          <div class="claims-banner-actions">
+            <button class="claims-btn-banner" (click)="downloadReport()">
               <i class="bi bi-download"></i> Download Report
             </button>
           </div>
@@ -124,6 +125,12 @@
 <!--                                (click)="openApprovalModal(claim, 'paid')">-->
 <!--                          <i class="bi bi-cash"></i>-->
 <!--                        </button>-->
+                        <button *ngIf="canDelete(claim)"
+                                class="btn btn-outline-danger"
+                                (click)="deleteClaim(claim)"
+                                title="Delete claim">
+                          <i class="bi bi-trash"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>

@@ -18,6 +18,7 @@ export interface ChartData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-dashboard-chart',
   template: `
     <div class="chart-container">

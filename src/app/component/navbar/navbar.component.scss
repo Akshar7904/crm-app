@@ -14,12 +14,18 @@
   left: 260px;
   z-index: 998;
   transition: left $transition-slow;
+  // Override Bootstrap's .navbar flex-wrap so items stay on one row
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  padding: 0;
 }
 
 .navbar-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   height: 100%;
   padding: 0 $spacing-lg;
 }

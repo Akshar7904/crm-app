@@ -10,6 +10,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-asset-detail',
   templateUrl: './asset-detail.component.html',
   styleUrls: ['./asset-detail.component.scss'],
@@ -111,15 +112,15 @@ export class AssetDetailComponent implements OnInit {
 
   getStatusClass(status: AssetStatus): string {
     const classes: { [key: string]: string } = {
-      'AVAILABLE': 'bg-success',
-      'ASSIGNED': 'bg-primary',
-      'RESERVED': 'bg-info',
-      'UNDER_MAINTENANCE': 'bg-warning',
-      'RETIRED': 'bg-secondary',
-      'LOST': 'bg-danger',
-      'DAMAGED': 'bg-danger'
+      'AVAILABLE': 'badge-soft-success',
+      'ASSIGNED': 'badge-soft-primary',
+      'RESERVED': 'badge-soft-info',
+      'UNDER_MAINTENANCE': 'badge-soft-warning',
+      'RETIRED': 'badge-soft-secondary',
+      'LOST': 'badge-soft-danger',
+      'DAMAGED': 'badge-soft-danger'
     };
-    return classes[status] || 'bg-secondary';
+    return classes[status] || 'badge-soft-secondary';
   }
 
   getCategoryIcon(category: AssetCategory): string {

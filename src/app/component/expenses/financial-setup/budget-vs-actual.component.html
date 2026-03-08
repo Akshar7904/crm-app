@@ -1,0 +1,264 @@
+<div class="bva-wrap">
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-bar-chart-line"></i> Budget vs Actual</h1>
+      <p class="banner-subtitle">Full-year financial performance against your budget targets</p>
+    </div>
+    <div class="banner-actions">
+      <select class="form-select form-select-sm banner-year-select" [(ngModel)]="selectedYear" (change)="onYearChange()">
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="bva-loading">
+    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+    Loading financial data...
+  </div>
+
+  <ng-container *ngIf="!loading && summary">
+
+    <!-- Opening Balance Bar -->
+    <div class="opening-bar" *ngIf="summary.openingBalance">
+      <div class="ob-item">
+        <span class="ob-label"><i class="bi bi-bank me-1"></i> Opening Cash</span>
+        <span class="ob-value">{{ fmt(summary.openingBalance.cashBalance) }}</span>
+      </div>
+      <div class="ob-divider"></div>
+      <div class="ob-item">
+        <span class="ob-label"><i class="bi bi-arrow-down-circle me-1"></i> Debtors (AR)</span>
+        <span class="ob-value text-success">{{ fmt(summary.openingBalance.accountsReceivable) }}</span>
+      </div>
+      <div class="ob-divider"></div>
+      <div class="ob-item">
+        <span class="ob-label"><i class="bi bi-arrow-up-circle me-1"></i> Creditors (AP)</span>
+        <span class="ob-value text-danger">{{ fmt(summary.openingBalance.accountsPayable) }}</span>
+      </div>
+      <div class="ob-divider"></div>
+      <div class="ob-item">
+        <span class="ob-label"><i class="bi bi-wallet2 me-1"></i> Net Opening Position</span>
+        <span class="ob-value"
+              [class.text-success]="summary.openingBalance.netOpeningPosition >= 0"
+              [class.text-danger]="summary.openingBalance.netOpeningPosition < 0">
+          {{ fmt(summary.openingBalance.netOpeningPosition) }}
+        </span>
+      </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <div class="bva-kpi-grid">
+
+      <!-- Revenue -->
+      <div class="bva-kpi-card">
+        <div class="kpi-icon kpi-income"><i class="bi bi-currency-dollar"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Revenue (YTD)</div>
+          <div class="kpi-actual">{{ fmt(summary.totalRevenueActual) }}</div>
+          <div class="kpi-budget">Budget: {{ fmt(summary.totalRevenueBudget) }}</div>
+          <div class="kpi-variance"
+               [class.positive]="summary.revenueVariance >= 0"
+               [class.negative]="summary.revenueVariance < 0">
+            {{ fmtPct(summary.revenueVariancePct) }} vs budget
+          </div>
+          <div class="progress mt-2" style="height:5px">
+            <div class="progress-bar"
+                 [class]="progressClass(progressPct(summary.totalRevenueActual, summary.totalRevenueBudget), true)"
+                 [style.width.%]="progressPct(summary.totalRevenueActual, summary.totalRevenueBudget)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Expenses -->
+      <div class="bva-kpi-card">
+        <div class="kpi-icon kpi-expense"><i class="bi bi-receipt"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Expenses (YTD)</div>
+          <div class="kpi-actual">{{ fmt(summary.totalExpensesActual) }}</div>
+          <div class="kpi-budget">Budget: {{ fmt(summary.totalExpensesBudget) }}</div>
+          <div class="kpi-variance"
+               [class.negative]="summary.expensesVariance > 0"
+               [class.positive]="summary.expensesVariance <= 0">
+            {{ fmtPct(variancePct(summary.totalExpensesActual, summary.totalExpensesBudget)) }} vs budget
+          </div>
+          <div class="progress mt-2" style="height:5px">
+            <div class="progress-bar"
+                 [class]="progressClass(progressPct(summary.totalExpensesActual, summary.totalExpensesBudget), false)"
+                 [style.width.%]="progressPct(summary.totalExpensesActual, summary.totalExpensesBudget)"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Net Profit -->
+      <div class="bva-kpi-card">
+        <div class="kpi-icon" [class.kpi-profit]="summary.netProfitActual >= 0" [class.kpi-loss]="summary.netProfitActual < 0">
+          <i class="bi" [ngClass]="summary.netProfitActual >= 0 ? 'bi-graph-up' : 'bi-graph-down'"></i>
+        </div>
+        <div class="kpi-body">
+          <div class="kpi-label">Net Profit / (Loss)</div>
+          <div class="kpi-actual"
+               [class.text-success]="summary.netProfitActual >= 0"
+               [class.text-danger]="summary.netProfitActual < 0">
+            {{ fmt(summary.netProfitActual) }}
+          </div>
+          <div class="kpi-budget">Budget: {{ fmt(summary.netProfitBudget) }}</div>
+          <div class="kpi-variance"
+               [class.positive]="summary.netProfitVariance >= 0"
+               [class.negative]="summary.netProfitVariance < 0">
+            Variance: {{ fmt(summary.netProfitVariance) }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Cash Position -->
+      <div class="bva-kpi-card">
+        <div class="kpi-icon kpi-cash"><i class="bi bi-safe2"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-label">Current Cash Position</div>
+          <div class="kpi-actual"
+               [class.text-success]="summary.currentCashPosition >= 0"
+               [class.text-danger]="summary.currentCashPosition < 0">
+            {{ fmt(summary.currentCashPosition) }}
+          </div>
+          <div class="kpi-budget">Opening + Revenue − Expenses</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail Table -->
+    <div class="bva-table-card">
+      <h3 class="bva-table-title">
+        <i class="bi bi-table me-2"></i>Account-Level Budget vs Actual — {{ selectedYear }}
+      </h3>
+      <div class="bva-table-wrap">
+        <table class="bva-table">
+          <thead>
+            <tr>
+              <th class="col-code">Code</th>
+              <th>Account</th>
+              <th class="col-num">Budget (Full Year)</th>
+              <th class="col-num">Actual (YTD)</th>
+              <th class="col-num">Variance</th>
+              <th class="col-pct">%</th>
+              <th class="col-bar">Progress</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <!-- INCOME -->
+            <tr class="section-row income-section">
+              <td colspan="7"><i class="bi bi-arrow-down-circle-fill me-1"></i> INCOME</td>
+            </tr>
+            <tr *ngFor="let line of summary.incomeLines"
+                class="data-row"
+                [class.row-over]="line.overBudget"
+                [class.row-no-budget]="!line.budgeted || line.budgeted === 0">
+              <td><span class="acct-code">{{ line.accountCode }}</span></td>
+              <td class="acct-name">{{ line.accountName }}</td>
+              <td class="num-col">{{ fmt(line.budgeted) }}</td>
+              <td class="num-col fw-medium">{{ fmt(line.actual) }}</td>
+              <td class="num-col"
+                  [class.text-success]="line.variance >= 0"
+                  [class.text-danger]="line.variance < 0">
+                {{ fmt(line.variance) }}
+              </td>
+              <td class="num-col"
+                  [class.text-success]="!line.overBudget && line.budgeted > 0"
+                  [class.text-danger]="line.overBudget">
+                {{ fmtPct(line.variancePercent) }}
+              </td>
+              <td class="col-bar">
+                <div class="progress" style="height:6px">
+                  <div class="progress-bar"
+                       [class]="progressClass(progressPct(line.actual, line.budgeted), true)"
+                       [style.width.%]="progressPct(line.actual, line.budgeted)"></div>
+                </div>
+                <div class="bar-label">{{ progressPct(line.actual, line.budgeted) | number:'1.0-0' }}%</div>
+              </td>
+            </tr>
+
+            <!-- COGS -->
+            <ng-container *ngIf="summary.cogsLines && summary.cogsLines.length > 0">
+              <tr class="section-row cogs-section">
+                <td colspan="7"><i class="bi bi-boxes me-1"></i> COST OF GOODS SOLD</td>
+              </tr>
+              <tr *ngFor="let line of summary.cogsLines"
+                  class="data-row"
+                  [class.row-over]="line.overBudget">
+                <td><span class="acct-code">{{ line.accountCode }}</span></td>
+                <td class="acct-name">{{ line.accountName }}</td>
+                <td class="num-col">{{ fmt(line.budgeted) }}</td>
+                <td class="num-col fw-medium">{{ fmt(line.actual) }}</td>
+                <td class="num-col"
+                    [class.text-danger]="line.variance > 0"
+                    [class.text-success]="line.variance <= 0">
+                  {{ fmt(line.variance) }}
+                </td>
+                <td class="num-col"
+                    [class.text-success]="!line.overBudget && line.budgeted > 0"
+                    [class.text-danger]="line.overBudget">
+                  {{ fmtPct(line.variancePercent) }}
+                </td>
+                <td class="col-bar">
+                  <div class="progress" style="height:6px">
+                    <div class="progress-bar"
+                         [class]="progressClass(progressPct(line.actual, line.budgeted), false)"
+                         [style.width.%]="progressPct(line.actual, line.budgeted)"></div>
+                  </div>
+                  <div class="bar-label">{{ progressPct(line.actual, line.budgeted) | number:'1.0-0' }}%</div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- OPERATING EXPENSES -->
+            <tr class="section-row expense-section">
+              <td colspan="7"><i class="bi bi-receipt me-1"></i> OPERATING EXPENSES</td>
+            </tr>
+            <tr *ngFor="let line of summary.operatingExpenseLines"
+                class="data-row"
+                [class.row-over]="line.overBudget">
+              <td><span class="acct-code">{{ line.accountCode }}</span></td>
+              <td class="acct-name">{{ line.accountName }}</td>
+              <td class="num-col">{{ fmt(line.budgeted) }}</td>
+              <td class="num-col fw-medium">{{ fmt(line.actual) }}</td>
+              <td class="num-col"
+                  [class.text-danger]="line.variance > 0"
+                  [class.text-success]="line.variance <= 0">
+                {{ fmt(line.variance) }}
+              </td>
+              <td class="num-col"
+                  [class.text-success]="!line.overBudget && line.budgeted > 0"
+                  [class.text-danger]="line.overBudget">
+                {{ fmtPct(line.variancePercent) }}
+              </td>
+              <td class="col-bar">
+                <div class="progress" style="height:6px">
+                  <div class="progress-bar"
+                       [class]="progressClass(progressPct(line.actual, line.budgeted), false)"
+                       [style.width.%]="progressPct(line.actual, line.budgeted)"></div>
+                </div>
+                <div class="bar-label">{{ progressPct(line.actual, line.budgeted) | number:'1.0-0' }}%</div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !summary" class="bva-empty">
+    <i class="bi bi-bar-chart"></i>
+    <h5>No Financial Data Available</h5>
+    <p>
+      Set up your <a routerLink="/expenses/opening-balance">Opening Balance</a> and
+      <a routerLink="/expenses/budget">Annual Budget</a> first, then come back here
+      to track your performance.
+    </p>
+  </div>
+
+</div>

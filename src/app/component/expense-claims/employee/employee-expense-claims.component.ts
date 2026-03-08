@@ -16,6 +16,7 @@ import { filter } from 'rxjs/operators';
 import { UserModel } from '../../profile/user.model';
 
 @Component({
+  standalone: false,
   selector: 'app-employee-expense-claims',
   templateUrl: './employee-expense-claims.component.html',
   styleUrls: ['./employee-expense-claims.component.scss'],
@@ -389,12 +390,12 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
 
   getStatusClass(status: ExpenseClaimStatus): string {
     switch (status) {
-      case ExpenseClaimStatus.PENDING: return 'badge-warning';
-      case ExpenseClaimStatus.APPROVED: return 'badge-success';
-      case ExpenseClaimStatus.REJECTED: return 'badge-danger';
-      case ExpenseClaimStatus.PAID: return 'badge-info';
-      case ExpenseClaimStatus.CANCELLED: return 'badge-secondary';
-      default: return 'badge-secondary';
+      case ExpenseClaimStatus.PENDING: return 'badge-soft-pending';
+      case ExpenseClaimStatus.APPROVED: return 'badge-soft-approved';
+      case ExpenseClaimStatus.REJECTED: return 'badge-soft-rejected';
+      case ExpenseClaimStatus.PAID: return 'badge-soft-paid';
+      case ExpenseClaimStatus.CANCELLED: return 'badge-soft-cancelled';
+      default: return 'badge-soft-cancelled';
     }
   }
 

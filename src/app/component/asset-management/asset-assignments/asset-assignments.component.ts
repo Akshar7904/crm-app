@@ -10,6 +10,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-asset-assignments',
   templateUrl: './asset-assignments.component.html',
   styleUrls: ['./asset-assignments.component.scss'],
@@ -160,12 +161,12 @@ export class AssetAssignmentsComponent implements OnInit {
 
   getStatusClass(status: AssignmentStatus): string {
     const classes: { [key: string]: string } = {
-      'ACTIVE': 'bg-success',
-      'RETURNED': 'bg-secondary',
-      'OVERDUE': 'bg-warning text-dark',
-      'LOST': 'bg-danger'
+      'ACTIVE': 'badge-soft-success',
+      'RETURNED': 'badge-soft-secondary',
+      'OVERDUE': 'badge-soft-warning',
+      'LOST': 'badge-soft-danger'
     };
-    return classes[status] || 'bg-secondary';
+    return classes[status] || 'badge-soft-secondary';
   }
 
   formatDate(date: Date | string): string {

@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { PayrollService, PayrollStats } from 'src/app/service/payroll.service';
 
 @Component({
+  standalone: false,
   selector: 'app-payroll-stats',
   templateUrl: './payroll-stats.component.html',
   styleUrls: ['./payroll-stats.component.scss']

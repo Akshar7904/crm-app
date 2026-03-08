@@ -7,6 +7,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-request-asset',
   templateUrl: './request-asset.component.html',
   styleUrls: ['./request-asset.component.scss'],
@@ -21,6 +22,13 @@ export class RequestAssetComponent implements OnInit {
   readonly requestTypes = Object.values(AssetRequestType);
   readonly priorities = Object.values(AssetRequestPriority);
   currentUser: any;
+
+  readonly steps = [
+    { num: 1, title: 'Submit Request',    desc: 'Fill in the form with a clear justification for the asset you need.' },
+    { num: 2, title: 'Manager Review',    desc: 'Your manager will review the request and approve or reject it.' },
+    { num: 3, title: 'Asset Assignment',  desc: 'If approved, IT admin will assign an available asset from inventory.' },
+    { num: 4, title: 'Receive & Acknowledge', desc: "You'll receive the asset and confirm receipt." }
+  ];
 
   constructor(
     private fb: FormBuilder,

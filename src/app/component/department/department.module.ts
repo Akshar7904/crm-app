@@ -23,7 +23,7 @@ const routes: Routes = [
     CommonModule,
     ReactiveFormsModule,
     NgbModule,
-    RouterModule.forChild(routes)
+    RouterModule.forChild(routes),
   ],
   providers: [
     DepartmentService

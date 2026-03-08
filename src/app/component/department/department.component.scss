@@ -2,6 +2,64 @@
 @import '../../../styles/variables';
 @import '../../../styles/mixins';
 
+// ─── Falcon Banner ────────────────────────────────────────────────────────────
+.dept-page-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-xl;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 60%, $primary-light 100%);
+  border-radius: $border-radius-xl;
+  margin-bottom: $spacing-lg;
+  box-shadow: 0 6px 24px rgba($primary, 0.28);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInDown 0.4s ease forwards;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 170px; height: 170px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+}
+
+.dept-banner-left { position: relative; z-index: 1; }
+.dept-banner-title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  i { opacity: 0.85; }
+}
+.dept-banner-subtitle { color: rgba(255, 255, 255, 0.75); font-size: $font-size-sm; margin: 4px 0 0; }
+.dept-banner-actions { position: relative; z-index: 1; display: flex; gap: $spacing-sm; }
+.dept-btn-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: $spacing-sm 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: $border-radius-md;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  backdrop-filter: blur(4px);
+  &:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-1px); }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 /* Department Card Styling */
 .department-card {
   transition: all 0.3s ease;

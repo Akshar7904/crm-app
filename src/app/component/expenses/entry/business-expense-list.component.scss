@@ -1,0 +1,42 @@
+// Business Expense List
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.expense-list {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// ─── Reference number chip ────────────────────────────────────────────────────
+code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: $font-weight-semibold;
+  color: $primary;
+  background: rgba($primary, 0.08);
+  border-radius: $border-radius-sm;
+  padding: 2px 7px;
+}
+
+// ─── Description truncation ───────────────────────────────────────────────────
+.description-col {
+  max-width: 180px;
+  @include truncate;
+  color: var(--text-secondary);
+}
+
+// ─── Status badges ────────────────────────────────────────────────────────────
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+
+  &.badge-approved { background: rgba($success, 0.12); color: darken($success, 8%); }
+  &.badge-draft    { background: rgba($warning, 0.15); color: darken($warning, 22%); }
+  &.badge-void     { background: rgba($gray-500, 0.12); color: $gray-600; }
+}

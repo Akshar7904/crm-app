@@ -8,6 +8,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-my-assets',
   templateUrl: './my-assets.component.html',
   styleUrls: ['./my-assets.component.scss'],

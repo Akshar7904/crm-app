@@ -1,0 +1,39 @@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+import { ExpensesRoutingModule } from './expenses-routing.module';
+import { ExpensesOverviewComponent } from './overview/expenses-overview.component';
+import { BusinessExpenseEntryComponent } from './entry/business-expense-entry.component';
+import { BusinessExpenseListComponent } from './entry/business-expense-list.component';
+import { ExpensesClaimsComponent } from './claims/expenses-claims.component';
+import { ExpensesReportsComponent } from './reports/expenses-reports.component';
+import { ChartOfAccountsComponent } from './accounts/chart-of-accounts.component';
+import { VendorsComponent } from './vendors/vendors.component';
+import { OpeningBalanceComponent } from './financial-setup/opening-balance.component';
+import { AnnualBudgetComponent } from './financial-setup/annual-budget.component';
+import { BudgetVsActualComponent } from './financial-setup/budget-vs-actual.component';
+
+@NgModule({
+  declarations: [
+    ExpensesOverviewComponent,
+    BusinessExpenseEntryComponent,
+    BusinessExpenseListComponent,
+    ExpensesClaimsComponent,
+    ExpensesReportsComponent,
+    ChartOfAccountsComponent,
+    VendorsComponent,
+    OpeningBalanceComponent,
+    AnnualBudgetComponent,
+    BudgetVsActualComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    ExpensesRoutingModule,
+  ]
+})
+export class ExpensesModule {}

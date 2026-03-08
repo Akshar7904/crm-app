@@ -11,6 +11,7 @@ export interface StatCard {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-stats-cards',
   template: `
     <div class="stats-grid">

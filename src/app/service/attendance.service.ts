@@ -338,13 +338,20 @@ export class AttendanceService {
    * Clock in for today (self-service)
    * Uses the existing createMyAttendance endpoint
    */
-  clockIn$(checkInTime: string, location?: string): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
+  clockIn$(
+    checkInTime: string,
+    location?: string,
+    latitude?: number,
+    longitude?: number
+  ): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
     const today = new Date().toISOString().split('T')[0];
     const form: SelfAttendanceForm = {
       attendanceDate: today,
       attendanceType: AttendanceType.FULL_DAY_PRESENT,
       checkInTime: checkInTime,
-      checkInLocation: location
+      checkInLocation: location,
+      checkInLatitude: latitude,
+      checkInLongitude: longitude
     };
     return this.createMyAttendance(form);
   }
@@ -353,13 +360,20 @@ export class AttendanceService {
    * Clock out for today (self-service)
    * Updates existing attendance with checkout time
    */
-  clockOut$(checkOutTime: string, location?: string): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
+  clockOut$(
+    checkOutTime: string,
+    location?: string,
+    latitude?: number,
+    longitude?: number
+  ): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
     const today = new Date().toISOString().split('T')[0];
     const form: SelfAttendanceForm = {
       attendanceDate: today,
       attendanceType: AttendanceType.FULL_DAY_PRESENT,
       checkOutTime: checkOutTime,
-      checkOutLocation: location
+      checkOutLocation: location,
+      checkOutLatitude: latitude,
+      checkOutLongitude: longitude
     };
     return this.updateMyAttendance(today, form);
   }
@@ -390,5 +404,22 @@ export class AttendanceService {
   getTodayAttendance$(): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
     const today = new Date().toISOString().split('T')[0];
     return this.getMyAttendanceByDate(today);
+  }
+
+  /**
+   * Download attendance report as Excel (.xlsx)
+   */
+  downloadAttendanceReport(year: number, month: number): Observable<Blob> {
+    return this.http.get(
+      `${this.API_URL}/export?year=${year}&month=${month}`,
+      { responseType: 'blob' }
+    );
+  }
+
+  downloadAttendancePdf(year: number, month: number): Observable<Blob> {
+    return this.http.get(
+      `${this.API_URL}/export/pdf?year=${year}&month=${month}`,
+      { responseType: 'blob' }
+    );
   }
 }

@@ -21,7 +21,7 @@ import { EmployeeService } from '../../service/employee.service';
     NavBarModule,
     ReactiveFormsModule,
     SharedModule,
-    EmployeeRoutingModule
+    EmployeeRoutingModule,
   ],
   providers: [EmployeeService]
 })

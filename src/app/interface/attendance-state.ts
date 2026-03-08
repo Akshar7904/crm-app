@@ -100,6 +100,10 @@ export interface SelfAttendanceForm {
   checkOutTime?: string;
   checkInLocation?: string;
   checkOutLocation?: string;
+  checkInLatitude?: number;
+  checkInLongitude?: number;
+  checkOutLatitude?: number;
+  checkOutLongitude?: number;
 }
 
 export interface MyMonthlyAttendanceResponse {

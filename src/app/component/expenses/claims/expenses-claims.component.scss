@@ -1,0 +1,67 @@
+// Expense Claims
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.expenses-claims {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// ─── Status tab pills inside banner ───────────────────────────────────────────
+.status-tabs {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: rgba(255,255,255,0.12);
+  border-radius: $border-radius-lg;
+  backdrop-filter: blur(4px);
+
+  .tab-btn {
+    padding: 5px 14px;
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,0.72);
+    font-size: 0.78rem;
+    font-weight: $font-weight-medium;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: all $transition-base;
+    white-space: nowrap;
+
+    &:hover { background: rgba(255,255,255,0.15); color: #fff; }
+    &.active {
+      background: rgba(255,255,255,0.22);
+      color: #fff;
+      font-weight: $font-weight-semibold;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+    }
+  }
+}
+
+// ─── Claim number code chip ───────────────────────────────────────────────────
+code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: $font-weight-semibold;
+  color: $primary;
+  background: rgba($primary, 0.08);
+  border-radius: $border-radius-sm;
+  padding: 2px 6px;
+}
+
+// ─── Status badges ────────────────────────────────────────────────────────────
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+
+  &.badge-approved, &.badge-paid { background: rgba($success, 0.12); color: darken($success, 8%); }
+  &.badge-pending  { background: rgba($warning, 0.15); color: darken($warning, 22%); }
+  &.badge-rejected,
+  &.badge-cancelled { background: rgba($danger, 0.12); color: $danger; }
+}

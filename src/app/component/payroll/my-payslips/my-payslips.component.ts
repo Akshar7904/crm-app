@@ -7,6 +7,7 @@ import { CustomHttpResponse } from 'src/app/interface/appstates';
 import { UserModel } from '../../profile/user.model';
 
 @Component({
+  standalone: false,
   selector: 'app-my-payslips',
   templateUrl: './my-payslips.component.html',
   styleUrls: ['./my-payslips.component.scss']
@@ -80,11 +81,11 @@ export class MyPayslipsComponent implements OnInit {
 
   getStatusClass(status: string): string {
     switch (status) {
-      case 'PAID': return 'badge bg-success';
-      case 'PROCESSED': return 'badge bg-info';
-      case 'DRAFT': return 'badge bg-secondary';
-      case 'CANCELLED': return 'badge bg-danger';
-      default: return 'badge bg-secondary';
+      case 'PAID': return 'badge-soft-paid';
+      case 'PROCESSED': return 'badge-soft-processed';
+      case 'DRAFT': return 'badge-soft-draft';
+      case 'CANCELLED': return 'badge-soft-cancelled';
+      default: return 'badge-soft-draft';
     }
   }
 

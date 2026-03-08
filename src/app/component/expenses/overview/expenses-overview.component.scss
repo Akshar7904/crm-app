@@ -1,0 +1,173 @@
+// Expenses Overview
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.expenses-overview {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// ─── Period selector inside banner ────────────────────────────────────────────
+.period-select {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.28);
+  border-radius: $border-radius;
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  appearance: none;
+  backdrop-filter: blur(4px);
+  transition: background $transition-fast;
+  option { background: $primary-dark; color: #fff; }
+  &:focus { outline: none; border-color: rgba(255,255,255,0.5); }
+  &:hover { background: rgba(255,255,255,0.22); }
+}
+
+// ─── KPI grid layout ──────────────────────────────────────────────────────────
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: $breakpoint-lg) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: $breakpoint-sm) { grid-template-columns: 1fr; }
+}
+
+// ─── KPI card (component-specific variant of global .kpi-stat) ────────────────
+.kpi-card {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: 20px $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  transition: transform $transition-base, box-shadow $transition-base;
+  opacity: 0;
+  animation: fadeInUp 0.45s ease forwards;
+
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.10s; }
+  &:nth-child(3) { animation-delay: 0.15s; }
+  &:nth-child(4) { animation-delay: 0.20s; }
+
+  &:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.10); }
+
+  &.skeleton {
+    height: 90px;
+    background: linear-gradient(90deg,
+      var(--table-hover, #f0f0f0) 25%,
+      var(--border-light, #e8e8e8) 37%,
+      var(--table-hover, #f0f0f0) 63%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite, fadeInUp 0.4s ease forwards;
+  }
+
+  &.income   .kpi-icon { background: rgba($success, 0.12); color: $success; }
+  &.gross    .kpi-icon { background: rgba($primary, 0.12); color: $primary; }
+  &.expenses .kpi-icon { background: rgba($danger,  0.12); color: $danger;  }
+  &.profit   .kpi-icon { background: rgba($success, 0.12); color: $success; }
+  &.loss     .kpi-icon { background: rgba($danger,  0.12); color: $danger;  }
+}
+
+.kpi-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: $border-radius-lg;
+  @include flex-center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+  transition: transform $transition-base;
+}
+
+.kpi-card:hover .kpi-icon { transform: scale(1.1); }
+
+.kpi-content { @include flex-column; flex: 1; min-width: 0; }
+
+.kpi-label {
+  font-size: 0.68rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  @include truncate;
+}
+
+.kpi-value {
+  font-size: 1.3rem;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+// ─── Two-column layout ────────────────────────────────────────────────────────
+.overview-grid {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  gap: $spacing-md;
+
+  @media (max-width: 1100px) { grid-template-columns: 1fr; }
+}
+
+// ─── Charts side ─────────────────────────────────────────────────────────────
+.charts-col {
+  @include flex-column;
+  gap: $spacing-md;
+}
+
+.chart-card canvas { max-height: 215px; }
+
+// ─── P&L Income Statement ─────────────────────────────────────────────────────
+.pl-section-title {
+  font-size: 0.63rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 1.3px;
+  color: var(--text-muted);
+  padding: 9px 0 4px;
+  border-top: 1px solid var(--border-light);
+  &:first-child { border-top: 0; padding-top: 0; }
+}
+
+.pl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+
+  .pl-label  { font-size: 0.83rem; color: var(--text-primary); }
+  .pl-amount { font-size: 0.83rem; font-weight: $font-weight-medium; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  &.pl-total {
+    margin-top: 3px; padding-top: 6px;
+    border-top: 1px solid var(--border-color);
+    .pl-label, .pl-amount { font-weight: $font-weight-bold; }
+  }
+}
+
+.pl-gross-profit {
+  background: rgba($primary, 0.07);
+  border-radius: $border-radius;
+  padding: 6px 10px;
+  margin: 6px 0;
+  .pl-label, .pl-amount { font-weight: $font-weight-bold; color: $primary; }
+}
+
+.pl-net-profit {
+  margin-top: $spacing-sm;
+  border-radius: $border-radius-md;
+  padding: 9px 12px;
+  .pl-label, .pl-amount { font-weight: $font-weight-bold; font-size: 0.95rem; }
+  &.positive { background: rgba($success, 0.1); .pl-label, .pl-amount { color: darken($success, 5%); } }
+  &.negative { background: rgba($danger,  0.1); .pl-label, .pl-amount { color: $danger; } }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position:  600px 0; }
+}

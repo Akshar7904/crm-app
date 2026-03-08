@@ -1,65 +1,48 @@
 <!-- Navbar rendered by app.component -->
 <section class="request-asset-page">
   <div class="container-fluid">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="page-breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item">
-          <a [routerLink]="['/']"><i class="bi bi-house-door"></i> Home</a>
-        </li>
-        <li class="breadcrumb-item">
-          <a [routerLink]="['/assets/my-assets']">My Assets</a>
-        </li>
-        <li class="breadcrumb-item active">Request Asset</li>
-      </ol>
-    </nav>
 
-    <!-- Page Header -->
-    <div class="page-header">
-      <div class="page-header-icon">
-        <i class="bi bi-box-seam"></i>
+    <!-- Page Banner -->
+    <div class="page-banner">
+      <div class="banner-left">
+        <h1 class="banner-title"><i class="bi bi-box-seam"></i> Request an Asset</h1>
+        <p class="banner-subtitle">Submit a request — your manager will review and approve it</p>
       </div>
-      <div>
-        <h4 class="page-title">Request an Asset</h4>
-        <p class="page-subtitle">Submit a request for a new asset. Your manager will review and approve the request.</p>
+      <div class="banner-actions">
+        <a [routerLink]="['/assets/my-assets']" class="btn-banner btn-banner-ghost">
+          <i class="bi bi-arrow-left"></i> My Assets
+        </a>
       </div>
     </div>
 
-    <div class="row g-4">
-      <!-- Form Card -->
+    <div class="row g-3">
+
+      <!-- Request Form -->
       <div class="col-lg-7">
-        <div class="form-card">
-          <div class="form-card-header">
-            <i class="bi bi-pencil-square me-2"></i>
-            Request Details
+        <div class="falcon-card">
+          <div class="req-card-header">
+            <i class="bi bi-pencil-square me-2"></i>Request Details
           </div>
-          <div class="form-card-body">
+          <div class="req-card-body">
             <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
 
-              <div class="form-row">
-                <div class="form-group">
+              <div class="req-form-row">
+                <div class="mb-3">
                   <label for="assetCategory" class="form-label">
-                    <i class="bi bi-tag label-icon"></i>
-                    Asset Category <span class="required">*</span>
+                    Asset Category <span class="text-danger">*</span>
                   </label>
                   <select id="assetCategory" formControlName="assetCategory" class="form-select">
-                    <option *ngFor="let cat of categories" [value]="cat">
-                      {{ cat | titlecase }}
-                    </option>
+                    <option *ngFor="let cat of categories" [value]="cat">{{ cat | titlecase }}</option>
                   </select>
                 </div>
-
-                <div class="form-group">
+                <div class="mb-3">
                   <label for="requestType" class="form-label">
-                    <i class="bi bi-arrow-repeat label-icon"></i>
-                    Request Type <span class="required">*</span>
+                    Request Type <span class="text-danger">*</span>
                   </label>
                   <select id="requestType" formControlName="requestType" class="form-select">
-                    <option *ngFor="let type of requestTypes" [value]="type">
-                      {{ type | titlecase }}
-                    </option>
+                    <option *ngFor="let type of requestTypes" [value]="type">{{ type | titlecase }}</option>
                   </select>
-                  <div class="form-hint">
+                  <div class="hint-tags mt-1">
                     <span class="hint-tag"><strong>New</strong> First-time</span>
                     <span class="hint-tag"><strong>Replacement</strong> Damaged/lost</span>
                     <span class="hint-tag"><strong>Upgrade</strong> Better model</span>
@@ -68,65 +51,45 @@
                 </div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="priority" class="form-label">
-                    <i class="bi bi-flag label-icon"></i>
-                    Priority <span class="required">*</span>
-                  </label>
+              <div class="req-form-row">
+                <div class="mb-3">
+                  <label for="priority" class="form-label">Priority <span class="text-danger">*</span></label>
                   <select id="priority" formControlName="priority" class="form-select">
-                    <option *ngFor="let p of priorities" [value]="p">
-                      {{ p | titlecase }}
-                    </option>
+                    <option *ngFor="let p of priorities" [value]="p">{{ p | titlecase }}</option>
                   </select>
                 </div>
-
-                <div class="form-group">
+                <div class="mb-3">
                   <label for="expectedReturnDate" class="form-label">
-                    <i class="bi bi-calendar-event label-icon"></i>
                     Expected Return Date <span class="text-muted">(if temporary)</span>
                   </label>
-                  <input type="date" id="expectedReturnDate" formControlName="expectedReturnDate" class="form-control">
+                  <input type="date" id="expectedReturnDate" formControlName="expectedReturnDate"
+                    class="form-control">
                 </div>
               </div>
 
-              <div class="form-group">
-                <label for="purpose" class="form-label">
-                  <i class="bi bi-chat-left-text label-icon"></i>
-                  Purpose <span class="required">*</span>
-                </label>
-                <textarea
-                  id="purpose"
-                  formControlName="purpose"
-                  class="form-control"
-                  [ngClass]="{'is-invalid': isFieldInvalid('purpose')}"
-                  rows="2"
-                  placeholder="Brief description of what you need the asset for..."
-                ></textarea>
-                <div class="invalid-feedback">Please provide a purpose (minimum 10 characters)</div>
+              <div class="mb-3">
+                <label for="purpose" class="form-label">Purpose <span class="text-danger">*</span></label>
+                <textarea id="purpose" formControlName="purpose" class="form-control"
+                  [ngClass]="{'is-invalid': isFieldInvalid('purpose')}" rows="2"
+                  placeholder="Brief description of what you need the asset for..."></textarea>
+                <div class="invalid-feedback">Please provide a purpose (min 10 characters)</div>
               </div>
 
-              <div class="form-group">
+              <div class="mb-3">
                 <label for="justification" class="form-label">
-                  <i class="bi bi-journal-text label-icon"></i>
-                  Justification <span class="required">*</span>
+                  Justification <span class="text-danger">*</span>
                 </label>
-                <textarea
-                  id="justification"
-                  formControlName="justification"
-                  class="form-control"
-                  [ngClass]="{'is-invalid': isFieldInvalid('justification')}"
-                  rows="3"
-                  placeholder="Explain why you need this asset..."
-                ></textarea>
-                <div class="invalid-feedback">Please provide a justification (minimum 10 characters)</div>
+                <textarea id="justification" formControlName="justification" class="form-control"
+                  [ngClass]="{'is-invalid': isFieldInvalid('justification')}" rows="3"
+                  placeholder="Explain why you need this asset..."></textarea>
+                <div class="invalid-feedback">Please provide a justification (min 10 characters)</div>
               </div>
 
-              <div class="form-actions">
-                <button type="button" class="btn-cancel" (click)="cancel()">
-                  <i class="bi bi-x-lg me-1"></i> Cancel
+              <div class="req-form-actions">
+                <button type="button" class="btn btn-secondary" (click)="cancel()">
+                  <i class="bi bi-x-lg me-1"></i>Cancel
                 </button>
-                <button type="submit" class="btn-submit" [disabled]="isLoading$ | async">
+                <button type="submit" class="btn btn-primary" [disabled]="isLoading$ | async">
                   <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
                   <i *ngIf="!(isLoading$ | async)" class="bi bi-send me-1"></i>
                   Submit Request
@@ -139,46 +102,21 @@
 
       <!-- Info Sidebar -->
       <div class="col-lg-5">
-        <div class="info-card">
-          <div class="info-card-icon">
-            <i class="bi bi-lightbulb"></i>
-          </div>
-          <h5 class="info-card-title">How it works</h5>
-          <div class="info-steps">
-            <div class="info-step">
-              <div class="step-number">1</div>
-              <div class="step-content">
-                <strong>Submit Request</strong>
-                <p>Fill in the form with a clear justification for the asset you need.</p>
-              </div>
-            </div>
-            <div class="info-step">
-              <div class="step-number">2</div>
-              <div class="step-content">
-                <strong>Manager Review</strong>
-                <p>Your manager will review the request and approve or reject it.</p>
-              </div>
-            </div>
-            <div class="info-step">
-              <div class="step-number">3</div>
-              <div class="step-content">
-                <strong>Asset Assignment</strong>
-                <p>If approved, IT admin will assign an available asset from inventory.</p>
-              </div>
-            </div>
-            <div class="info-step">
-              <div class="step-number">4</div>
-              <div class="step-content">
-                <strong>Receive & Acknowledge</strong>
-                <p>You'll receive the asset and confirm receipt.</p>
+        <div class="falcon-card mb-3">
+          <div class="req-card-header"><i class="bi bi-lightbulb me-2"></i>How it works</div>
+          <div class="req-steps">
+            <div class="req-step" *ngFor="let step of steps">
+              <div class="step-num">{{ step.num }}</div>
+              <div>
+                <strong>{{ step.title }}</strong>
+                <p class="mb-0 text-muted" style="font-size:0.78rem; line-height:1.5">{{ step.desc }}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Tips Card -->
-        <div class="tips-card">
-          <h6 class="tips-title"><i class="bi bi-stars me-2"></i>Tips for a quick approval</h6>
+        <div class="tips-card falcon-card">
+          <div class="req-card-header"><i class="bi bi-stars me-2"></i>Tips for a quick approval</div>
           <ul class="tips-list">
             <li>Be specific about what you need and why</li>
             <li>Include relevant project or client references</li>
@@ -187,6 +125,7 @@
           </ul>
         </div>
       </div>
+
     </div>
   </div>
 </section>

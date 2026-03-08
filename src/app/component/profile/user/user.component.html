@@ -1,929 +1,845 @@
 <ng-container *ngIf="(profileState$ | async) as state">
-  <ng-container>
-    <!-- Navbar removed - already in app.component -->
 
-    <section>
-      <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" style="margin-top: 8px;">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a [routerLink]="['/']">Home</a>
-            </li>
-            <li class="breadcrumb-item active">Profile</li>
-            <li class="breadcrumb-item active" aria-current="page">
-              {{ state?.appData?.data?.user?.firstName }} {{ state?.appData?.data?.user?.lastName }}
-            </li>
-          </ol>
-        </nav>
+  <!-- ─── Page Banner ─── -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-person-circle me-2"></i>My Profile</h1>
+      <p class="banner-subtitle">
+        {{ state?.appData?.data?.user?.firstName }} {{ state?.appData?.data?.user?.lastName }}
+        <span class="up-role-badge ms-2">{{ state?.appData?.data?.user?.roleName | titlecase }}</span>
+      </p>
+    </div>
+  </div>
 
-        <!-- Profile Completion Alert -->
-        <div *ngIf="!isProfileComplete" class="alert alert-warning alert-dismissible fade show" role="alert">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          <strong>Complete Your Profile!</strong>
-          Please update your employee details to access all features.
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  <!-- ─── Profile Completion Alert ─── -->
+  <div *ngIf="!isProfileComplete" class="up-alert-wrap">
+    <div class="up-alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      <span><strong>Complete Your Profile!</strong> Please update your employee details to access all features.</span>
+    </div>
+  </div>
+
+  <!-- ─── Main Layout ─── -->
+  <div class="up-layout">
+
+    <!-- ── Left Sidebar ── -->
+    <div class="up-sidebar">
+
+      <!-- Avatar -->
+      <div class="up-avatar-wrap">
+        <div class="up-avatar-ring">
+          <img [src]="getProfileImageUrl(state?.appData?.data?.user?.id)"
+               (error)="onProfileImageError($event)"
+               alt="{{ state?.appData?.data?.user?.firstName }}"
+               class="up-avatar-img" />
+          <button class="up-avatar-edit" (click)="fileInput.click()" title="Change photo">
+            <i class="bi bi-camera-fill"></i>
+          </button>
+        </div>
+        <h5 class="up-name">{{ state?.appData?.data?.user?.firstName }} {{ state?.appData?.data?.user?.lastName }}</h5>
+
+        <div class="up-badges">
+          <span class="badge-soft-emp" *ngIf="state?.appData?.data?.user?.employeeId">
+            {{ state?.appData?.data?.user?.employeeId }}
+          </span>
+          <span [ngClass]="getStatusClass(state?.appData?.data?.user?.status)"
+                *ngIf="state?.appData?.data?.user?.status">
+            {{ state?.appData?.data?.user?.status }}
+          </span>
         </div>
 
-        <!-- Main Profile Card -->
-        <div class="bg-white shadow rounded-lg d-flex flex-column flex-md-row" style="border-radius: 8px; min-height: 600px;">
+        <p class="up-designation" *ngIf="state?.appData?.data?.user?.designationTitle">
+          {{ state?.appData?.data?.user?.designationTitle }}
+        </p>
+        <p class="up-department" *ngIf="state?.appData?.data?.user?.departmentName">
+          <i class="bi bi-building me-1"></i>{{ state?.appData?.data?.user?.departmentName }}
+        </p>
+        <p class="up-member-since">
+          <i class="bi bi-calendar3 me-1"></i>
+          Member since {{ state?.appData?.data?.user?.createdAt | date:'MMM y' }}
+        </p>
+      </div>
 
-          <!-- Left Sidebar Navigation -->
-          <div class="profile-tab-nav border-right">
-            <div class="p-4">
-              <div class="img-circle text-center mb-3">
-                         <span style="position: relative">
-                            <img
-                              [src]="getProfileImageUrl(state?.appData?.data?.user?.id)"
-                              (error)="onProfileImageError($event)"
-                              alt="{{ state?.appData?.data?.user?.firstName }}"
-                              class="shadow"
-                            />
-                            <i (click)="fileInput.click()" class="bi bi-camera-fill right-position"></i>
-                         </span>
-              </div>
-              <h4 class="text-center">
-                {{ state?.appData?.data?.user?.firstName }} {{ state?.appData?.data?.user?.lastName }}
-              </h4>
+      <!-- Nav Pills -->
+      <nav class="up-nav nav flex-column">
+        <div class="up-nav-section">Profile</div>
+        <a class="up-nav-link nav-link active" id="profile" data-bs-toggle="pill" data-bs-target="#profile-tab"
+           aria-selected="true" role="tab">
+          <i class="bi bi-person-circle"></i> Basic Info
+        </a>
+        <a class="up-nav-link nav-link" id="employee" data-bs-toggle="pill" data-bs-target="#employee-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-briefcase-fill"></i> Employee Details
+        </a>
+        <a class="up-nav-link nav-link" id="documents" data-bs-toggle="pill" data-bs-target="#documents-tab"
+           aria-selected="false" role="tab" (click)="loadMyDocuments()">
+          <i class="bi bi-folder-fill"></i> My Documents
+        </a>
+        <a class="up-nav-link nav-link" id="banking" data-bs-toggle="pill" data-bs-target="#banking-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-bank"></i> Banking Info
+        </a>
 
-              <!-- Employee ID & Status -->
-              <div class="text-center mb-2">
-                         <span class="badge bg-primary me-2" *ngIf="state?.appData?.data?.user?.employeeId">
-                            {{ state?.appData?.data?.user?.employeeId }}
-                         </span>
-                <span
-                  class="badge"
-                  [ngClass]="getStatusClass(state?.appData?.data?.user?.status)"
-                  *ngIf="state?.appData?.data?.user?.status"
-                >
-                            {{ state?.appData?.data?.user?.status }}
-                         </span>
-              </div>
+        <div class="up-nav-section">Security</div>
+        <a class="up-nav-link nav-link" id="password" data-bs-toggle="pill" data-bs-target="#password-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-key-fill"></i> Password
+        </a>
+        <a class="up-nav-link nav-link" id="security" data-bs-toggle="pill" data-bs-target="#security-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-shield-shaded"></i> Authorization
+        </a>
+        <a class="up-nav-link nav-link" id="application" data-bs-toggle="pill" data-bs-target="#application-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-gear"></i> Account
+        </a>
+        <a class="up-nav-link nav-link" id="notification" data-bs-toggle="pill" data-bs-target="#notification-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-lock-fill"></i> Authentication
+        </a>
+      </nav>
+    </div>
 
-              <p class="text-center text-muted mb-1" *ngIf="state?.appData?.data?.user?.designationTitle">
-                {{ state?.appData?.data?.user?.designationTitle }}
-              </p>
-              <p class="text-center text-muted" *ngIf="state?.appData?.data?.user?.departmentName">
-                {{ state?.appData?.data?.user?.departmentName }}
-              </p>
-              <span class="d-block text-center small">
-                         Member since {{ state?.appData?.data?.user?.createdAt | date: 'MMMM d, y' }}
-                      </span>
-            </div>
+    <!-- ── Tab Content ── -->
+    <div class="tab-content up-content" id="v-pills-tabContent">
 
-            <!-- Navigation Tabs -->
-            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-              <!-- Profile Section -->
-              <div class="nav-section-label">Profile</div>
-              <a class="nav-link active" id="profile" data-bs-toggle="pill" data-bs-target="#profile-tab"
-                 aria-selected="true" aria-controls="profile" role="tab">
-                <i class="bi bi-person-circle" style="margin-right: 12px;"></i> Basic Info
-              </a>
-              <a class="nav-link" id="employee" data-bs-toggle="pill" data-bs-target="#employee-tab"
-                 aria-selected="false" aria-controls="employee" role="tab">
-                <i class="bi bi-briefcase-fill" style="margin-right: 12px;"></i> Employee Details
-              </a>
-              <a class="nav-link" id="documents" data-bs-toggle="pill" data-bs-target="#documents-tab"
-                 aria-selected="false" aria-controls="documents" role="tab" (click)="loadMyDocuments()">
-                <i class="bi bi-folder-fill" style="margin-right: 12px;"></i> My Documents
-              </a>
-              <a class="nav-link" id="banking" data-bs-toggle="pill" data-bs-target="#banking-tab"
-                 aria-selected="false" aria-controls="banking" role="tab">
-                <i class="bi bi-bank" style="margin-right: 12px;"></i> Banking Info
-              </a>
-
-              <!-- Security Section -->
-              <div class="nav-section-label" style="margin-top: 16px;">Security Settings</div>
-              <a class="nav-link" id="password" data-bs-toggle="pill" data-bs-target="#password-tab"
-                 aria-selected="false" aria-controls="password" role="tab">
-                <i class="bi bi-key-fill" style="margin-right: 12px;"></i> Password
-              </a>
-              <a class="nav-link" id="security" data-bs-toggle="pill" data-bs-target="#security-tab"
-                 aria-selected="false" aria-controls="security" role="tab">
-                <i class="bi bi-shield-shaded" style="margin-right: 12px;"></i> Authorization
-              </a>
-              <a class="nav-link" id="application" data-bs-toggle="pill" data-bs-target="#application-tab"
-                 aria-selected="false" aria-controls="application" role="tab">
-                <i class="bi bi-gear" style="margin-right: 12px;"></i> Account
-              </a>
-              <a class="nav-link" id="notification" data-bs-toggle="pill" data-bs-target="#notification-tab"
-                 aria-selected="false" aria-controls="notification" role="tab">
-                <i class="bi bi-lock-fill" style="margin-right: 12px;"></i> Authentication
-              </a>
-            </div>
+      <!-- ═══ Basic Info Tab ═══ -->
+      <div class="tab-pane fade show active" id="profile-tab" role="tabpanel" aria-labelledby="profile">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Basic Profile</h3>
+            <p class="text-muted small mb-0">Update your personal contact information</p>
           </div>
+        </div>
 
-          <!-- Right Content Area -->
-          <div class="tab-content p-4 p-md-5" id="v-pills-tabContent" style="border-left: 1px solid #d4d0d0;">
+        <form #profileForm="ngForm" (ngSubmit)="updateProfile(profileForm)">
+          <input type="hidden" name="id" [ngModel]="state?.appData?.data?.user?.id">
 
-            <!-- Basic Info Tab -->
-            <div class="tab-pane fade show active" id="profile-tab" role="tabpanel" aria-labelledby="profile" style="min-height: 510px;">
-              <h3 class="mb-4">Basic Profile Settings</h3>
-              <form #profileForm="ngForm" (ngSubmit)="updateProfile(profileForm)">
-                <input type="hidden" name="id" [ngModel]="state?.appData?.data?.user?.id">
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>First Name *</label>
-                      <input type="text" name="firstName"
-                             [ngModel]="state?.appData?.data?.user?.firstName"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Last Name *</label>
-                      <input type="text" name="lastName"
-                             [ngModel]="state?.appData?.data?.user?.lastName"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label for="email">Email *</label>
-                      <input type="email" name="email"
-                             [ngModel]="state?.appData?.data?.user?.email"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Phone</label>
-                      <input type="text" name="phone"
-                             [ngModel]="state?.appData?.data?.user?.phone"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="+27 123 456 789">
-                    </div>
-                  </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label>Address</label>
-                      <input type="text" name="address"
-                             [ngModel]="state?.appData?.data?.user?.address"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="Street address">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>City</label>
-                      <input type="text" name="city"
-                             [ngModel]="state?.appData?.data?.user?.city"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-12">
-                    <div class="form-group">
-                      <label>Bio</label>
-                      <textarea name="bio"
-                                [ngModel]="state?.appData?.data?.user?.bio"
-                                [disabled]="(isLoading$ | async)"
-                                class="form-control"
-                                rows="4"
-                                placeholder="Tell us about yourself..."></textarea>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <button [disabled]="profileForm.invalid || (isLoading$ | async)"
-                          type="submit" class="btn btn-primary">
-                               <span *ngIf="isLoading$ | async"
-                                     class="spinner-border spinner-border-sm"
-                                     role="status" aria-hidden="true"
-                                     style="margin-right: 5px;"></span>
-                    <span *ngIf="isLoading$ | async">Loading...</span>
-                    <span *ngIf="!(isLoading$ | async)">Update Profile</span>
-                  </button>
-                </div>
-              </form>
+          <div class="profile-info-card mb-4">
+            <div class="profile-info-card-header">
+              <i class="bi bi-person-lines-fill me-2"></i> Personal Information
             </div>
-
-            <!-- Employee Details Tab -->
-
-            <!-- Banking Details Tab -->
-            <div class="tab-pane fade" id="employee-tab" role="tabpanel" aria-labelledby="employee" style="min-height: 510px;">
-              <h3 class="mb-4">Employee Information</h3>
-
-              <!-- Info message - different for regular users vs admins -->
-              <div class="alert alert-info mb-4" *ngIf="state?.appData?.data?.user?.roleName === 'ROLE_USER'">
-                <i class="bi bi-info-circle me-2"></i>
-                Employment details (Department, Designation, Salary) can only be updated by HR administrators.
-              </div>
-              <div class="alert alert-success mb-4" *ngIf="state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN'">
-                <i class="bi bi-check-circle me-2"></i>
-                As an administrator, you can view and manage employee information.
-              </div>
-
-              <form #employeeForm="ngForm" (ngSubmit)="updateEmployeeDetails(employeeForm)">
-                <input type="hidden" name="id" [ngModel]="state?.appData?.data?.user?.id">
-
-                <!-- Employment Information -->
-                <h5 class="mb-3">Employment Details</h5>
-
-                <!-- Admin: Editable employment fields -->
-                <div class="row mb-4" *ngIf="state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN'">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Employee ID</label>
-                      <input type="text" name="employeeId" class="form-control"
-                             [ngModel]="state?.appData?.data?.user?.employeeId"
-                             [disabled]="(isLoading$ | async)">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Department</label>
-                      <select name="departmentId" class="form-control"
-                              [ngModel]="state?.appData?.data?.user?.departmentId"
-                              [disabled]="(isLoading$ | async)">
-                        <option [ngValue]="null">Select Department</option>
-                        <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Designation</label>
-                      <select name="designationId" class="form-control"
-                              [ngModel]="state?.appData?.data?.user?.designationId"
-                              [disabled]="(isLoading$ | async)">
-                        <option [ngValue]="null">Select Designation</option>
-                        <option *ngFor="let desig of designations" [ngValue]="desig.id">{{ desig.title }}</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Hire Date</label>
-                      <input type="date" name="hireDate" class="form-control"
-                             [ngModel]="state?.appData?.data?.user?.hireDate"
-                             [disabled]="(isLoading$ | async)">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Status</label>
-                      <select name="status" class="form-control"
-                              [ngModel]="state?.appData?.data?.user?.status"
-                              [disabled]="(isLoading$ | async)">
-                        <option value="Pending">Pending</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="On Leave">On Leave</option>
-                        <option value="Terminated">Terminated</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Base Salary</label>
-                      <input type="number" name="baseSalary" class="form-control"
-                             [ngModel]="state?.appData?.data?.user?.baseSalary"
-                             [disabled]="(isLoading$ | async)"
-                             placeholder="0.00" step="0.01">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Employment Type</label>
-                      <select name="employmentType" class="form-control"
-                              [ngModel]="state?.appData?.data?.user?.employmentType"
-                              [disabled]="(isLoading$ | async)">
-                        <option value="FULL_TIME">Full Time</option>
-                        <option value="PART_TIME">Part Time</option>
-                        <option value="CONTRACT">Contract</option>
-                        <option value="INTERN">Intern</option>
-                      </select>
-                    </div>
+            <div class="profile-info-card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">First Name <span class="text-danger">*</span></label>
+                    <input type="text" name="firstName" class="form-control"
+                           [ngModel]="state?.appData?.data?.user?.firstName"
+                           [disabled]="(isLoading$ | async)" required>
                   </div>
                 </div>
-
-                <!-- Regular User: Read-only employment fields -->
-                <div class="row mb-4" *ngIf="state?.appData?.data?.user?.roleName !== 'ROLE_SYSADMIN' && state?.appData?.data?.user?.roleName !== 'ROLE_ADMIN'">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Employee ID</label>
-                      <input type="text" class="form-control"
-                             [value]="state?.appData?.data?.user?.employeeId || 'Not assigned'"
-                             disabled>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Department</label>
-                      <input type="text" class="form-control"
-                             [value]="state?.appData?.data?.user?.departmentName || 'Not assigned'"
-                             disabled>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Designation</label>
-                      <input type="text" class="form-control"
-                             [value]="state?.appData?.data?.user?.designationTitle || 'Not assigned'"
-                             disabled>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Hire Date</label>
-                      <input type="text" class="form-control"
-                             [value]="formatDate(state?.appData?.data?.user?.hireDate)"
-                             disabled>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Status</label>
-                      <input type="text" class="form-control"
-                             [value]="state?.appData?.data?.user?.status || 'Pending'"
-                             disabled>
-                    </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">Last Name <span class="text-danger">*</span></label>
+                    <input type="text" name="lastName" class="form-control"
+                           [ngModel]="state?.appData?.data?.user?.lastName"
+                           [disabled]="(isLoading$ | async)" required>
                   </div>
                 </div>
-
-                <hr>
-
-                <!-- Personal Details (Editable) -->
-                <h5 class="mb-3">Personal Details</h5>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Date of Birth</label>
-                      <input type="date" name="dateOfBirth"
-                             [ngModel]="state?.appData?.data?.user?.dateOfBirth"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control">
-                    </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">Email <span class="text-danger">*</span></label>
+                    <input type="email" name="email" class="form-control"
+                           [ngModel]="state?.appData?.data?.user?.email"
+                           [disabled]="(isLoading$ | async)" required>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Gender</label>
-                      <select name="gender"
-                              [ngModel]="state?.appData?.data?.user?.gender"
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" name="phone" class="form-control"
+                           [ngModel]="state?.appData?.data?.user?.phone"
+                           [disabled]="(isLoading$ | async)" placeholder="+27 123 456 789">
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-label">Street Address</label>
+                    <input type="text" name="address" class="form-control"
+                           [ngModel]="state?.appData?.data?.user?.address"
+                           [disabled]="(isLoading$ | async)" placeholder="Street address">
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label class="form-label">City</label>
+                    <input type="text" name="city" class="form-control"
+                           [ngModel]="state?.appData?.data?.user?.city"
+                           [disabled]="(isLoading$ | async)">
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="form-group">
+                    <label class="form-label">Bio</label>
+                    <textarea name="bio" class="form-control" rows="3"
+                              [ngModel]="state?.appData?.data?.user?.bio"
                               [disabled]="(isLoading$ | async)"
-                              class="form-control">
-                        <option value="">Select Gender</option>
-                        <option value="MALE">Male</option>
-                        <option value="FEMALE">Female</option>
-                        <option value="OTHER">Other</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>State/Province</label>
-                      <input type="text" name="state"
-                             [ngModel]="state?.appData?.data?.user?.state"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="Gauteng">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Country</label>
-                      <input type="text" name="country"
-                             [ngModel]="state?.appData?.data?.user?.country || 'South Africa'"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Postal Code</label>
-                      <input type="text" name="postalCode"
-                             [ngModel]="state?.appData?.data?.user?.postalCode"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control">
-                    </div>
-                  </div>
-                </div>
-
-                <hr>
-
-                <!-- Emergency Contact -->
-                <h5 class="mb-3">Emergency Contact</h5>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Contact Name</label>
-                      <input type="text" name="emergencyContactName"
-                             [ngModel]="state?.appData?.data?.user?.emergencyContactName"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="Full name">
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Contact Phone</label>
-                      <input type="tel" name="emergencyContactPhone"
-                             [ngModel]="state?.appData?.data?.user?.emergencyContactPhone"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="+27 123 456 789">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="mt-4">
-                  <button [disabled]="(isLoading$ | async)" type="submit" class="btn btn-primary">
-                               <span *ngIf="isLoading$ | async"
-                                     class="spinner-border spinner-border-sm"
-                                     role="status" aria-hidden="true"
-                                     style="margin-right: 5px;"></span>
-                    <span *ngIf="isLoading$ | async">Loading...</span>
-                    <span *ngIf="!(isLoading$ | async)">Update Employee Details</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <div class="tab-pane fade" id="documents-tab" role="tabpanel" aria-labelledby="documents" style="min-height: 510px;">
-              <h3 class="mb-4">My Documents</h3>
-
-              <div class="alert alert-info mb-4">
-                <i class="bi bi-info-circle me-2"></i>
-                Upload important documents such as ID, proof of address, bank confirmation, and qualifications.
-                These documents may be required for payroll and HR verification.
-              </div>
-
-              <!-- Upload Form -->
-              <div class="card mb-4">
-                <div class="card-body">
-                  <h5 class="card-title mb-3">
-                    <i class="bi bi-cloud-arrow-up me-2"></i>Upload New Document
-                  </h5>
-                  <form #documentForm="ngForm">
-                    <div class="row">
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label>Document Type *</label>
-                          <select name="documentType" ngModel class="form-control" required #docType="ngModel">
-                            <option value="">Select Type</option>
-                            <option *ngFor="let type of documentTypes" [value]="type.value">
-                              {{ type.label }}
-                            </option>
-                          </select>
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label>File *</label>
-                          <input type="file" #docFile class="form-control"
-                                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                                 (change)="null">
-                        </div>
-                      </div>
-                      <div class="col-md-4">
-                        <div class="form-group">
-                          <label>Description (Optional)</label>
-                          <input type="text" name="description" ngModel class="form-control"
-                                 placeholder="Brief description" #docDesc="ngModel">
-                        </div>
-                      </div>
-                    </div>
-                    <div class="mt-3">
-                      <button type="button" class="btn btn-primary"
-                              [disabled]="!docType.value || !docFile.files?.length || (isLoading$ | async)"
-                              (click)="uploadDocument(docFile.files[0], docType.value, docDesc.value); documentForm.reset(); docFile.value = ''">
-                        <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
-                        <i *ngIf="!(isLoading$ | async)" class="bi bi-upload me-2"></i>
-                        Upload Document
-                      </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-
-              <!-- Documents List -->
-              <div class="card">
-                <div class="card-body">
-                  <h5 class="card-title mb-3">
-                    <i class="bi bi-folder2-open me-2"></i>
-                    Uploaded Documents
-                    <span class="badge bg-primary ms-2">{{ documentCount$ | async }}</span>
-                  </h5>
-
-                  <!-- No documents message -->
-                  <div *ngIf="(documents$ | async)?.length === 0" class="text-center text-muted py-5">
-                    <i class="bi bi-folder" style="font-size: 3rem;"></i>
-                    <p class="mt-3">No documents uploaded yet.</p>
-                    <p class="small">Upload your first document using the form above.</p>
-                  </div>
-
-                  <!-- Documents table -->
-                  <div *ngIf="(documents$ | async)?.length > 0" class="table-responsive">
-                    <table class="table table-hover">
-                      <thead>
-                      <tr>
-                        <th>Type</th>
-                        <th>File Name</th>
-                        <th>Description</th>
-                        <th>Uploaded</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                      </tr>
-                      </thead>
-                      <tbody>
-                      <tr *ngFor="let doc of (documents$ | async)">
-                        <td>
-                          <span class="badge bg-secondary">{{ getDocumentTypeLabel(doc.documentType) }}</span>
-                        </td>
-                        <td>{{ doc.originalFileName }}</td>
-                        <td>{{ doc.description || '-' }}</td>
-                        <td>{{ formatDate(doc.uploadedAt) }}</td>
-                        <td>
-                            <span *ngIf="doc.verified" class="badge bg-success">
-                              <i class="bi bi-check-circle me-1"></i>Verified
-                            </span>
-                          <span *ngIf="!doc.verified" class="badge bg-warning text-dark">
-                              <i class="bi bi-clock me-1"></i>Pending
-                            </span>
-                        </td>
-                        <td>
-                          <button class="btn btn-sm btn-outline-primary me-1"
-                                  (click)="downloadDocument(doc.id)"
-                                  title="Download">
-                            <i class="bi bi-download"></i>
-                          </button>
-                          <button class="btn btn-sm btn-outline-danger"
-                                  (click)="deleteDocument(doc.id)"
-                                  [disabled]="doc.verified"
-                                  title="Delete">
-                            <i class="bi bi-trash"></i>
-                          </button>
-                        </td>
-                      </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Password Tab -->
-            <div class="tab-pane fade" id="banking-tab" role="tabpanel" aria-labelledby="banking" style="min-height: 510px;">
-              <h3 class="mb-4">Banking Information</h3>
-
-              <div class="alert alert-warning mb-4">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong>Important:</strong> Ensure your banking details are correct for salary payments.
-                All fields are required for payroll processing.
-              </div>
-
-              <form #bankingForm="ngForm" (ngSubmit)="updateBankingDetails(bankingForm)">
-                <input type="hidden" name="id" [ngModel]="state?.appData?.data?.user?.id">
-
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Bank Name *</label>
-                      <select name="bankName"
-                              #bankNameSelect="ngModel"
-                              [ngModel]="state?.appData?.data?.user?.bankName"
-                              (ngModelChange)="onBankChange($event, bankingForm)"
-                              [disabled]="(isLoading$ | async)"
-                              class="form-control" required>
-                        <option value="">Select Bank</option>
-                        <option value="ABSA">ABSA</option>
-                        <option value="Standard Bank">Standard Bank</option>
-                        <option value="FNB">FNB</option>
-                        <option value="Nedbank">Nedbank</option>
-                        <option value="Capitec">Capitec</option>
-                        <option value="TymeBank">TymeBank</option>
-                        <option value="Discovery Bank">Discovery Bank</option>
-                        <option value="African Bank">African Bank</option>
-                      </select>
-                      <small class="text-muted" *ngIf="bankNameSelect.value">
-                        Universal Branch Code: {{ getBranchCode(bankNameSelect.value) }}
-                      </small>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Account Type *</label>
-                      <select name="accountType"
-                              [ngModel]="state?.appData?.data?.user?.accountType"
-                              [disabled]="(isLoading$ | async)"
-                              class="form-control" required>
-                        <option value="">Select Account Type</option>
-                        <option value="CURRENT">Current Account</option>
-                        <option value="SAVINGS">Savings Account</option>
-                        <option value="CHEQUE">Cheque Account</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Account Holder Name *</label>
-                      <input type="text" name="accountHolderName"
-                             [ngModel]="state?.appData?.data?.user?.accountHolderName"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="Full name as per bank records" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Account Number *</label>
-                      <input type="text" name="bankAccountNumber"
-                             [ngModel]="state?.appData?.data?.user?.bankAccountNumber"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="7-11 digit account number"
-                             minlength="7" maxlength="11" required
-                             pattern="[0-9]{7,11}">
-                      <small class="text-muted">
-                        <i class="bi bi-info-circle me-1"></i>
-                        SA banks: Capitec/Nedbank (10), Discovery/Bidvest/Investec (11), Standard Bank (9-11), Ithala (8)
-                      </small>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Branch Code *</label>
-                      <input type="text" name="branchCode"
-                             [ngModel]="selectedBranchCode || state?.appData?.data?.user?.branchCode"
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control"
-                             placeholder="Auto-filled from bank selection"
-                             maxlength="6" required readonly>
-                      <small class="text-muted">
-                        <i class="bi bi-info-circle me-1"></i>
-                        Branch code is automatically set based on selected bank (universal code)
-                      </small>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="alert alert-info mt-3">
-                  <strong>Note:</strong> Your banking information is encrypted and securely stored.
-                  It will only be used for salary payments and will never be shared with third parties.
-                </div>
-
-                <div class="mt-4">
-                  <button [disabled]="bankingForm.invalid || (isLoading$ | async)"
-                          type="submit" class="btn btn-primary">
-                               <span *ngIf="isLoading$ | async"
-                                     class="spinner-border spinner-border-sm"
-                                     role="status" aria-hidden="true"
-                                     style="margin-right: 5px;"></span>
-                    <span *ngIf="isLoading$ | async">Loading...</span>
-                    <span *ngIf="!(isLoading$ | async)">Update Banking Details</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Authorization Tab -->
-            <div class="tab-pane fade" id="password-tab" role="tabpanel" aria-labelledby="password" style="min-height: 510px;">
-              <h3 class="mb-4">Password Settings</h3>
-              <form #passwordForm="ngForm" (ngSubmit)="updatePassword(passwordForm)">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Current password</label>
-                      <input type="password" name="currentPassword" ngModel
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control" required>
-                    </div>
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>New password</label>
-                      <input type="password" name="newPassword" ngModel
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control" minlength="5" required>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label>Confirm new password</label>
-                      <input type="password" name="confirmNewPassword" ngModel
-                             [disabled]="(isLoading$ | async)"
-                             class="form-control" minlength="5" required>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <button [disabled]="passwordForm.invalid || (isLoading$ | async)"
-                          type="submit" class="btn btn-primary">
-                               <span *ngIf="isLoading$ | async"
-                                     class="spinner-border spinner-border-sm"
-                                     role="status" aria-hidden="true"
-                                     style="margin-right: 5px;"></span>
-                    <span *ngIf="isLoading$ | async">Loading...</span>
-                    <span *ngIf="!(isLoading$ | async)">Update Password</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Account Settings Tab -->
-            <div class="tab-pane fade" id="security-tab" role="tabpanel" aria-labelledby="security" style="min-height: 510px;">
-              <h3 class="mb-4">Authorization Settings</h3>
-              <form #roleForm="ngForm" (ngSubmit)="updateRole(roleForm)">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label style="margin-bottom: 5px;">Role Name</label>
-                      <select name="roleName"
-                              [ngModel]="state?.appData?.data?.user?.roleName"
-                              [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
-                              class="form-control select-cl" required>
-                        <option *ngFor="let role of state?.appData?.data?.roles"
-                                [selected]="state?.appData?.data?.user?.roleName === role.name"
-                                [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
-                                [ngValue]="role.name"
-                                class="select-cl">{{ role.name }}</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <label style="margin-bottom: 5px;">Role Permissions</label>
-                      <input type="text"
-                             *ngFor="let permission of state?.appData?.data?.user?.permissions.split(',')"
-                             [value]="permission"
-                             [disabled]="true"
-                             class="form-control"
-                             style="margin-bottom: 5px;">
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <button [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
-                          type="submit" class="btn btn-primary">
-                               <span *ngIf="isLoading$ | async"
-                                     class="spinner-border spinner-border-sm"
-                                     role="status" aria-hidden="true"
-                                     style="margin-right: 5px;"></span>
-                    <span *ngIf="isLoading$ | async">Loading...</span>
-                    <span *ngIf="!(isLoading$ | async)">Update Role</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Authentication Tab -->
-            <div class="tab-pane fade" id="application-tab" role="tabpanel" aria-labelledby="application" style="min-height: 510px;">
-              <h3 class="mb-4">Account Settings</h3>
-              <form #settingsForm="ngForm" (ngSubmit)="updateAccountSettings(settingsForm)">
-                <input type="hidden" name="userId">
-                <div class="row">
-                  <div class="col-md-6">
-                    <div class="form-group">
-                      <div class="form-check">
-                        <input [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
-                               [checked]="state?.appData?.data?.user?.enabled"
-                               [ngModel]="state?.appData?.data?.user?.enabled"
-                               type="checkbox" name="enabled" class="form-check-input">
-                        <label class="form-check-label" for="enabled">
-                          Account Active
-                        </label>
-                      </div>
-                      <div class="form-check">
-                        <input [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
-                               [checked]="state?.appData?.data?.user?.notLocked"
-                               [ngModel]="state?.appData?.data?.user?.notLocked"
-                               type="checkbox" name="notLocked" class="form-check-input">
-                        <label class="form-check-label" for="notLocked">
-                          Account Unlocked
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <button [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
-                          type="submit" class="btn btn-primary">
-                               <span *ngIf="isLoading$ | async"
-                                     class="spinner-border spinner-border-sm"
-                                     role="status" aria-hidden="true"
-                                     style="margin-right: 5px;"></span>
-                    <span *ngIf="isLoading$ | async">Loading...</span>
-                    <span *ngIf="!(isLoading$ | async)">Update Settings</span>
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <!-- Documents Tab -->
-            <div class="tab-pane fade" id="notification-tab" role="tabpanel" aria-labelledby="notification" style="min-height: 510px;">
-              <h3 class="mb-4">Authentication Settings</h3>
-              <p>These settings help keep your account more secure.</p>
-              <div class="list-group mb-5 shadow">
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col">
-                      <strong class="mb-2">Multi-Factor Authentication</strong>
-                      <span *ngIf="state?.appData?.data?.user?.usingMfa" class="badge bg-success mx-3">Enabled</span>
-                      <span *ngIf="!state?.appData?.data?.user?.usingMfa" class="badge bg-warning mx-3">Disabled</span>
-                      <p class="text-muted mb-0">Set up Multi-factor Authentication (MFA) help keep your account more secure</p>
-                    </div>
-                    <div class="col-auto">
-                      <button (click)="toggleMfa()"
-                              [disabled]="(isLoading$ | async)"
-                              class="btn btn-primary btn-sm">
-                        {{ state?.appData?.data?.user?.usingMfa ? 'Disable' : 'Enable' }}
-                        <span *ngIf="(isLoading$ | async)"
-                              class="spinner-border spinner-border-sm"
-                              role="status" aria-hidden="true"
-                              style="margin-right: 5px;"></span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div class="list-group-item">
-                  <div class="row align-items-center">
-                    <div class="col">
-                      <strong class="mb-2">Activity Logs</strong>
-                      <p class="text-muted mb-0">Show the latest activities on your account</p>
-                    </div>
-                    <div class="col-auto">
-                      <div class="custom-control custom-switch">
-                        <input type="checkbox" (change)="toggleLogs()"
-                               [disabled]="(isLoading$ | async)"
-                               [checked]="(showLogs$ | async)"
-                               class="custom-control-input"
-                               id="activityLog">
-                        <span class="custom-control-label"></span>
-                      </div>
-                    </div>
+                              placeholder="Tell us about yourself..."></textarea>
                   </div>
                 </div>
               </div>
             </div>
           </div>
+
+          <div class="d-flex justify-content-end">
+            <button [disabled]="profileForm.invalid || (isLoading$ | async)" type="submit" class="btn btn-primary px-4">
+              <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!(isLoading$ | async)" class="bi bi-check-circle me-2"></i>
+              {{ (isLoading$ | async) ? 'Saving...' : 'Update Profile' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ═══ Employee Details Tab ═══ -->
+      <div class="tab-pane fade" id="employee-tab" role="tabpanel" aria-labelledby="employee">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Employee Information</h3>
+            <p class="text-muted small mb-0">View your employment details and update personal information</p>
+          </div>
         </div>
 
-        <!-- Activity Logs -->
-        <div *ngIf="(showLogs$ | async)" class="row">
-          <div class="col-xl-12 mt-4">
-            <div class="card" style="border-radius: 8px;">
-              <div class="card-body">
-                <h5 class="card-title">Account Activities</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Latest activities on your account.</h6>
-                <table class="table table-hover">
-                  <thead>
+        <form #employeeForm="ngForm" (ngSubmit)="updateEmployeeDetails(employeeForm)">
+          <input type="hidden" name="id" [ngModel]="state?.appData?.data?.user?.id">
+
+          <!-- Employment Details -->
+          <div class="profile-info-card mb-4">
+            <div class="profile-info-card-header">
+              <i class="bi bi-briefcase-fill me-2"></i> Employment Details
+              <span class="profile-info-readonly-badge"
+                    *ngIf="state?.appData?.data?.user?.roleName === 'ROLE_USER'">
+                <i class="bi bi-lock-fill me-1"></i>HR Managed
+              </span>
+            </div>
+
+            <!-- Admin: editable -->
+            <div class="profile-info-card-body"
+                 *ngIf="state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN'">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Employee ID</label>
+                  <input type="text" name="employeeId" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.employeeId" [disabled]="(isLoading$ | async)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Department</label>
+                  <select name="departmentId" class="form-control"
+                          [ngModel]="state?.appData?.data?.user?.departmentId" [disabled]="(isLoading$ | async)">
+                    <option [ngValue]="null">Select Department</option>
+                    <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Designation</label>
+                  <select name="designationId" class="form-control"
+                          [ngModel]="state?.appData?.data?.user?.designationId" [disabled]="(isLoading$ | async)">
+                    <option [ngValue]="null">Select Designation</option>
+                    <option *ngFor="let desig of designations" [ngValue]="desig.id">{{ desig.title }}</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Hire Date</label>
+                  <input type="date" name="hireDate" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.hireDate" [disabled]="(isLoading$ | async)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select name="status" class="form-control"
+                          [ngModel]="state?.appData?.data?.user?.status" [disabled]="(isLoading$ | async)">
+                    <option value="Pending">Pending</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="On Leave">On Leave</option>
+                    <option value="Terminated">Terminated</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Base Salary</label>
+                  <input type="number" name="baseSalary" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.baseSalary"
+                         [disabled]="(isLoading$ | async)" placeholder="0.00" step="0.01">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Employment Type</label>
+                  <select name="employmentType" class="form-control"
+                          [ngModel]="state?.appData?.data?.user?.employmentType" [disabled]="(isLoading$ | async)">
+                    <option value="FULL_TIME">Full Time</option>
+                    <option value="PART_TIME">Part Time</option>
+                    <option value="CONTRACT">Contract</option>
+                    <option value="INTERN">Intern</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Employee: read-only tiles -->
+            <div class="profile-info-card-body"
+                 *ngIf="state?.appData?.data?.user?.roleName !== 'ROLE_SYSADMIN' && state?.appData?.data?.user?.roleName !== 'ROLE_ADMIN'">
+              <div class="profile-info-tiles">
+                <div class="profile-info-tile">
+                  <span class="pit-label"><i class="bi bi-person-badge me-1"></i>Employee ID</span>
+                  <span class="pit-value">{{ state?.appData?.data?.user?.employeeId || 'Not assigned' }}</span>
+                </div>
+                <div class="profile-info-tile">
+                  <span class="pit-label"><i class="bi bi-building me-1"></i>Department</span>
+                  <span class="pit-value">{{ state?.appData?.data?.user?.departmentName || 'Not assigned' }}</span>
+                </div>
+                <div class="profile-info-tile">
+                  <span class="pit-label"><i class="bi bi-award me-1"></i>Designation</span>
+                  <span class="pit-value">{{ state?.appData?.data?.user?.designationTitle || 'Not assigned' }}</span>
+                </div>
+                <div class="profile-info-tile">
+                  <span class="pit-label"><i class="bi bi-calendar3 me-1"></i>Hire Date</span>
+                  <span class="pit-value">{{ formatDate(state?.appData?.data?.user?.hireDate) || 'N/A' }}</span>
+                </div>
+                <div class="profile-info-tile">
+                  <span class="pit-label"><i class="bi bi-circle-fill me-1"
+                        [style.color]="state?.appData?.data?.user?.status === 'Active' ? '#27ae60' : '#aaa'"></i>Status</span>
+                  <span class="pit-value">{{ state?.appData?.data?.user?.status || 'Pending' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Details -->
+          <div class="profile-info-card mb-4">
+            <div class="profile-info-card-header">
+              <i class="bi bi-person-lines-fill me-2"></i> Personal Details
+              <span class="profile-info-editable-badge"><i class="bi bi-pencil me-1"></i>Editable</span>
+            </div>
+            <div class="profile-info-card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Date of Birth</label>
+                  <input type="date" name="dateOfBirth" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.dateOfBirth" [disabled]="(isLoading$ | async)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Gender</label>
+                  <select name="gender" class="form-control"
+                          [ngModel]="state?.appData?.data?.user?.gender" [disabled]="(isLoading$ | async)">
+                    <option value="">Select Gender</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">State / Province</label>
+                  <input type="text" name="state" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.state"
+                         [disabled]="(isLoading$ | async)" placeholder="e.g. Gauteng">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Country</label>
+                  <input type="text" name="country" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.country || 'South Africa'"
+                         [disabled]="(isLoading$ | async)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Postal Code</label>
+                  <input type="text" name="postalCode" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.postalCode" [disabled]="(isLoading$ | async)">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Emergency Contact -->
+          <div class="profile-info-card mb-4">
+            <div class="profile-info-card-header">
+              <i class="bi bi-telephone-fill me-2"></i> Emergency Contact
+              <span class="profile-info-editable-badge"><i class="bi bi-pencil me-1"></i>Editable</span>
+            </div>
+            <div class="profile-info-card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Contact Name</label>
+                  <input type="text" name="emergencyContactName" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.emergencyContactName"
+                         [disabled]="(isLoading$ | async)" placeholder="Full name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Contact Phone</label>
+                  <input type="tel" name="emergencyContactPhone" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.emergencyContactPhone"
+                         [disabled]="(isLoading$ | async)" placeholder="+27 123 456 789">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button [disabled]="(isLoading$ | async)" type="submit" class="btn btn-primary px-4">
+              <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!(isLoading$ | async)" class="bi bi-check-circle me-2"></i>
+              {{ (isLoading$ | async) ? 'Saving...' : 'Save Employee Details' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ═══ Documents Tab ═══ -->
+      <div class="tab-pane fade" id="documents-tab" role="tabpanel" aria-labelledby="documents">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">My Documents</h3>
+            <p class="text-muted small mb-0">Upload and manage your employment documents</p>
+          </div>
+        </div>
+
+        <div class="profile-info-card mb-4">
+          <div class="profile-info-card-header">
+            <i class="bi bi-cloud-arrow-up me-2"></i> Upload New Document
+          </div>
+          <div class="profile-info-card-body">
+            <div class="alert up-info-alert mb-3">
+              <i class="bi bi-info-circle me-2"></i>
+              Upload important documents such as ID, proof of address, bank confirmation, and qualifications.
+            </div>
+            <form #documentForm="ngForm">
+              <div class="row g-3">
+                <div class="col-md-4">
+                  <label class="form-label">Document Type <span class="text-danger">*</span></label>
+                  <select name="documentType" ngModel class="form-control" required #docType="ngModel">
+                    <option value="">Select Type</option>
+                    <option *ngFor="let type of documentTypes" [value]="type.value">{{ type.label }}</option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">File <span class="text-danger">*</span></label>
+                  <input type="file" #docFile class="form-control"
+                         accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" (change)="null">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Description (Optional)</label>
+                  <input type="text" name="description" ngModel class="form-control"
+                         placeholder="Brief description" #docDesc="ngModel">
+                </div>
+                <div class="col-12">
+                  <button type="button" class="btn btn-primary"
+                          [disabled]="!docType.value || !docFile.files?.length || (isLoading$ | async)"
+                          (click)="uploadDocument(docFile.files[0], docType.value, docDesc.value); documentForm.reset(); docFile.value = ''">
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!(isLoading$ | async)" class="bi bi-upload me-2"></i>
+                    Upload Document
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <div class="profile-info-card">
+          <div class="profile-info-card-header">
+            <i class="bi bi-folder2-open me-2"></i> Uploaded Documents
+            <span class="up-count-badge ms-2">{{ documentCount$ | async }}</span>
+          </div>
+          <div class="profile-info-card-body p-0">
+            <div *ngIf="(documents$ | async)?.length === 0" class="empty-state-cell">
+              <i class="bi bi-folder"></i>
+              <p>No documents uploaded yet.</p>
+            </div>
+            <div *ngIf="(documents$ | async)?.length > 0" class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
                   <tr>
-                    <th scope="col">Device</th>
-                    <th scope="col">IP Address</th>
-                    <th scope="col">Date</th>
-                    <th scope="col">Type</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Action</th>
+                    <th>Type</th>
+                    <th>File Name</th>
+                    <th>Description</th>
+                    <th>Uploaded</th>
+                    <th>Status</th>
+                    <th>Actions</th>
                   </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let event of state?.appData?.data?.events">
-                    <td>{{ event.device }}</td>
-                    <td>{{ event.ipAddress }}</td>
-                    <td>{{ event.createdAt | date: 'MMMM d, y, h:mm a' }}</td>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let doc of (documents$ | async)">
+                    <td><span class="up-doc-type-badge">{{ getDocumentTypeLabel(doc.documentType) }}</span></td>
+                    <td>{{ doc.originalFileName }}</td>
+                    <td>{{ doc.description || '—' }}</td>
+                    <td>{{ formatDate(doc.uploadedAt) }}</td>
                     <td>
-                                     <span class="badge pill" [ngClass]="[
-                                        event.type === EventType.LOGIN_ATTEMPT_SUCCESS ? 'bg-success' : '',
-                                        event.type === EventType.LOGIN_ATTEMPT ? 'bg-warning' : '',
-                                        event.type === EventType.PROFILE_UPDATE ? 'bg-primary' : '',
-                                        event.type === EventType.LOGIN_ATTEMPT_FAILURE ? 'bg-danger' : '',
-                                        event.type === EventType.PROFILE_PICTURE_UPDATE ? 'bg-primary' : '',
-                                        event.type === EventType.ROLE_UPDATE ? 'bg-info' : '',
-                                        event.type === EventType.ACCOUNT_SETTINGS_UPDATE ? 'bg-warning' : '',
-                                        event.type === EventType.PASSWORD_UPDATE ? 'bg-warning' : '',
-                                        event.type === EventType.MFA_UPDATE ? 'bg-info' : ''
-                                     ]">
-                                        {{ event.type }}
-                                     </span>
+                      <span *ngIf="doc.verified" class="badge-soft-verified"><i class="bi bi-check-circle me-1"></i>Verified</span>
+                      <span *ngIf="!doc.verified" class="badge-soft-pending-doc"><i class="bi bi-clock me-1"></i>Pending</span>
                     </td>
-                    <td>{{ event.description }}</td>
                     <td>
-                      <button type="button" class="btn btn-sm" style="background-color: #fd5d0d; font-weight: 450;">Report</button>
+                      <div class="action-btn-group">
+                        <button class="action-btn action-btn-view" (click)="downloadDocument(doc.id)" title="Download">
+                          <i class="bi bi-download"></i>
+                        </button>
+                        <button class="action-btn action-btn-cancel" (click)="deleteDocument(doc.id)"
+                                [disabled]="doc.verified" title="Delete">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                      </div>
                     </td>
                   </tr>
-                  </tbody>
-                </table>
-              </div>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
       </div>
-    </section>
-  </ng-container>
+
+      <!-- ═══ Banking Tab ═══ -->
+      <div class="tab-pane fade" id="banking-tab" role="tabpanel" aria-labelledby="banking">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Banking Information</h3>
+            <p class="text-muted small mb-0">Your salary payment details</p>
+          </div>
+        </div>
+
+        <div class="up-info-alert mb-4">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>Important:</strong> Ensure your banking details are correct for salary payments.
+        </div>
+
+        <form #bankingForm="ngForm" (ngSubmit)="updateBankingDetails(bankingForm)">
+          <input type="hidden" name="id" [ngModel]="state?.appData?.data?.user?.id">
+
+          <div class="profile-info-card mb-4">
+            <div class="profile-info-card-header">
+              <i class="bi bi-bank me-2"></i> Bank Account Details
+            </div>
+            <div class="profile-info-card-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+                  <select name="bankName" #bankNameSelect="ngModel"
+                          [ngModel]="state?.appData?.data?.user?.bankName"
+                          (ngModelChange)="onBankChange($event, bankingForm)"
+                          [disabled]="(isLoading$ | async)"
+                          class="form-control" required>
+                    <option value="">Select Bank</option>
+                    <option value="ABSA">ABSA</option>
+                    <option value="Standard Bank">Standard Bank</option>
+                    <option value="FNB">FNB</option>
+                    <option value="Nedbank">Nedbank</option>
+                    <option value="Capitec">Capitec</option>
+                    <option value="TymeBank">TymeBank</option>
+                    <option value="Discovery Bank">Discovery Bank</option>
+                    <option value="African Bank">African Bank</option>
+                  </select>
+                  <small class="text-muted" *ngIf="bankNameSelect.value">
+                    Universal Branch Code: <strong>{{ getBranchCode(bankNameSelect.value) }}</strong>
+                  </small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Account Type <span class="text-danger">*</span></label>
+                  <select name="accountType" class="form-control"
+                          [ngModel]="state?.appData?.data?.user?.accountType"
+                          [disabled]="(isLoading$ | async)" required>
+                    <option value="">Select Account Type</option>
+                    <option value="CURRENT">Current Account</option>
+                    <option value="SAVINGS">Savings Account</option>
+                    <option value="CHEQUE">Cheque Account</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Account Holder Name <span class="text-danger">*</span></label>
+                  <input type="text" name="accountHolderName" class="form-control"
+                         [ngModel]="state?.appData?.data?.user?.accountHolderName"
+                         [disabled]="(isLoading$ | async)"
+                         placeholder="Full name as per bank records" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Account Number <span class="text-danger">*</span></label>
+                  <input type="text" name="bankAccountNumber" class="form-control up-mono"
+                         [ngModel]="state?.appData?.data?.user?.bankAccountNumber"
+                         [disabled]="(isLoading$ | async)"
+                         placeholder="7–11 digit account number"
+                         minlength="7" maxlength="11" required pattern="[0-9]{7,11}">
+                  <small class="text-muted">Capitec/Nedbank (10), Standard Bank (9–11), Ithala (8)</small>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Branch Code <span class="text-danger">*</span></label>
+                  <input type="text" name="branchCode" class="form-control up-mono"
+                         [ngModel]="selectedBranchCode || state?.appData?.data?.user?.branchCode"
+                         [disabled]="(isLoading$ | async)"
+                         placeholder="Auto-filled from bank" maxlength="6" required readonly>
+                  <small class="text-muted">Auto-filled when bank is selected</small>
+                </div>
+              </div>
+
+              <div class="up-secure-note mt-3">
+                <i class="bi bi-shield-lock-fill me-2"></i>
+                Banking details are encrypted and only used for salary payments.
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end">
+            <button [disabled]="bankingForm.invalid || (isLoading$ | async)" type="submit" class="btn btn-primary px-4">
+              <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+              <i *ngIf="!(isLoading$ | async)" class="bi bi-check-circle me-2"></i>
+              {{ (isLoading$ | async) ? 'Saving...' : 'Update Banking Details' }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ═══ Password Tab ═══ -->
+      <div class="tab-pane fade" id="password-tab" role="tabpanel" aria-labelledby="password">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Password Settings</h3>
+            <p class="text-muted small mb-0">Change your account password</p>
+          </div>
+        </div>
+
+        <div class="profile-info-card">
+          <div class="profile-info-card-header">
+            <i class="bi bi-key-fill me-2"></i> Change Password
+          </div>
+          <div class="profile-info-card-body">
+            <form #passwordForm="ngForm" (ngSubmit)="updatePassword(passwordForm)">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Current Password</label>
+                  <input type="password" name="currentPassword" ngModel class="form-control"
+                         [disabled]="(isLoading$ | async)" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">New Password</label>
+                  <input type="password" name="newPassword" ngModel class="form-control"
+                         [disabled]="(isLoading$ | async)" minlength="5" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Confirm New Password</label>
+                  <input type="password" name="confirmNewPassword" ngModel class="form-control"
+                         [disabled]="(isLoading$ | async)" minlength="5" required>
+                </div>
+                <div class="col-12">
+                  <button [disabled]="passwordForm.invalid || (isLoading$ | async)" type="submit" class="btn btn-primary px-4">
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!(isLoading$ | async)" class="bi bi-key me-2"></i>
+                    {{ (isLoading$ | async) ? 'Updating...' : 'Update Password' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Authorization Tab ═══ -->
+      <div class="tab-pane fade" id="security-tab" role="tabpanel" aria-labelledby="security">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Authorization Settings</h3>
+            <p class="text-muted small mb-0">Role and permission configuration</p>
+          </div>
+        </div>
+
+        <div class="profile-info-card">
+          <div class="profile-info-card-header">
+            <i class="bi bi-shield-shaded me-2"></i> Role & Permissions
+          </div>
+          <div class="profile-info-card-body">
+            <form #roleForm="ngForm" (ngSubmit)="updateRole(roleForm)">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Role Name</label>
+                  <select name="roleName" class="form-control select-cl"
+                          [ngModel]="state?.appData?.data?.user?.roleName"
+                          [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
+                          required>
+                    <option *ngFor="let role of state?.appData?.data?.roles"
+                            [selected]="state?.appData?.data?.user?.roleName === role.name"
+                            [ngValue]="role.name">{{ role.name }}</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Permissions</label>
+                  <div class="up-permissions-wrap">
+                    <span class="up-perm-tag"
+                          *ngFor="let permission of state?.appData?.data?.user?.permissions?.split(',')">
+                      {{ permission.trim() }}
+                    </span>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
+                          type="submit" class="btn btn-primary px-4">
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!(isLoading$ | async)" class="bi bi-check-circle me-2"></i>
+                    {{ (isLoading$ | async) ? 'Saving...' : 'Update Role' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Account Tab ═══ -->
+      <div class="tab-pane fade" id="application-tab" role="tabpanel" aria-labelledby="application">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Account Settings</h3>
+            <p class="text-muted small mb-0">Manage account status and access</p>
+          </div>
+        </div>
+
+        <div class="profile-info-card">
+          <div class="profile-info-card-header">
+            <i class="bi bi-gear me-2"></i> Account Configuration
+          </div>
+          <div class="profile-info-card-body">
+            <form #settingsForm="ngForm" (ngSubmit)="updateAccountSettings(settingsForm)">
+              <input type="hidden" name="userId">
+              <div class="row g-3">
+                <div class="col-12">
+                  <div class="up-toggle-row">
+                    <div class="up-toggle-info">
+                      <strong>Account Active</strong>
+                      <p class="text-muted small mb-0">Enable or disable this account</p>
+                    </div>
+                    <div class="form-check form-switch">
+                      <input type="checkbox" name="enabled" class="form-check-input"
+                             [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
+                             [checked]="state?.appData?.data?.user?.enabled"
+                             [ngModel]="state?.appData?.data?.user?.enabled">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="up-toggle-row">
+                    <div class="up-toggle-info">
+                      <strong>Account Unlocked</strong>
+                      <p class="text-muted small mb-0">Lock or unlock this account</p>
+                    </div>
+                    <div class="form-check form-switch">
+                      <input type="checkbox" name="notLocked" class="form-check-input"
+                             [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
+                             [checked]="state?.appData?.data?.user?.notLocked"
+                             [ngModel]="state?.appData?.data?.user?.notLocked">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <button [disabled]="!(state?.appData?.data?.user?.roleName === 'ROLE_SYSADMIN' || state?.appData?.data?.user?.roleName === 'ROLE_ADMIN') || (isLoading$ | async)"
+                          type="submit" class="btn btn-primary px-4">
+                    <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!(isLoading$ | async)" class="bi bi-check-circle me-2"></i>
+                    {{ (isLoading$ | async) ? 'Saving...' : 'Update Settings' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ Authentication Tab ═══ -->
+      <div class="tab-pane fade" id="notification-tab" role="tabpanel" aria-labelledby="notification">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h3 class="mb-0">Authentication Settings</h3>
+            <p class="text-muted small mb-0">Keep your account more secure</p>
+          </div>
+        </div>
+
+        <div class="profile-info-card mb-4">
+          <div class="profile-info-card-header">
+            <i class="bi bi-shield-lock-fill me-2"></i> Security Options
+          </div>
+          <div class="profile-info-card-body">
+
+            <!-- MFA -->
+            <div class="up-security-row">
+              <div class="up-security-icon">
+                <i class="bi bi-phone-fill"></i>
+              </div>
+              <div class="up-security-info">
+                <strong>Multi-Factor Authentication</strong>
+                <span *ngIf="state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-on ms-2">Enabled</span>
+                <span *ngIf="!state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-off ms-2">Disabled</span>
+                <p class="text-muted small mb-0 mt-1">Add an extra layer of security to your account</p>
+              </div>
+              <button (click)="toggleMfa()" [disabled]="(isLoading$ | async)"
+                      class="btn btn-sm" [class.btn-danger]="state?.appData?.data?.user?.usingMfa"
+                      [class.btn-primary]="!state?.appData?.data?.user?.usingMfa">
+                <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                {{ state?.appData?.data?.user?.usingMfa ? 'Disable' : 'Enable' }}
+              </button>
+            </div>
+
+            <!-- Activity Logs -->
+            <div class="up-security-row mt-3">
+              <div class="up-security-icon">
+                <i class="bi bi-activity"></i>
+              </div>
+              <div class="up-security-info">
+                <strong>Activity Logs</strong>
+                <p class="text-muted small mb-0 mt-1">Show the latest activities on your account</p>
+              </div>
+              <div class="form-check form-switch mb-0">
+                <input type="checkbox" class="form-check-input" id="activityLog"
+                       (change)="toggleLogs()"
+                       [disabled]="(isLoading$ | async)"
+                       [checked]="(showLogs$ | async)">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Activity Log Table -->
+        <div class="profile-info-card" *ngIf="(showLogs$ | async)">
+          <div class="profile-info-card-header">
+            <i class="bi bi-clock-history me-2"></i> Account Activity Log
+          </div>
+          <div class="profile-info-card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th>Device</th>
+                    <th>IP Address</th>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let event of state?.appData?.data?.events">
+                    <td>{{ event.device }}</td>
+                    <td><code class="up-ip">{{ event.ipAddress }}</code></td>
+                    <td>{{ event.createdAt | date:'dd MMM y, HH:mm' }}</td>
+                    <td>
+                      <span class="up-event-badge" [ngClass]="{
+                        'up-event-success': event.type === EventType.LOGIN_ATTEMPT_SUCCESS,
+                        'up-event-warning': event.type === EventType.LOGIN_ATTEMPT || event.type === EventType.ACCOUNT_SETTINGS_UPDATE || event.type === EventType.PASSWORD_UPDATE,
+                        'up-event-primary': event.type === EventType.PROFILE_UPDATE || event.type === EventType.PROFILE_PICTURE_UPDATE || event.type === EventType.ROLE_UPDATE,
+                        'up-event-danger':  event.type === EventType.LOGIN_ATTEMPT_FAILURE,
+                        'up-event-info':    event.type === EventType.MFA_UPDATE
+                      }">{{ event.type }}</span>
+                    </td>
+                    <td>{{ event.description }}</td>
+                    <td>
+                      <button type="button" class="action-btn action-btn-cancel" title="Report">
+                        <i class="bi bi-flag"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end up-content -->
+  </div><!-- end up-layout -->
+
 </ng-container>
 
-<!-- Profile image change form -->
+<!-- Profile image upload (hidden) -->
 <form enctype="multipart/form-data" style="display:none;">
   <input type="file" #fileInput (change)="updatePicture($event.target.files[0])"
          name="image" id="image" placeholder="file" ngModel accept="image/*" />

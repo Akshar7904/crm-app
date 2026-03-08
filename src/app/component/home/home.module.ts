@@ -20,7 +20,7 @@ import { DashboardSharedModule } from "../../shared/dashboard-shared.module";
     SharedModule,
     NavBarModule,
     StatsModule,
-    DashboardSharedModule
+    DashboardSharedModule,
   ],
   exports: [
     HomeComponent  // Export so it can be used in app-routing

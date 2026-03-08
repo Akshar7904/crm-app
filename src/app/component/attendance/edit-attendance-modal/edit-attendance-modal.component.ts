@@ -6,6 +6,7 @@ import { catchError, of, finalize } from 'rxjs';
 import { Employee} from "../../employee/employee.model";
 
 @Component({
+  standalone: false,
   selector: 'app-edit-attendance-modal',
   templateUrl: './edit-attendance-modal.component.html',
   styleUrls: ['./edit-attendance-modal.component.scss'],

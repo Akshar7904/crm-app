@@ -6,7 +6,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { takeUntil, switchMap } from 'rxjs/operators';
+import { takeUntil } from 'rxjs/operators';
 import { DataState } from "../../../enum/datastate.enum";
 import { LeaveService } from "../../../service/leave.service";
 import { UserService } from '../../../service/user.service';
@@ -23,6 +23,7 @@ import {
 } from "../../../interface/leave-state";
 
 @Component({
+  standalone: false,
   selector: 'app-admin-leave',
   templateUrl: './admin-leave.component.html',
   styleUrls: ['./admin-leave.component.scss']
@@ -37,13 +38,11 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   currentEmployeeId: number | null = null;
 
   // State
-  leaves: Leave[] = [];
-  allLeaves: Leave[] = [];
+  allLeaves: Leave[] = [];           // Full unfiltered dataset
   selectedLeave: Leave | null = null;
   dataState = DataState;
   currentDataState: DataState = DataState.LOADED;
   error: string | null = null;
-  pendingCount: number = 0;
   upcomingLeaves: Leave[] = [];
 
   // Forms
@@ -56,12 +55,6 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   searchQuery: string = '';
   selectedStatus: LeaveStatus | 'all' = 'all';
   selectedType: LeaveType | 'all' = 'all';
-
-  // Pagination
-  currentPage: number = 0;
-  pageSize: number = 20;
-  totalElements: number = 0;
-  totalPages: number = 0;
 
   // Enums for template
   leaveTypes = Object.values(LeaveType);
@@ -101,137 +94,91 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
    */
   private loadCurrentUserAndEmployee(): void {
     this.userService.profile$()
-      .pipe(
-        switchMap((response) => {
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
           this.currentUser = response.data.user;
 
           if (!this.currentUser || !this.currentUser.id) {
-            throw new Error('User profile not found');
+            this.notificationService.onError('User profile not found');
+            return;
           }
 
-          // Fetch employee by user ID - CORRECTED ENDPOINT
-          return this.http.get<CustomHttpResponse<{ employee: any }>>(
-            `${this.employeeServer}/by-user/${this.currentUser.id}`
-          );
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (employeeResponse) => {
-          const employee = employeeResponse.data.employee;
-          if (employee && employee.id) {
-            this.currentEmployeeId = employee.id;
-            console.log('Admin/Manager Employee ID loaded:', this.currentEmployeeId);
-            this.subscribeToState();
-            this.loadPendingLeaves();
-            this.loadStatistics();
-          } else {
-            this.notificationService.onError('Employee record not found. Please contact system admin.');
+          // SYSADMIN has no Employee record — skip the lookup and load directly
+          if (this.currentUser.roleName === 'ROLE_SYSADMIN') {
+            console.log('SYSADMIN detected — skipping employee lookup');
+            this.loadAllData();
+            return;
           }
+
+          // For other admin/manager roles, fetch the linked Employee record
+          this.http.get<CustomHttpResponse<{ employee: any }>>(
+            `${this.employeeServer}/by-user/${this.currentUser.id}`
+          ).pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (employeeResponse: any) => {
+                const employee = employeeResponse.data.employee;
+                if (employee && employee.id) {
+                  this.currentEmployeeId = employee.id;
+                }
+                this.loadAllData();
+              },
+              error: () => {
+                this.loadAllData();
+              }
+            });
         },
         error: (error) => {
-          console.error('Error loading user/employee:', error);
-          this.notificationService.onError('Failed to load employee information');
+          console.error('Error loading user profile:', error);
+          this.notificationService.onError('Failed to load user profile');
         }
       });
   }
 
-  private subscribeToState(): void {
-    this.leaveService.state$
+  private loadAllData(): void {
+    this.currentDataState = DataState.LOADING;
+    this.leaveService.getAllLeaves(0, 500)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
-        this.currentDataState = state.dataState;
-        this.leaves = state.leaves || [];
-        this.allLeaves = state.leaves || [];
-        this.error = state.error || null;
+      .subscribe({
+        next: (leaves: Leave[]) => {
+          this.allLeaves = leaves;
+          this.currentDataState = DataState.LOADED;
+          this.error = null;
+        },
+        error: (err) => {
+          this.currentDataState = DataState.ERROR;
+          this.error = err?.message || 'Failed to load leave requests';
+        }
       });
-  }
-
-  private loadStatistics(): void {
-    this.leaveService.getPendingCount()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(count => this.pendingCount = count);
 
     this.leaveService.getUpcomingLeaves(30)
       .pipe(takeUntil(this.destroy$))
-      .subscribe(leaves => this.upcomingLeaves = leaves);
+      .subscribe((leaves: Leave[]) => this.upcomingLeaves = leaves);
   }
 
-  // Load methods
-  private loadPendingLeaves(): void {
-    this.leaveService.getLeavesByStatus(LeaveStatus.PENDING, this.currentPage, this.pageSize)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
-  }
+  // ─── Computed counts per tab
+  get pendingCount(): number { return this.allLeaves.filter(l => l.status === LeaveStatus.PENDING).length; }
+  get approvedCount(): number { return this.allLeaves.filter(l => l.status === LeaveStatus.APPROVED).length; }
+  get rejectedCount(): number { return this.allLeaves.filter(l => l.status === LeaveStatus.REJECTED).length; }
+  get upcomingCount(): number { return this.upcomingLeaves.length; }
 
-  private loadAllLeaves(): void {
-    this.leaveService.getAllLeaves(this.currentPage, this.pageSize)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
-  }
-
-  // Tab actions
+  // ─── Tab
   setActiveTab(tab: 'all' | 'pending' | 'approved' | 'rejected' | 'upcoming'): void {
     this.activeTab = tab;
-    this.currentPage = 0;
     this.searchQuery = '';
-
-    switch (tab) {
-      case 'all':
-        this.loadAllLeaves();
-        break;
-      case 'pending':
-        this.leaveService.getLeavesByStatus(LeaveStatus.PENDING, this.currentPage, this.pageSize)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe();
-        break;
-      case 'approved':
-        this.leaveService.getLeavesByStatus(LeaveStatus.APPROVED, this.currentPage, this.pageSize)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe();
-        break;
-      case 'rejected':
-        this.leaveService.getLeavesByStatus(LeaveStatus.REJECTED, this.currentPage, this.pageSize)
-          .pipe(takeUntil(this.destroy$))
-          .subscribe();
-        break;
-      case 'upcoming':
-        this.leaves = this.upcomingLeaves;
-        break;
-    }
+    this.selectedStatus = 'all';
+    this.selectedType = 'all';
   }
 
-  // Search and filter
-  onSearch(): void {
-    if (!this.searchQuery.trim()) {
-      this.loadPendingLeaves();
-      return;
-    }
+  // ─── Filter / search (all client-side)
+  onSearch(): void { /* triggers filteredLeaves getter */ }
 
-    this.leaveService.searchLeaves(this.searchQuery, this.currentPage, this.pageSize)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe();
-  }
-
-  applyFilters(): void {
-    let filtered = [...this.allLeaves];
-
-    if (this.selectedStatus !== 'all') {
-      filtered = filtered.filter(l => l.status === this.selectedStatus);
-    }
-
-    if (this.selectedType !== 'all') {
-      filtered = filtered.filter(l => l.leaveType === this.selectedType);
-    }
-
-    this.leaves = filtered;
-  }
+  applyFilters(): void { /* triggers filteredLeaves getter */ }
 
   clearFilters(): void {
     this.selectedStatus = 'all';
     this.selectedType = 'all';
     this.searchQuery = '';
-    this.loadPendingLeaves();
   }
 
   // Approval actions
@@ -245,11 +192,6 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   }
 
   openApprovalModal(leave: Leave, action: 'approve' | 'reject'): void {
-    if (!this.currentEmployeeId) {
-      this.notificationService.onError('Employee information not loaded. Please refresh the page.');
-      return;
-    }
-
     this.selectedLeave = leave;
     this.approvalAction = action;
     this.showApprovalModal = true;
@@ -270,7 +212,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   }
 
   submitApproval(): void {
-    if (!this.selectedLeave || !this.selectedLeave.id || !this.currentEmployeeId) {
+    if (!this.selectedLeave || !this.selectedLeave.id) {
       this.notificationService.onError('Missing required information');
       return;
     }
@@ -280,10 +222,12 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const approverId = this.currentEmployeeId ?? (this.currentUser?.id as unknown as number);
+
     const approval: LeaveApproval = {
       leaveId: this.selectedLeave.id,
       status: this.approvalAction === 'approve' ? LeaveStatus.APPROVED : LeaveStatus.REJECTED,
-      approvedBy: this.currentEmployeeId,
+      approvedBy: approverId,
       remarks: this.approvalForm.value.remarks,
       rejectionReason: this.approvalForm.value.rejectionReason
     };
@@ -299,8 +243,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
             `Leave ${this.approvalAction === 'approve' ? 'approved' : 'rejected'} successfully`
           );
           this.closeApprovalModal();
-          this.loadPendingLeaves();
-          this.loadStatistics();
+          this.loadAllData();
         },
         error: (error) => {
           this.notificationService.onError(
@@ -311,13 +254,14 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   }
 
   quickApprove(leave: Leave): void {
-    if (!leave.id || !this.currentEmployeeId) return;
+    if (!leave.id) return;
 
     if (confirm(`Are you sure you want to approve this leave request for ${leave.employeeName}?`)) {
+      const approverId = this.currentEmployeeId ?? (this.currentUser?.id as unknown as number);
       const approval: LeaveApproval = {
         leaveId: leave.id,
         status: LeaveStatus.APPROVED,
-        approvedBy: this.currentEmployeeId
+        approvedBy: approverId
       };
 
       this.leaveService.approveLeave(approval)
@@ -325,8 +269,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
         .subscribe({
           next: () => {
             this.notificationService.onSuccess('Leave approved successfully');
-            this.loadPendingLeaves();
-            this.loadStatistics();
+            this.loadAllData();
           },
           error: (error) => {
             this.notificationService.onError(
@@ -337,9 +280,47 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Helper methods
+  // ─── Filtered leaves (fully client-side)
   get filteredLeaves(): Leave[] {
-    return this.leaves;
+    let result = [...this.allLeaves];
+
+    // Tab filter
+    switch (this.activeTab) {
+      case 'pending':   result = result.filter(l => l.status === LeaveStatus.PENDING); break;
+      case 'approved':  result = result.filter(l => l.status === LeaveStatus.APPROVED); break;
+      case 'rejected':  result = result.filter(l => l.status === LeaveStatus.REJECTED); break;
+      case 'upcoming':  result = this.upcomingLeaves; break;
+      // 'all': no tab filter
+    }
+
+    // Status dropdown (only meaningful on 'all' tab)
+    if (this.selectedStatus !== 'all') {
+      result = result.filter(l => l.status === this.selectedStatus);
+    }
+
+    // Type dropdown
+    if (this.selectedType !== 'all') {
+      result = result.filter(l => l.leaveType === this.selectedType);
+    }
+
+    // Search
+    if (this.searchQuery.trim()) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(l =>
+        l.employeeName?.toLowerCase().includes(q) ||
+        l.employeeEmail?.toLowerCase().includes(q)
+      );
+    }
+
+    return result;
+  }
+
+  get activeTabLabel(): string {
+    const labels: Record<string, string> = {
+      pending: 'pending', approved: 'approved', rejected: 'rejected',
+      upcoming: 'upcoming', all: ''
+    };
+    return labels[this.activeTab] || '';
   }
 
   getStatusClass(status: LeaveStatus): string {
@@ -409,28 +390,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
     return '';
   }
 
-  // Export functionality
   exportToExcel(): void {
     console.log('Export to Excel - to be implemented');
-  }
-
-  // Pagination
-  nextPage(): void {
-    if (this.currentPage < this.totalPages - 1) {
-      this.currentPage++;
-      this.loadPendingLeaves();
-    }
-  }
-
-  previousPage(): void {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-      this.loadPendingLeaves();
-    }
-  }
-
-  goToPage(page: number): void {
-    this.currentPage = page;
-    this.loadPendingLeaves();
   }
 }

@@ -1,327 +1,159 @@
-// payroll-detail Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-/* payroll-detail.component.css */
+// ─── Action Bar (screen only)
+.pay-action-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 24px 20px;
+}
 
-/* Payslip Container */
-.payslip-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-  background: white;
+// ─── Payslip Document
+.payslip-doc {
+  max-width: 820px;
+  margin: 0 auto 40px;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 11px;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 11px;
-  border: 1px solid #000;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+
+  @media screen {
+    margin-left: 24px;
+    margin-right: 24px;
+  }
 }
 
-/* Company Header */
-.company-header {
+// ─── Company Header
+.ps-company-header {
   text-align: center;
-  border: 1px solid #000;
-  padding: 15px;
-  margin-bottom: 10px;
+  padding: 18px 20px 14px;
+  border-bottom: 2px solid #1a2a4a;
+  background: linear-gradient(135deg, #1a2a4a 0%, #375fa0 100%);
 }
 
-.company-header h3 {
-  margin: 0 0 8px 0;
-  font-size: 16px;
-  font-weight: bold;
-  color: #000;
+.ps-company-name {
+  color: #fff; font-size: 15px; font-weight: 700; margin: 0 0 5px;
 }
 
-.company-header p {
-  margin: 3px 0;
-  font-size: 10px;
-  color: #000;
+.ps-company-info {
+  color: rgba(255,255,255,0.75); font-size: 10px; margin: 2px 0;
 }
 
-.company-header h4 {
-  margin: 12px 0 0 0;
-  font-size: 13px;
-  font-weight: bold;
-  color: #000;
+.ps-period-title {
+  display: inline-block;
+  margin-top: 10px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  padding: 4px 20px;
+  border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
 }
 
-/* Employee Details Section */
-.employee-details {
-  border: 1px solid #000;
-  padding: 8px;
-  margin-bottom: 8px;
+// ─── Employee Details Section
+.ps-section {
+  padding: 10px 16px;
+  border-bottom: 1px solid #ddd;
 }
 
-.details-table {
-  width: 100%;
-  border-collapse: collapse;
+.ps-detail-table {
+  width: 100%; border-collapse: collapse;
+  td { padding: 4px 8px; font-size: 11px; }
 }
 
-.details-table td {
-  padding: 3px 6px;
-  font-size: 10px;
-}
+.ps-label { font-weight: 700; color: #374151; width: 18%; }
+.ps-value { color: #111; width: 32%; }
 
-.details-table .label {
-  font-weight: bold;
-  width: 25%;
-}
-
-.details-table .value {
-  width: 25%;
-}
-
-/* Earnings and Deductions Section */
-.earnings-deductions {
+// ─── Earnings & Deductions
+.ps-ed-container {
   display: flex;
-  border: 1px solid #000;
-  margin-bottom: 5px;
+  border-bottom: 1px solid #ccc;
 }
 
-.earnings-section,
-.deductions-section {
+.ps-col {
   flex: 1;
-  border-right: 1px solid #000;
+  border-right: 1px solid #ccc;
+  &:last-child { border-right: none; }
 }
 
-.deductions-section {
-  border-right: none;
+.ps-col-header {
+  display: flex; justify-content: space-between;
+  padding: 7px 12px;
+  font-size: 11px; font-weight: 700;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+
+  &.ps-earnings-header   { background: #e8f5e9; color: #2e7d32; }
+  &.ps-deductions-header { background: #fde8e8; color: #c62828; }
 }
 
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  background-color: #ddd;
-  padding: 6px 8px;
-  border-bottom: 1px solid #000;
-  font-weight: bold;
-  font-size: 11px;
+.ps-items-table {
+  width: 100%; border-collapse: collapse;
+
+  td {
+    padding: 5px 12px; font-size: 11px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #374151;
+    &:last-child { text-align: right; font-family: 'Courier New', monospace; }
+  }
+
+  tr:last-child td { border-bottom: none; }
 }
 
-.header-label {
-  flex: 1;
+.ps-col-total {
+  display: flex; justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid #ccc;
+  font-weight: 700; font-size: 11px;
+  background: #f5f5f5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  span:last-child { font-family: 'Courier New', monospace; }
 }
 
-.header-amount {
-  text-align: right;
-  width: 100px;
+// ─── Net Pay
+.ps-net-pay {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: #e8f0fc;
+  border-bottom: 1px solid #ccc;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
-.items-table {
-  width: 100%;
-  border-collapse: collapse;
+.ps-net-label { font-weight: 700; font-size: 12px; color: #1a2a4a; text-transform: uppercase; letter-spacing: 0.4px; }
+.ps-net-amount { font-weight: 700; font-size: 13px; color: #1a2a4a; font-family: 'Courier New', monospace; }
+
+// ─── Payment Details
+.ps-payment-section { border-bottom: none; }
+.ps-payment-title { font-weight: 700; font-size: 11px; color: #374151; margin-bottom: 8px; }
+
+.ps-payment-table {
+  width: 100%; border-collapse: collapse; font-size: 11px;
+  th { background: #f0f0f0; font-weight: 700; padding: 5px 10px; text-align: left; border-bottom: 1px solid #ccc; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  td { padding: 6px 10px; color: #374151; }
 }
 
-.items-table tr {
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.items-table td {
-  padding: 4px 8px;
-  font-size: 10px;
-}
-
-.item-label {
-  width: 60%;
-}
-
-.item-amount {
-  width: 40%;
-  text-align: right;
-  font-family: 'Courier New', monospace;
-}
-
-.section-total {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 8px;
-  border-top: 1px solid #000;
-  font-weight: bold;
-  background-color: #f5f5f5;
-  font-size: 11px;
-}
-
-.total-label {
-  flex: 1;
-}
-
-.total-amount {
-  text-align: right;
-  width: 100px;
-  font-family: 'Courier New', monospace;
-}
-
-/* Net Pay Section */
-.net-pay {
-  border: 1px solid #000;
-  padding: 10px;
-  text-align: center;
-  margin-bottom: 8px;
-  font-size: 13px;
-  font-weight: bold;
-}
-
-/* Payment Details Section */
-.payment-details {
-  border: 1px solid #000;
-  padding: 10px;
-}
-
-.payment-details h5 {
-  margin: 0 0 8px 0;
-  font-size: 11px;
-  font-weight: bold;
-}
-
-.payment-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 10px;
-}
-
-.payment-table th {
-  background-color: #fff;
-  padding: 5px;
-  font-weight: bold;
-  text-align: left;
-  border-bottom: 1px solid #000;
-  font-size: 10px;
-}
-
-.payment-table td {
-  padding: 5px;
-  font-size: 10px;
-}
-
-/* Action Buttons */
-.no-print {
-  margin-bottom: 20px;
-}
-
-/* Print Styles - HIDE ALL UI ELEMENTS */
+// ─── Print
 @media print {
-  /* Hide everything except payslip */
-  body * {
-    visibility: hidden;
+  .no-print { display: none !important; }
+
+  body * { visibility: hidden; }
+  .payslip-doc, .payslip-doc * { visibility: visible; }
+
+  .payslip-doc {
+    position: absolute; left: 0; top: 0;
+    width: 100%; max-width: 100%;
+    margin: 0; padding: 0;
+    border: none; box-shadow: none;
   }
 
-  .payslip-container,
-  .payslip-container * {
-    visibility: visible;
-  }
+  app-navbar, app-sidebar, .sidebar, nav { display: none !important; }
 
-  /* Position payslip at top of page */
-  .payslip-container {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 10mm;
-    border: none;
-  }
+  @page { margin: 10mm; size: A4; }
 
-  /* Hide navigation, sidebar, buttons */
-  .navbar,
-  .sidebar,
-  app-navbar,
-  app-sidebar,
-  .btn,
-  button,
-  .no-print,
-  .card-header .actions,
-  nav,
-  header,
-  .breadcrumb,
-  .main-wrapper .sidebar,
-  .content-area {
-    display: none !important;
-    visibility: hidden !important;
-  }
-
-  /* Remove page margins */
-  @page {
-    margin: 10mm;
-    size: A4;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-  }
-
-  /* Ensure borders print */
-  .company-header,
-  .employee-details,
-  .earnings-deductions,
-  .earnings-section,
-  .deductions-section,
-  .net-pay,
-  .payment-details {
-    border: 1px solid #000 !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Ensure background colors print */
-  .section-header,
-  .section-total,
-  .payment-table th {
-    background-color: #ddd !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-  }
-
-  /* Page break control */
-  .payslip-container {
-    page-break-inside: avoid;
-    page-break-after: auto;
-  }
-
-  /* Ensure flex layout works in print */
-  .earnings-deductions {
-    display: table;
-    width: 100%;
-  }
-
-  .earnings-section,
-  .deductions-section {
-    display: table-cell;
-    width: 50%;
-  }
-
-  /* Fix text colors for print */
-  * {
-    color: #000 !important;
-  }
-}
-
-/* Screen-only styles */
-@media screen {
-  .payslip-container {
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-    margin-bottom: 20px;
-  }
-}
-
-/* Responsive adjustments for small screens */
-@media screen and (max-width: 768px) {
-  .payslip-container {
-    padding: 10px;
-    font-size: 10px;
-  }
-
-  .earnings-deductions {
-    flex-direction: column;
-  }
-
-  .earnings-section {
-    border-right: 1px solid #000;
-    border-bottom: 1px solid #000;
-  }
-
-  .details-table td {
-    font-size: 9px;
-    padding: 2px 4px;
-  }
+  .ps-company-header { background: #1a2a4a !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  * { color: #000 !important; }
+  .ps-company-header * { color: #fff !important; }
 }

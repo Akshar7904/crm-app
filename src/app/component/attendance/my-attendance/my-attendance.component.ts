@@ -16,6 +16,7 @@ import {
 } from '../../../interface/attendance-state';
 
 @Component({
+  standalone: false,
   selector: 'app-my-attendance',
   templateUrl: './my-attendance.component.html',
   styleUrls: ['./my-attendance.component.scss'],
@@ -136,7 +137,7 @@ export class MyAttendanceComponent implements OnInit, OnDestroy {
     this.userService.profile$()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           this.currentUser = response.data.user;
 
           if (!this.currentUser || !this.currentUser.id) {
@@ -177,7 +178,7 @@ export class MyAttendanceComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         })
       )
-      .subscribe(response => {
+      .subscribe((response: any) => {
         this.attendances = response.data?.attendances || [];
         this.summary = response.data?.summary || { totalPresent: 0, totalAbsent: 0, totalHalfDay: 0, totalLeave: 0 };
 

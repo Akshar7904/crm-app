@@ -1,262 +1,250 @@
-<div class="employee-leave-container">
-  <!-- Header -->
-  <div class="page-header">
-    <div class="header-content">
-      <h1>My Leave Requests</h1>
-      <p>Manage your leave applications and view your leave balance</p>
+<div class="el-wrap">
+
+  <!-- No Employee Record -->
+  <div *ngIf="noEmployeeRecord" class="el-no-record">
+    <div class="el-no-record-card">
+      <i class="bi bi-person-x el-no-record-icon"></i>
+      <h4>No Employee Record Found</h4>
+      <p>Your account is not linked to an employee record. Leave management requires an employee profile.</p>
+      <p class="text-muted small">Contact your HR administrator to have your profile set up.</p>
     </div>
-    <button class="btn btn-primary" (click)="openLeaveForm()">
-      <i class="fas fa-plus"></i> Apply for Leave
-    </button>
   </div>
 
-  <!-- Leave Balance Cards -->
-  <div class="balance-section">
-    <h2>Leave Balance - {{currentYear}}</h2>
-    <div class="balance-grid">
-      <div class="balance-card" *ngFor="let balance of leaveBalances">
-        <div class="balance-header">
-          <i class="fas fa-calendar-alt"></i>
-          <span>{{leaveTypeLabels[balance.leaveType]}}</span>
+  <ng-container *ngIf="!noEmployeeRecord">
+
+    <!-- ─── Page Banner ─── -->
+    <div class="page-banner">
+      <div class="banner-left">
+        <h1 class="banner-title"><i class="bi bi-calendar-check me-2"></i>My Leave Requests</h1>
+        <p class="banner-subtitle">Manage your leave applications and view your balance — {{currentYear}}</p>
+      </div>
+      <div class="banner-actions">
+        <button class="btn-banner" (click)="openLeaveForm()">
+          <i class="bi bi-plus-circle me-1"></i> Apply for Leave
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── Balance KPI Cards ─── -->
+    <div class="el-balance-grid">
+      <div class="el-balance-card" *ngFor="let balance of leaveBalances; let i = index"
+           [class]="'el-balance-card el-balance-' + i">
+        <div class="el-balance-icon-wrap">
+          <i class="bi bi-calendar-event"></i>
         </div>
-        <div class="balance-stats">
-          <div class="stat">
-            <span class="stat-value">{{balance.available}}</span>
-            <span class="stat-label">Available</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value">{{balance.used}}</span>
-            <span class="stat-label">Used</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value">{{balance.pending}}</span>
-            <span class="stat-label">Pending</span>
-          </div>
-          <div class="stat">
-            <span class="stat-value">{{balance.totalEntitled}}</span>
-            <span class="stat-label">Entitled</span>
+        <div class="el-balance-info">
+          <span class="el-balance-type">{{ leaveTypeLabels[balance.leaveType] }}</span>
+          <div class="el-balance-stats">
+            <div class="el-stat">
+              <span class="el-stat-val">{{ balance.available }}</span>
+              <span class="el-stat-lbl">Available</span>
+            </div>
+            <div class="el-stat-div"></div>
+            <div class="el-stat">
+              <span class="el-stat-val">{{ balance.used }}</span>
+              <span class="el-stat-lbl">Used</span>
+            </div>
+            <div class="el-stat-div"></div>
+            <div class="el-stat">
+              <span class="el-stat-val">{{ balance.pending }}</span>
+              <span class="el-stat-lbl">Pending</span>
+            </div>
+            <div class="el-stat-div"></div>
+            <div class="el-stat">
+              <span class="el-stat-val">{{ balance.totalEntitled }}</span>
+              <span class="el-stat-lbl">Entitled</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Tabs -->
-  <div class="tabs-section">
-    <div class="tabs">
-      <button
-        class="tab"
-        [class.active]="activeTab === 'all'"
-        (click)="setActiveTab('all')">
-        All Requests
-      </button>
-      <button
-        class="tab"
-        [class.active]="activeTab === 'pending'"
-        (click)="setActiveTab('pending')">
-        Pending
-      </button>
-      <button
-        class="tab"
-        [class.active]="activeTab === 'approved'"
-        (click)="setActiveTab('approved')">
-        Approved
-      </button>
-      <button
-        class="tab"
-        [class.active]="activeTab === 'rejected'"
-        (click)="setActiveTab('rejected')">
-        Rejected
-      </button>
+    <!-- ─── Filter Tabs + Table Card ─── -->
+    <div class="table-card el-table-card">
+
+      <!-- Tabs inside banner-like header -->
+      <div class="el-tabs-bar">
+        <button class="el-tab" [class.active]="activeTab === 'all'"      (click)="setActiveTab('all')">All</button>
+        <button class="el-tab" [class.active]="activeTab === 'pending'"  (click)="setActiveTab('pending')">Pending</button>
+        <button class="el-tab" [class.active]="activeTab === 'approved'" (click)="setActiveTab('approved')">Approved</button>
+        <button class="el-tab" [class.active]="activeTab === 'rejected'" (click)="setActiveTab('rejected')">Rejected</button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="currentDataState === dataState.LOADING" class="el-state-cell">
+        <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+        Loading leave requests...
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length === 0" class="empty-state-cell">
+        <i class="bi bi-inbox"></i>
+        <p>No leave requests found for this filter.</p>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Leave Type</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Days</th>
+              <th>Status</th>
+              <th>Reason</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let leave of filteredLeaves">
+              <td>
+                <span class="el-type-badge">{{ leaveTypeLabels[leave.leaveType] }}</span>
+              </td>
+              <td>{{ formatDate(leave.startDate) }}</td>
+              <td>{{ formatDate(leave.endDate) }}</td>
+              <td><span class="el-days-badge">{{ leave.numberOfDays }}d</span></td>
+              <td>
+                <span [ngClass]="getStatusClass(leave.status)">{{ leaveStatusLabels[leave.status] }}</span>
+              </td>
+              <td>
+                <span class="el-reason">{{ leave.reason || '—' }}</span>
+                <div *ngIf="leave.doctorNoteAttached" class="el-doc-note mt-1">
+                  <i class="bi bi-file-earmark-medical text-success"></i>
+                  <a *ngIf="leave.doctorNoteUrl" [href]="getDoctorNoteDownloadUrl(leave)" target="_blank" class="ms-1">
+                    {{ leave.doctorNoteFilename || "Doctor's note" }}
+                  </a>
+                  <span *ngIf="!leave.doctorNoteUrl" class="ms-1">Doctor's note attached</span>
+                </div>
+                <div *ngIf="leave.rejectionReason" class="el-rejection mt-1">
+                  <i class="bi bi-exclamation-circle"></i>
+                  <small>{{ leave.rejectionReason }}</small>
+                </div>
+              </td>
+              <td>
+                <div class="action-btn-group">
+                  <button
+                    *ngIf="leave.status === LeaveStatus.PENDING"
+                    class="action-btn action-btn-edit"
+                    (click)="editLeave(leave)"
+                    title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button
+                    *ngIf="canEditOrCancel(leave)"
+                    class="action-btn action-btn-cancel"
+                    (click)="cancelLeave(leave)"
+                    title="Cancel">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
 
-  <!-- Leave Requests Table -->
-  <div class="table-section">
-    <div *ngIf="currentDataState === dataState.LOADING" class="loading">
-      <i class="fas fa-spinner fa-spin"></i> Loading...
-    </div>
+  </ng-container><!-- end !noEmployeeRecord -->
+</div>
 
-    <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length === 0" class="empty-state">
-      <i class="fas fa-inbox"></i>
-      <p>No leave requests found</p>
-    </div>
+<!-- ─── Apply / Edit Modal ─── -->
+<div class="modal fade show d-block el-modal-backdrop" *ngIf="showLeaveForm" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content el-modal">
 
-    <table *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="leave-table">
-      <thead>
-      <tr>
-        <th>Leave Type</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Days</th>
-        <th>Status</th>
-        <th>Reason</th>
-        <th>Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let leave of filteredLeaves">
-        <td>
-            <span class="leave-type-badge">
-              {{leaveTypeLabels[leave.leaveType]}}
-            </span>
-        </td>
-        <td>{{formatDate(leave.startDate)}}</td>
-        <td>{{formatDate(leave.endDate)}}</td>
-        <td>
-          <span class="days-badge">{{leave.numberOfDays}} days</span>
-        </td>
-        <td>
-            <span class="status-badge" [ngClass]="getStatusClass(leave.status)">
-              {{leaveStatusLabels[leave.status]}}
-            </span>
-        </td>
-        <td>
-          <span class="reason-text">{{leave.reason || 'N/A'}}</span>
-          <div *ngIf="leave.doctorNoteAttached" class="doctor-note-indicator mt-1">
-            <small>
-              <i class="fas fa-file-medical text-success"></i>
-              <a *ngIf="leave.doctorNoteUrl" [href]="getDoctorNoteDownloadUrl(leave)" target="_blank">
-                {{ leave.doctorNoteFilename || 'Doctor\'s note' }}
-              </a>
-              <span *ngIf="!leave.doctorNoteUrl">Doctor's note attached</span>
-            </small>
-          </div>
-          <div *ngIf="leave.rejectionReason" class="rejection-reason">
-            <small><strong>Rejection Reason:</strong> {{leave.rejectionReason}}</small>
-          </div>
-        </td>
-        <td>
-          <div class="action-buttons">
-            <button
-              *ngIf="leave.status === LeaveStatus.PENDING"
-              class="btn-icon btn-edit"
-              (click)="editLeave(leave)"
-              title="Edit">
-              <i class="fas fa-edit"></i>
-            </button>
-            <button
-              *ngIf="canEditOrCancel(leave)"
-              class="btn-icon btn-cancel"
-              (click)="cancelLeave(leave)"
-              title="Cancel">
-              <i class="fas fa-times"></i>
-            </button>
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Leave Form Modal -->
-  <div class="modal-overlay" *ngIf="showLeaveForm" (click)="closeLeaveForm()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h2>{{editMode ? 'Edit' : 'Apply for'}} Leave</h2>
-        <button class="btn-close" (click)="closeLeaveForm()">
-          <i class="fas fa-times"></i>
+      <div class="el-modal-header">
+        <h5 class="el-modal-title">
+          <i class="bi bi-calendar-plus me-2"></i>
+          {{ editMode ? 'Edit' : 'Apply for' }} Leave
+        </h5>
+        <button type="button" class="el-modal-close" (click)="closeLeaveForm()">
+          <i class="bi bi-x-lg"></i>
         </button>
       </div>
 
-      <form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()">
-        <div class="form-grid">
-          <!-- Leave Type -->
-          <div class="form-group">
-            <label for="leaveType">Leave Type <span class="required">*</span></label>
-            <select
-              id="leaveType"
-              formControlName="leaveType"
-              class="form-control"
-              [class.is-invalid]="leaveForm.get('leaveType')?.invalid && leaveForm.get('leaveType')?.touched">
-              <option value="">Select leave type</option>
-              <option *ngFor="let type of leaveTypes" [value]="type">
-                {{leaveTypeLabels[type]}}
-              </option>
-            </select>
-            <div *ngIf="leaveForm.get('leaveType')?.value" class="balance-info">
-              Available: <strong>{{getAvailableDays(leaveForm.get('leaveType')?.value)}} days</strong>
+      <div class="modal-body el-modal-body">
+        <form [formGroup]="leaveForm" (ngSubmit)="submitLeaveRequest()">
+          <div class="row g-3">
+
+            <!-- Leave Type -->
+            <div class="col-md-12">
+              <label class="form-label fw-semibold">Leave Type <span class="text-danger">*</span></label>
+              <select formControlName="leaveType" class="form-control"
+                      [class.is-invalid]="leaveForm.get('leaveType')?.invalid && leaveForm.get('leaveType')?.touched">
+                <option value="">Select leave type</option>
+                <option *ngFor="let type of leaveTypes" [value]="type">{{ leaveTypeLabels[type] }}</option>
+              </select>
+              <div *ngIf="leaveForm.get('leaveType')?.value" class="el-balance-hint mt-1">
+                <i class="bi bi-info-circle me-1"></i>
+                Available: <strong>{{ getAvailableDays(leaveForm.get('leaveType')?.value) }} days</strong>
+              </div>
             </div>
-          </div>
 
-          <!-- Start Date -->
-          <div class="form-group">
-            <label for="startDate">Start Date <span class="required">*</span></label>
-            <input
-              type="date"
-              id="startDate"
-              formControlName="startDate"
-              class="form-control"
-              (change)="onDateChange()"
-              [class.is-invalid]="leaveForm.get('startDate')?.invalid && leaveForm.get('startDate')?.touched">
-          </div>
-
-          <!-- End Date -->
-          <div class="form-group">
-            <label for="endDate">End Date <span class="required">*</span></label>
-            <input
-              type="date"
-              id="endDate"
-              formControlName="endDate"
-              class="form-control"
-              (change)="onDateChange()"
-              [class.is-invalid]="leaveForm.get('endDate')?.invalid && leaveForm.get('endDate')?.touched">
-          </div>
-
-          <!-- Reason -->
-          <div class="form-group full-width">
-            <label for="reason">Reason</label>
-            <textarea
-              id="reason"
-              formControlName="reason"
-              class="form-control"
-              rows="3"
-              placeholder="Reason for leave..."></textarea>
-          </div>
-
-          <!-- Remarks -->
-          <div class="form-group full-width">
-            <label for="remarks">Additional Remarks</label>
-            <textarea
-              id="remarks"
-              formControlName="remarks"
-              class="form-control"
-              rows="2"
-              placeholder="Any additional information..."></textarea>
-          </div>
-
-          <!-- Doctor Note File Upload -->
-          <div class="form-group full-width">
-            <label class="checkbox-label">
-              <input type="checkbox" formControlName="doctorNoteAttached">
-              <span>Attach doctor's note</span>
-            </label>
-          </div>
-
-          <div class="form-group full-width" *ngIf="leaveForm.get('doctorNoteAttached')?.value">
-            <label for="doctorNoteFile">Doctor's Note (Image/PDF)</label>
-            <input
-              type="file"
-              id="doctorNoteFile"
-              class="form-control"
-              accept="image/*,.pdf"
-              (change)="onDoctorNoteFileSelected($event)">
-            <small class="form-text text-muted">Upload a photo or PDF of the doctor's note (max 5MB)</small>
-            <div *ngIf="selectedDoctorNoteFile" class="file-info mt-1">
-              <i class="fas fa-file-medical"></i> {{ selectedDoctorNoteFile.name }}
+            <!-- Dates -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Start Date <span class="text-danger">*</span></label>
+              <input type="date" formControlName="startDate" class="form-control"
+                     (change)="onDateChange()"
+                     [class.is-invalid]="leaveForm.get('startDate')?.invalid && leaveForm.get('startDate')?.touched">
             </div>
-          </div>
-        </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">End Date <span class="text-danger">*</span></label>
+              <input type="date" formControlName="endDate" class="form-control"
+                     (change)="onDateChange()"
+                     [class.is-invalid]="leaveForm.get('endDate')?.invalid && leaveForm.get('endDate')?.touched">
+            </div>
 
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeLeaveForm()">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary" [disabled]="leaveForm.invalid || currentDataState === dataState.LOADING">
-            {{editMode ? 'Update' : 'Submit'}} Request
-          </button>
-        </div>
-      </form>
+            <!-- Reason -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">Reason</label>
+              <textarea formControlName="reason" class="form-control" rows="3"
+                        placeholder="Reason for leave..."></textarea>
+            </div>
+
+            <!-- Remarks -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">Additional Remarks</label>
+              <textarea formControlName="remarks" class="form-control" rows="2"
+                        placeholder="Any additional information..."></textarea>
+            </div>
+
+            <!-- Doctor Note -->
+            <div class="col-12">
+              <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="doctorNote"
+                       formControlName="doctorNoteAttached">
+                <label class="form-check-label fw-semibold" for="doctorNote">
+                  Attach doctor's note
+                </label>
+              </div>
+            </div>
+            <div class="col-12" *ngIf="leaveForm.get('doctorNoteAttached')?.value">
+              <label class="form-label fw-semibold">Doctor's Note (Image/PDF)</label>
+              <input type="file" class="form-control" accept="image/*,.pdf"
+                     (change)="onDoctorNoteFileSelected($event)">
+              <small class="text-muted">Max 5MB</small>
+              <div *ngIf="selectedDoctorNoteFile" class="el-file-info mt-1">
+                <i class="bi bi-file-earmark-medical text-success me-1"></i>
+                {{ selectedDoctorNoteFile.name }}
+              </div>
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer el-modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeLeaveForm()">Cancel</button>
+        <button type="button" class="btn btn-primary"
+                (click)="submitLeaveRequest()"
+                [disabled]="leaveForm.invalid || currentDataState === dataState.LOADING">
+          <span *ngIf="currentDataState === dataState.LOADING"
+                class="spinner-border spinner-border-sm me-2"></span>
+          {{ editMode ? 'Update' : 'Submit' }} Request
+        </button>
+      </div>
+
     </div>
   </div>
 </div>

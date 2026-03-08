@@ -9,7 +9,18 @@
 // Import external fonts and icons
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i");
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.2/font/bootstrap-icons.css");
-@import "node_modules/angular-notifier/styles";
+/* angular-notifier base styles (inlined - package stub has no styles file) */
+.notifier__container { position: fixed; z-index: 10000; top: 0; right: 0; pointer-events: none; width: 100%; }
+.notifier__container-list { display: flex; flex-direction: column; align-items: flex-end; margin: 0; padding: 12px 16px; gap: 8px; list-style: none; }
+.notifier__notification { pointer-events: all; display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.18); color: #fff; font-size: 14px; min-width: 280px; max-width: 420px; animation: notifierSlideIn .2s ease; }
+.notifier__notification--success { background: #28a745; }
+.notifier__notification--error   { background: #dc3545; }
+.notifier__notification--warning { background: #ffc107; color: #212529; }
+.notifier__notification--info    { background: #17a2b8; }
+.notifier__notification--default { background: #343a40; }
+.notifier__notification-button   { background: none; border: none; color: inherit; cursor: pointer; opacity: .7; padding: 0 0 0 12px; font-size: 18px; line-height: 1; }
+.notifier__notification-button:hover { opacity: 1; }
+@keyframes notifierSlideIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
 
 // ========================================
 // THEME SYSTEM - CSS Custom Properties
@@ -88,6 +99,13 @@
   --overlay-bg: rgba(0, 0, 0, 0.5);
   --badge-muted-bg: #{$gray-100};
   --badge-muted-text: #{$gray-600};
+
+  // Page section headers
+  --page-header-bg: linear-gradient(135deg, #{$primary} 0%, #{$primary-medium} 60%, #{$primary-light} 100%);
+  --section-title-color: #{$gray-700};
+
+  // Form focus ring
+  --input-focus-ring: rgba(0, 92, 143, 0.2);
 }
 
 // Dark Theme
@@ -163,6 +181,13 @@
   --overlay-bg: rgba(0, 0, 0, 0.7);
   --badge-muted-bg: rgba(255, 255, 255, 0.08);
   --badge-muted-text: rgba(255, 255, 255, 0.65);
+
+  // Page section headers
+  --page-header-bg: linear-gradient(135deg, #0a2a4a 0%, #0d3561 60%, #0a2a4a 100%);
+  --section-title-color: rgba(255, 255, 255, 0.65);
+
+  // Form focus ring
+  --input-focus-ring: rgba(121, 120, 233, 0.25);
 }
 
 // ==================== GLOBAL ANIMATIONS ====================
@@ -325,6 +350,429 @@ thead {
 .status-cancelled {
   @include status-badge('cancelled');
 }
+
+// ==================== FALCON UI — GLOBAL PATTERNS ====================
+
+// Page layout wrapper
+.page-container {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// Page header banner — gradient with white text
+.page-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-xl;
+  background: var(--page-header-bg, $gradient-primary);
+  border-radius: $border-radius-xl;
+  margin-bottom: $spacing-lg;
+  position: relative;
+  overflow: hidden;
+  animation: fadeInDown 0.4s ease forwards;
+  box-shadow: 0 6px 24px rgba($primary, 0.26);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -50px; left: 80px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+  }
+
+  .banner-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: #fff;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    i { opacity: 0.85; }
+  }
+
+  .banner-subtitle {
+    color: rgba(255,255,255,0.75);
+    font-size: $font-size-sm;
+    margin: 4px 0 0;
+    position: relative;
+  }
+
+  .banner-actions {
+    display: flex;
+    gap: $spacing-sm;
+    position: relative;
+  }
+
+  .btn-banner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: $spacing-sm 16px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: $border-radius-md;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-base;
+    backdrop-filter: blur(4px);
+    text-decoration: none;
+
+    &:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); color: #fff; }
+    &:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  }
+
+  .btn-banner-success {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: $spacing-sm 16px;
+    background: rgba($success, 0.25);
+    border: 1px solid rgba($success, 0.4);
+    border-radius: $border-radius-md;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-base;
+    text-decoration: none;
+    &:hover { background: rgba($success, 0.4); transform: translateY(-1px); color: #fff; }
+  }
+
+  // Ghost variant — same as base .btn-banner (transparent, outlined)
+  .btn-banner-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: $spacing-sm 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: $border-radius-md;
+    color: rgba(255,255,255,0.85);
+    font-size: 0.82rem;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-base;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    &:hover { background: rgba(255,255,255,0.18); transform: translateY(-1px); color: #fff; }
+  }
+
+  // Danger variant
+  .btn-banner-danger {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: $spacing-sm 16px;
+    background: rgba($danger, 0.22);
+    border: 1px solid rgba($danger, 0.4);
+    border-radius: $border-radius-md;
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-base;
+    text-decoration: none;
+    &:hover { background: rgba($danger, 0.4); transform: translateY(-1px); color: #fff; }
+  }
+}
+
+// Section title above cards
+.section-label {
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted, $text-muted);
+  margin-bottom: $spacing-sm;
+}
+
+// Falcon card with Poppins/Falcon defaults
+.falcon-card {
+  background: var(--bg-card, $bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, $shadow);
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  animation: fadeInUp 0.4s ease forwards;
+
+  .falcon-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px $spacing-md;
+    border-bottom: 1px solid var(--border-light, $gray-200);
+    background: var(--table-header-bg, $gray-50);
+
+    .falcon-card-title {
+      font-size: 0.9rem;
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary, $primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      i { font-size: 0.85rem; color: $primary; }
+    }
+  }
+
+  .falcon-card-body {
+    padding: $spacing-md;
+  }
+}
+
+// Falcon table defaults — applied globally when inside .falcon-card or .table-card
+.table-card {
+  background: var(--bg-card, $bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, $shadow);
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease forwards;
+
+  .table {
+    margin: 0;
+    color: var(--text-primary, $text-primary);
+
+    thead th {
+      background: var(--table-header-bg, $gray-100);
+      font-size: 0.72rem;
+      font-weight: $font-weight-bold;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      color: var(--text-muted, $text-muted);
+      padding: 10px $spacing-md;
+      border: 0;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-light, $gray-200);
+      transition: background $transition-fast;
+
+      &:last-child { border-bottom: 0; }
+      &:hover { background: var(--table-hover, $gray-100); }
+
+      td {
+        padding: 11px $spacing-md;
+        vertical-align: middle;
+        font-size: 0.855rem;
+        border: 0;
+      }
+    }
+  }
+
+  .table-footer {
+    background: transparent;
+    border-top: 1px solid var(--border-light, $gray-200);
+    padding: 10px $spacing-md;
+  }
+}
+
+// Soft status badges (Falcon style)
+.badge-soft {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.28rem 0.65rem;
+  border-radius: 50px;
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  letter-spacing: 0.3px;
+
+  &.badge-soft-success  { background: rgba($success, 0.12); color: darken($success, 8%); }
+  &.badge-soft-warning  { background: rgba($warning, 0.15); color: darken($warning, 20%); }
+  &.badge-soft-danger   { background: rgba($danger,  0.12); color: darken($danger, 8%); }
+  &.badge-soft-primary  { background: rgba($primary, 0.12); color: $primary; }
+  &.badge-soft-info     { background: rgba($info,    0.12); color: darken($info, 10%); }
+  &.badge-soft-secondary { background: rgba($secondary, 0.12); color: $secondary; }
+  &.badge-soft-muted    { background: var(--badge-muted-bg); color: var(--badge-muted-text); }
+}
+
+// Action button group
+.action-btn-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  font-size: 0.82rem;
+  border-radius: $border-radius;
+  border: 1px solid var(--border-color, $gray-300);
+  background: transparent;
+  color: var(--text-secondary, $gray-600);
+  cursor: pointer;
+  transition: all $transition-fast;
+  line-height: 1;
+
+  &:hover { background: var(--table-hover, $gray-100); border-color: $primary; color: $primary; transform: scale(1.08); }
+
+  // Color modifier classes
+  &.btn-action-edit:hover    { border-color: $primary; color: $primary; background: rgba($primary, 0.07); }
+  &.btn-action-success:hover { border-color: $success; color: $success; background: rgba($success, 0.07); }
+  &.btn-action-danger:hover  { border-color: $danger;  color: $danger;  background: rgba($danger,  0.07); }
+  &.btn-action-warning:hover { border-color: darken($warning, 15%); color: darken($warning, 15%); background: rgba($warning, 0.08); }
+
+  // Approve / Void / Delete semantic variants
+  &.approve {
+    color: $success; border-color: rgba($success, 0.3); background: rgba($success, 0.07);
+    &:hover { background: $success; color: #fff; border-color: $success; }
+  }
+  &.void {
+    color: darken($warning, 18%); border-color: rgba($warning, 0.35); background: rgba($warning, 0.07);
+    &:hover { background: darken($warning, 5%); color: #fff; border-color: darken($warning, 5%); }
+  }
+  &.delete {
+    color: $danger; border-color: rgba($danger, 0.3); background: rgba($danger, 0.07);
+    &:hover { background: $danger; color: #fff; border-color: $danger; }
+  }
+  &.edit:hover { border-color: $primary; color: $primary; background: rgba($primary, 0.07); }
+  &.toggle:hover { border-color: $success; color: $success; background: rgba($success, 0.07); }
+}
+
+// KPI stat cards — white card with colored icon
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-lg;
+
+  @media (max-width: $breakpoint-lg) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: $breakpoint-sm) { grid-template-columns: 1fr; }
+}
+
+.kpi-stat {
+  background: var(--bg-card, $bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, $shadow);
+  padding: 20px $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  transition: transform $transition-base, box-shadow $transition-base;
+  animation: fadeInUp 0.4s ease forwards;
+
+  &:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+
+  .kpi-stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: $border-radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+
+    &.icon-income   { background: rgba($success, 0.12); color: $success; }
+    &.icon-gross    { background: rgba($primary, 0.12); color: $primary; }
+    &.icon-expenses { background: rgba($danger,  0.12); color: $danger; }
+    &.icon-profit   { background: rgba($success, 0.12); color: $success; }
+    &.icon-loss     { background: rgba($danger,  0.12); color: $danger; }
+    &.icon-info     { background: rgba($info,    0.12); color: $info; }
+    &.icon-warning  { background: rgba($warning, 0.15); color: darken($warning, 15%); }
+  }
+
+  .kpi-stat-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .kpi-stat-label {
+    font-size: 0.7rem;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--text-muted, $text-muted);
+    margin-bottom: 4px;
+  }
+
+  .kpi-stat-value {
+    font-size: 1.35rem;
+    font-weight: $font-weight-bold;
+    color: var(--text-primary, $gray-900);
+    line-height: 1;
+  }
+
+  .kpi-stat-sub {
+    font-size: 0.72rem;
+    color: var(--text-muted, $text-muted);
+    margin-top: 3px;
+  }
+}
+
+// Empty state (both names supported)
+.empty-state-cell,
+.empty-cell {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted, $text-muted);
+
+  i {
+    font-size: 2.8rem;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.28;
+    color: $primary;
+  }
+
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+    line-height: 1.6;
+
+    a { color: $primary; text-decoration: none; font-weight: $font-weight-medium; &:hover { text-decoration: underline; } }
+    strong { font-weight: $font-weight-semibold; color: var(--text-secondary); }
+  }
+}
+
+// Skeleton loading shimmer
+@keyframes shimmer {
+  0%   { background-position: -600px 0; }
+  100% { background-position: 600px 0; }
+}
+
+.skeleton-box {
+  border-radius: $border-radius-md;
+  background: linear-gradient(90deg,
+    var(--table-hover, #f0f0f0) 25%,
+    var(--border-light, #e0e0e0) 37%,
+    var(--table-hover, #f0f0f0) 63%);
+  background-size: 600px 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+// ==================== TOGGLE ICON COLORS ====================
+
+.bi-toggle-on  { color: $success !important; }
+.bi-toggle-off { color: $gray-400 !important; }
 
 // ==================== PRINT STYLES ====================
 

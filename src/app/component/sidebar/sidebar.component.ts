@@ -25,6 +25,7 @@ interface MenuItem {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
@@ -145,7 +146,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
         {
           label: 'Reports',
           icon: 'bi-file-earmark-bar-graph',
-          route: '/attendance/reports',
+          route: '/attendance',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
           excludeRoles: ['ROLE_USER']
         }
@@ -256,6 +257,77 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           label: 'Submit Claim',
           icon: 'bi-plus-circle',
           route: '/expense-claims/new'
+        }
+      ]
+    },
+    {
+      label: 'Expenses',
+      icon: 'bi-receipt',
+      expanded: false,
+      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+      excludeRoles: ['ROLE_USER'],
+      children: [
+        {
+          label: 'Overview',
+          icon: 'bi-bar-chart-line',
+          route: '/expenses/overview',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Record Expense',
+          icon: 'bi-plus-square',
+          route: '/expenses/entry',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          excludeRoles: ['ROLE_USER', 'ROLE_MANAGER']
+        },
+        {
+          label: 'All Expenses',
+          icon: 'bi-list-ul',
+          route: '/expenses/entry/list',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Expense Claims',
+          icon: 'bi-wallet',
+          route: '/expenses/claims',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Reports',
+          icon: 'bi-file-earmark-bar-graph',
+          route: '/expenses/reports',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Chart of Accounts',
+          icon: 'bi-diagram-3',
+          route: '/expenses/accounts',
+          requiredRoles: ['ROLE_SYSADMIN']
+        },
+        {
+          label: 'Vendors',
+          icon: 'bi-building',
+          route: '/expenses/vendors',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          excludeRoles: ['ROLE_USER', 'ROLE_MANAGER']
+        },
+        {
+          label: 'Opening Balance',
+          icon: 'bi-bank',
+          route: '/expenses/opening-balance',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Annual Budget',
+          icon: 'bi-graph-up-arrow',
+          route: '/expenses/budget',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Budget vs Actual',
+          icon: 'bi-bar-chart-line',
+          route: '/expenses/budget-vs-actual',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
         }
       ]
     },

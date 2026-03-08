@@ -6,6 +6,7 @@ import { EmployeeService } from 'src/app/service/employee.service';
 import { Employee } from 'src/app/component/employee/employee.model';
 
 @Component({
+  standalone: false,
   selector: 'app-create-payroll',
   templateUrl: './create-payroll.component.html',
   styleUrls: ['./create-payroll.component.scss']

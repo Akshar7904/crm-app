@@ -18,6 +18,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-asset-requests',
   templateUrl: './asset-requests.component.html',
   styleUrls: ['./asset-requests.component.scss'],
@@ -278,23 +279,23 @@ export class AssetRequestsComponent implements OnInit {
 
   getStatusClass(status: AssetRequestStatus): string {
     const classes: { [key: string]: string } = {
-      'PENDING': 'bg-warning text-dark',
-      'APPROVED': 'bg-info',
-      'REJECTED': 'bg-danger',
-      'CANCELLED': 'bg-secondary',
-      'FULFILLED': 'bg-success'
+      'PENDING': 'badge-soft-warning',
+      'APPROVED': 'badge-soft-info',
+      'REJECTED': 'badge-soft-danger',
+      'CANCELLED': 'badge-soft-secondary',
+      'FULFILLED': 'badge-soft-success'
     };
-    return classes[status] || 'bg-secondary';
+    return classes[status] || 'badge-soft-secondary';
   }
 
   getPriorityClass(priority: string): string {
     const classes: { [key: string]: string } = {
-      'LOW': 'bg-secondary',
-      'NORMAL': 'bg-primary',
-      'HIGH': 'bg-warning text-dark',
-      'URGENT': 'bg-danger'
+      'LOW': 'badge-soft-secondary',
+      'NORMAL': 'badge-soft-primary',
+      'HIGH': 'badge-soft-warning',
+      'URGENT': 'badge-soft-danger'
     };
-    return classes[priority] || 'bg-secondary';
+    return classes[priority] || 'badge-soft-secondary';
   }
 
   formatDate(date: Date | string): string {

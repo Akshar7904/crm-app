@@ -1,13 +1,70 @@
-// process-payroll Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-.form-check {
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  transition: background-color 0.2s;
+.ann-wrap { padding: 0; }
+
+.pay-form-card {
+  margin: 0 24px 24px;
+  padding: 24px;
 }
 
-.form-check:hover {
-  background-color: #f8f9fa;
+.pay-section-title {
+  font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-secondary, #555);
+  padding: 10px 0;
+  margin-bottom: 16px;
+  border-bottom: 2px solid var(--border-color, #eee);
+  display: flex; align-items: center;
+}
+
+.pay-form-row { margin-bottom: 8px; }
+
+.pay-label {
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--text-secondary, #555); margin-bottom: 4px;
+}
+
+.pay-select-all {
+  padding: 12px 16px;
+  background: var(--bg-hover, #f8f9fa);
+  border-radius: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border-color, #eee);
+}
+
+.pay-employee-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+}
+
+.pay-emp-check {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #eee);
+  background: var(--bg-card, #fff);
+  transition: all 0.15s;
+  cursor: pointer;
+
+  &:hover { border-color: rgba(55,95,160,0.3); background: rgba(55,95,160,0.02); }
+
+  &.pay-emp-selected {
+    border-color: rgba(55,95,160,0.5);
+    background: rgba(55,95,160,0.05);
+  }
+}
+
+.pay-form-actions {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding-top: 20px; margin-top: 16px;
+  border-top: 1px solid var(--border-color, #eee);
+}
+
+.btn-banner-ghost {
+  background: rgba(255,255,255,0.1) !important;
+  border-color: rgba(255,255,255,0.2) !important;
 }

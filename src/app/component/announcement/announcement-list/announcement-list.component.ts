@@ -13,6 +13,7 @@ interface AnnouncementListState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-announcement-list',
   templateUrl: './announcement-list.component.html',
   styleUrls: ['./announcement-list.component.scss']
@@ -89,7 +90,7 @@ export class AnnouncementListComponent implements OnInit, OnDestroy {
     this.announcementService.getAnnouncement$(announcement.id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           // Use the fresh data from API (which also increments view count)
           this.selectedAnnouncement = response.data?.announcement || announcement;
         },

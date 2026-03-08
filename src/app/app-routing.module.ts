@@ -60,17 +60,9 @@ const routes: Routes = [
   },
 
   // =============================================
-  // EMPLOYEES
-  // =============================================
-  {
-    path: 'employee',
-    loadChildren: () => import('./component/employee/employee.module').then(module => module.EmployeeModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Employees' }
-  },
-
-  // =============================================
   // LEAVE MANAGEMENT
+  // NOTE: Must be before the 'employee' lazy module — Angular prefix-matches
+  // 'employee' first and would swallow 'employee/leave' if placed after it.
   // =============================================
   {
     path: 'employee/leave',
@@ -83,6 +75,16 @@ const routes: Routes = [
     component: AdminLeaveComponent,
     canActivate: [AuthenticationGuard],
     data: { title: 'Leave Management' }
+  },
+
+  // =============================================
+  // EMPLOYEES
+  // =============================================
+  {
+    path: 'employee',
+    loadChildren: () => import('./component/employee/employee.module').then(module => module.EmployeeModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Employees' }
   },
 
   // =============================================
@@ -145,6 +147,16 @@ const routes: Routes = [
     loadChildren: () => import('./component/expense-claims/expense-claims.module').then(m => m.ExpenseClaimsModule),
     canActivate: [AuthenticationGuard],
     data: { title: 'Expense Claims' }
+  },
+
+  // =============================================
+  // EXPENSES MODULE (QuickBooks-style)
+  // =============================================
+  {
+    path: 'expenses',
+    loadChildren: () => import('./component/expenses/expenses.module').then(m => m.ExpensesModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Expenses' }
   },
 
   // =============================================

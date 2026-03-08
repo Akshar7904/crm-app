@@ -1,133 +1,173 @@
-<!-- Notification List Page -->
-<div class="container-fluid py-4">
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h4 class="mb-1">Messages</h4>
-      <p class="text-muted mb-0">View and manage your messages</p>
+<div class="msg-wrap">
+
+  <!-- Falcon Banner -->
+  <div class="msg-banner">
+    <div class="msg-banner-left">
+      <h1 class="msg-banner-title"><i class="bi bi-chat-left-text"></i> Messages</h1>
+      <p class="msg-banner-subtitle">View and manage your notifications</p>
     </div>
-    <div class="d-flex gap-2">
-      <button class="btn btn-outline-primary btn-sm" (click)="markAllAsRead()">
-        <i class="bi bi-check2-all me-1"></i> Mark All Read
+    <div class="msg-banner-actions">
+      <button class="btn-msg-glass" (click)="markAllAsRead()">
+        <i class="bi bi-check2-all"></i> Mark All Read
       </button>
-      <button class="btn btn-outline-danger btn-sm" (click)="deleteAllNotifications()">
-        <i class="bi bi-trash me-1"></i> Clear All
+      <button class="btn-msg-glass btn-msg-glass--danger" (click)="deleteAllNotifications()">
+        <i class="bi bi-trash"></i> Clear All
       </button>
     </div>
   </div>
 
-  <!-- Filters -->
-  <div class="card mb-4">
-    <div class="card-body py-2">
-      <div class="d-flex flex-wrap gap-2">
-        <button *ngFor="let filter of filters"
-                class="btn btn-sm"
-                [class.btn-primary]="selectedFilter === filter.value"
-                [class.btn-outline-secondary]="selectedFilter !== filter.value"
-                (click)="onFilterChange(filter.value)">
-          {{ filter.label }}
-        </button>
-      </div>
-    </div>
+  <!-- Filter Tabs -->
+  <div class="msg-filter-card">
+    <button *ngFor="let filter of filters"
+            class="msg-filter-tab"
+            [class.active]="selectedFilter === filter.value"
+            (click)="onFilterChange(filter.value)">
+      {{ filter.label }}
+    </button>
   </div>
 
   <!-- Content -->
   <ng-container *ngIf="state$ | async as state">
+
     <!-- Loading -->
-    <div *ngIf="state.dataState === DataState.LOADING" class="text-center py-5">
+    <div *ngIf="state.dataState === DataState.LOADING" class="msg-loading">
       <div class="spinner-border text-primary" role="status">
         <span class="visually-hidden">Loading...</span>
       </div>
-      <p class="mt-2 text-muted">Loading messages...</p>
+      <p>Loading messages...</p>
     </div>
 
     <!-- Loaded -->
-    <div *ngIf="state.dataState === DataState.LOADED">
-      <!-- Empty State -->
-      <div *ngIf="!state.notifications?.length" class="card">
-        <div class="card-body text-center py-5">
-          <i class="bi bi-chat-left-text display-1 text-muted"></i>
-          <h5 class="mt-3">No Messages</h5>
-          <p class="text-muted">You're all caught up! No messages to display.</p>
-        </div>
+    <ng-container *ngIf="state.dataState === DataState.LOADED">
+
+      <!-- Empty -->
+      <div *ngIf="!state.notifications?.length" class="msg-empty">
+        <i class="bi bi-chat-left-text msg-empty-icon"></i>
+        <h5 class="mt-3 mb-1">No Messages</h5>
+        <p class="text-muted mb-0">You're all caught up! No messages to display.</p>
       </div>
 
-      <!-- Notification Cards -->
-      <div *ngIf="state.notifications?.length" class="notification-cards">
-        <div *ngFor="let notification of state.notifications"
-             class="card mb-2 notification-card"
-             [class.unread]="!notification.isRead">
-          <div class="card-body d-flex align-items-start py-3">
-            <!-- Icon -->
-            <div class="notification-icon me-3">
-              <i [class]="getIcon(notification.type) + ' fs-4'" [ngClass]="getPriorityClass(notification.priority)"></i>
-            </div>
+      <!-- List -->
+      <div *ngIf="state.notifications?.length" class="msg-list-card">
 
-            <!-- Content -->
-            <div class="flex-grow-1">
-              <div class="d-flex justify-content-between align-items-start mb-1">
-                <h6 class="mb-0 fw-semibold">{{ notification.title }}</h6>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="badge" [ngClass]="{
-                    'bg-secondary': notification.priority === 'LOW',
-                    'bg-primary': notification.priority === 'NORMAL',
-                    'bg-warning': notification.priority === 'HIGH',
-                    'bg-danger': notification.priority === 'URGENT'
-                  }">{{ notification.priority }}</span>
-                  <small class="text-muted">{{ getTimeAgo(notification.createdAt) }}</small>
-                </div>
-              </div>
-              <p class="mb-2 text-muted">{{ notification.message }}</p>
-              <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-light text-dark">{{ notification.type }}</span>
-                <span *ngIf="!notification.isRead" class="badge bg-info">Unread</span>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="ms-3 d-flex flex-column gap-1">
-              <button *ngIf="!notification.isRead"
-                      class="btn btn-sm btn-outline-primary"
-                      title="Mark as read"
-                      (click)="markAsRead(notification)">
-                <i class="bi bi-check2"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger"
-                      title="Delete"
-                      (click)="deleteNotification(notification.id)">
-                <i class="bi bi-trash"></i>
-              </button>
-            </div>
+        <!-- Bulk Action Bar -->
+        <div class="msg-bulk-bar" [class.msg-bulk-bar--visible]="selectedIds.size > 0">
+          <div class="msg-bulk-info">
+            <i class="bi bi-check2-square"></i>
+            <span>{{ selectedIds.size }} selected</span>
+          </div>
+          <div class="msg-bulk-actions">
+            <button class="msg-bulk-btn msg-bulk-btn--read"
+                    (click)="bulkMarkAsRead()"
+                    title="Mark selected as read">
+              <i class="bi bi-check2-all"></i> Mark as Read
+            </button>
+            <button class="msg-bulk-btn msg-bulk-btn--delete"
+                    (click)="bulkDelete()"
+                    title="Delete selected">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+            <button class="msg-bulk-btn msg-bulk-btn--clear" (click)="clearSelection()">
+              <i class="bi bi-x-lg"></i> Clear
+            </button>
           </div>
         </div>
 
+        <!-- Select All row -->
+        <div class="msg-select-all-row">
+          <label class="msg-checkbox-label" (click)="$event.stopPropagation()">
+            <input type="checkbox"
+                   class="msg-checkbox"
+                   [checked]="isAllSelected(state.notifications!)"
+                   (change)="isAllSelected(state.notifications!) ? clearSelection() : selectAll(state.notifications!)">
+            <span class="msg-select-all-text">Select all</span>
+          </label>
+          <span class="msg-count-label">{{ state.totalCount }} message{{ state.totalCount !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <!-- Notification Rows -->
+        <div *ngFor="let notification of state.notifications; let last = last"
+             class="msg-row"
+             [class.msg-row--unread]="!notification.isRead"
+             [class.msg-row--selected]="isSelected(notification.id)"
+             [class.msg-row--last]="last"
+             (click)="toggleSelection(notification.id)">
+
+          <!-- Checkbox -->
+          <div class="msg-check-wrap" (click)="$event.stopPropagation()">
+            <input type="checkbox"
+                   class="msg-checkbox"
+                   [checked]="isSelected(notification.id)"
+                   (change)="toggleSelection(notification.id)">
+          </div>
+
+          <!-- Icon -->
+          <div class="msg-icon-wrap" [ngClass]="'msg-icon-wrap--' + notification.priority?.toLowerCase()">
+            <i [class]="getIcon(notification.type)"></i>
+          </div>
+
+          <!-- Body -->
+          <div class="msg-body">
+            <div class="msg-header-row">
+              <span class="msg-title">{{ notification.title }}</span>
+              <div class="msg-meta">
+                <span class="msg-priority-badge" [ngClass]="{
+                  'badge--low':    notification.priority === 'LOW',
+                  'badge--normal': notification.priority === 'NORMAL',
+                  'badge--high':   notification.priority === 'HIGH',
+                  'badge--urgent': notification.priority === 'URGENT'
+                }">{{ notification.priority }}</span>
+                <span class="msg-time">{{ getTimeAgo(notification.createdAt) }}</span>
+              </div>
+            </div>
+            <p class="msg-text">{{ notification.message }}</p>
+            <div class="msg-tags">
+              <span class="msg-type-tag">{{ notification.type }}</span>
+              <span *ngIf="!notification.isRead" class="msg-unread-tag">Unread</span>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="msg-actions" (click)="$event.stopPropagation()">
+            <button *ngIf="!notification.isRead"
+                    class="msg-action-btn msg-action-btn--read"
+                    title="Mark as read"
+                    (click)="markAsRead(notification)">
+              <i class="bi bi-check2"></i>
+            </button>
+            <button class="msg-action-btn msg-action-btn--delete"
+                    title="Delete"
+                    (click)="deleteNotification(notification.id)">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+
+        </div>
+
         <!-- Pagination -->
-        <div *ngIf="state.totalCount && state.totalCount > pageSize" class="d-flex justify-content-center mt-4">
-          <nav>
-            <ul class="pagination mb-0">
-              <li class="page-item" [class.disabled]="currentPage === 0">
-                <button class="page-link" (click)="onPageChange(currentPage - 1)">Previous</button>
-              </li>
-              <li class="page-item">
-                <span class="page-link">Page {{ currentPage + 1 }}</span>
-              </li>
-              <li class="page-item" [class.disabled]="(currentPage + 1) * pageSize >= state.totalCount">
-                <button class="page-link" (click)="onPageChange(currentPage + 1)">Next</button>
-              </li>
-            </ul>
-          </nav>
+        <div *ngIf="state.totalCount && state.totalCount > pageSize" class="msg-pagination">
+          <button class="msg-page-btn" [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)">
+            <i class="bi bi-chevron-left"></i> Previous
+          </button>
+          <span class="msg-page-label">Page {{ currentPage + 1 }}</span>
+          <button class="msg-page-btn"
+                  [disabled]="(currentPage + 1) * pageSize >= state.totalCount"
+                  (click)="onPageChange(currentPage + 1)">
+            Next <i class="bi bi-chevron-right"></i>
+          </button>
         </div>
       </div>
-    </div>
+    </ng-container>
 
     <!-- Error -->
-    <div *ngIf="state.dataState === DataState.ERROR" class="card">
-      <div class="card-body text-center py-5 text-danger">
-        <i class="bi bi-exclamation-circle display-1"></i>
-        <h5 class="mt-3">Error Loading Messages</h5>
-        <p class="text-muted">{{ state.error }}</p>
-        <button class="btn btn-primary" (click)="refresh()">Try Again</button>
-      </div>
+    <div *ngIf="state.dataState === DataState.ERROR" class="msg-error">
+      <i class="bi bi-exclamation-circle msg-error-icon"></i>
+      <h5 class="mt-3 mb-1">Error Loading Messages</h5>
+      <p class="text-muted">{{ state.error }}</p>
+      <button class="msg-retry-btn" (click)="refresh()">
+        <i class="bi bi-arrow-clockwise"></i> Try Again
+      </button>
     </div>
+
   </ng-container>
 </div>

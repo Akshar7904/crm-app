@@ -11,6 +11,7 @@ import { CustomerService } from 'src/app/service/customer.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-newcustomer',
   templateUrl: './newcustomer.component.html',
   styleUrls: ['./newcustomer.component.scss'],

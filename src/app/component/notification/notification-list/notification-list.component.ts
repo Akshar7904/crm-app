@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable, Subject, BehaviorSubject, of } from 'rxjs';
+import { Observable, Subject, BehaviorSubject, of, forkJoin } from 'rxjs';
 import { takeUntil, map, startWith, catchError, switchMap } from 'rxjs/operators';
 import { NotificationApiService } from 'src/app/service/notification-api.service';
 import { Notification, NotificationType, getNotificationIcon, getPriorityClass } from 'src/app/interface/notification';
@@ -13,6 +13,7 @@ interface NotificationListState {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-notification-list',
   templateUrl: './notification-list.component.html',
   styleUrls: ['./notification-list.component.scss']
@@ -26,6 +27,7 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   currentPage = 0;
   pageSize = 20;
   selectedFilter: NotificationType | 'ALL' = 'ALL';
+  selectedIds = new Set<number>();
 
   readonly DataState = DataState;
   readonly filters: { value: NotificationType | 'ALL'; label: string }[] = [
@@ -52,27 +54,71 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   loadNotifications(): void {
     this.state$ = this.refreshTrigger$.pipe(
       switchMap(() => {
-        if (this.selectedFilter === 'ALL') {
-          return this.notificationService.getNotifications$(this.currentPage, this.pageSize);
-        } else {
-          return this.notificationService.getNotificationsByType$(this.selectedFilter);
-        }
-      }),
-      map(response => ({
-        dataState: DataState.LOADED,
-        notifications: response.data?.notifications || [],
-        totalCount: (response.data as any)?.totalCount || response.data?.notifications?.length || 0
-      })),
-      startWith({ dataState: DataState.LOADING }),
-      catchError(error => of({
-        dataState: DataState.ERROR,
-        error: error
-      }))
+        const source$ = this.selectedFilter === 'ALL'
+          ? this.notificationService.getNotifications$(this.currentPage, this.pageSize)
+          : this.notificationService.getNotificationsByType$(this.selectedFilter);
+
+        return source$.pipe(
+          map(response => ({
+            dataState: DataState.LOADED,
+            notifications: response.data?.notifications || [],
+            totalCount: (response.data as any)?.totalCount || response.data?.notifications?.length || 0
+          })),
+          startWith({ dataState: DataState.LOADING } as NotificationListState),
+          catchError(error => of({ dataState: DataState.ERROR, error } as NotificationListState))
+        );
+      })
     );
   }
 
   refresh(): void {
+    this.selectedIds.clear();
     this.refreshTrigger$.next();
+  }
+
+  // ─── Selection
+  toggleSelection(id: number): void {
+    if (this.selectedIds.has(id)) {
+      this.selectedIds.delete(id);
+    } else {
+      this.selectedIds.add(id);
+    }
+  }
+
+  isSelected(id: number): boolean {
+    return this.selectedIds.has(id);
+  }
+
+  selectAll(notifications: Notification[]): void {
+    notifications.forEach(n => this.selectedIds.add(n.id));
+  }
+
+  clearSelection(): void {
+    this.selectedIds.clear();
+  }
+
+  isAllSelected(notifications: Notification[]): boolean {
+    return notifications.length > 0 && notifications.every(n => this.selectedIds.has(n.id));
+  }
+
+  // ─── Bulk Actions
+  bulkMarkAsRead(): void {
+    const ids = Array.from(this.selectedIds);
+    const pending = ids.map(id => this.notificationService.markAsRead$(id));
+    forkJoin(pending).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { this.notificationService.refreshUnreadCount(); this.refresh(); },
+      error: () => { this.notificationService.refreshUnreadCount(); this.refresh(); }
+    });
+  }
+
+  bulkDelete(): void {
+    if (!confirm(`Delete ${this.selectedIds.size} notification(s)?`)) return;
+    const ids = Array.from(this.selectedIds);
+    const pending = ids.map(id => this.notificationService.deleteNotification$(id));
+    forkJoin(pending).pipe(takeUntil(this.destroy$)).subscribe({
+      next: () => { this.notificationService.refreshUnreadCount(); this.refresh(); },
+      error: () => this.refresh()
+    });
   }
 
   onFilterChange(filter: NotificationType | 'ALL'): void {
@@ -88,16 +134,14 @@ export class NotificationListComponent implements OnInit, OnDestroy {
 
   markAsRead(notification: Notification): void {
     if (!notification.isRead) {
+      notification.isRead = true; // optimistic update
       this.notificationService.markAsRead$(notification.id)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: () => {
-            notification.isRead = true;
-            this.notificationService.refreshUnreadCount();
-          },
+          next: () => this.notificationService.refreshUnreadCount(),
           error: (err) => {
             console.error('Error marking as read:', err);
-            notification.isRead = false;
+            notification.isRead = false; // revert on failure
             this.notificationService.refreshUnreadCount();
           }
         });

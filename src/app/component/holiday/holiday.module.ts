@@ -20,7 +20,7 @@ import { HolidayService } from '../../service/holiday.service';
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    HolidayRoutingModule
+    HolidayRoutingModule,
   ],
   providers: [HolidayService]
 })

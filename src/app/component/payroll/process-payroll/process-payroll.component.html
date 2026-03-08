@@ -1,60 +1,80 @@
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">
-            <i class="bi bi-gear me-2"></i>Process Payroll
-          </h4>
+<div class="ann-wrap">
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-gear"></i> Process Payroll</h1>
+      <p class="banner-subtitle">Generate payroll for multiple employees in bulk</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-banner btn-banner-ghost" type="button" (click)="cancel()">
+        <i class="bi bi-x-circle"></i> Cancel
+      </button>
+    </div>
+  </div>
+
+  <div class="pay-form-card table-card">
+    <form [formGroup]="processForm">
+
+      <!-- Pay Period -->
+      <div class="pay-section-title">
+        <i class="bi bi-calendar-range me-2"></i>Pay Period
+      </div>
+      <div class="row pay-form-row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Pay Period Start <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="payPeriodStart">
         </div>
-        <div class="card-body">
-          <form [formGroup]="processForm">
-            <div class="row mb-4">
-              <div class="col-md-6">
-                <label class="form-label">Pay Period Start <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" formControlName="payPeriodStart">
-              </div>
-              <div class="col-md-6">
-                <label class="form-label">Pay Period End <span class="text-danger">*</span></label>
-                <input type="date" class="form-control" formControlName="payPeriodEnd">
-              </div>
-            </div>
-
-            <h5 class="mb-3">Select Employees</h5>
-            <div class="form-check mb-3">
-              <input class="form-check-input" type="checkbox" [checked]="selectAll" (change)="toggleAll()" id="selectAll">
-              <label class="form-check-label fw-bold" for="selectAll">
-                Select All ({{ employees.length }} employees)
-              </label>
-            </div>
-
-            <div class="row">
-              <div class="col-md-4 mb-2" *ngFor="let employee of employees">
-                <div class="form-check">
-                  <input class="form-check-input" type="checkbox"
-                         [checked]="selectedEmployees.has(employee.id)"
-                         (change)="toggleEmployee(employee.id)"
-                         [id]="'emp-' + employee.id">
-                  <label class="form-check-label" [for]="'emp-' + employee.id">
-                    {{ employee.firstName }} {{ employee.lastName }} ({{ employee.employeeId }})
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-4">
-              <button type="button" class="btn btn-primary me-2" (click)="processPayroll()" [disabled]="isProcessing || selectedEmployees.size === 0">
-                <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
-                <i class="bi bi-check-circle me-1" *ngIf="!isProcessing"></i>
-                Process {{ selectedEmployees.size }} Payroll(s)
-              </button>
-              <button type="button" class="btn btn-secondary" (click)="cancel()" [disabled]="isProcessing">
-                <i class="bi bi-x-circle me-1"></i>Cancel
-              </button>
-            </div>
-          </form>
+        <div class="col-md-6 mb-3">
+          <label class="form-label pay-label">Pay Period End <span class="text-danger">*</span></label>
+          <input type="date" class="form-control" formControlName="payPeriodEnd">
         </div>
       </div>
-    </div>
+
+      <!-- Employee Selection -->
+      <div class="pay-section-title">
+        <i class="bi bi-people me-2"></i>Select Employees
+      </div>
+
+      <div class="pay-form-row">
+        <div class="pay-select-all">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" [checked]="selectAll" (change)="toggleAll()" id="selectAll">
+            <label class="form-check-label fw-semibold" for="selectAll">
+              Select All &nbsp;<span class="text-muted">({{ employees.length }} employees)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="pay-employee-grid">
+          <div *ngFor="let employee of employees" class="pay-emp-check" [class.pay-emp-selected]="selectedEmployees.has(employee.id)">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox"
+                     [checked]="selectedEmployees.has(employee.id)"
+                     (change)="toggleEmployee(employee.id)"
+                     [id]="'emp-' + employee.id">
+              <label class="form-check-label" [for]="'emp-' + employee.id">
+                <span class="fw-semibold">{{ employee.firstName }} {{ employee.lastName }}</span>
+                <span class="text-muted ms-1 small">({{ employee.employeeId }})</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="pay-form-actions">
+        <button type="button" class="btn btn-light" (click)="cancel()" [disabled]="isProcessing">
+          <i class="bi bi-x-circle me-1"></i> Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="processPayroll()"
+                [disabled]="isProcessing || selectedEmployees.size === 0">
+          <span *ngIf="isProcessing" class="spinner-border spinner-border-sm me-2"></span>
+          <i class="bi bi-check-circle me-1" *ngIf="!isProcessing"></i>
+          Process {{ selectedEmployees.size }} Payroll(s)
+        </button>
+      </div>
+
+    </form>
   </div>
 </div>

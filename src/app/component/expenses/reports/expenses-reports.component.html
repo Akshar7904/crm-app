@@ -1,0 +1,66 @@
+<div class="expenses-reports">
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-bar-chart-line"></i> Financial Reports</h1>
+      <p class="banner-subtitle">Income statements, trends and Excel exports</p>
+    </div>
+  </div>
+
+  <!-- Export Card -->
+  <div class="falcon-card export-card">
+    <div class="export-row">
+      <div class="export-info">
+        <h5>
+          <i class="bi bi-file-earmark-excel-fill" style="color:#1d6f42"></i>
+          Download Income Statement (.xlsx)
+        </h5>
+        <p>4-sheet Excel report: P&amp;L statement, Business Expenses detail, Invoice summary, Payroll summary</p>
+      </div>
+      <div class="export-controls">
+        <select class="form-select form-select-sm" [(ngModel)]="selectedYear" (change)="onYearChange()">
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedStartMonth">
+          <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+        </select>
+        <span class="separator">to</span>
+        <select class="form-select form-select-sm" [(ngModel)]="selectedEndMonth">
+          <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+        </select>
+        <button class="btn btn-success btn-sm" (click)="exportExcel()" [disabled]="exporting">
+          <span *ngIf="exporting" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!exporting" class="bi bi-download me-1"></i>
+          {{ exporting ? 'Preparing…' : 'Download' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Year Bar Chart -->
+  <div class="falcon-card chart-card">
+    <div class="chart-card-header">
+      <h6 class="chart-title">
+        <i class="bi bi-bar-chart-line me-2"></i>
+        Monthly Income vs Expenses — {{ selectedYear }}
+      </h6>
+      <div class="year-select">
+        <select class="form-select form-select-sm" [(ngModel)]="selectedYear" (change)="onYearChange()">
+          <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="chart-body">
+      <div class="chart-loading" *ngIf="loading">
+        <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+        Loading chart data…
+      </div>
+      <!-- canvas must always be in DOM so Chart.js can find it -->
+      <div class="chart-canvas-wrap" [style.display]="loading ? 'none' : 'block'">
+        <canvas id="yearBarChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>

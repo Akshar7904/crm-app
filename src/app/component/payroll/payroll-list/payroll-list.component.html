@@ -1,179 +1,183 @@
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h4 class="mb-0">
-            <i class="bi bi-cash-stack me-2"></i>Payroll Management
-          </h4>
-          <div>
-            <button class="btn btn-primary me-2" routerLink="/payroll/create">
-              <i class="bi bi-plus-circle me-1"></i>Create Payroll
-            </button>
-            <button class="btn btn-info" routerLink="/payroll/process">
-              <i class="bi bi-gear me-1"></i>Process Payroll
-            </button>
-          </div>
-        </div>
+<div class="ann-wrap">
 
-        <div class="card-body">
-          <ng-container *ngIf="payrollState$ | async as state">
-            <!-- Loading State -->
-            <div *ngIf="state.dataState === DataState.LOADING" class="text-center py-5">
-              <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-              <p class="mt-3">Loading payrolls...</p>
-            </div>
-
-            <!-- Error State -->
-            <div *ngIf="state.dataState === DataState.ERROR" class="alert alert-danger">
-              <i class="bi bi-exclamation-triangle me-2"></i>
-              {{ state.error }}
-            </div>
-
-            <!-- Loaded State -->
-            <div *ngIf="state.dataState === DataState.LOADED">
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead>
-                  <tr>
-                    <th>Employee</th>
-                    <th>Period</th>
-                    <th>Payment Date</th>
-                    <th>Gross Salary</th>
-                    <th>Deductions</th>
-                    <th>Net Salary</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr *ngFor="let payroll of getPayrolls(state)">
-                    <td>
-                      <strong>{{ payroll.employeeName || 'N/A' }}</strong><br>
-                      <small class="text-muted">{{ payroll.employeeNumber || '' }}</small>
-                    </td>
-                    <td>{{ formatDate(payroll.payPeriodStart) }} - {{ formatDate(payroll.payPeriodEnd) }}</td>
-                    <td>{{ formatDate(payroll.paymentDate) }}</td>
-                    <td>{{ formatCurrency(payroll.grossSalary) }}</td>
-                    <td>{{ formatCurrency(payroll.totalDeductions) }}</td>
-                    <td><strong>{{ formatCurrency(payroll.netSalary) }}</strong></td>
-                    <td><span [ngClass]="getStatusBadgeClass(payroll.status)">{{ payroll.status }}</span></td>
-                    <td>
-                      <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary" (click)="viewPayroll(payroll)" title="View">
-                          <i class="bi bi-eye"></i>
-                        </button>
-                        <button class="btn btn-outline-secondary" (click)="editPayroll(payroll)"
-                                *ngIf="payroll.status === 'DRAFT'" title="Edit">
-                          <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-outline-success" (click)="openStatusModal(payroll, 'approve')"
-                                *ngIf="payroll.status === 'DRAFT'" title="Approve">
-                          <i class="bi bi-check-circle"></i>
-                        </button>
-                        <button class="btn btn-outline-info" (click)="openStatusModal(payroll, 'paid')"
-                                *ngIf="payroll.status === 'PROCESSED'" title="Mark as Paid">
-                          <i class="bi bi-cash"></i>
-                        </button>
-                        <button class="btn btn-outline-warning" (click)="initiatePayment(payroll.id)"
-                                *ngIf="payroll.status === 'PROCESSED'" title="Pay via PayFast"
-                                [disabled]="isProcessingPayment === payroll.id">
-                          <i class="bi bi-credit-card" *ngIf="isProcessingPayment !== payroll.id"></i>
-                          <span class="spinner-border spinner-border-sm" *ngIf="isProcessingPayment === payroll.id"></span>
-                        </button>
-                        <button class="btn btn-outline-success" (click)="downloadPayslip(payroll.id)"
-                                *ngIf="payroll.status === 'PROCESSED' || payroll.status === 'PAID'" title="Download Payslip">
-                          <i class="bi bi-download"></i>
-                        </button>
-                        <button class="btn btn-outline-danger" (click)="openStatusModal(payroll, 'cancel')"
-                                *ngIf="payroll.status !== 'CANCELLED' && payroll.status !== 'PAID'" title="Cancel">
-                          <i class="bi bi-x-circle"></i>
-                        </button>
-                        <button class="btn btn-outline-warning" (click)="recalculate(payroll.id)"
-                                *ngIf="payroll.status === 'DRAFT'" title="Recalculate">
-                          <i class="bi bi-calculator"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr *ngIf="getPayrolls(state).length === 0">
-                    <td colspan="8" class="text-center py-4">
-                      <i class="bi bi-inbox display-4 d-block mb-3 text-muted"></i>
-                      <p class="text-muted">No payrolls found</p>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Pagination -->
-              <nav *ngIf="getTotalPages(state) > 1" class="mt-4">
-                <ul class="pagination justify-content-center">
-                  <li class="page-item" [class.disabled]="currentPage === 0">
-                    <button class="page-link" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 0">
-                      Previous
-                    </button>
-                  </li>
-                  <li class="page-item" *ngFor="let page of [].constructor(getTotalPages(state)); let i = index"
-                      [class.active]="i === currentPage">
-                    <button class="page-link" (click)="onPageChange(i)">{{ i + 1 }}</button>
-                  </li>
-                  <li class="page-item" [class.disabled]="currentPage >= getTotalPages(state) - 1">
-                    <button class="page-link" (click)="onPageChange(currentPage + 1)"
-                            [disabled]="currentPage >= getTotalPages(state) - 1">
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </ng-container>
-        </div>
-      </div>
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-cash-stack"></i> Payroll Management</h1>
+      <p class="banner-subtitle">Process and manage employee payroll</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-banner btn-banner-ghost" routerLink="/payroll/process">
+        <i class="bi bi-gear"></i> Process Payroll
+      </button>
+      <button class="btn-banner" routerLink="/payroll/create">
+        <i class="bi bi-plus-circle"></i> Create Payroll
+      </button>
     </div>
   </div>
+
+  <ng-container *ngIf="payrollState$ | async as state">
+
+    <!-- Loading -->
+    <div *ngIf="state.dataState === DataState.LOADING" class="pay-loading">
+      <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+      Loading payrolls...
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="state.dataState === DataState.ERROR" class="pay-error">
+      <i class="bi bi-exclamation-circle"></i>
+      <h5>Failed to Load</h5>
+      <p>{{ state.error }}</p>
+    </div>
+
+    <!-- Loaded -->
+    <ng-container *ngIf="state.dataState === DataState.LOADED">
+      <div class="table-card pay-table-card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Employee</th>
+                <th>Period</th>
+                <th>Payment Date</th>
+                <th>Gross</th>
+                <th>Deductions</th>
+                <th>Net Salary</th>
+                <th>Status</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let payroll of getPayrolls(state)">
+                <td>
+                  <div class="fw-semibold">{{ payroll.employeeName || 'N/A' }}</div>
+                  <div class="text-muted small">{{ payroll.employeeNumber || '' }}</div>
+                </td>
+                <td class="text-muted small">{{ formatDate(payroll.payPeriodStart) }} – {{ formatDate(payroll.payPeriodEnd) }}</td>
+                <td class="text-muted small">{{ formatDate(payroll.paymentDate) }}</td>
+                <td class="text-muted small">{{ formatCurrency(payroll.grossSalary) }}</td>
+                <td class="text-muted small">{{ formatCurrency(payroll.totalDeductions) }}</td>
+                <td class="fw-semibold">{{ formatCurrency(payroll.netSalary) }}</td>
+                <td><span [ngClass]="getStatusBadgeClass(payroll.status)">{{ payroll.status }}</span></td>
+                <td class="text-center">
+                  <div class="action-btn-group">
+                    <button class="action-btn action-btn-view" title="View" (click)="viewPayroll(payroll)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button class="action-btn action-btn-edit" title="Edit" (click)="editPayroll(payroll)"
+                            *ngIf="payroll.status === 'DRAFT'">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="action-btn action-btn-approve" title="Approve" (click)="openStatusModal(payroll, 'approve')"
+                            *ngIf="payroll.status === 'DRAFT'">
+                      <i class="bi bi-check-circle"></i>
+                    </button>
+                    <button class="action-btn action-btn-paid" title="Mark as Paid" (click)="openStatusModal(payroll, 'paid')"
+                            *ngIf="payroll.status === 'PROCESSED'">
+                      <i class="bi bi-cash"></i>
+                    </button>
+                    <button class="action-btn action-btn-pay" title="Pay via PayFast" (click)="initiatePayment(payroll.id)"
+                            *ngIf="payroll.status === 'PROCESSED'"
+                            [disabled]="isProcessingPayment === payroll.id">
+                      <i class="bi bi-credit-card" *ngIf="isProcessingPayment !== payroll.id"></i>
+                      <span class="spinner-border spinner-border-sm" *ngIf="isProcessingPayment === payroll.id"></span>
+                    </button>
+                    <button class="action-btn action-btn-download" title="Download Payslip" (click)="downloadPayslip(payroll.id)"
+                            *ngIf="payroll.status === 'PROCESSED' || payroll.status === 'PAID'">
+                      <i class="bi bi-download"></i>
+                    </button>
+                    <button class="action-btn action-btn-calc" title="Recalculate" (click)="recalculate(payroll.id)"
+                            *ngIf="payroll.status === 'DRAFT'">
+                      <i class="bi bi-calculator"></i>
+                    </button>
+                    <button class="action-btn action-btn-cancel" title="Cancel" (click)="openStatusModal(payroll, 'cancel')"
+                            *ngIf="payroll.status !== 'CANCELLED' && payroll.status !== 'PAID'">
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="getPayrolls(state).length === 0">
+                <td colspan="8">
+                  <div class="pay-empty">
+                    <i class="bi bi-inbox"></i>
+                    <h5>No Payrolls Found</h5>
+                    <p>Create a payroll record to get started.</p>
+                    <button class="btn btn-primary btn-sm" routerLink="/payroll/create">
+                      <i class="bi bi-plus-circle me-1"></i> Create Payroll
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="getTotalPages(state) > 1" class="pay-pagination">
+          <button class="pay-page-btn" (click)="onPageChange(currentPage - 1)" [disabled]="currentPage === 0">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button *ngFor="let page of [].constructor(getTotalPages(state)); let i = index"
+                  class="pay-page-btn" [class.pay-page-active]="i === currentPage"
+                  (click)="onPageChange(i)">{{ i + 1 }}</button>
+          <button class="pay-page-btn" (click)="onPageChange(currentPage + 1)"
+                  [disabled]="currentPage >= getTotalPages(state) - 1">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </ng-container>
+
+  </ng-container>
 </div>
 
-<!-- Delete Confirmation Modal -->
-<div class="modal fade show d-block" *ngIf="showDeleteModal" tabindex="-1" style="background-color: rgba(0,0,0,0.5)">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Delete</h5>
-        <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+<!-- Modal Backdrop -->
+<div *ngIf="showDeleteModal || showStatusModal" class="modal-backdrop fade show"></div>
+
+<!-- Delete Modal -->
+<div *ngIf="showDeleteModal" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content pay-modal">
+      <div class="pay-modal-header">
+        <h5 class="pay-modal-title"><i class="bi bi-trash me-2"></i>Confirm Delete</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeDeleteModal()"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body pay-modal-body">
         <p>Are you sure you want to delete this payroll record?</p>
-        <p><strong>Employee:</strong> {{ selectedPayroll?.employeeName }}</p>
-        <p><strong>Period:</strong> {{ formatDate(selectedPayroll?.payPeriodStart) }} - {{ formatDate(selectedPayroll?.payPeriodEnd) }}</p>
+        <div class="pay-confirm-info">
+          <div><span class="pay-info-label">Employee:</span> {{ selectedPayroll?.employeeName }}</div>
+          <div><span class="pay-info-label">Period:</span> {{ formatDate(selectedPayroll?.payPeriodStart) }} – {{ formatDate(selectedPayroll?.payPeriodEnd) }}</div>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+      <div class="pay-modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeDeleteModal()">Cancel</button>
         <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Status Change Modal -->
-<div class="modal fade show d-block" *ngIf="showStatusModal" tabindex="-1" style="background-color: rgba(0,0,0,0.5)">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Confirm Status Change</h5>
-        <button type="button" class="btn-close" (click)="closeStatusModal()"></button>
+<!-- Status Modal -->
+<div *ngIf="showStatusModal" class="modal fade show d-block" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content pay-modal">
+      <div class="pay-modal-header">
+        <h5 class="pay-modal-title"><i class="bi bi-arrow-repeat me-2"></i>Confirm Status Change</h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeStatusModal()"></button>
       </div>
-      <div class="modal-body">
-        <p *ngIf="statusAction === 'approve'">Are you sure you want to approve this payroll?</p>
-        <p *ngIf="statusAction === 'paid'">Are you sure you want to mark this payroll as paid?</p>
-        <p *ngIf="statusAction === 'cancel'">Are you sure you want to cancel this payroll?</p>
-        <p><strong>Employee:</strong> {{ selectedPayroll?.employeeName }}</p>
-        <p><strong>Net Salary:</strong> {{ formatCurrency(selectedPayroll?.netSalary) }}</p>
+      <div class="modal-body pay-modal-body">
+        <p *ngIf="statusAction === 'approve'">Approve this payroll record?</p>
+        <p *ngIf="statusAction === 'paid'">Mark this payroll as paid?</p>
+        <p *ngIf="statusAction === 'cancel'">Cancel this payroll record?</p>
+        <div class="pay-confirm-info">
+          <div><span class="pay-info-label">Employee:</span> {{ selectedPayroll?.employeeName }}</div>
+          <div><span class="pay-info-label">Net Salary:</span> {{ formatCurrency(selectedPayroll?.netSalary) }}</div>
+        </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeStatusModal()">Cancel</button>
+      <div class="pay-modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeStatusModal()">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="confirmStatusChange()">Confirm</button>
       </div>
     </div>

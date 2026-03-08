@@ -6,6 +6,7 @@ import { EmployeeForm, Designation, Department } from '../employee.model';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-newemployee',
   templateUrl: './newemployee.component.html',
   styleUrls: ['./newemployee.component.scss']
@@ -60,7 +61,8 @@ export class NewemployeeComponent implements OnInit {
       postalCode: [''],
       emergencyContactName: [''],
       emergencyContactPhone: [''],
-      bio: ['']
+      bio: [''],
+      accountType: ['']
     });
   }
 

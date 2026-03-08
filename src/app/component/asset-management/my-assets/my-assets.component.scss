@@ -1,72 +1,82 @@
-// my-assets Component - SCSS
+// My Assets
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-// Cards with login-style shadow and hover
-.card {
-  @include card;
-  border: none;
-  transition: transform $transition-base, box-shadow $transition-base;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
-  }
-
-  .card-header {
-    background: $white;
-    border-bottom: $border-width solid rgba($primary, 0.1);
-  }
-
-  .card-footer {
-    background: $white;
-    border-top: $border-width solid rgba($primary, 0.1);
-  }
+.my-assets-page {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
 }
 
-// Asset icon with primary accent background
-.asset-icon {
+// ─── Asset card ───────────────────────────────────────────────────────────────
+.asset-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: transform $transition-base, box-shadow $transition-base;
+  &:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.10); }
+}
+
+.asset-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px $spacing-md;
+  border-bottom: 1px solid var(--border-light);
+}
+
+code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-weight: $font-weight-bold;
+  color: $primary;
+  background: rgba($primary, 0.08);
+  border-radius: $border-radius-sm;
+  padding: 2px 7px;
+  font-size: 0.82rem;
+}
+
+.asset-card-body {
+  padding: $spacing-md;
+  flex: 1;
+  text-align: center;
+}
+
+.asset-card-icon {
   width: 60px;
   height: 60px;
-  background: rgba($primary, 0.08);
   border-radius: $border-radius-xl;
+  background: rgba($primary, 0.08);
   @include flex-center;
-
-  i {
-    color: $primary;
-  }
+  margin: 0 auto $spacing-sm;
+  i { color: $primary; font-size: 1.5rem; }
 }
 
-// Table details
-.table td:first-child {
+.asset-card-name {
+  font-weight: $font-weight-semibold;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin: 0 0 $spacing-sm;
+}
+
+.detail-key {
+  color: var(--text-muted);
+  font-size: 0.78rem;
   width: 45%;
+  text-align: left;
 }
 
-.table td.text-muted {
-  color: $gray-500;
-  font-size: $font-size-sm;
+// ─── Card footer ──────────────────────────────────────────────────────────────
+.asset-card-footer {
+  padding: $spacing-sm $spacing-md $spacing-md;
+  border-top: 1px solid var(--border-light);
 }
 
-// Acknowledge button
-.btn-success {
-  transition: all $transition-base;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-}
-
-// Primary button gradient
-.btn-primary {
-  @include btn-primary;
-}
-
-// Breadcrumb accent
-.breadcrumb-item a {
-  color: $primary;
-  transition: color $transition-base;
-
-  &:hover {
-    color: $primary-medium;
-  }
+.ack-confirmed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  color: $success;
+  padding: 8px;
 }

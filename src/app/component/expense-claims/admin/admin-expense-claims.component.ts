@@ -11,6 +11,7 @@ import { UserService } from '../../../service/user.service';
 import { UserModel } from '../../profile/user.model';
 
 @Component({
+  standalone: false,
   selector: 'app-admin-expense-claims',
   templateUrl: './admin-expense-claims.component.html',
   styleUrls: ['./admin-expense-claims.component.scss'],
@@ -46,6 +47,7 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
 
   currentUser: UserModel | null = null;
   currentEmployeeId: number | null = null;
+  isSysAdmin = false;
   approvalForm: FormGroup;
   selectedClaim: ExpenseClaim | null = null;
   approvalAction: 'approve' | 'reject' = 'approve';
@@ -89,6 +91,7 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
             this.notificationService.onError('Unable to load user profile.');
             return;
           }
+          this.isSysAdmin = (this.currentUser as any).roleName === 'ROLE_SYSADMIN';
           // Use user ID as approver ID (same as employee ID in unified users table)
           this.currentEmployeeId = this.currentUser.id;
           this.loadExpenseClaims();
@@ -408,5 +411,25 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
 
   canMarkAsPaid(claim: ExpenseClaim): boolean {
     return claim.status === ExpenseClaimStatus.APPROVED;
+  }
+
+  canDelete(claim: ExpenseClaim): boolean {
+    return this.isSysAdmin ||
+      claim.status === ExpenseClaimStatus.PENDING ||
+      claim.status === ExpenseClaimStatus.CANCELLED;
+  }
+
+  deleteClaim(claim: ExpenseClaim): void {
+    if (!claim.id) return;
+    if (!confirm(`Delete this expense claim (${claim.claimNumber})? This cannot be undone.`)) return;
+    this.expenseClaimService.deleteExpenseClaim$(claim.id)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.notificationService.onSuccess('Expense claim deleted');
+          this.refreshClaimsList();
+        },
+        error: (err) => this.notificationService.onError(err?.error?.message || 'Failed to delete claim')
+      });
   }
 }

@@ -1,0 +1,157 @@
+<div class="budget-wrap">
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-graph-up-arrow"></i> Annual Budget</h1>
+      <p class="banner-subtitle">Set revenue targets and expense limits per account for the fiscal year</p>
+    </div>
+    <div class="banner-actions">
+      <select class="form-select form-select-sm banner-year-select" [(ngModel)]="selectedYear" (change)="onYearChange()">
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+      <button class="btn btn-light btn-sm" (click)="save()" [disabled]="saving">
+        <i class="bi bi-floppy me-1"></i> {{ saving ? 'Saving...' : 'Save Budget' }}
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="successMsg" class="alert alert-success mx-4 mt-0 mb-3">{{ successMsg }}</div>
+  <div *ngIf="errorMsg" class="alert alert-danger mx-4 mt-0 mb-3">{{ errorMsg }}</div>
+
+  <!-- Budget Summary Bar -->
+  <div class="budget-summary-bar">
+    <div class="summary-item">
+      <div class="summary-label">Total Revenue Budget</div>
+      <div class="summary-value text-success">{{ formatCurrency(totalIncomeBudget) }}</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <div class="summary-label">Total Expense Budget</div>
+      <div class="summary-value text-danger">{{ formatCurrency(totalExpenseBudget) }}</div>
+    </div>
+    <div class="summary-divider"></div>
+    <div class="summary-item">
+      <div class="summary-label">Budgeted Net Profit</div>
+      <div class="summary-value" [class.text-success]="netBudget >= 0" [class.text-danger]="netBudget < 0">{{ formatCurrency(netBudget) }}</div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="budget-loading">
+    <div class="spinner-border text-primary spinner-border-sm me-2"></div> Loading accounts...
+  </div>
+
+  <div *ngIf="!loading" class="budget-content">
+
+    <!-- INCOME Section -->
+    <div class="budget-section" *ngIf="incomeLines.length > 0">
+      <div class="budget-section-header income-header">
+        <i class="bi bi-arrow-down-circle-fill"></i> INCOME
+      </div>
+      <div class="budget-table-wrap">
+        <table class="budget-table">
+          <thead>
+            <tr>
+              <th class="col-code">Code</th>
+              <th>Account Name</th>
+              <th class="col-amount">Budgeted Amount (R)</th>
+              <th class="col-notes">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of incomeLines" class="budget-row">
+              <td class="col-code"><span class="account-code">{{ line.accountCode }}</span></td>
+              <td class="account-name">{{ line.accountName }}</td>
+              <td class="col-amount">
+                <input type="number" class="form-control budget-input" [(ngModel)]="line.budgetedAmount" min="0" step="1000" placeholder="0">
+              </td>
+              <td class="col-notes">
+                <input type="text" class="form-control budget-input-notes" [(ngModel)]="line.notes" placeholder="Notes...">
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="2" class="total-label">Total Income Budget</td>
+              <td class="total-value text-success">R {{ totalIncomeBudget | number:'1.0-0' }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- COGS Section -->
+    <div class="budget-section" *ngIf="cogsLines.length > 0">
+      <div class="budget-section-header cogs-header">
+        <i class="bi bi-boxes"></i> COST OF GOODS SOLD
+      </div>
+      <div class="budget-table-wrap">
+        <table class="budget-table">
+          <thead>
+            <tr>
+              <th class="col-code">Code</th>
+              <th>Account Name</th>
+              <th class="col-amount">Budgeted Amount (R)</th>
+              <th class="col-notes">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of cogsLines" class="budget-row">
+              <td class="col-code"><span class="account-code">{{ line.accountCode }}</span></td>
+              <td class="account-name">{{ line.accountName }}</td>
+              <td class="col-amount">
+                <input type="number" class="form-control budget-input" [(ngModel)]="line.budgetedAmount" min="0" step="1000" placeholder="0">
+              </td>
+              <td class="col-notes">
+                <input type="text" class="form-control budget-input-notes" [(ngModel)]="line.notes" placeholder="Notes...">
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- OPERATING EXPENSES Section -->
+    <div class="budget-section" *ngIf="expenseLines.length > 0">
+      <div class="budget-section-header expense-header">
+        <i class="bi bi-receipt"></i> OPERATING EXPENSES
+      </div>
+      <div class="budget-table-wrap">
+        <table class="budget-table">
+          <thead>
+            <tr>
+              <th class="col-code">Code</th>
+              <th>Account Name</th>
+              <th class="col-amount">Budgeted Amount (R)</th>
+              <th class="col-notes">Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of expenseLines" class="budget-row">
+              <td class="col-code"><span class="account-code">{{ line.accountCode }}</span></td>
+              <td class="account-name">{{ line.accountName }}</td>
+              <td class="col-amount">
+                <input type="number" class="form-control budget-input" [(ngModel)]="line.budgetedAmount" min="0" step="1000" placeholder="0">
+              </td>
+              <td class="col-notes">
+                <input type="text" class="form-control budget-input-notes" [(ngModel)]="line.notes" placeholder="Notes...">
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="2" class="total-label">Total Expense Budget</td>
+              <td class="total-value text-danger">R {{ totalExpenseBudget | number:'1.0-0' }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="budgetLines.length === 0" class="budget-empty">
+      <i class="bi bi-bar-chart"></i>
+      <h5>No Accounts Found</h5>
+      <p>Please seed Chart of Accounts first from <a routerLink="/expenses/accounts">Chart of Accounts</a> page.</p>
+    </div>
+  </div>
+</div>

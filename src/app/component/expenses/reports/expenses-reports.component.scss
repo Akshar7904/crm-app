@@ -1,0 +1,114 @@
+// Expenses Reports
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.expenses-reports {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
+}
+
+// ─── Export card ──────────────────────────────────────────────────────────────
+.export-card {
+  border-left: 4px solid $success;
+  margin-bottom: $spacing-md;
+  transition: box-shadow $transition-base;
+  &:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.10); }
+}
+
+.export-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  padding: $spacing-md $spacing-lg;
+}
+
+.export-info {
+  h5 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  p { color: var(--text-muted); font-size: 0.82rem; margin: 0; }
+}
+
+.export-controls {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+
+  .form-select {
+    background: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+    font-size: 0.82rem;
+    border-radius: $border-radius;
+    min-width: 115px;
+    &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.12); outline: none; }
+  }
+}
+
+.separator {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: $font-weight-medium;
+  padding: 0 2px;
+}
+
+// ─── Chart card ───────────────────────────────────────────────────────────────
+.chart-card { overflow: hidden; }
+
+.chart-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px $spacing-lg;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.chart-title {
+  font-size: 0.88rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  i { color: $primary; }
+}
+
+.year-select .form-select {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  width: auto;
+  min-width: 90px;
+  border-radius: $border-radius;
+  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.12); outline: none; }
+}
+
+.chart-body { padding: $spacing-md $spacing-lg $spacing-lg; }
+
+.chart-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 360px;
+  canvas { width: 100% !important; height: 100% !important; }
+}
+
+// ─── Loading placeholder ──────────────────────────────────────────────────────
+.chart-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 360px;
+  color: var(--text-muted);
+  font-size: $font-size-sm;
+  gap: 8px;
+}

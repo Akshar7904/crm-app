@@ -32,6 +32,7 @@
 .logo-link {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   text-decoration: none;
   overflow: hidden;
@@ -39,85 +40,12 @@
 
 .logo-image {
   width: auto;
-  height: 48px;
-  max-width: 200px;
+  height: 88px;
+  max-width: 220px;
   object-fit: contain;
   flex-shrink: 0;
   transition: all $transition-slow;
   filter: var(--logo-filter, none);
-}
-
-// ========================================
-// USER PROFILE SECTION
-// ========================================
-.sidebar-user {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px $spacing-md;
-  border-bottom: 1px solid var(--sidebar-header-border, $gray-200);
-  flex-shrink: 0;
-  background: var(--sidebar-active-bg, rgba($primary, 0.04));
-  transition: all $transition-slow;
-  overflow: hidden;
-}
-
-.sidebar-user-avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.sidebar-user-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--sidebar-active-border, $primary);
-  transition: border-color $transition-base;
-  display: block;
-}
-
-.sidebar-user-online {
-  position: absolute;
-  bottom: 1px;
-  right: 1px;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: $success;
-  border: 2px solid var(--bg-sidebar, $white);
-  box-shadow: 0 0 0 1px rgba($success, 0.3);
-}
-
-.sidebar-user-details {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  opacity: 1;
-  transition: opacity $transition-base, max-width $transition-slow;
-  max-width: 200px;
-}
-
-.sidebar-user-name {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: $font-weight-semibold;
-  color: var(--text-primary, $gray-900);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
-}
-
-.sidebar-user-role {
-  display: block;
-  font-size: 0.68rem;
-  color: var(--sidebar-text-active, $primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-weight: $font-weight-medium;
-  margin-top: 1px;
 }
 
 // ========================================
@@ -342,19 +270,6 @@
 .sidebar.collapsed {
   width: 72px;
 
-  // User section: show only avatar
-  .sidebar-user {
-    padding: 12px;
-    justify-content: center;
-    gap: 0;
-  }
-
-  .sidebar-user-details {
-    opacity: 0;
-    max-width: 0;
-    overflow: hidden;
-  }
-
   .menu-label,
   .expand-icon,
   .menu-badge {
@@ -438,15 +353,6 @@
       width: 260px;
 
       &.mobile-open { left: 0; }
-
-      .sidebar-user {
-        flex-direction: row;
-        padding: 14px $spacing-md;
-        justify-content: flex-start;
-        gap: 12px;
-      }
-
-      .sidebar-user-details { opacity: 1; max-width: 200px; overflow: visible; }
 
       .menu-label,
       .expand-icon,

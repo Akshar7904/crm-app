@@ -11,21 +11,6 @@
     </a>
   </div>
 
-  <!-- User Profile Section -->
-  <div class="sidebar-user">
-    <div class="sidebar-user-avatar-wrap">
-      <img class="sidebar-user-avatar"
-           [src]="getAvatarUrl()"
-           (error)="onAvatarError($event)"
-           [alt]="user?.firstName" />
-      <span class="sidebar-user-online"></span>
-    </div>
-    <div class="sidebar-user-details">
-      <span class="sidebar-user-name">{{ user?.firstName }} {{ user?.lastName }}</span>
-      <span class="sidebar-user-role">{{ getUserRoleName() }}</span>
-    </div>
-  </div>
-
   <!-- Menu Items -->
   <nav class="sidebar-menu">
     <ul class="menu-list">

@@ -1,38 +1,75 @@
-// asset-assignments Component - SCSS
+// Asset Assignments
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-.table th {
-  font-weight: 600;
-  color: #495057;
+.asset-assignments-page {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
 }
 
-.table tbody tr:hover {
-  background-color: #f8f9fa;
+// ─── Asset tag chip ────────────────────────────────────────────────────────────
+code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-weight: $font-weight-bold;
+  color: $primary;
+  background: rgba($primary, 0.08);
+  border-radius: $border-radius-sm;
+  padding: 2px 7px;
+  font-size: 0.82rem;
 }
 
-.badge {
-  font-weight: 500;
+// ─── Active toggle inside banner ───────────────────────────────────────────────
+.active-toggle {
+  display: flex;
+  align-items: center;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: $border-radius-md;
+  padding: 6px 14px;
+  backdrop-filter: blur(4px);
+  .form-check-input { cursor: pointer; }
 }
 
-.btn-group-sm .btn {
-  padding: 0.25rem 0.5rem;
+// ─── Table footer ─────────────────────────────────────────────────────────────
+.table-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
 }
 
-.modal.show {
-  display: block;
+// ─── Modal ────────────────────────────────────────────────────────────────────
+.modal-backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); }
+
+.modal-content {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+
+  .modal-header {
+    border-bottom: 1px solid var(--border-light);
+    padding: $spacing-md $spacing-lg;
+    .modal-title { font-size: 1rem; font-weight: $font-weight-semibold; color: var(--text-primary); }
+    .btn-close { opacity: 0.5; &:hover { opacity: 1; } }
+  }
+
+  .modal-body { padding: $spacing-lg; }
+  .modal-footer { border-top: 1px solid var(--border-light); padding: $spacing-md $spacing-lg; gap: $spacing-sm; }
 }
 
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1040;
+.form-label {
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 5px;
 }
 
-.modal {
-  z-index: 1050;
+.form-control, .form-select {
+  background: var(--input-bg); border-color: var(--input-border); color: var(--input-text);
+  border-radius: $border-radius; font-size: 0.875rem;
+  &:focus { background: var(--bg-card); border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.15); }
+  &::placeholder { color: var(--text-light); }
 }

@@ -1,136 +1,105 @@
-<!-- my-payslips.component.html -->
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-12">
+<div class="ann-wrap">
 
-      <!-- Page Header -->
-      <div class="page-header mb-4">
-        <h3><i class="bi bi-receipt me-2"></i>My Payslips</h3>
-        <p class="text-muted">View and download your salary statements</p>
-      </div>
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-receipt"></i> My Payslips</h1>
+      <p class="banner-subtitle">View and download your salary statements</p>
+    </div>
+  </div>
 
-      <!-- Loading State -->
-      <div *ngIf="isLoading" class="text-center py-5">
-        <div class="spinner-border text-primary"></div>
-        <p class="mt-3">Loading payslips...</p>
-      </div>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="pay-loading">
+    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+    Loading payslips...
+  </div>
 
-      <!-- Empty State -->
-      <div *ngIf="!isLoading && payrolls.length === 0" class="empty-state">
-        <i class="bi bi-inbox display-4 d-block mb-3"></i>
-        <p>No payslips found</p>
-      </div>
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && payrolls.length === 0" class="pay-empty">
+    <i class="bi bi-inbox"></i>
+    <h5>No Payslips</h5>
+    <p>Your payslips will appear here once payroll is processed.</p>
+  </div>
 
-      <!-- Payslips List -->
-      <div *ngIf="!isLoading && payrolls.length > 0" class="payslips-container">
+  <!-- Payslips -->
+  <div *ngIf="!isLoading && payrolls.length > 0" class="pay-slips-list">
 
-        <div *ngFor="let payroll of payrolls" class="payslip-card">
+    <div *ngFor="let payroll of payrolls" class="table-card pay-slip-card">
 
-          <!-- Payslip Header -->
-          <div class="payslip-header">
-            <div class="header-left">
-              <h5>Payslip for the month of {{ getPayPeriod(payroll) }}</h5>
-              <p class="period">{{ formatDate(payroll.payPeriodStart) }} - {{ formatDate(payroll.payPeriodEnd) }}</p>
-            </div>
-            <div class="header-right">
-              <span [ngClass]="getStatusClass(payroll.status)">{{ payroll.status }}</span>
-            </div>
-          </div>
-
-          <!-- Payment Summary -->
-          <div class="payment-summary">
-            <table class="summary-table">
-              <tr>
-                <td class="label">Payment Date:</td>
-                <td class="value">{{ formatDate(payroll.paymentDate) }}</td>
-                <td class="label">Payment Method:</td>
-                <td class="value">{{ payroll.paymentMethod || 'BANK TRANSFER' }}</td>
-              </tr>
-            </table>
-          </div>
-
-          <!-- Earnings & Deductions -->
-          <div class="earnings-deductions-container">
-            <!-- Earnings -->
-            <div class="earnings-box">
-              <div class="box-header">
-                <span class="header-label">Earnings</span>
-                <span class="header-amount">Amount (R)</span>
-              </div>
-              <table class="items-table">
-                <tr>
-                  <td class="item-label">Basic Salary</td>
-                  <td class="item-amount">{{ formatAmount(payroll.basicSalary) }}</td>
-                </tr>
-                <tr>
-                  <td class="item-label">Allowances</td>
-                  <td class="item-amount">{{ formatAmount(payroll.allowances) }}</td>
-                </tr>
-                <tr>
-                  <td class="item-label">Bonus</td>
-                  <td class="item-amount">{{ formatAmount(payroll.bonus) }}</td>
-                </tr>
-                <tr>
-                  <td class="item-label">Overtime</td>
-                  <td class="item-amount">{{ formatAmount(payroll.overtimePay) }}</td>
-                </tr>
-              </table>
-              <div class="box-total">
-                <span class="total-label">Total Earnings:</span>
-                <span class="total-amount">{{ formatAmount(payroll.grossSalary) }}</span>
-              </div>
-            </div>
-
-            <!-- Deductions -->
-            <div class="deductions-box">
-              <div class="box-header">
-                <span class="header-label">Deductions</span>
-                <span class="header-amount">Amount (R)</span>
-              </div>
-              <table class="items-table">
-                <tr>
-                  <td class="item-label">Provident Fund</td>
-                  <td class="item-amount">{{ formatAmount(payroll.pensionFund) }}</td>
-                </tr>
-                <tr>
-                  <td class="item-label">PAYE Tax</td>
-                  <td class="item-amount">{{ formatAmount(payroll.payeTax) }}</td>
-                </tr>
-                <tr>
-                  <td class="item-label">UIF</td>
-                  <td class="item-amount">{{ formatAmount(payroll.uif) }}</td>
-                </tr>
-                <tr>
-                  <td class="item-label">Medical Aid</td>
-                  <td class="item-amount">{{ formatAmount(payroll.medicalAid) }}</td>
-                </tr>
-              </table>
-              <div class="box-total">
-                <span class="total-label">Total Deductions:</span>
-                <span class="total-amount">{{ formatAmount(payroll.totalDeductions) }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Net Pay -->
-          <div class="net-pay-section">
-            <strong>Net Pay: R {{ formatAmount(payroll.netSalary) }}</strong>
-          </div>
-
-          <!-- Actions -->
-          <div class="payslip-actions">
-            <button class="btn btn-outline-primary btn-sm" [routerLink]="['/payroll/detail', payroll.id]">
-              <i class="bi bi-eye me-1"></i>View Details
+      <!-- Payslip Header -->
+      <div class="pay-slip-header">
+        <div>
+          <div class="pay-slip-period">{{ getPayPeriod(payroll) }}</div>
+          <div class="text-muted small">{{ formatDate(payroll.payPeriodStart) }} – {{ formatDate(payroll.payPeriodEnd) }}</div>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+          <span [ngClass]="getStatusClass(payroll.status)">{{ payroll.status }}</span>
+          <div class="action-btn-group">
+            <button class="action-btn action-btn-view" title="View Details" [routerLink]="['/payroll/detail', payroll.id]">
+              <i class="bi bi-eye"></i>
             </button>
-            <button class="btn btn-success btn-sm" (click)="downloadPayslip(payroll.id)">
-              <i class="bi bi-download me-1"></i>Download PDF
+            <button class="action-btn action-btn-download" title="Download PDF" (click)="downloadPayslip(payroll.id)">
+              <i class="bi bi-download"></i>
             </button>
           </div>
+        </div>
+      </div>
 
+      <!-- Payment Info -->
+      <div class="pay-slip-meta">
+        <div class="pay-meta-item">
+          <span class="pay-meta-label">Payment Date</span>
+          <span class="pay-meta-value">{{ formatDate(payroll.paymentDate) }}</span>
+        </div>
+        <div class="pay-meta-item">
+          <span class="pay-meta-label">Payment Method</span>
+          <span class="pay-meta-value">{{ payroll.paymentMethod || 'BANK TRANSFER' }}</span>
+        </div>
+      </div>
+
+      <!-- Earnings & Deductions -->
+      <div class="pay-slip-body">
+
+        <!-- Earnings -->
+        <div class="pay-slip-col">
+          <div class="pay-col-header pay-col-earnings">
+            <span>Earnings</span><span>Amount (R)</span>
+          </div>
+          <div class="pay-slip-rows">
+            <div class="pay-slip-row"><span>Basic Salary</span><span>{{ formatAmount(payroll.basicSalary) }}</span></div>
+            <div class="pay-slip-row"><span>Allowances</span><span>{{ formatAmount(payroll.allowances) }}</span></div>
+            <div class="pay-slip-row"><span>Bonus</span><span>{{ formatAmount(payroll.bonus) }}</span></div>
+            <div class="pay-slip-row"><span>Overtime</span><span>{{ formatAmount(payroll.overtimePay) }}</span></div>
+          </div>
+          <div class="pay-col-total">
+            <span>Total Earnings</span><span>{{ formatAmount(payroll.grossSalary) }}</span>
+          </div>
         </div>
 
+        <!-- Deductions -->
+        <div class="pay-slip-col">
+          <div class="pay-col-header pay-col-deductions">
+            <span>Deductions</span><span>Amount (R)</span>
+          </div>
+          <div class="pay-slip-rows">
+            <div class="pay-slip-row"><span>Provident Fund</span><span>{{ formatAmount(payroll.pensionFund) }}</span></div>
+            <div class="pay-slip-row"><span>PAYE Tax</span><span>{{ formatAmount(payroll.payeTax) }}</span></div>
+            <div class="pay-slip-row"><span>UIF</span><span>{{ formatAmount(payroll.uif) }}</span></div>
+            <div class="pay-slip-row"><span>Medical Aid</span><span>{{ formatAmount(payroll.medicalAid) }}</span></div>
+          </div>
+          <div class="pay-col-total">
+            <span>Total Deductions</span><span>{{ formatAmount(payroll.totalDeductions) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Net Pay -->
+      <div class="pay-slip-net">
+        <span class="pay-net-label">Net Pay</span>
+        <span class="pay-net-amount">R {{ formatAmount(payroll.netSalary) }}</span>
       </div>
 
     </div>
   </div>
+
 </div>

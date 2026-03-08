@@ -2,6 +2,7 @@ import { environment } from '@env/environment';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { PayrollService } from 'src/app/service/payroll.service';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { UserService } from 'src/app/service/user.service';
@@ -9,6 +10,7 @@ import { Payroll } from 'src/app/interface/payroll';
 import { Employee } from "../../employee/employee.model";
 
 @Component({
+  standalone: false,
   selector: 'app-payroll-detail',
   templateUrl: './payroll-detail.component.html',
   styleUrls: ['./payroll-detail.component.scss']
@@ -31,7 +33,8 @@ export class PayrollDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -151,13 +154,28 @@ export class PayrollDetailComponent implements OnInit {
 
   downloadPayslip(payrollId?: number): void {
     const id = payrollId || this.payroll?.id;
-    if (id) {
-      // Use self-service endpoint for regular employees
-      const endpoint = this.isAdmin
-        ? `${this.server}/payroll/payslip/download/${id}`
-        : `${this.server}/payroll/my-payslip/download/${id}`;
-      window.open(endpoint, '_blank');
-    }
+    if (!id) return;
+
+    // window.open() bypasses the Angular interceptor (no Auth header → 401).
+    // Use HttpClient so the TokenInterceptor adds the Bearer token.
+    const endpoint = this.isAdmin
+      ? `${this.server}/payroll/payslip/download/${id}`
+      : `${this.server}/payroll/my-payslip/download/${id}`;
+
+    this.http.get(endpoint, { responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        const period = this.payroll?.payPeriodEnd
+          ? new Date(this.payroll.payPeriodEnd).toISOString().slice(0, 7)
+          : id;
+        a.download = `Payslip_${period}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => console.error('Failed to download payslip:', err)
+    });
   }
 
   initiatePayment(): void {

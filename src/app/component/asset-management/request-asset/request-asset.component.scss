@@ -1,350 +1,119 @@
-// request-asset Component - SCSS
+// Request Asset
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
 .request-asset-page {
-  padding: $spacing-lg 0;
-}
-
-// Breadcrumb
-.page-breadcrumb {
-  margin-bottom: $spacing-lg;
-
-  .breadcrumb {
-    background: none;
-    padding: 0;
-    margin: 0;
-    font-size: $font-size-sm;
-  }
-
-  .breadcrumb-item a {
-    color: $primary;
-    text-decoration: none;
-    transition: color $transition-base;
-
-    &:hover {
-      color: $primary-medium;
-    }
-  }
-
-  .breadcrumb-item.active {
-    color: $text-muted;
-  }
-}
-
-// Page Header
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: $spacing-md;
-  margin-bottom: $spacing-xl;
-}
-
-.page-header-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: $border-radius-lg;
-  background: $gradient-primary;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  i {
-    font-size: 1.5rem;
-    color: $white;
-  }
-}
-
-.page-title {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-bold;
-  color: $primary-dark;
-  margin: 0;
-}
-
-.page-subtitle {
-  font-size: $font-size-sm;
-  color: $text-muted;
-  margin: 0.25rem 0 0;
-}
-
-// Form Card
-.form-card {
-  background: $white;
-  border-radius: $card-border-radius;
-  box-shadow: $shadow;
-  overflow: hidden;
-}
-
-.form-card-header {
-  background: $gradient-primary;
-  color: $white;
-  padding: 0.875rem $spacing-lg;
-  font-weight: $font-weight-semibold;
-  font-size: $font-size-base;
-  display: flex;
-  align-items: center;
-}
-
-.form-card-body {
   padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
 }
 
-// Form Layout
-.form-row {
+// ─── Card sub-header ──────────────────────────────────────────────────────────
+.req-card-header {
+  font-size: 0.72rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 12px $spacing-md;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  i { color: $primary; }
+}
+
+.req-card-body { padding: $spacing-md $spacing-lg $spacing-lg; }
+
+// ─── Two-column form row ──────────────────────────────────────────────────────
+.req-form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: $spacing-md;
-  margin-bottom: 0;
-
-  @media (max-width: $breakpoint-md) {
-    grid-template-columns: 1fr;
-  }
+  @media (max-width: $breakpoint-md) { grid-template-columns: 1fr; }
 }
 
-.form-group {
-  margin-bottom: $spacing-md;
-}
-
+// ─── Form fields ──────────────────────────────────────────────────────────────
 .form-label {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  font-weight: $font-weight-medium;
-  color: $gray-700;
-  margin-bottom: 0.375rem;
-  font-size: $font-size-sm;
+  font-size: 0.75rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 5px;
 }
 
-.label-icon {
-  color: $primary;
-  font-size: 0.875rem;
+.form-control, .form-select {
+  background: var(--input-bg); border-color: var(--input-border); color: var(--input-text);
+  border-radius: $border-radius; font-size: 0.875rem;
+  &:focus { background: var(--bg-card); border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.15); }
+  &.is-invalid { border-color: $danger; }
+  &::placeholder { color: var(--text-light); }
 }
 
-.required {
-  color: $danger;
-  font-weight: $font-weight-bold;
-}
-
-// Form Controls
-.form-control,
-.form-select {
-  padding: $input-padding-y $input-padding-x;
-  font-size: $input-font-size;
-  border: $border-width-md solid $gray-200;
-  border-radius: $border-radius;
-  background: $gray-50;
-  transition: all $transition-base;
-  width: 100%;
-
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
-    background: $white;
-    outline: none;
-  }
-
-  &.is-invalid {
-    border-color: $danger;
-
-    &:focus {
-      box-shadow: 0 0 0 3px rgba($danger, 0.12);
-    }
-  }
-}
-
-textarea.form-control {
-  resize: vertical;
-}
-
-.invalid-feedback {
-  font-size: $font-size-xs;
-  color: $danger;
-}
-
-// Form Hint (request type explanations)
-.form-hint {
+// ─── Hint tags ────────────────────────────────────────────────────────────────
+.hint-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.375rem;
-  margin-top: 0.5rem;
+  gap: 4px;
 }
 
 .hint-tag {
-  font-size: 0.7rem;
-  color: $text-muted;
-  background: $gray-50;
-  border: 1px solid $gray-200;
-  border-radius: $border-radius-full;
-  padding: 0.125rem 0.5rem;
-
-  strong {
-    color: $primary;
-    font-weight: $font-weight-semibold;
-  }
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  background: var(--table-hover);
+  border: 1px solid var(--border-light);
+  border-radius: 50px;
+  padding: 1px 7px;
+  strong { color: $primary; font-weight: $font-weight-semibold; }
 }
 
-// Form Actions
-.form-actions {
+// ─── Form actions ─────────────────────────────────────────────────────────────
+.req-form-actions {
   display: flex;
   justify-content: flex-end;
   gap: $spacing-sm;
-  margin-top: $spacing-lg;
   padding-top: $spacing-md;
-  border-top: 1px solid $gray-200;
+  border-top: 1px solid var(--border-light);
+  margin-top: $spacing-sm;
 }
 
-.btn-cancel {
-  padding: $btn-padding-y $btn-padding-x;
-  font-size: $btn-font-size;
-  font-weight: $font-weight-medium;
-  border-radius: $btn-border-radius;
-  border: 1px solid $gray-200;
-  background: $white;
-  color: $gray-700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: all $transition-base;
-
-  &:hover {
-    background: $gray-50;
-    border-color: $gray-400;
-  }
+// ─── How-it-works steps ───────────────────────────────────────────────────────
+.req-steps {
+  @include flex-column;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg $spacing-lg;
 }
 
-.btn-submit {
-  padding: $btn-padding-y $btn-padding-x;
-  font-size: $btn-font-size;
-  font-weight: $font-weight-semibold;
-  border-radius: $btn-border-radius;
-  border: none;
-  background: $gradient-primary;
-  color: $white;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  transition: all $transition-base;
-
-  &:hover:not(:disabled) {
-    background: $gradient-primary-hover;
-    box-shadow: $shadow-primary;
-    transform: translateY(-1px);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+.req-step {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
 }
 
-// Info Card (How it works)
-.info-card {
-  background: $white;
-  border-radius: $card-border-radius;
-  box-shadow: $shadow;
-  padding: $spacing-lg;
-  text-align: center;
-  margin-bottom: $spacing-md;
-}
-
-.info-card-icon {
-  width: 56px;
-  height: 56px;
+.step-num {
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  background: rgba($primary, 0.08);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto $spacing-md;
-
-  i {
-    font-size: 1.5rem;
-    color: $primary;
-  }
-}
-
-.info-card-title {
+  background: $primary;
+  color: #fff;
+  font-size: 0.75rem;
   font-weight: $font-weight-bold;
-  color: $primary-dark;
-  margin-bottom: $spacing-md;
-}
-
-// Info Steps
-.info-steps {
-  text-align: left;
-}
-
-.info-step {
-  display: flex;
-  gap: 0.75rem;
-  margin-bottom: $spacing-md;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.step-number {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: $gradient-primary;
-  color: $white;
-  font-size: $font-size-sm;
-  font-weight: $font-weight-bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
   flex-shrink: 0;
 }
 
-.step-content {
-  flex: 1;
-
-  strong {
-    display: block;
-    font-size: $font-size-sm;
-    color: $gray-800;
-    margin-bottom: 0.125rem;
-  }
-
-  p {
-    font-size: $font-size-xs;
-    color: $text-muted;
-    margin: 0;
-    line-height: $line-height-relaxed;
-  }
-}
-
-// Tips Card
-.tips-card {
-  background: rgba($primary, 0.03);
-  border: 1px solid rgba($primary, 0.1);
-  border-radius: $card-border-radius;
-  padding: $spacing-md $spacing-lg;
-}
-
-.tips-title {
-  font-weight: $font-weight-semibold;
-  color: $primary-dark;
-  margin-bottom: $spacing-sm;
-  font-size: $font-size-sm;
-}
-
+// ─── Tips list ────────────────────────────────────────────────────────────────
 .tips-list {
   list-style: none;
-  padding: 0;
+  padding: $spacing-sm $spacing-lg $spacing-md;
   margin: 0;
 
   li {
     position: relative;
     padding-left: $spacing-md;
-    margin-bottom: 0.375rem;
-    font-size: $font-size-xs;
-    color: $gray-600;
-    line-height: $line-height-relaxed;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
 
     &::before {
       content: '';
@@ -357,26 +126,6 @@ textarea.form-control {
       background: $primary;
     }
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-}
-
-// Responsive
-@media (max-width: $breakpoint-md) {
-  .page-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .form-actions {
-    flex-direction: column-reverse;
-
-    .btn-cancel,
-    .btn-submit {
-      width: 100%;
-      justify-content: center;
-    }
+    &:last-child { margin-bottom: 0; }
   }
 }

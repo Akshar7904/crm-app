@@ -16,6 +16,7 @@ import { InvoiceLineItem } from '../invoice.model';
 const INVOICE_ID = 'id';
 
 @Component({
+  standalone: false,
   selector: 'app-invoice',
   templateUrl: './invoice-detail.component.html',
   styleUrls: ['./invoice-detail.component.scss'],

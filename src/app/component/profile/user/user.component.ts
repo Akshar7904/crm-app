@@ -31,6 +31,7 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
  * Company: LKCentrix Solutions (PTY) LTD
  */
 @Component({
+  standalone: false,
   selector: 'app-user',
   templateUrl: './user.component.html',
   styleUrls: ['./user.component.scss'],
@@ -562,13 +563,13 @@ export class UserComponent implements OnInit {
    */
   getStatusClass(status: string): string {
     const statusClasses: { [key: string]: string } = {
-      'Active': 'bg-success',
-      'Pending': 'bg-warning text-dark',
-      'Inactive': 'bg-secondary',
-      'On Leave': 'bg-info',
-      'Terminated': 'bg-danger'
+      'Active':     'up-status-badge up-status-active',
+      'Pending':    'up-status-badge up-status-pending',
+      'Inactive':   'up-status-badge up-status-inactive',
+      'On Leave':   'up-status-badge up-status-on-leave',
+      'Terminated': 'up-status-badge up-status-terminated'
     };
-    return statusClasses[status] || 'bg-secondary';
+    return statusClasses[status] || 'up-status-badge up-status-inactive';
   }
 
   // ==================== DOCUMENT MANAGEMENT ====================

@@ -1,111 +1,123 @@
-// asset-detail Component - SCSS
+// Asset Detail
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-// Cards with login-style shadow
-.card {
-  @include card;
-  border: none;
-
-  .card-header {
-    background: $white;
-    border-bottom: $border-width solid rgba($primary, 0.1);
-
-    h5, h6 {
-      color: $primary-dark;
-      font-weight: $font-weight-semibold;
-    }
-  }
-
-  // Primary accent card header (Currently Assigned To)
-  .card-header.bg-primary {
-    background: $gradient-primary !important;
-    border-bottom: none;
-
-    h6 {
-      color: $white;
-    }
-  }
+.asset-detail-page {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
 }
 
-// Asset icon with primary accent background
-.asset-icon {
-  width: 80px;
-  height: 80px;
-  background: rgba($primary, 0.08);
-  border-radius: $border-radius-xl;
-  @include flex-center;
-
-  i {
-    color: $primary;
-  }
+// ─── Banner code chip ──────────────────────────────────────────────────────────
+.banner-code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border-radius: $border-radius-sm;
+  padding: 2px 8px;
+  font-size: 0.82rem;
 }
 
-// Table styling
-.table th {
-  font-weight: $font-weight-semibold;
-  color: $gray-700;
-  font-size: $font-size-sm;
-  border-bottom: $border-width-md solid rgba($primary, 0.15);
+.btn-banner-danger {
+  background: rgba($danger, 0.8) !important;
+  border-color: rgba($danger, 0.4) !important;
+  &:hover { background: $danger !important; }
 }
 
-.table td:first-child {
-  width: 40%;
-}
-
-// Section subheadings
-h6.text-muted {
-  color: $primary !important;
-  font-weight: $font-weight-semibold;
-  font-size: $font-size-sm;
+// ─── Card sub-header ──────────────────────────────────────────────────────────
+.detail-card-header {
+  font-size: 0.72rem;
+  font-weight: $font-weight-bold;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: $spacing-md;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 12px $spacing-md;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  i { color: $primary; }
 }
 
-// Badge styling
-.badge {
-  font-weight: $font-weight-semibold;
-  padding: $badge-padding-y $badge-padding-x;
-  border-radius: $badge-border-radius;
-  font-size: $badge-font-size;
+.detail-card-header-primary {
+  background: rgba($primary, 0.06);
+  i { color: $primary; }
 }
 
-// Action buttons
-.btn-primary {
-  @include btn-primary;
-}
-
-.btn-outline-secondary,
-.btn-outline-warning,
-.btn-outline-success,
-.btn-outline-danger {
-  border-radius: $btn-border-radius;
-  transition: all $transition-base;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
-}
-
-// Breadcrumb accent
-.breadcrumb-item a {
+// ─── Detail table ─────────────────────────────────────────────────────────────
+.detail-section-label {
+  font-size: 0.68rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
   color: $primary;
-  transition: color $transition-base;
-
-  &:hover {
-    color: $primary-medium;
-  }
+  padding: $spacing-sm $spacing-md 4px;
+  margin: 0;
 }
 
-// Quick actions card
-.d-grid .btn {
-  text-align: left;
-  padding: $spacing-sm $spacing-md;
-  border-radius: $border-radius;
-  transition: all $transition-base;
+.detail-table {
+  td { font-size: 0.84rem; border-bottom: 1px solid var(--border-light); padding: 6px $spacing-md; }
+  tr:last-child td { border-bottom: 0; }
+}
 
-  &:hover {
-    transform: translateX(3px);
-  }
+.detail-key {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  width: 42%;
+}
+
+.detail-notes-row {
+  padding: $spacing-sm $spacing-md $spacing-md;
+  border-top: 1px solid var(--border-light);
+}
+
+// ─── Assignee block ───────────────────────────────────────────────────────────
+.assignee-block {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: $spacing-md;
+}
+
+.assignee-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba($primary, 0.1);
+  color: $primary;
+  font-weight: $font-weight-bold;
+  font-size: 1rem;
+  text-transform: uppercase;
+  @include flex-center;
+  flex-shrink: 0;
+}
+
+// ─── Quick actions ────────────────────────────────────────────────────────────
+.quick-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: $spacing-md;
+}
+
+.quick-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px $spacing-md;
+  border-radius: $border-radius;
+  border: 1px solid transparent;
+  font-size: 0.84rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  width: 100%;
+  text-align: left;
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:hover:not(:disabled) { transform: translateX(3px); }
+
+  &.warning  { background: rgba($warning, 0.08); color: darken($warning, 25%); border-color: rgba($warning, 0.2);  &:hover:not(:disabled) { background: rgba($warning, 0.15); } }
+  &.success  { background: rgba($success, 0.08); color: darken($success, 5%);  border-color: rgba($success, 0.2);  &:hover:not(:disabled) { background: rgba($success, 0.15); } }
+  &.secondary{ background: rgba($gray-500, 0.08); color: $gray-600;            border-color: rgba($gray-400, 0.3); &:hover:not(:disabled) { background: rgba($gray-500, 0.15); } }
+  &.danger   { background: rgba($danger, 0.08);  color: $danger;               border-color: rgba($danger, 0.2);   &:hover:not(:disabled) { background: rgba($danger, 0.15); } }
 }

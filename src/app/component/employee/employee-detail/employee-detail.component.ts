@@ -26,6 +26,7 @@ interface EmployeeDocument {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-employee-detail',
   templateUrl: './employee-detail.component.html',
   styleUrls: ['./employee-detail.component.scss'],
@@ -43,6 +44,13 @@ export class EmployeeDetailComponent implements OnInit {
   isMyDetailsPage: boolean = false;
   isAdminView: boolean = false;
   currentUserId: number | null = null; // Store current user's ID for permission checks
+
+  // Tab state
+  activeTab: 'overview' | 'edit' | 'documents' = 'overview';
+
+  setTab(tab: 'overview' | 'edit' | 'documents'): void {
+    this.activeTab = tab;
+  }
 
   // Server URL
   private readonly SERVER_URL = environment.apiUrl + '/api/v1';
@@ -635,11 +643,7 @@ export class EmployeeDetailComponent implements OnInit {
    * Navigate back based on context
    */
   goBack(): void {
-    if (this.isMyDetailsPage) {
-      this.router.navigate(['/']);
-    } else {
-      this.router.navigate(['/employee']);
-    }
+    this.router.navigate(['/employee']);
   }
 
   onDesignationChange(event: Event): void {

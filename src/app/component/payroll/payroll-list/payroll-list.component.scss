@@ -1,21 +1,129 @@
-// payroll-list Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-.table-responsive {
-  overflow-x: auto;
+.ann-wrap { padding: 0; }
+
+// ─── Table Card
+.pay-table-card {
+  margin: 0 24px 24px;
+
+  table thead th {
+    padding: 10px 14px;
+    background: var(--table-header-bg, #f8f9fa);
+    font-size: 0.73rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.4px;
+    color: var(--text-secondary, #555);
+    border-bottom: 1px solid var(--border-color, #eee);
+    white-space: nowrap;
+  }
+
+  table tbody td {
+    padding: 10px 14px; vertical-align: middle;
+    border-bottom: 1px solid var(--border-color, #f0f0f0);
+  }
+
+  table tbody tr { transition: background 0.15s; }
+  table tbody tr:hover { background: var(--bg-hover, #fafafa); }
 }
 
-.btn-group-sm .btn {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
+// ─── Status Badges
+.badge-soft-draft      { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,0.1); color: #6c757d; }
+.badge-soft-processed  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(52,152,219,0.12); color: #2980b9; }
+.badge-soft-paid       { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,0.12); color: #27ae60; }
+.badge-soft-cancelled  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1); color: #dc3545; }
+.badge-soft-approved   { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(241,196,15,0.15); color: #b38600; }
+
+// ─── Action Buttons
+.action-btn-group { display: flex; align-items: center; justify-content: center; gap: 4px; flex-wrap: wrap; }
+
+.action-btn {
+  width: 30px; height: 30px; border-radius: 7px; border: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; cursor: pointer; transition: all 0.15s;
+
+  &.action-btn-view     { background: rgba(55,95,160,0.1);   color: #375fa0; &:hover { background: rgba(55,95,160,0.2); } }
+  &.action-btn-edit     { background: rgba(52,152,219,0.1);  color: #2980b9; &:hover { background: rgba(52,152,219,0.2); } }
+  &.action-btn-approve  { background: rgba(39,174,96,0.1);   color: #27ae60; &:hover { background: rgba(39,174,96,0.2); } }
+  &.action-btn-paid     { background: rgba(39,174,96,0.1);   color: #27ae60; &:hover { background: rgba(39,174,96,0.2); } }
+  &.action-btn-pay      { background: rgba(241,196,15,0.12); color: #b38600; &:hover { background: rgba(241,196,15,0.22); } }
+  &.action-btn-download { background: rgba(39,174,96,0.1);   color: #27ae60; &:hover { background: rgba(39,174,96,0.2); } }
+  &.action-btn-calc     { background: rgba(155,89,182,0.1);  color: #8e44ad; &:hover { background: rgba(155,89,182,0.2); } }
+  &.action-btn-cancel   { background: rgba(220,53,69,0.08);  color: #dc3545; &:hover { background: rgba(220,53,69,0.18); } }
+
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 
-.badge {
-  font-size: 0.875rem;
-  padding: 0.375rem 0.75rem;
+// ─── Empty / Error / Loading
+.pay-empty {
+  text-align: center; padding: 60px 24px;
+  color: var(--text-muted, #aaa);
+  i { font-size: 3rem; display: block; margin-bottom: 16px; opacity: 0.3; }
+  h5 { color: var(--text-secondary, #666); margin-bottom: 8px; }
+  p  { font-size: 0.85rem; max-width: 380px; margin: 0 auto 16px; }
+}
+.pay-error {
+  text-align: center; padding: 60px 24px; color: var(--text-muted, #aaa);
+  i { font-size: 3rem; display: block; margin-bottom: 16px; color: #dc3545; opacity: 0.5; }
+  h5 { color: #dc3545; margin-bottom: 8px; }
+  p  { font-size: 0.85rem; }
+}
+.pay-loading { text-align: center; padding: 60px; color: var(--text-muted, #888); font-size: 0.9rem; margin: 0 24px; }
+
+// ─── Pagination
+.pay-pagination {
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+  padding: 16px;
+  border-top: 1px solid var(--border-color, #eee);
 }
 
-.modal.show {
-  display: block;
+.pay-page-btn {
+  min-width: 32px; height: 32px; padding: 0 8px;
+  border-radius: 7px; border: 1px solid var(--border-color, #dee2e6);
+  background: var(--bg-card, #fff); color: var(--text-secondary, #555);
+  font-size: 0.8rem; cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+
+  &:hover:not(:disabled) { border-color: #375fa0; color: #375fa0; }
+  &.pay-page-active { background: #375fa0; border-color: #375fa0; color: #fff; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+// ─── Modal
+.pay-modal { border: none; border-radius: 14px; overflow: hidden; }
+
+.pay-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #1a2a4a 0%, #375fa0 100%);
+}
+.pay-modal-title { font-size: 1rem; font-weight: 700; color: #fff; margin: 0; }
+
+.pay-modal-body {
+  padding: 24px; background: var(--bg-card, #fff); color: var(--text-primary, #333);
+  p { margin-bottom: 16px; }
+}
+
+.pay-confirm-info {
+  background: var(--bg-hover, #f8f9fa);
+  border-radius: 10px; padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  font-size: 0.88rem; color: var(--text-secondary, #555);
+}
+.pay-info-label { font-weight: 600; margin-right: 6px; color: var(--text-primary, #333); }
+
+.pay-modal-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border-color, #eee);
+  background: var(--bg-card, #fff);
+}
+
+:host ::ng-deep {
+  .modal-backdrop { z-index: 1040; }
+  .modal { z-index: 1050; }
+}
+
+.btn-banner-ghost {
+  background: rgba(255,255,255,0.1) !important;
+  border-color: rgba(255,255,255,0.2) !important;
 }

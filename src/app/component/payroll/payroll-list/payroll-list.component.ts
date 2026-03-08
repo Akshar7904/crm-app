@@ -11,6 +11,7 @@ import { CustomHttpResponse, Page } from '../../../interface/appstates';
 import { State } from '../../../interface/state';
 
 @Component({
+  standalone: false,
   selector: 'app-payroll-list',
   templateUrl: './payroll-list.component.html',
   styleUrls: ['./payroll-list.component.scss'],
@@ -246,11 +247,12 @@ export class PayrollListComponent implements OnInit {
   /** Helpers for template */
   getStatusBadgeClass(status: string): string {
     switch (status) {
-      case 'DRAFT': return 'badge bg-secondary';
-      case 'PROCESSED': return 'badge bg-info';
-      case 'PAID': return 'badge bg-success';
-      case 'CANCELLED': return 'badge bg-danger';
-      default: return 'badge bg-secondary';
+      case 'DRAFT': return 'badge-soft-draft';
+      case 'PROCESSED': return 'badge-soft-processed';
+      case 'PAID': return 'badge-soft-paid';
+      case 'CANCELLED': return 'badge-soft-cancelled';
+      case 'APPROVED': return 'badge-soft-approved';
+      default: return 'badge-soft-draft';
     }
   }
 

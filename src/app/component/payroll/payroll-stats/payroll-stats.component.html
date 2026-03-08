@@ -1,50 +1,49 @@
-<!-- payroll-stats.component.html -->
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-12 mb-4">
-      <h4><i class="bi bi-graph-up me-2"></i>Payroll Statistics</h4>
-    </div>
+<div class="ann-wrap">
 
-    <div *ngIf="isLoading" class="col-12 text-center py-5">
-      <div class="spinner-border text-primary"></div>
-      <p class="mt-3">Loading statistics...</p>
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-graph-up"></i> Payroll Statistics</h1>
+      <p class="banner-subtitle">Overview of payroll processing status</p>
     </div>
+  </div>
 
-    <div *ngIf="!isLoading && stats" class="col-12">
-      <div class="row">
-        <div class="col-md-3 mb-4">
-          <div class="card text-white bg-primary">
-            <div class="card-body">
-              <h6 class="card-title">Total Payrolls</h6>
-              <h2 class="mb-0">{{ stats.totalPayrolls || 0 }}</h2>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card text-white bg-secondary">
-            <div class="card-body">
-              <h6 class="card-title">Draft</h6>
-              <h2 class="mb-0">{{ stats.draftPayrolls || 0 }}</h2>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card text-white bg-info">
-            <div class="card-body">
-              <h6 class="card-title">Processed</h6>
-              <h2 class="mb-0">{{ stats.processedPayrolls || 0 }}</h2>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-3 mb-4">
-          <div class="card text-white bg-success">
-            <div class="card-body">
-              <h6 class="card-title">Paid</h6>
-              <h2 class="mb-0">{{ stats.paidPayrolls || 0 }}</h2>
-            </div>
-          </div>
-        </div>
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="pay-loading">
+    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+    Loading statistics...
+  </div>
+
+  <!-- KPI Cards -->
+  <div *ngIf="!isLoading && stats" class="pay-kpi-row">
+    <div class="pay-kpi-card">
+      <div class="pay-kpi-icon pay-kpi-total"><i class="bi bi-stack"></i></div>
+      <div class="pay-kpi-body">
+        <div class="pay-kpi-label">Total Payrolls</div>
+        <div class="pay-kpi-value">{{ stats.totalPayrolls || 0 }}</div>
+      </div>
+    </div>
+    <div class="pay-kpi-card">
+      <div class="pay-kpi-icon pay-kpi-draft"><i class="bi bi-file-earmark-text"></i></div>
+      <div class="pay-kpi-body">
+        <div class="pay-kpi-label">Draft</div>
+        <div class="pay-kpi-value">{{ stats.draftPayrolls || 0 }}</div>
+      </div>
+    </div>
+    <div class="pay-kpi-card">
+      <div class="pay-kpi-icon pay-kpi-processed"><i class="bi bi-gear-fill"></i></div>
+      <div class="pay-kpi-body">
+        <div class="pay-kpi-label">Processed</div>
+        <div class="pay-kpi-value">{{ stats.processedPayrolls || 0 }}</div>
+      </div>
+    </div>
+    <div class="pay-kpi-card">
+      <div class="pay-kpi-icon pay-kpi-paid"><i class="bi bi-check-circle-fill"></i></div>
+      <div class="pay-kpi-body">
+        <div class="pay-kpi-label">Paid</div>
+        <div class="pay-kpi-value">{{ stats.paidPayrolls || 0 }}</div>
       </div>
     </div>
   </div>
+
 </div>

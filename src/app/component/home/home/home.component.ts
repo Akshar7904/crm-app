@@ -8,6 +8,8 @@ import { DashboardService, DashboardStats, EmployeeDashboardStats } from 'src/ap
 import { HolidayService } from 'src/app/service/holiday.service';
 import { AttendanceService } from 'src/app/service/attendance.service';
 import { LeaveService } from 'src/app/service/leave.service';
+import { AnnouncementService } from 'src/app/service/announcement.service';
+import { ExpensesService } from 'src/app/component/expenses/services/expenses.service';
 import { Attendance } from 'src/app/interface/attendance-state';
 import { Leave } from 'src/app/interface/leave-state';
 import { Holiday } from 'src/app/component/holiday/holiday.model';
@@ -32,6 +34,7 @@ interface DashboardState {
  * @since 2025-01-12
  */
 @Component({
+  standalone: false,
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
@@ -56,6 +59,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   attendanceChartData: any = null;
   leaveChartData: any = null;
   genderChartData: any = null;
+
+  // New dashboard widgets
+  recentAnnouncements: any[] = [];
+  recentClockEvents: Attendance[] = [];
+  financialSummary: any = null;
+  currentYear: number = new Date().getFullYear();
 
   // Calendar
   upcomingEvents: CalendarEvent[] = [];
@@ -91,6 +100,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     private holidayService: HolidayService,
     private attendanceService: AttendanceService,
     private leaveService: LeaveService,
+    private announcementService: AnnouncementService,
+    private expensesService: ExpensesService,
     private notification: NotificationService,
     private router: Router,
     private cdr: ChangeDetectorRef
@@ -194,74 +205,99 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   clockIn(): void {
     this.isClockingIn = true;
-    const now = new Date();
-    const checkInTimeISO = now.toISOString();
-    const checkInTime = now.toLocaleTimeString('en-ZA', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    this.getDeviceLocation().then(coords => {
+      const now = new Date();
+      const checkInTimeISO = now.toISOString();
+      const checkInTime = now.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      const locationLabel = coords
+        ? `${coords.latitude.toFixed(6)},${coords.longitude.toFixed(6)}`
+        : (this.locationName || undefined);
 
-    // Call attendance service to clock in (send ISO format for backend parsing)
-    this.attendanceService.clockIn$(checkInTimeISO, this.locationName || undefined).subscribe({
-      next: (response) => {
-        this.isClockedIn = true;
-        this.clockInTime = checkInTime;
-        this.currentStatus = 'WORKING';
-        localStorage.setItem('todayClockIn', JSON.stringify({
-          date: now.toDateString(),
-          time: this.clockInTime,
-          clockedOut: false,
-          attendanceId: response.data?.attendance?.id
-        }));
-        this.isClockingIn = false;
-        this.notification.onSuccess('Clocked in successfully at ' + checkInTime);
-        // Add to calendar
-        if (response.data?.attendance) {
-          this.addTodayAttendanceToCalendar(response.data.attendance);
+      this.attendanceService.clockIn$(
+        checkInTimeISO,
+        locationLabel,
+        coords?.latitude,
+        coords?.longitude
+      ).subscribe({
+        next: (response) => {
+          this.isClockedIn = true;
+          this.clockInTime = checkInTime;
+          this.currentStatus = 'WORKING';
+          localStorage.setItem('todayClockIn', JSON.stringify({
+            date: now.toDateString(),
+            time: this.clockInTime,
+            clockedOut: false,
+            attendanceId: response.data?.attendance?.id
+          }));
+          this.isClockingIn = false;
+          this.notification.onSuccess('Clocked in successfully at ' + checkInTime);
+          if (response.data?.attendance) {
+            this.addTodayAttendanceToCalendar(response.data.attendance);
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.isClockingIn = false;
+          this.notification.onError(error || 'Failed to clock in');
+          this.cdr.markForCheck();
         }
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.isClockingIn = false;
-        this.notification.onError(error || 'Failed to clock in');
-        this.cdr.markForCheck();
-      }
+      });
     });
   }
 
   clockOut(): void {
     this.isClockingIn = true;
-    const now = new Date();
-    const checkOutTimeISO = now.toISOString();
-    const checkOutTime = now.toLocaleTimeString('en-ZA', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    this.getDeviceLocation().then(coords => {
+      const now = new Date();
+      const checkOutTimeISO = now.toISOString();
+      const checkOutTime = now.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit' });
+      const locationLabel = coords
+        ? `${coords.latitude.toFixed(6)},${coords.longitude.toFixed(6)}`
+        : (this.locationName || undefined);
 
-    // Call attendance service to clock out (send ISO format for backend parsing)
-    this.attendanceService.clockOut$(checkOutTimeISO, this.locationName || undefined).subscribe({
-      next: (response) => {
-        this.isClockedIn = false;
-        this.isClockedOut = true;
-        this.clockOutTime = checkOutTime;
-        this.currentStatus = 'CLOCKED_OUT';
-        const clockData = JSON.parse(localStorage.getItem('todayClockIn') || '{}');
-        clockData.clockedOut = true;
-        clockData.checkOutTime = checkOutTime;
-        localStorage.setItem('todayClockIn', JSON.stringify(clockData));
-        this.isClockingIn = false;
-        this.notification.onSuccess('Clocked out successfully at ' + checkOutTime);
-        // Update calendar
-        if (response.data?.attendance) {
-          this.addTodayAttendanceToCalendar(response.data.attendance);
+      this.attendanceService.clockOut$(
+        checkOutTimeISO,
+        locationLabel,
+        coords?.latitude,
+        coords?.longitude
+      ).subscribe({
+        next: (response) => {
+          this.isClockedIn = false;
+          this.isClockedOut = true;
+          this.clockOutTime = checkOutTime;
+          this.currentStatus = 'CLOCKED_OUT';
+          const clockData = JSON.parse(localStorage.getItem('todayClockIn') || '{}');
+          clockData.clockedOut = true;
+          clockData.checkOutTime = checkOutTime;
+          localStorage.setItem('todayClockIn', JSON.stringify(clockData));
+          this.isClockingIn = false;
+          this.notification.onSuccess('Clocked out successfully at ' + checkOutTime);
+          if (response.data?.attendance) {
+            this.addTodayAttendanceToCalendar(response.data.attendance);
+          }
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.isClockingIn = false;
+          this.notification.onError(error || 'Failed to clock out');
+          this.cdr.markForCheck();
         }
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.isClockingIn = false;
-        this.notification.onError(error || 'Failed to clock out');
-        this.cdr.markForCheck();
+      });
+    });
+  }
+
+  /** Resolve the device's GPS coordinates, or null if unavailable/denied. */
+  private getDeviceLocation(): Promise<{ latitude: number; longitude: number } | null> {
+    return new Promise(resolve => {
+      if (!navigator.geolocation) {
+        resolve(null);
+        return;
       }
+      navigator.geolocation.getCurrentPosition(
+        pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
+        ()  => resolve(null),
+        { timeout: 8000, maximumAge: 60000, enableHighAccuracy: false }
+      );
     });
   }
 
@@ -493,9 +529,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       stats: this.dashboardService.getAdminDashboardStats(),
       holidays: this.holidayService.getUpcomingHolidays$(10),
       attendance: this.attendanceService.getAttendanceByDateRange(startDate, endDate),
-      leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC')
+      leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC'),
+      announcements: this.announcementService.getAnnouncements$(0, 5).pipe(catchError(() => of(null))),
+      financial: this.expensesService.getSummary(now.getFullYear(), now.getMonth() + 1).pipe(catchError(() => of(null)))
     }).pipe(
-      map(({ stats, holidays, attendance, leaves }) => {
+      map(({ stats, holidays, attendance, leaves, announcements, financial }) => {
         const dashboardStats = stats.data.stats;
         this.buildAdminStatsCards(dashboardStats);
         this.buildAdminCharts(dashboardStats);
@@ -504,8 +542,15 @@ export class HomeComponent implements OnInit, OnDestroy {
           attendance.data?.attendances || [],
           leaves || []
         );
-
-        this.notification.onDefault('Admin dashboard loaded successfully');
+        this.recentAnnouncements = announcements?.data?.announcements || [];
+        this.financialSummary = financial?.data || null;
+        const today = new Date().toISOString().split('T')[0];
+        this.recentClockEvents = (attendance.data?.attendances || [])
+          .filter((a: Attendance) => a.attendanceDate === today && a.checkInTime)
+          .sort((a: Attendance, b: Attendance) =>
+            new Date(b.checkInTime!).getTime() - new Date(a.checkInTime!).getTime()
+          )
+          .slice(0, 15);
         this.cdr.markForCheck();
 
         return {
@@ -538,8 +583,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.buildEmployeeStatsCards(employeeStats);
         this.buildEmployeeCharts(employeeStats);
         this.buildEmployeeCalendar(employeeStats, holidays.data.holidays);
-
-        this.notification.onDefault('Dashboard loaded successfully');
         this.cdr.markForCheck();
 
         return {
@@ -977,5 +1020,18 @@ export class HomeComponent implements OnInit, OnDestroy {
    */
   refreshDashboard(): void {
     this.loadDashboard();
+  }
+
+  getCategoryBadgeClass(category: string): string {
+    const map: any = {
+      GENERAL: 'primary', HR: 'info', POLICY: 'warning',
+      IT: 'secondary', FINANCE: 'success', URGENT: 'danger'
+    };
+    return map[category] || 'primary';
+  }
+
+  formatCurrency(amount: number): string {
+    if (!amount && amount !== 0) return 'R 0';
+    return 'R ' + Math.round(amount).toLocaleString('en-ZA');
   }
 }

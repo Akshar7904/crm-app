@@ -12,6 +12,7 @@ import { NotificationService } from 'src/app/service/notification.service';
 import { InvoiceLineItem, InvoiceModel } from '../invoice.model';
 
 @Component({
+  standalone: false,
   selector: 'app-newinvoice',
   templateUrl: './newinvoice.component.html',
   styleUrls: ['./newinvoice.component.scss'],

@@ -1,234 +1,166 @@
 <ng-container *ngIf="assetsState$ | async as state" [ngSwitch]="state.dataState">
   <ng-container *ngSwitchCase="DataState.LOADED">
-    <!-- Navbar rendered by app.component -->
-    <section>
+    <section class="asset-list-page">
       <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" style="margin-top: 8px">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a [routerLink]="['/']">Home</a>
-            </li>
-            <li class="breadcrumb-item active">Assets</li>
-          </ol>
-        </nav>
 
-        <!-- Header Section -->
-        <div class="row mt-3">
-          <div class="col">
-            <h4 class="fw-bold text-start">Asset Management</h4>
+        <!-- Page Banner -->
+        <div class="page-banner">
+          <div class="banner-left">
+            <h1 class="banner-title"><i class="bi bi-laptop"></i> Asset Management</h1>
+            <p class="banner-subtitle">Manage and track company assets</p>
           </div>
-          <div class="col text-end">
-            <button class="btn btn-success" (click)="addNewAsset()">
+          <div class="banner-actions">
+            <a [routerLink]="['/assets/assignments']" class="btn-banner btn-banner-ghost">
+              <i class="bi bi-clipboard-check"></i> Assignments
+            </a>
+            <a [routerLink]="['/assets/requests']" class="btn-banner btn-banner-ghost">
+              <i class="bi bi-inbox"></i> Requests
+            </a>
+            <button class="btn-banner" (click)="addNewAsset()">
               <i class="bi bi-plus-circle"></i> Add Asset
             </button>
           </div>
         </div>
 
         <!-- Filters and Search -->
-        <div class="row mt-3 mb-3">
+        <div class="row mb-3 g-2">
           <div class="col-md-4">
             <form #searchForm="ngForm" (ngSubmit)="searchAssets(searchForm)">
               <div class="input-group">
-                <input
-                  type="text"
-                  ngModel
-                  name="query"
-                  class="form-control"
-                  placeholder="Search assets..."
-                />
-                <button type="submit" class="btn btn-primary">
-                  <i class="bi bi-search"></i>
-                </button>
+                <input type="text" ngModel name="query" class="form-control" placeholder="Search assets..." />
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i></button>
               </div>
             </form>
           </div>
           <div class="col-md-4">
-            <select
-              class="form-select"
-              [(ngModel)]="selectedCategory"
-              (change)="filterByCategory(selectedCategory)"
-            >
+            <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterByCategory(selectedCategory)">
               <option value="">All Categories</option>
               <option *ngFor="let cat of [
-                'LAPTOP', 'DESKTOP', 'TABLET', 'PHONE', 'MONITOR',
-                'KEYBOARD', 'MOUSE', 'HEADSET', 'PRINTER', 'SCANNER',
-                'PROJECTOR', 'CAMERA', 'FURNITURE', 'VEHICLE', 'SOFTWARE_LICENSE', 'OTHER'
+                'LAPTOP','DESKTOP','TABLET','PHONE','MONITOR',
+                'KEYBOARD','MOUSE','HEADSET','PRINTER','SCANNER',
+                'PROJECTOR','CAMERA','FURNITURE','VEHICLE','SOFTWARE_LICENSE','OTHER'
               ]" [value]="cat">{{ cat | titlecase }}</option>
             </select>
           </div>
           <div class="col-md-4">
-            <select
-              class="form-select"
-              [(ngModel)]="selectedStatus"
-              (change)="filterByStatus(selectedStatus)"
-            >
+            <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterByStatus(selectedStatus)">
               <option value="">All Statuses</option>
               <option *ngFor="let status of [
-                'AVAILABLE', 'ASSIGNED', 'RESERVED', 'UNDER_MAINTENANCE', 'RETIRED', 'LOST', 'DAMAGED'
+                'AVAILABLE','ASSIGNED','RESERVED','UNDER_MAINTENANCE','RETIRED','LOST','DAMAGED'
               ]" [value]="status">{{ status | titlecase }}</option>
             </select>
           </div>
         </div>
 
-        <!-- Quick Links -->
-        <div class="row mb-3">
-          <div class="col">
-            <a [routerLink]="['/assets/requests']" class="btn btn-outline-primary me-2">
-              <i class="bi bi-inbox"></i> Requests
-            </a>
-            <a [routerLink]="['/assets/assignments']" class="btn btn-outline-primary">
-              <i class="bi bi-clipboard-check"></i> Assignments
-            </a>
+        <!-- Assets Table -->
+        <div class="table-card" *ngIf="hasAssets(state)">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Asset Tag</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Status</th>
+                  <th>Condition</th>
+                  <th>Assigned To</th>
+                  <th>Location</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let asset of getAssets(state)" (click)="selectAsset(asset)" style="cursor:pointer">
+                  <td><code>{{ asset.assetTag }}</code></td>
+                  <td>
+                    <div class="asset-name-cell">
+                      <i class="bi {{ getCategoryIcon(asset.category) }} asset-cat-icon"></i>
+                      <div>
+                        <strong>{{ asset.name }}</strong>
+                        <br><small class="text-muted">{{ asset.brand }} {{ asset.model }}</small>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ asset.category | titlecase }}</td>
+                  <td>
+                    <span class="badge-soft {{ getStatusClass(asset.status) }}">
+                      {{ asset.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>{{ asset.condition | titlecase }}</td>
+                  <td>
+                    <span *ngIf="asset.currentAssigneeName">{{ asset.currentAssigneeName }}</span>
+                    <span *ngIf="!asset.currentAssigneeName" class="text-muted">—</span>
+                  </td>
+                  <td>{{ asset.location || '—' }}</td>
+                  <td>
+                    <div class="action-btn-group">
+                      <button class="btn-action edit" (click)="editAsset(asset, $event)" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn-action approve" *ngIf="asset.status === 'AVAILABLE'"
+                        (click)="assignAsset(asset, $event)" title="Assign">
+                        <i class="bi bi-person-plus"></i>
+                      </button>
+                      <button class="btn-action delete" (click)="deleteAsset(asset, $event)" title="Delete">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="table-footer">
+            <nav aria-label="Page navigation">
+              <ul class="pagination mb-0">
+                <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+                  <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor:pointer">&laquo;</a>
+                </li>
+                <li *ngFor="let p of getTotalPages(state) | ExtractArrayValue:'number'; let i = index" class="page-item">
+                  <a (click)="goToPage(i)" [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
+                     class="page-link" style="cursor:pointer">{{ i + 1 }}</a>
+                </li>
+                <li [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+                  <a (click)="goToNextOrPreviousPage('forward')" class="page-link" style="cursor:pointer">&raquo;</a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
 
-        <!-- Assets Table -->
-        <div class="table-responsive" *ngIf="hasAssets(state)">
-          <table class="table table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>Asset Tag</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Status</th>
-                <th>Condition</th>
-                <th>Assigned To</th>
-                <th>Location</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let asset of getAssets(state)" (click)="selectAsset(asset)" style="cursor: pointer;">
-                <td>
-                  <span class="badge bg-dark">{{ asset.assetTag }}</span>
-                </td>
-                <td>
-                  <div class="d-flex align-items-center">
-                    <i class="bi {{ getCategoryIcon(asset.category) }} me-2 fs-5"></i>
-                    <div>
-                      <strong>{{ asset.name }}</strong>
-                      <br>
-                      <small class="text-muted">{{ asset.brand }} {{ asset.model }}</small>
-                    </div>
-                  </div>
-                </td>
-                <td>{{ asset.category | titlecase }}</td>
-                <td>
-                  <span class="badge {{ getStatusClass(asset.status) }}">
-                    {{ asset.status | titlecase }}
-                  </span>
-                </td>
-                <td>{{ asset.condition | titlecase }}</td>
-                <td>
-                  <span *ngIf="asset.currentAssigneeName">{{ asset.currentAssigneeName }}</span>
-                  <span *ngIf="!asset.currentAssigneeName" class="text-muted">-</span>
-                </td>
-                <td>{{ asset.location || '-' }}</td>
-                <td>
-                  <div class="btn-group btn-group-sm">
-                    <button
-                      class="btn btn-outline-primary"
-                      (click)="editAsset(asset, $event)"
-                      title="Edit"
-                    >
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <button
-                      class="btn btn-outline-success"
-                      *ngIf="asset.status === 'AVAILABLE'"
-                      (click)="assignAsset(asset, $event)"
-                      title="Assign"
-                    >
-                      <i class="bi bi-person-plus"></i>
-                    </button>
-                    <button
-                      class="btn btn-outline-danger"
-                      (click)="deleteAsset(asset, $event)"
-                      title="Delete"
-                    >
-                      <i class="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
         <!-- Empty State -->
-        <div *ngIf="!hasAssets(state)" class="text-center py-5">
-          <i class="bi bi-box-seam" style="font-size: 4rem; color: #ccc"></i>
-          <h4 class="mt-3">No Assets Found</h4>
-          <p class="text-muted">Get started by adding your first asset</p>
-          <button class="btn btn-primary mt-3" (click)="addNewAsset()">
-            <i class="bi bi-plus-circle"></i> Add Asset
-          </button>
+        <div *ngIf="!hasAssets(state)" class="table-card">
+          <div class="empty-cell">
+            <i class="bi bi-box-seam"></i>
+            <p>No assets found</p>
+            <a class="empty-link" (click)="addNewAsset()">Add your first asset</a>
+          </div>
         </div>
 
-        <!-- Pagination -->
-        <nav *ngIf="hasAssets(state)" aria-label="Page navigation">
-          <ul class="pagination justify-content-end">
-            <li
-              [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''"
-              class="page-item"
-            >
-              <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor: pointer;">
-                &laquo; Prev
-              </a>
-            </li>
-            <li
-              *ngFor="let pageNumber of getTotalPages(state) | ExtractArrayValue:'number'; let i = index"
-              class="page-item"
-            >
-              <a
-                (click)="goToPage(i)"
-                [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
-                class="page-link"
-                style="cursor: pointer;"
-              >
-                {{ i + 1 }}
-              </a>
-            </li>
-            <li
-              [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''"
-              class="page-item"
-            >
-              <a (click)="goToNextOrPreviousPage('forward')" class="page-link" style="cursor: pointer;">
-                Next &raquo;
-              </a>
-            </li>
-          </ul>
-        </nav>
       </div>
     </section>
   </ng-container>
 
   <!-- Loading State -->
   <ng-container *ngSwitchCase="DataState.LOADING">
-    <!-- Navbar rendered by app.component -->
-    <div class="container-fluid mt-5">
-      <div class="text-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-3">Loading assets...</p>
+    <div class="container-fluid p-4">
+      <div class="page-banner skeleton-box" style="height:80px"></div>
+      <div class="table-card mt-3">
+        <div class="skeleton-box" style="height:200px"></div>
       </div>
     </div>
   </ng-container>
 
   <!-- Error State -->
   <ng-container *ngSwitchCase="DataState.ERROR">
-    <!-- Navbar rendered by app.component -->
-    <div class="container-fluid mt-5">
-      <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">
-          <i class="bi bi-exclamation-triangle"></i> Error Loading Assets
-        </h4>
-        <p>{{ state.error }}</p>
-        <hr />
-        <button class="btn btn-primary" (click)="ngOnInit()">
-          <i class="bi bi-arrow-clockwise"></i> Retry
+    <div class="container-fluid p-4">
+      <div class="alert alert-danger">
+        <h5><i class="bi bi-exclamation-triangle me-2"></i>Error Loading Assets</h5>
+        <p class="mb-2">{{ state.error }}</p>
+        <button class="btn btn-primary btn-sm" (click)="ngOnInit()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Retry
         </button>
       </div>
     </div>

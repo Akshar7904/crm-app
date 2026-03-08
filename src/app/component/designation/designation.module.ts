@@ -15,7 +15,7 @@ import { DesignationService } from '../../service/designation.service';
     CommonModule,
     ReactiveFormsModule,
     NgbModule,
-    DesignationRoutingModule
+    DesignationRoutingModule,
   ],
   providers: [
     DesignationService

@@ -12,6 +12,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
  * Uses OnPush change detection for optimal performance
  */
 @Component({
+  standalone: false,
   selector: 'app-designations',
   templateUrl: './designation.component.html',
   styleUrls: ['./designation.component.scss'],
@@ -69,7 +70,7 @@ export class DesignationsComponent implements OnInit, OnDestroy {
     // Subscribe to designation state for real-time updates
     this.designationService.designationState$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
+      .subscribe((state: any) => {
         this.designationState = state;
         this.cdr.markForCheck(); // Trigger change detection
       });
@@ -96,7 +97,7 @@ export class DesignationsComponent implements OnInit, OnDestroy {
         distinctUntilChanged(), // Only emit when value changes
         takeUntil(this.destroy$)
       )
-      .subscribe(query => {
+      .subscribe((query: any) => {
         if (query && query.trim()) {
           this.onSearch();
         } else {

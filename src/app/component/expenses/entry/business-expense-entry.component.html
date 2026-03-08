@@ -1,0 +1,155 @@
+<div class="expense-entry">
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-plus-circle"></i> Record Business Expense</h1>
+      <p class="banner-subtitle">Enter a direct business expense against a chart of account</p>
+    </div>
+    <div class="banner-actions">
+      <a routerLink="/expenses/entry/list" class="btn-banner">
+        <i class="bi bi-list-ul"></i> View All Expenses
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <h5><i class="bi bi-pencil-square"></i> Expense Details</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="form">
+        <div class="row g-3">
+          <!-- Date -->
+          <div class="col-md-4">
+            <label class="form-label">Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="expenseDate"
+                   [class.is-invalid]="isInvalid('expenseDate')">
+            <div class="invalid-feedback">Date is required</div>
+          </div>
+
+          <!-- Vendor -->
+          <div class="col-md-4">
+            <label class="form-label">Vendor (optional)</label>
+            <select class="form-select" formControlName="vendorId">
+              <option value="">-- No vendor --</option>
+              <option *ngFor="let v of vendors" [value]="v.id">{{ v.vendorName }}</option>
+            </select>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="col-md-4">
+            <label class="form-label">Payment Method <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="paymentMethod" [class.is-invalid]="isInvalid('paymentMethod')">
+              <option value="CASH">Cash</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+              <option value="CREDIT_CARD">Credit Card</option>
+              <option value="CHEQUE">Cheque</option>
+            </select>
+          </div>
+
+          <!-- Account -->
+          <div class="col-md-8">
+            <label class="form-label">Expense Account <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="accountId" [class.is-invalid]="isInvalid('accountId')">
+              <option value="">-- Select account --</option>
+              <optgroup label="Operating Expenses">
+                <option *ngFor="let a of getAccountsByType('OPERATING_EXPENSE')" [value]="a.id">
+                  {{ a.accountCode }} - {{ a.accountName }}
+                </option>
+              </optgroup>
+              <optgroup label="Cost of Goods Sold">
+                <option *ngFor="let a of getAccountsByType('COGS')" [value]="a.id">
+                  {{ a.accountCode }} - {{ a.accountName }}
+                </option>
+              </optgroup>
+              <optgroup label="Other">
+                <option *ngFor="let a of getAccountsByType('OTHER_EXPENSE')" [value]="a.id">
+                  {{ a.accountCode }} - {{ a.accountName }}
+                </option>
+              </optgroup>
+            </select>
+            <div class="invalid-feedback">Please select an account</div>
+          </div>
+
+          <!-- Description -->
+          <div class="col-md-12">
+            <label class="form-label">Description <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="description"
+                   placeholder="e.g., Monthly office rent - February 2026"
+                   [class.is-invalid]="isInvalid('description')">
+            <div class="invalid-feedback">Description is required</div>
+          </div>
+
+          <!-- Amount -->
+          <div class="col-md-4">
+            <label class="form-label">Amount (excl. VAT) <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <span class="input-group-text">R</span>
+              <input type="number" class="form-control" formControlName="amount"
+                     placeholder="0.00" step="0.01" min="0"
+                     [class.is-invalid]="isInvalid('amount')">
+            </div>
+            <div class="invalid-feedback">Amount is required</div>
+          </div>
+
+          <!-- VAT Rate -->
+          <div class="col-md-2">
+            <label class="form-label">VAT Rate</label>
+            <div class="input-group">
+              <input type="number" class="form-control" formControlName="vatRate"
+                     placeholder="15" step="0.5" min="0" max="100"
+                     [class.is-invalid]="isInvalid('vatRate')">
+              <span class="input-group-text">%</span>
+            </div>
+          </div>
+
+          <!-- VAT Amount (computed) -->
+          <div class="col-md-3">
+            <label class="form-label">VAT Amount</label>
+            <div class="input-group">
+              <span class="input-group-text">R</span>
+              <input type="text" class="form-control total-display" [value]="vatAmount.toFixed(2)" readonly>
+            </div>
+          </div>
+
+          <!-- Total -->
+          <div class="col-md-3">
+            <label class="form-label">Total (incl. VAT)</label>
+            <div class="input-group">
+              <span class="input-group-text">R</span>
+              <input type="text" class="form-control total-display" [value]="total.toFixed(2)" readonly>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="col-md-12">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" rows="2" formControlName="notes" placeholder="Any additional notes..."></textarea>
+          </div>
+
+          <!-- Receipt -->
+          <div class="col-md-12">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" formControlName="receiptAttached" id="receiptCheck">
+              <label class="form-check-label" for="receiptCheck">Receipt attached / filed</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions mt-4">
+          <button type="button" class="btn btn-outline-secondary" routerLink="/expenses/entry/list">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-outline-primary" (click)="onSave(false)" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+            Save as Draft
+          </button>
+          <button type="button" class="btn btn-primary" (click)="onSave(true)" [disabled]="loading">
+            <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"></span>
+            Save &amp; Approve
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

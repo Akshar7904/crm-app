@@ -28,7 +28,7 @@ import { PayrollStatsComponent } from './payroll-stats/payroll-stats.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
-    PayrollRoutingModule
+    PayrollRoutingModule,
   ]
 })
 export class PayrollModule { }

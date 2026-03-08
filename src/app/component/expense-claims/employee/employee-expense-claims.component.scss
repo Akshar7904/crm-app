@@ -1,182 +1,172 @@
-// employee-expense-claims Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-/* expense-claims.component.css */
-
-/* Badge styles for claim status */
-.badge-warning {
-  background-color: #ffc107;
-  color: #000;
+// ─── Wrapper
+.ec-wrap {
+  padding: 0 24px 32px;
 }
 
-.badge-success {
-  background-color: #28a745;
+// ─── Table card overrides for this module
+.table-card {
+  .table thead th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted, #888);
+    background: var(--table-header-bg, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #eee);
+    padding: 10px 14px;
+    white-space: nowrap;
+  }
+
+  .table tbody td {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    color: var(--text-primary, #333);
+    border-bottom: 1px solid var(--border-color, #f0f0f0);
+    vertical-align: middle;
+  }
+
+  .table tbody tr:last-child td { border-bottom: none; }
+  .table tbody tr:hover td { background: var(--table-hover, #f8faff); }
+}
+
+// ─── Status Badges
+.badge-soft-pending   { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(255,193,7,0.15);  color: #d68910; }
+.badge-soft-approved  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,0.12);  color: #27ae60; }
+.badge-soft-rejected  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1);   color: #dc3545; }
+.badge-soft-paid      { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(52,152,219,0.12); color: #2980b9; }
+.badge-soft-cancelled { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,0.1); color: #6c757d; }
+
+// ─── Action Buttons (extends global action-btn-group)
+.action-btn-edit   { background: rgba(255,193,7,0.1);   color: #d68910; &:hover { background: rgba(255,193,7,0.22); } }
+.action-btn-cancel { background: rgba(220,53,69,0.1);   color: #dc3545; &:hover { background: rgba(220,53,69,0.2);  } }
+
+// ─── Loading / Error
+.ec-loading {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  padding: 60px 24px; color: var(--text-muted, #888); font-size: 0.9rem;
+}
+
+.ec-error {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 24px; color: #dc3545; text-align: center;
+  i { font-size: 2.5rem; margin-bottom: 12px; }
+  p { font-size: 0.9rem; margin: 0; }
+}
+
+// ─── Pagination
+.ec-pagination {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border-color, #eee);
+
+  .page-link {
+    color: var(--primary, #375fa0);
+    cursor: pointer;
+    border-color: var(--border-color, #dee2e6);
+    font-size: 0.85rem;
+  }
+
+  .page-item.active .page-link {
+    background: var(--primary, #375fa0);
+    border-color: var(--primary, #375fa0);
+    color: #fff;
+  }
+}
+
+// ─── Modal Backdrop
+.ec-modal-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+// ─── Modal
+.ec-modal {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.ec-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 22px;
+  background: linear-gradient(135deg, #1a2a4a 0%, #375fa0 100%);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.ec-modal-title {
   color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
 }
 
-.badge-danger {
-  background-color: #dc3545;
+.ec-modal-close {
+  background: rgba(255,255,255,0.15);
+  border: none;
   color: #fff;
-}
-
-.badge-info {
-  background-color: #17a2b8;
-  color: #fff;
-}
-
-.badge-secondary {
-  background-color: #6c757d;
-  color: #fff;
-}
-
-/* Modal styling */
-.modal.show {
-  display: block;
-}
-
-.modal-backdrop {
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-/* Table responsive */
-.table-responsive {
-  overflow-x: auto;
-}
-
-/* Card styling */
-.card {
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-header {
-  border-radius: 8px 8px 0 0;
-}
-
-/* Button group */
-.btn-group-sm .btn {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-}
-
-/* Pagination */
-.pagination {
-  margin-top: 1rem;
-}
-
-.page-link {
-  cursor: pointer;
-  color: #00bcd4;
-}
-
-.page-link:hover {
-  color: #0097a7;
-  background-color: #e0f7fa;
-}
-
-.page-item.active .page-link {
-  background-color: #00bcd4;
-  border-color: #00bcd4;
-}
-
-/* Form styling */
-.form-control:focus,
-.form-select:focus {
-  border-color: #00bcd4;
-  box-shadow: 0 0 0 0.2rem rgba(0, 188, 212, 0.25);
-}
-
-/* Input group */
-.input-group .btn {
-  border-color: #ced4da;
-}
-
-/* Alert styling */
-.alert {
+  width: 30px; height: 30px;
   border-radius: 6px;
-}
-
-/* Table */
-.table thead th {
-  font-weight: 600;
-  text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
   font-size: 0.85rem;
-  letter-spacing: 0.5px;
+  transition: background 0.15s;
+  &:hover { background: rgba(255,255,255,0.28); }
 }
 
-.table tbody tr:hover {
-  background-color: #f8f9fa;
+.ec-modal-body {
+  background: var(--bg-card, #fff);
+  padding: 22px;
 }
 
-/* Empty state */
-.bi-inbox {
-  font-size: 3rem;
-  color: #ccc;
+.ec-modal-footer {
+  background: var(--bg-hover, #f8f9fa);
+  border-top: 1px solid var(--border-color, #eee);
+  padding: 14px 22px;
+  gap: 10px;
 }
 
-/* Loading spinner */
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
+// ─── Expense Items Sub-card
+.ec-items-card {
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0;
 }
 
-/* Status badge in table */
-td .badge {
-  min-width: 80px;
-  text-align: center;
+.ec-items-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--table-header-bg, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #eee);
 }
 
-/* Expense items table in modal */
-.table-bordered {
-  border: 1px solid #dee2e6;
+.ec-items-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary, #333);
 }
 
-.table-bordered th,
-.table-bordered td {
-  border: 1px solid #dee2e6;
+.ec-items-table {
+  font-size: 0.82rem;
+  th { font-size: 0.78rem; font-weight: 600; background: var(--table-header-bg, #f8f9fa); color: var(--text-muted, #888); }
+  td { vertical-align: middle; }
 }
 
-/* Footer total row */
-tfoot tr {
-  font-weight: 600;
+.ec-items-total {
+  background: var(--table-header-bg, #f8f9fa);
+  font-weight: 700;
+  font-size: 0.85rem;
 }
 
-/* Action buttons */
-.btn-group .btn {
-  margin: 0 2px;
-}
-
-/* Small text in table */
-small.text-muted {
-  font-size: 0.75rem;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .card-header h4 {
-    font-size: 1.2rem;
-  }
-
-  .btn-group {
-    flex-direction: column;
-  }
-
-  .btn-group .btn {
-    margin: 2px 0;
-    width: 100%;
-  }
-
-  .table {
-    font-size: 0.875rem;
-  }
-}
-
-/* Modal z-index fix */
-.modal {
-  z-index: 1050;
-}
-
-.modal-backdrop {
-  z-index: 1040;
+// ─── btn-banner sm variant
+.btn-banner.btn-sm {
+  padding: 5px 12px;
+  font-size: 0.8rem;
 }

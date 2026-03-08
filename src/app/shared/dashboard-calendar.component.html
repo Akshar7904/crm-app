@@ -40,22 +40,17 @@
           <!-- Day Number -->
           <div class="day-number">{{ day.dayNumber }}</div>
 
-          <!-- Event Indicators -->
-          <div class="event-indicators" *ngIf="day.events.length > 0">
-            <ng-container *ngFor="let event of day.events.slice(0, 3); let i = index">
-
-              <div
-                class="event-bar"
-                [ngClass]="getEventTypeClass(event)"
-                [style.background-color]="getEventDotColor(event)"
-                (click)="onEventClick(event, $event)"
-                [title]="event.title">
-                <span class="event-bar-text">{{ event.title }}</span>
-              </div>
-            </ng-container>
-            <div *ngIf="day.events.length > 3" class="more-events">
-              +{{ day.events.length - 3 }} more
-            </div>
+          <!-- Event Dots -->
+          <div class="event-dots" *ngIf="day.events.length > 0">
+            <span
+              *ngFor="let event of day.events.slice(0, 3)"
+              class="event-dot"
+              [style.background]="getEventDotColor(event)"
+              [title]="event.title">
+            </span>
+            <span *ngIf="day.events.length > 3" class="event-dot-more">
+              +{{ day.events.length - 3 }}
+            </span>
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ import { takeUntil } from 'rxjs/operators';
 import { DataState } from '../../../enum/datastate.enum';
 import { LeaveService } from '../../../service/leave.service';
 import { NotificationService } from '../../../service/notification.service';
+import { UserService } from '../../../service/user.service';
 import { UserModel } from '../../profile/user.model';
 import {
   Leave,
@@ -23,16 +24,18 @@ import {
 } from '../../../interface/leave-state';
 
 @Component({
+  standalone: false,
   selector: 'app-employee-leave',
   templateUrl: './employee-leave.component.html',
   styleUrls: ['./employee-leave.component.scss']
 })
 export class EmployeeLeaveComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private readonly employeeServer: string = environment.apiUrl + '/api/v1/employee';
 
-  // ✅ SIMPLIFIED: Only need current user (which has employee data)
   currentUser: UserModel | null = null;
   currentEmployeeId: number | null = null;
+  noEmployeeRecord: boolean = false;
 
   // State
   leaves: Leave[] = [];
@@ -64,7 +67,8 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
     private formBuilder: FormBuilder,
     private http: HttpClient,
     private leaveService: LeaveService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private userService: UserService
   ) {
     this.leaveForm = this.createLeaveForm();
   }
@@ -89,99 +93,105 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
     });
   }
 
-  /**
-   * ✅ SIMPLIFIED: Load employee profile via /me endpoint
-   * Uses self-service endpoint - no special permissions needed
-   */
   private loadCurrentUser(): void {
-    // Use /api/v1/employee/me endpoint directly for self-service access
-    this.http.get<any>('/api/v1/employee/me')
+    this.userService.profile$()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          const employee = response.data?.employee;
-          if (!employee || !employee.id) {
-            this.notificationService.onError('Employee profile not found');
+        next: (profileResponse: any) => {
+          const user = profileResponse?.data?.user;
+          if (!user) {
+            this.notificationService.onError('Failed to identify current user');
+            return;
+          }
+          this.currentUser = user;
+          const roleName = user.roleName || '';
+
+          if (roleName === 'ROLE_SYSADMIN') {
+            // SYSADMIN may or may not have an employee record — try by-user lookup
+            this.http.get<any>(`${this.employeeServer}/by-user/${user.id}`)
+              .pipe(takeUntil(this.destroy$))
+              .subscribe({
+                next: (response: any) => {
+                  const employee = response.data?.employee;
+                  if (employee?.id) {
+                    this.currentEmployeeId = employee.id;
+                    this.subscribeToState();
+                    this.loadEmployeeLeaves();
+                    this.loadLeaveBalances();
+                  } else {
+                    this.noEmployeeRecord = true;
+                  }
+                },
+                error: () => {
+                  // No employee record linked to this SYSADMIN account
+                  this.noEmployeeRecord = true;
+                }
+              });
             return;
           }
 
-          this.currentUser = employee as UserModel;
-          this.currentEmployeeId = employee.id;
-
-          console.log('✅ Employee loaded via /me endpoint:', {
-            userId: employee.id,
-            employeeId: employee.employeeId, // LKC0001, etc.
-            name: `${employee.firstName} ${employee.lastName}`,
-            department: employee.departmentName,
-            designation: employee.designationTitle,
-            role: employee.roleName
-          });
-
-          // Check if employee profile is complete (skip for admin roles)
-          const isAdmin = ['ROLE_SYSADMIN', 'ROLE_ADMIN', 'SYSADMIN', 'ADMIN'].includes(employee.roleName);
-          if (!isAdmin && (!employee.departmentId || !employee.designationId)) {
-            this.notificationService.onError(
-              'Please complete your employee profile before applying for leave'
-            );
-          }
-
-          // Load leave data
-          this.subscribeToState();
-          this.loadEmployeeLeaves();
-          this.loadLeaveBalances();
+          // All other roles — use the /me endpoint
+          this.http.get<any>(`${this.employeeServer}/me`)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (response: any) => {
+                const employee = response.data?.employee;
+                if (!employee?.id) {
+                  this.noEmployeeRecord = true;
+                  return;
+                }
+                this.currentEmployeeId = employee.id;
+                this.subscribeToState();
+                this.loadEmployeeLeaves();
+                this.loadLeaveBalances();
+              },
+              error: () => {
+                this.noEmployeeRecord = true;
+              }
+            });
         },
-        error: (error) => {
-          console.error('❌ Error loading employee profile:', error);
-          this.notificationService.onError('Failed to load employee information');
+        error: () => {
+          this.notificationService.onError('Failed to identify current user');
         }
       });
   }
 
   private subscribeToState(): void {
-    this.leaveService.state$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
-        this.currentDataState = state.dataState;
-        this.leaves = state.leaves || [];
-        this.leaveBalances = state.leaveBalances || [];
-        this.error = state.error || null;
-      });
+    // Not used — leaves and balances are managed directly to avoid
+    // the shared LeaveService BehaviorSubject overwriting both datasets
+    // when each call resets state to LOADING then LOADED with only partial data.
   }
 
-  /**
-   * ✅ Use currentEmployeeId (which is currentUser.id)
-   */
   private loadEmployeeLeaves(): void {
     if (!this.currentEmployeeId) return;
+    this.currentDataState = DataState.LOADING;
 
     this.leaveService.getLeavesByEmployee(this.currentEmployeeId, 0, 50)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          console.log('✅ Leaves loaded successfully');
+        next: (leaves) => {
+          this.leaves = leaves;
+          this.currentDataState = DataState.LOADED;
         },
         error: (error) => {
           console.error('❌ Error loading leaves:', error);
+          this.currentDataState = DataState.ERROR;
           this.notificationService.onError('Failed to load leaves');
         }
       });
   }
 
-  /**
-   * ✅ Use currentEmployeeId (which is currentUser.id)
-   */
   private loadLeaveBalances(): void {
     if (!this.currentEmployeeId) return;
 
     this.leaveService.getLeaveBalances(this.currentEmployeeId, this.currentYear)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => {
-          console.log('✅ Leave balances loaded successfully');
+        next: (balances) => {
+          this.leaveBalances = balances;
         },
         error: (error) => {
           console.error('❌ Error loading leave balances:', error);
-          this.notificationService.onError('Failed to load leave balances');
         }
       });
   }
@@ -289,7 +299,7 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
       this.leaveService.updateLeaveRequest(this.currentLeaveId, request)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (leave) => {
+          next: (leave: any) => {
             this.uploadDoctorNoteIfNeeded(leave.id!, 'Leave request updated successfully');
           },
           error: (error) => {
@@ -300,7 +310,7 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
       this.leaveService.createLeaveRequest(request)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (leave) => {
+          next: (leave: any) => {
             this.uploadDoctorNoteIfNeeded(leave.id!, 'Leave request submitted successfully');
           },
           error: (error) => {

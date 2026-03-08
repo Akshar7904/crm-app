@@ -29,8 +29,8 @@ export class CacheInterceptor implements HttpInterceptor {
       return next.handle(cleanedRequest);
     }
 
-    // Clear cache for non-GET requests and downloads
-    if (request.method !== 'GET' || request.url.includes('download')) {
+    // Clear cache for non-GET requests, downloads, and blob exports
+    if (request.method !== 'GET' || request.url.includes('download') || request.url.includes('export')) {
       this.httpCache.evictAll();
       return next.handle(request);
     }

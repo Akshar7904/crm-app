@@ -1,0 +1,91 @@
+<div class="expense-list">
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-receipt-cutoff"></i> Business Expenses</h1>
+      <p class="banner-subtitle">{{ totalElements }} total expense records</p>
+    </div>
+    <div class="banner-actions">
+      <select class="form-select form-select-sm" [(ngModel)]="selectedStatus" (change)="onStatusChange()"
+              style="background:rgba(255,255,255,0.15);border-color:rgba(255,255,255,0.3);color:#fff;font-size:0.82rem;border-radius:6px;cursor:pointer">
+        <option value="" style="background:#004d7a">All Statuses</option>
+        <option value="DRAFT" style="background:#004d7a">Draft</option>
+        <option value="APPROVED" style="background:#004d7a">Approved</option>
+        <option value="VOID" style="background:#004d7a">Void</option>
+      </select>
+      <a routerLink="/expenses/entry" class="btn-banner">
+        <i class="bi bi-plus-lg"></i> Record Expense
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="text-center p-4">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <table class="table table-hover mb-0" *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Date</th>
+            <th>Vendor</th>
+            <th>Account</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Total</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let exp of expenses">
+            <td><code>{{ exp.referenceNumber }}</code></td>
+            <td>{{ exp.expenseDate }}</td>
+            <td>{{ exp.vendor?.vendorName || '—' }}</td>
+            <td>{{ exp.account?.accountName }}</td>
+            <td class="description-col">{{ exp.description }}</td>
+            <td>{{ formatCurrency(exp.amount) }}</td>
+            <td><strong>{{ formatCurrency(exp.totalAmount) }}</strong></td>
+            <td>{{ exp.paymentMethod }}</td>
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(exp.status)">{{ exp.status }}</span>
+            </td>
+            <td>
+              <div class="action-btns">
+                <button class="btn-action approve" *ngIf="exp.status === 'DRAFT'" (click)="approve(exp.id)" title="Approve">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button class="btn-action void" *ngIf="exp.status === 'APPROVED'" (click)="voidExpense(exp.id)" title="Void">
+                  <i class="bi bi-x-octagon"></i>
+                </button>
+                <button class="btn-action delete"
+                  *ngIf="exp.status === 'DRAFT' || isSysAdmin"
+                  (click)="delete(exp.id)"
+                  title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="expenses.length === 0">
+            <td colspan="10" class="empty-cell">
+              <i class="bi bi-receipt"></i>
+              <p>No expenses found. <a routerLink="/expenses/entry">Record the first one.</a></p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="card-footer d-flex align-items-center justify-content-between" *ngIf="totalPages > 1">
+      <small class="text-muted">Page {{ currentPage + 1 }} of {{ totalPages }}</small>
+      <div>
+        <button class="btn btn-sm btn-outline-secondary me-1" (click)="prevPage()" [disabled]="currentPage === 0">Prev</button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Next</button>
+      </div>
+    </div>
+  </div>
+</div>

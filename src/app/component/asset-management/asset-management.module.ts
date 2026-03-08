@@ -39,7 +39,7 @@ import { MyRequestsComponent } from './my-requests/my-requests.component';
     ReactiveFormsModule,
     SharedModule,
     NavBarModule,
-    AssetManagementRoutingModule
+    AssetManagementRoutingModule,
   ],
   providers: [AssetService]
 })

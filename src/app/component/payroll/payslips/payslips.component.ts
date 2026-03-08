@@ -5,6 +5,7 @@ import { PayrollService } from 'src/app/service/payroll.service';
 import { Payroll } from 'src/app/interface/payroll';
 
 @Component({
+  standalone: false,
   selector: 'app-payslips',
   templateUrl: './payslips.component.html',
   styleUrls: ['./payslips.component.scss']

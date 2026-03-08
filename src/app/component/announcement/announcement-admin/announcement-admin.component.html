@@ -1,240 +1,207 @@
-<!-- Announcement Admin Page -->
-<div class="container-fluid py-4">
-  <!-- Header -->
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-      <h4 class="mb-1">
-        <i class="bi bi-megaphone me-2"></i>Manage Announcements
-      </h4>
-      <p class="text-muted mb-0">Create and manage company announcements</p>
+<div class="ann-wrap">
+
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-megaphone"></i> Manage Announcements</h1>
+      <p class="banner-subtitle">Create and manage company announcements</p>
     </div>
-    <div class="d-flex gap-2">
-      <button class="btn btn-outline-secondary btn-sm" (click)="refresh()">
-        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+    <div class="banner-actions">
+      <button class="btn-banner btn-banner-ghost" (click)="refresh()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
       </button>
-      <button class="btn btn-primary" (click)="openCreateModal()">
-        <i class="bi bi-plus-lg me-1"></i> New Announcement
+      <button class="btn-banner" (click)="openCreateModal()">
+        <i class="bi bi-plus-circle"></i> New Announcement
       </button>
     </div>
   </div>
 
-  <!-- Content -->
   <ng-container *ngIf="state$ | async as state">
+
     <!-- Loading -->
-    <div *ngIf="state.dataState === DataState.LOADING" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
+    <div *ngIf="state.dataState === DataState.LOADING" class="ann-loading">
+      <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
+      Loading announcements...
     </div>
 
     <!-- Loaded -->
-    <div *ngIf="state.dataState === DataState.LOADED">
-      <!-- Stats -->
-      <div class="row mb-4">
-        <div class="col-md-3">
-          <div class="card bg-primary text-white">
-            <div class="card-body">
-              <h6 class="card-title">Total Announcements</h6>
-              <h3 class="mb-0">{{ state.count }}</h3>
-            </div>
+    <ng-container *ngIf="state.dataState === DataState.LOADED">
+
+      <!-- KPI -->
+      <div class="ann-kpi-row">
+        <div class="ann-kpi-card">
+          <div class="ann-kpi-icon"><i class="bi bi-megaphone-fill"></i></div>
+          <div class="ann-kpi-body">
+            <div class="ann-kpi-label">Total Announcements</div>
+            <div class="ann-kpi-value">{{ state.count }}</div>
           </div>
         </div>
       </div>
 
-      <!-- Table -->
-      <div class="card">
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Title</th>
-                  <th>Category</th>
-                  <th>Priority</th>
-                  <th>Target</th>
-                  <th>Status</th>
-                  <th>Views</th>
-                  <th>Created</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let announcement of state.announcements">
-                  <td>
-                    <div class="d-flex align-items-center">
-                      <i *ngIf="announcement.isPinned" class="bi bi-pin-fill text-primary me-2" title="Pinned"></i>
-                      <span class="fw-semibold">{{ announcement.title }}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="getCategoryBadge(announcement.category)">
-                      {{ announcement.category }}
-                    </span>
-                  </td>
-                  <td>
-                    <span class="badge" [ngClass]="{
-                      'bg-secondary': announcement.priority === 'LOW',
-                      'bg-primary': announcement.priority === 'NORMAL',
-                      'bg-warning': announcement.priority === 'HIGH',
-                      'bg-danger': announcement.priority === 'URGENT'
-                    }">{{ announcement.priority }}</span>
-                  </td>
-                  <td>{{ announcement.targetAudience }}</td>
-                  <td>
-                    <span class="badge" [ngClass]="announcement.isActive ? 'bg-success' : 'bg-secondary'">
-                      {{ announcement.isActive ? 'Active' : 'Inactive' }}
-                    </span>
-                  </td>
-                  <td>{{ announcement.viewCount }}</td>
-                  <td>
-                    <small>{{ formatDate(announcement.createdAt) }}</small>
-                  </td>
-                  <td>
-                    <div class="btn-group btn-group-sm">
-                      <button class="btn btn-outline-primary" title="Edit" (click)="openEditModal(announcement)">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button class="btn btn-outline-secondary"
-                              [title]="announcement.isPinned ? 'Unpin' : 'Pin'"
-                              (click)="togglePin(announcement)">
-                        <i [class]="announcement.isPinned ? 'bi bi-pin-fill' : 'bi bi-pin'"></i>
-                      </button>
-                      <button class="btn btn-outline-warning"
-                              [title]="announcement.isActive ? 'Deactivate' : 'Activate'"
-                              (click)="toggleStatus(announcement)">
-                        <i [class]="announcement.isActive ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-                      </button>
-                      <button class="btn btn-outline-danger" title="Delete" (click)="deleteAnnouncement(announcement.id)">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      <!-- Table Card -->
+      <div class="table-card ann-table-card">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Category</th>
+                <th>Priority</th>
+                <th>Target</th>
+                <th>Status</th>
+                <th>Views</th>
+                <th>Created</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of state.announcements">
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <i *ngIf="a.isPinned" class="bi bi-pin-fill text-primary" title="Pinned"></i>
+                    <span class="fw-semibold">{{ a.title }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span [class]="'ann-badge ann-badge-' + (a.category | lowercase)">{{ a.category }}</span>
+                </td>
+                <td>
+                  <span [class]="getPriorityClass(a.priority)">{{ a.priority }}</span>
+                </td>
+                <td class="text-muted small">{{ a.targetAudience }}</td>
+                <td>
+                  <span [class]="a.isActive ? 'badge-soft-success' : 'badge-soft-secondary'">
+                    {{ a.isActive ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="text-muted small">{{ a.viewCount }}</td>
+                <td class="text-muted small">{{ formatDate(a.createdAt) }}</td>
+                <td class="text-center">
+                  <div class="action-btn-group">
+                    <button class="action-btn action-btn-edit" title="Edit" (click)="openEditModal(a)">
+                      <i class="bi bi-pencil-square"></i>
+                    </button>
+                    <button class="action-btn action-btn-pin" [title]="a.isPinned ? 'Unpin' : 'Pin'" (click)="togglePin(a)">
+                      <i [class]="'bi ' + (a.isPinned ? 'bi-pin-fill' : 'bi-pin')"></i>
+                    </button>
+                    <button class="action-btn action-btn-toggle" [title]="a.isActive ? 'Deactivate' : 'Activate'" (click)="toggleStatus(a)">
+                      <i [class]="'bi ' + (a.isActive ? 'bi-eye-slash' : 'bi-eye')"></i>
+                    </button>
+                    <button class="action-btn action-btn-delete" title="Delete" (click)="deleteAnnouncement(a.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <!-- Empty -->
-          <div *ngIf="!state.announcements?.length" class="text-center py-5">
-            <i class="bi bi-megaphone display-1 text-muted"></i>
-            <h5 class="mt-3">No Announcements Yet</h5>
-            <p class="text-muted">Create your first announcement to get started.</p>
-            <button class="btn btn-primary" (click)="openCreateModal()">
-              <i class="bi bi-plus-lg me-1"></i> Create Announcement
-            </button>
-          </div>
+        <!-- Empty -->
+        <div *ngIf="!state.announcements?.length" class="ann-empty">
+          <i class="bi bi-megaphone"></i>
+          <h5>No Announcements Yet</h5>
+          <p>Create your first announcement to get started.</p>
+          <button class="btn btn-primary btn-sm" (click)="openCreateModal()">
+            <i class="bi bi-plus-circle me-1"></i> Create Announcement
+          </button>
         </div>
       </div>
-    </div>
+    </ng-container>
 
     <!-- Error -->
-    <div *ngIf="state.dataState === DataState.ERROR" class="card">
-      <div class="card-body text-center py-5 text-danger">
-        <i class="bi bi-exclamation-circle display-1"></i>
-        <h5 class="mt-3">Error Loading Announcements</h5>
-        <p class="text-muted">{{ state.error }}</p>
-        <button class="btn btn-primary" (click)="refresh()">Try Again</button>
-      </div>
+    <div *ngIf="state.dataState === DataState.ERROR" class="ann-error">
+      <i class="bi bi-exclamation-circle"></i>
+      <h5>Error Loading Announcements</h5>
+      <p>{{ state.error }}</p>
+      <button class="btn btn-primary btn-sm" (click)="refresh()">Try Again</button>
     </div>
+
   </ng-container>
 </div>
 
-<!-- Create/Edit Modal -->
+<!-- Modal Backdrop -->
 <div *ngIf="showCreateModal || showEditModal" class="modal-backdrop fade show"></div>
+
+<!-- Create / Edit Modal -->
 <div *ngIf="showCreateModal || showEditModal" class="modal fade show d-block" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content">
+    <div class="modal-content ann-modal">
       <form #announcementForm="ngForm" (ngSubmit)="showEditModal ? updateAnnouncement(announcementForm) : createAnnouncement(announcementForm)">
-        <div class="modal-header">
-          <h5 class="modal-title">
+
+        <div class="ann-modal-header">
+          <h5 class="ann-modal-title">
+            <i [class]="'bi me-2 ' + (showEditModal ? 'bi-pencil-square' : 'bi-plus-circle')"></i>
             {{ showEditModal ? 'Edit Announcement' : 'New Announcement' }}
           </h5>
-          <button type="button" class="btn-close" (click)="closeModals()"></button>
+          <button type="button" class="btn-close btn-close-white" (click)="closeModals()"></button>
         </div>
-        <div class="modal-body">
-          <!-- Title -->
+
+        <div class="modal-body ann-modal-body">
           <div class="mb-3">
-            <label class="form-label">Title <span class="text-danger">*</span></label>
+            <label class="form-label ann-label">Title <span class="text-danger">*</span></label>
             <input type="text" class="form-control" name="title"
-                   [ngModel]="editingAnnouncement?.title"
-                   required placeholder="Announcement title">
+                   [ngModel]="editingAnnouncement?.title" required placeholder="Announcement title">
           </div>
-
-          <!-- Summary -->
           <div class="mb-3">
-            <label class="form-label">Summary</label>
+            <label class="form-label ann-label">Summary</label>
             <input type="text" class="form-control" name="summary"
-                   [ngModel]="editingAnnouncement?.summary"
-                   placeholder="Brief summary (optional)">
+                   [ngModel]="editingAnnouncement?.summary" placeholder="Brief summary (optional)">
           </div>
-
-          <!-- Content -->
           <div class="mb-3">
-            <label class="form-label">Content <span class="text-danger">*</span></label>
+            <label class="form-label ann-label">Content <span class="text-danger">*</span></label>
             <textarea class="form-control" name="content" rows="4"
-                      [ngModel]="editingAnnouncement?.content"
-                      required placeholder="Full announcement content..."></textarea>
+                      [ngModel]="editingAnnouncement?.content" required placeholder="Full announcement content..."></textarea>
           </div>
-
           <div class="row">
-            <!-- Category -->
             <div class="col-md-4 mb-3">
-              <label class="form-label">Category</label>
+              <label class="form-label ann-label">Category</label>
               <select class="form-select" name="category" [ngModel]="editingAnnouncement?.category || 'GENERAL'">
                 <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
               </select>
             </div>
-
-            <!-- Priority -->
             <div class="col-md-4 mb-3">
-              <label class="form-label">Priority</label>
+              <label class="form-label ann-label">Priority</label>
               <select class="form-select" name="priority" [ngModel]="editingAnnouncement?.priority || 'NORMAL'">
                 <option *ngFor="let p of priorities" [value]="p">{{ p }}</option>
               </select>
             </div>
-
-            <!-- Target Audience -->
             <div class="col-md-4 mb-3">
-              <label class="form-label">Target Audience</label>
+              <label class="form-label ann-label">Target Audience</label>
               <select class="form-select" name="targetAudience" [ngModel]="editingAnnouncement?.targetAudience || 'ALL'">
                 <option *ngFor="let a of audiences" [value]="a.value">{{ a.label }}</option>
               </select>
             </div>
           </div>
-
           <div class="row">
-            <!-- Expires At -->
             <div class="col-md-6 mb-3">
-              <label class="form-label">Expires At (Optional)</label>
+              <label class="form-label ann-label">Expires At (Optional)</label>
               <input type="datetime-local" class="form-control" name="expiresAt"
                      [ngModel]="editingAnnouncement?.expiresAt">
             </div>
-
-            <!-- Attachment URL -->
             <div class="col-md-6 mb-3">
-              <label class="form-label">Attachment URL (Optional)</label>
+              <label class="form-label ann-label">Attachment URL (Optional)</label>
               <input type="url" class="form-control" name="attachmentUrl"
-                     [ngModel]="editingAnnouncement?.attachmentUrl"
-                     placeholder="https://...">
+                     [ngModel]="editingAnnouncement?.attachmentUrl" placeholder="https://...">
             </div>
           </div>
-
-          <!-- Pin -->
-          <div class="form-check mb-3">
+          <div class="form-check">
             <input type="checkbox" class="form-check-input" name="isPinned" id="isPinned"
                    [ngModel]="editingAnnouncement?.isPinned">
-            <label class="form-check-label" for="isPinned">
+            <label class="form-check-label ann-label" for="isPinned">
               <i class="bi bi-pin me-1"></i> Pin this announcement
             </label>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModals()">Cancel</button>
+
+        <div class="ann-modal-footer">
+          <button type="button" class="btn btn-light" (click)="closeModals()">Cancel</button>
           <button type="submit" class="btn btn-primary" [disabled]="announcementForm.invalid || isSubmitting">
             <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-1"></span>
             {{ showEditModal ? 'Update' : 'Create' }}
           </button>
         </div>
+
       </form>
     </div>
   </div>

@@ -1,54 +1,188 @@
-// announcement-list Component - SCSS
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-.announcement-card {
+.ann-wrap { padding: 0; }
+
+// ─── Filter Tabs
+.ann-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 24px 20px;
+}
+
+.ann-tab {
+  padding: 5px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color, #dee2e6);
+  background: var(--bg-card, #fff);
+  color: var(--text-muted, #888);
+  font-size: 0.8rem; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+
+  &:hover { border-color: #375fa0; color: #375fa0; }
+
+  &.ann-tab-active {
+    background: #375fa0; border-color: #375fa0;
+    color: #fff; font-weight: 600;
+  }
+}
+
+// ─── Section Labels
+.ann-section { padding: 0 24px 8px; }
+
+.ann-section-label {
+  font-size: 0.75rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-muted, #888);
+  margin-bottom: 14px;
+}
+
+// ─── Card Grid
+.ann-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: 1100px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 640px)  { grid-template-columns: 1fr; }
+}
+
+// ─── Announcement Card
+.ann-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: 12px;
+  padding: 18px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  border: 1px solid #dee2e6;
+  transition: all 0.18s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  display: flex; flex-direction: column;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(55,95,160,0.12);
+    border-color: rgba(55,95,160,0.3);
+  }
+
+  &.ann-card-pinned {
+    border-left: 3px solid #375fa0;
+    background: linear-gradient(135deg, rgba(55,95,160,0.03) 0%, var(--bg-card, #fff) 100%);
+  }
 }
 
-.announcement-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-  border-color: #0d6efd;
+.ann-card-top {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
 }
 
-.announcement-card.pinned {
-  border-left: 3px solid #0d6efd;
-  background: linear-gradient(135deg, #f8f9ff 0%, #fff 100%);
+.ann-pin-icon { color: #375fa0; font-size: 0.9rem; }
+
+.ann-card-title {
+  font-size: 0.9rem; font-weight: 700;
+  color: var(--text-primary, #333);
+  margin-bottom: 6px; line-height: 1.4;
 }
 
-.announcement-content {
-  line-height: 1.8;
+.ann-card-summary {
+  font-size: 0.8rem; color: var(--text-muted, #888);
+  line-height: 1.6; flex: 1; margin-bottom: 12px;
 }
 
-.announcement-content h1,
-.announcement-content h2,
-.announcement-content h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
+.ann-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.72rem; color: var(--text-muted, #aaa);
+  border-top: 1px solid var(--border-color, #f0f0f0);
+  padding-top: 10px; margin-top: auto;
 }
 
-.announcement-content p {
-  margin-bottom: 1rem;
+.ann-card-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 0.72rem; color: var(--text-muted, #aaa);
+  margin-top: 8px;
 }
 
-.announcement-content ul,
-.announcement-content ol {
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
+.ann-read-more {
+  color: #375fa0; font-weight: 600; font-size: 0.72rem;
+  .bi { font-size: 0.65rem; }
 }
 
-.modal-backdrop {
-  z-index: 1040;
+// ─── Category & Priority Badges
+.ann-badge {
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+
+  &-general    { background: rgba(55,95,160,0.1);  color: #375fa0; }
+  &-hr         { background: rgba(39,174,96,0.12); color: #27ae60; }
+  &-it         { background: rgba(52,152,219,0.12);color: #2980b9; }
+  &-finance    { background: rgba(241,196,15,0.15);color: #b38600; }
+  &-operations { background: rgba(155,89,182,0.12);color: #8e44ad; }
+  &-urgent     { background: rgba(220,53,69,0.1);  color: #dc3545; }
 }
 
-.modal {
-  z-index: 1050;
+// ─── Empty / Error / Loading
+.ann-empty, .ann-error {
+  text-align: center; padding: 80px 24px;
+  color: var(--text-muted, #aaa);
+  i { font-size: 3.5rem; display: block; margin-bottom: 16px; opacity: 0.3; }
+  h5 { color: var(--text-secondary, #666); margin-bottom: 8px; }
+  p  { font-size: 0.85rem; max-width: 380px; margin: 0 auto; }
+}
+.ann-error i { color: #dc3545; }
+.ann-loading { text-align: center; padding: 60px; color: var(--text-muted, #888); font-size: 0.9rem; }
+
+// ─── Modal
+.ann-modal { border: none; border-radius: 14px; overflow: hidden; }
+
+.ann-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #1a2a4a 0%, #375fa0 100%);
 }
 
-/* Purple badge for events */
-.bg-purple {
-  background-color: #6f42c1 !important;
+.ann-modal-body {
+  padding: 24px; background: var(--bg-card, #fff);
+}
+
+.ann-detail-title {
+  font-size: 1.2rem; font-weight: 700;
+  color: var(--text-primary, #333); margin-bottom: 12px;
+}
+
+.ann-detail-meta {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  font-size: 0.8rem; color: var(--text-muted, #888);
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color, #eee);
+}
+
+.ann-detail-content {
+  font-size: 0.88rem; line-height: 1.8;
+  color: var(--text-primary, #444);
+
+  h1, h2, h3 { margin-top: 1.5rem; margin-bottom: 0.8rem; }
+  p  { margin-bottom: 1rem; }
+  ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+}
+
+.ann-modal-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 10px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--border-color, #eee);
+  background: var(--bg-card, #fff);
+}
+
+// ─── z-index fix
+:host ::ng-deep {
+  .modal-backdrop { z-index: 1040; }
+  .modal { z-index: 1050; }
+}
+
+// ─── Banner ghost button
+.btn-banner-ghost {
+  background: rgba(255,255,255,0.1) !important;
+  border-color: rgba(255,255,255,0.2) !important;
 }

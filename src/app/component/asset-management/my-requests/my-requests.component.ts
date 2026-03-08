@@ -10,6 +10,7 @@ import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
+  standalone: false,
   selector: 'app-my-requests',
   templateUrl: './my-requests.component.html',
   styleUrls: ['./my-requests.component.scss'],
@@ -120,13 +121,13 @@ export class MyRequestsComponent implements OnInit {
 
   getStatusClass(status: AssetRequestStatus): string {
     const classes: { [key: string]: string } = {
-      'PENDING': 'bg-warning text-dark',
-      'APPROVED': 'bg-info',
-      'REJECTED': 'bg-danger',
-      'CANCELLED': 'bg-secondary',
-      'FULFILLED': 'bg-success'
+      'PENDING': 'badge-soft-warning',
+      'APPROVED': 'badge-soft-info',
+      'REJECTED': 'badge-soft-danger',
+      'CANCELLED': 'badge-soft-secondary',
+      'FULFILLED': 'badge-soft-success'
     };
-    return classes[status] || 'bg-secondary';
+    return classes[status] || 'badge-soft-secondary';
   }
 
   getStatusIcon(status: AssetRequestStatus): string {

@@ -1,37 +1,526 @@
-// notification-list Component - SCSS
+// Notification List (Messages) — Falcon UI
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-.notification-card {
-  transition: all 0.2s ease;
-  border-left: 3px solid transparent;
+.msg-wrap {
+  padding: $spacing-lg;
+  max-width: 960px;
+  margin: 0 auto;
 }
 
-.notification-card:hover {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-.notification-card.unread {
-  background-color: #f8f9ff;
-  border-left-color: #0d6efd;
-}
-
-.notification-icon {
-  width: 48px;
-  height: 48px;
+// ─── Falcon Banner
+.msg-banner {
   display: flex;
   align-items: center;
-  justify-content: center;
-  background-color: #f8f9fa;
-  border-radius: 50%;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-xl;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 60%, $primary-light 100%);
+  border-radius: $border-radius-xl;
+  margin-bottom: $spacing-lg;
+  box-shadow: 0 6px 24px rgba($primary, 0.28);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInDown 0.4s ease forwards;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 170px; height: 170px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+}
+
+.msg-banner-left { position: relative; z-index: 1; }
+
+.msg-banner-title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: #fff;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  i { opacity: 0.85; }
+}
+
+.msg-banner-subtitle {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: $font-size-sm;
+  margin: 4px 0 0;
+}
+
+.msg-banner-actions {
+  display: flex;
+  gap: $spacing-sm;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-msg-glass {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: $border-radius-md;
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+  backdrop-filter: blur(4px);
+
+  &:hover { background: rgba(255, 255, 255, 0.25); transform: translateY(-1px); }
+
+  &--danger {
+    background: rgba($danger, 0.25);
+    border-color: rgba($danger, 0.4);
+    &:hover { background: rgba($danger, 0.4); }
+  }
+}
+
+// ─── Filter Tabs
+.msg-filter-card {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: 8px;
+  margin-bottom: $spacing-md;
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+.msg-filter-tab {
+  padding: 7px 16px;
+  background: none;
+  border: none;
+  border-radius: $border-radius-md;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover { background: var(--table-hover); color: var(--text-primary); }
+
+  &.active {
+    background: linear-gradient(135deg, $primary 0%, $primary-medium 100%);
+    color: #fff;
+  }
+}
+
+// ─── Loading
+.msg-loading {
+  text-align: center;
+  padding: 60px 20px;
+  p { color: var(--text-muted); font-size: 0.875rem; margin-top: $spacing-sm; }
+}
+
+// ─── Empty
+.msg-empty {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeInUp 0.4s ease forwards;
+
+  h5 { color: var(--text-primary); font-weight: $font-weight-semibold; }
+  p  { color: var(--text-muted); font-size: 0.875rem; }
+}
+
+.msg-empty-icon {
+  font-size: 4rem;
+  color: var(--text-muted);
+  opacity: 0.25;
+  display: block;
+}
+
+// ─── Message List Card
+.msg-list-card {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+// ─── Bulk Action Bar
+.msg-bulk-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 10px $spacing-lg;
+  background: rgba($primary, 0.06);
+  border-bottom: 1px solid rgba($primary, 0.15);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.25s ease, opacity 0.2s ease, padding 0.2s ease;
+  padding-top: 0;
+  padding-bottom: 0;
+
+  &--visible {
+    max-height: 60px;
+    opacity: 1;
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
+
+.msg-bulk-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: $font-weight-semibold;
+  color: $primary;
+
+  i { font-size: 1rem; }
+}
+
+.msg-bulk-actions {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.msg-bulk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  border-radius: $border-radius-md;
+  border: 1px solid;
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &--read {
+    background: rgba($success, 0.1);
+    border-color: rgba($success, 0.3);
+    color: darken($success, 10%);
+    &:hover { background: rgba($success, 0.2); border-color: $success; }
+  }
+
+  &--delete {
+    background: rgba($danger, 0.1);
+    border-color: rgba($danger, 0.3);
+    color: $danger;
+    &:hover { background: rgba($danger, 0.2); border-color: $danger; }
+  }
+
+  &--clear {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    &:hover { background: var(--table-hover); color: var(--text-primary); }
+  }
+}
+
+// ─── Select All Row
+.msg-select-all-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px $spacing-lg;
+  background: var(--table-header-bg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.msg-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.msg-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: $primary;
   flex-shrink: 0;
 }
 
-.notification-cards {
-  max-width: 900px;
+.msg-select-all-text {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: $font-weight-medium;
 }
 
-/* Filter buttons */
-.btn-outline-secondary:hover {
-  background-color: #f8f9fa;
+.msg-count-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+// ─── Check Wrap (per row)
+.msg-check-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+// ─── Message Row
+.msg-row {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-bottom: 1px solid var(--border-light);
+  border-left: 3px solid transparent;
+  transition: background $transition-base;
+  cursor: pointer;
+
+  &:hover { background: var(--table-hover); }
+
+  &--unread {
+    background: rgba($primary, 0.03);
+    border-left-color: $primary;
+
+    .msg-title { font-weight: $font-weight-bold; }
+  }
+
+  &--selected {
+    background: rgba($primary, 0.07) !important;
+    border-left-color: $primary;
+  }
+
+  &--last { border-bottom: none; }
+}
+
+// ─── Icon
+.msg-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+
+  &--low    { background: rgba($gray-500, 0.12); color: $gray-500; }
+  &--normal { background: rgba($primary, 0.12); color: $primary; }
+  &--high   { background: rgba($warning, 0.15); color: darken($warning, 20%); }
+  &--urgent { background: rgba($danger, 0.12); color: $danger; }
+}
+
+// ─── Body
+.msg-body { flex: 1; min-width: 0; }
+
+.msg-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.msg-title {
+  font-size: 0.9rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+}
+
+.msg-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.msg-priority-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: $border-radius-xl;
+  font-size: 0.68rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+
+  &.badge--low    { background: rgba($gray-500, 0.12); color: $gray-600; }
+  &.badge--normal { background: rgba($primary, 0.12); color: $primary; }
+  &.badge--high   { background: rgba($warning, 0.15); color: darken($warning, 20%); }
+  &.badge--urgent { background: rgba($danger, 0.12); color: $danger; }
+}
+
+.msg-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.msg-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.msg-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.msg-type-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--table-header-bg);
+  border: 1px solid var(--border-light);
+  border-radius: $border-radius-xl;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.msg-unread-tag {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba($info, 0.12);
+  border-radius: $border-radius-xl;
+  font-size: 0.68rem;
+  color: $info;
+  font-weight: $font-weight-semibold;
+}
+
+// ─── Actions
+.msg-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.msg-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: $border-radius;
+  border: 1px solid;
+  background: transparent;
+  cursor: pointer;
+  transition: all $transition-base;
+  font-size: 0.85rem;
+
+  &:hover { transform: translateY(-1px); }
+
+  &--read {
+    border-color: rgba($success, 0.4);
+    color: $success;
+    &:hover { background: rgba($success, 0.1); border-color: $success; }
+  }
+
+  &--delete {
+    border-color: rgba($danger, 0.4);
+    color: $danger;
+    &:hover { background: rgba($danger, 0.1); border-color: $danger; }
+  }
+}
+
+// ─── Pagination
+.msg-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  padding: $spacing-md $spacing-lg;
+  border-top: 1px solid var(--border-light);
+}
+
+.msg-page-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: $border-radius-md;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: $font-weight-medium;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover:not(:disabled) {
+    background: var(--table-hover);
+    border-color: $primary;
+    color: $primary;
+  }
+
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+
+.msg-page-label {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: $font-weight-medium;
+}
+
+// ─── Error
+.msg-error {
+  background: var(--bg-card);
+  border: 0;
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: 60px 20px;
+  text-align: center;
+  animation: fadeInUp 0.4s ease forwards;
+
+  h5 { color: var(--text-primary); font-weight: $font-weight-semibold; }
+  p  { color: var(--text-muted); font-size: 0.875rem; }
+}
+
+.msg-error-icon {
+  font-size: 3.5rem;
+  color: $danger;
+  opacity: 0.6;
+  display: block;
+}
+
+.msg-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 20px;
+  background: linear-gradient(135deg, $primary 0%, $primary-medium 100%);
+  border: none;
+  border-radius: $border-radius-md;
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: $font-weight-semibold;
+  cursor: pointer;
+  transition: all $transition-base;
+  margin-top: $spacing-sm;
+
+  &:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba($primary, 0.35); }
+}
+
+// ─── Responsive
+@include respond-to('md') {
+  .msg-wrap { padding: $spacing-md; }
+  .msg-banner { flex-direction: column; align-items: flex-start; }
+  .msg-header-row { flex-direction: column; gap: 4px; }
+  .msg-meta { flex-wrap: wrap; }
 }

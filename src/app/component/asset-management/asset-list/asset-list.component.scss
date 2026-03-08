@@ -1,104 +1,41 @@
-// asset-list Component - SCSS
+// Asset List
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-// Table styling with login color scheme
-.table th {
-  font-weight: $font-weight-semibold;
-  color: $gray-700;
-  font-size: $font-size-sm;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: $border-width-md solid rgba($primary, 0.15);
+.asset-list-page {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
 }
 
-.table tbody tr {
-  transition: background-color $transition-base;
-
-  &:hover {
-    background-color: rgba($primary, 0.03);
-  }
-}
-
-// Badge styling
-.badge {
-  font-weight: $font-weight-semibold;
-  padding: $badge-padding-y $badge-padding-x;
-  border-radius: $badge-border-radius;
-  font-size: $badge-font-size;
-}
-
-// Action buttons
-.btn-group-sm .btn {
-  padding: 0.25rem 0.5rem;
+// ─── Asset tag monospace chip ──────────────────────────────────────────────────
+code {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-weight: $font-weight-bold;
+  color: $primary;
+  background: rgba($primary, 0.08);
   border-radius: $border-radius-sm;
-  transition: all $transition-base;
-
-  &:hover {
-    transform: translateY(-1px);
-  }
+  padding: 2px 7px;
+  font-size: 0.82rem;
 }
 
-// Search and filter inputs
-.form-control,
-.form-select {
-  border: $border-width-md solid $gray-200;
-  border-radius: $border-radius;
-  background-color: $gray-50;
-  transition: all $transition-base;
-
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 4px rgba($primary, 0.1);
-    background: $white;
-    outline: none;
-  }
+// ─── Asset name cell ──────────────────────────────────────────────────────────
+.asset-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-// Primary button gradient
-.btn-primary {
-  @include btn-primary;
-}
-
-// Quick links with primary accent
-.btn-outline-primary {
+.asset-cat-icon {
+  font-size: 1.3rem;
   color: $primary;
-  border-color: $primary;
-  border-radius: $btn-border-radius;
-  transition: all $transition-base;
-
-  &:hover {
-    background: $gradient-primary;
-    border-color: $primary;
-    color: $white;
-    transform: translateY(-1px);
-    box-shadow: $shadow-primary;
-  }
+  opacity: 0.7;
+  flex-shrink: 0;
 }
 
-// Breadcrumb accent
-.breadcrumb-item a {
-  color: $primary;
-  transition: color $transition-base;
-
-  &:hover {
-    color: $primary-medium;
-  }
-}
-
-// Pagination with primary accent
-.page-link {
-  color: $primary;
-  transition: all $transition-base;
-
-  &:hover {
-    background-color: rgba($primary, 0.08);
-    color: $primary-dark;
-  }
-
-  &.active {
-    background: $gradient-primary;
-    border-color: $primary;
-    color: $white;
-  }
+// ─── Table footer pagination ──────────────────────────────────────────────────
+.table-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
 }

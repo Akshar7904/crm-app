@@ -15,6 +15,7 @@ import { NotificationService } from '../../service/notification.service';
  * Uses OnPush change detection for optimal performance
  */
 @Component({
+  standalone: false,
   selector: 'app-departments',
   templateUrl: './department.component.html',
   styleUrls: ['./department.component.scss'],
@@ -80,7 +81,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
     // Subscribe to department state for real-time updates
     this.departmentService.departmentState$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(state => {
+      .subscribe((state: any) => {
         this.departmentState = state;
         this.cdr.markForCheck(); // Trigger change detection
       });
@@ -110,7 +111,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
         distinctUntilChanged(), // Only emit when value changes
         takeUntil(this.destroy$)
       )
-      .subscribe(query => {
+      .subscribe((query: any) => {
         if (query && query.trim()) {
           this.onSearch();
         } else {
@@ -470,7 +471,7 @@ export class DepartmentsComponent implements OnInit, OnDestroy {
     this.employeeService.employeesByDepartment$(departmentId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           console.log('✅ Employees loaded for department:', response);
           // Handle different response structures
           if (response && response.data) {

@@ -6,6 +6,7 @@ import { NotificationService } from '../../../service/notification.service';
 
 
 @Component({
+  standalone: false,
   selector: 'app-new-holiday',
   templateUrl: './new-holiday.component.html',
   styleUrls: ['./new-holiday.component.scss']

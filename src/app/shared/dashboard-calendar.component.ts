@@ -33,6 +33,7 @@ interface CalendarDay {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-dashboard-calendar',
   templateUrl: './dashboard-calendar.component.html',
   styleUrls: ['./dashboard-calendar.component.scss']
@@ -119,7 +120,7 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
 
   getEventsForDate(date: Date): CalendarEvent[] {
     const dateStr = this.formatDateToISO(date);
-    const allEvents = this.upcomingEvents.length > 0 ? [...this.events, ...this.upcomingEvents] : this.events;
+    const allEvents = this.upcomingEvents.length > 0 ? this.upcomingEvents : this.events;
 
     return allEvents.filter(event => {
       const eventDateStr = event.date.split('T')[0];

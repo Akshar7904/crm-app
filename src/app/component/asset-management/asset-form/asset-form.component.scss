@@ -1,81 +1,101 @@
-// asset-form Component - SCSS
+// Asset Form
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
-// Card styling matching login aesthetic
-.card {
-  @include card;
-  border: none;
+.asset-form-page {
+  padding: $spacing-lg;
+  animation: fadeInUp 0.35s ease forwards;
 }
 
-// Form labels - matching login style
+.asset-form-card { overflow: hidden; }
+
+// ─── Section dividers ──────────────────────────────────────────────────────────
+.form-section {
+  padding: $spacing-sm $spacing-lg $spacing-md;
+  border-bottom: 1px solid var(--border-light);
+  &.form-section-last { border-bottom: 0; }
+}
+
+.form-section-label {
+  font-size: 0.68rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  i { color: $primary; font-size: 0.8rem; }
+}
+
+// ─── Compact grid layouts ─────────────────────────────────────────────────────
+.form-grid {
+  display: grid;
+  gap: $spacing-sm $spacing-md;
+  align-items: start;
+}
+
+.form-grid-2 { grid-template-columns: 1fr 1fr; }
+.form-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.form-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.col-span-2 { grid-column: span 2; }
+
+@media (max-width: $breakpoint-lg) {
+  .form-grid-4 { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: $breakpoint-md) {
+  .form-grid-2,
+  .form-grid-3,
+  .form-grid-4 { grid-template-columns: 1fr; }
+  .col-span-2  { grid-column: span 1; }
+}
+
+// ─── Field wrapper ────────────────────────────────────────────────────────────
+.form-field { @include flex-column; gap: 4px; }
+
+// ─── Labels (Falcon small-caps style) ─────────────────────────────────────────
 .form-label {
-  @include form-label;
-}
-
-// Section headings with primary accent (replacing #2c3e50 and #3498db)
-h5 {
-  color: $primary-dark;
-  border-bottom: $border-width-md solid $primary;
-  padding-bottom: $spacing-sm;
+  font-size: 0.72rem;
   font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
 }
 
-// Form controls - matching login input styling
-.form-control,
-.form-select {
-  padding: $input-padding-y $input-padding-x;
-  font-size: $input-font-size;
-  border: $border-width-md solid $gray-200;
+// ─── Form inputs ──────────────────────────────────────────────────────────────
+.form-control, .form-select {
+  background: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--input-text);
   border-radius: $border-radius;
-  background: $gray-50;
-  transition: all $transition-base;
-
+  font-size: 0.875rem;
+  padding: 7px 10px;
   &:focus {
+    background: var(--bg-card);
     border-color: $primary;
-    box-shadow: 0 0 0 4px rgba($primary, 0.1);
-    background: $white;
-    outline: none;
+    box-shadow: 0 0 0 3px rgba($primary, 0.15);
   }
-
-  &.is-invalid {
-    border-color: $danger;
-
-    &:focus {
-      box-shadow: 0 0 0 4px rgba($danger, 0.1);
-    }
-  }
+  &.is-invalid { border-color: $danger; }
+  &::placeholder { color: var(--text-light); }
 }
 
-// Input group addon
 .input-group-text {
-  background: $gray-100;
-  border: $border-width-md solid $gray-200;
-  border-radius: $border-radius 0 0 $border-radius;
-  color: $gray-600;
+  background: var(--table-header-bg);
+  border-color: var(--input-border);
+  color: var(--text-secondary);
   font-weight: $font-weight-medium;
+  padding: 7px 10px;
 }
 
-// Primary submit button - matching login button gradient
-.btn-primary {
-  @include btn-primary;
-}
-
-// Secondary/cancel button
-.btn-secondary {
-  padding: $btn-padding-y $btn-padding-x;
-  font-size: $btn-font-size;
-  font-weight: $font-weight-medium;
-  border-radius: $btn-border-radius;
-  transition: all $transition-base;
-}
-
-// Breadcrumb accent
-.breadcrumb-item a {
-  color: $primary;
-  transition: color $transition-base;
-
-  &:hover {
-    color: $primary-medium;
-  }
+// ─── Form actions bar ─────────────────────────────────────────────────────────
+.form-actions-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-sm;
+  padding: $spacing-md $spacing-lg;
+  border-top: 1px solid var(--border-light);
+  background: var(--table-header-bg);
 }

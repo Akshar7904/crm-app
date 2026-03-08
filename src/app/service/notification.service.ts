@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { NotifierService } from 'angular-notifier';
-import {HttpErrorResponse} from "@angular/common/http";
+import { NotifierService } from '../notifier/notifier.service';
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Injectable()
 export class NotificationService {

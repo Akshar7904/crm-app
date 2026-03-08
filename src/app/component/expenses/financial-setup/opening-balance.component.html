@@ -1,0 +1,122 @@
+<div class="setup-wrap">
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-bank"></i> Opening Balance</h1>
+      <p class="banner-subtitle">Set the company's starting financial position for each fiscal year</p>
+    </div>
+    <div class="banner-actions">
+      <select class="form-select form-select-sm banner-year-select" [(ngModel)]="selectedYear" (change)="onYearChange()">
+        <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="setup-layout">
+    <!-- Form Card -->
+    <div class="setup-form-card">
+      <div class="card-header-row">
+        <h3 class="card-section-title"><i class="bi bi-pencil-square"></i> {{ selectedYear }} Opening Balance</h3>
+      </div>
+
+      <div *ngIf="successMsg" class="alert alert-success alert-sm">{{ successMsg }}</div>
+      <div *ngIf="errorMsg" class="alert alert-danger alert-sm">{{ errorMsg }}</div>
+
+      <div class="setup-form">
+        <!-- Cash & Bank -->
+        <div class="form-group-row">
+          <label class="setup-label">
+            <i class="bi bi-cash-coin"></i> Cash &amp; Bank Balance
+            <span class="setup-hint">Total cash on hand + all bank account balances at year start</span>
+          </label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">R</span>
+            <input type="number" class="form-control setup-input" [(ngModel)]="form.cashBalance" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Accounts Receivable -->
+        <div class="form-group-row">
+          <label class="setup-label">
+            <i class="bi bi-arrow-down-circle"></i> Accounts Receivable (Debtors)
+            <span class="setup-hint">Outstanding invoices from clients carried over from previous year</span>
+          </label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">R</span>
+            <input type="number" class="form-control setup-input" [(ngModel)]="form.accountsReceivable" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Accounts Payable -->
+        <div class="form-group-row">
+          <label class="setup-label">
+            <i class="bi bi-arrow-up-circle"></i> Accounts Payable (Creditors)
+            <span class="setup-hint">Outstanding bills owed to suppliers/vendors from previous year</span>
+          </label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">R</span>
+            <input type="number" class="form-control setup-input" [(ngModel)]="form.accountsPayable" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Other Assets -->
+        <div class="form-group-row">
+          <label class="setup-label">
+            <i class="bi bi-box-seam"></i> Other Assets
+            <span class="setup-hint">Equipment, vehicles, prepayments, deposits etc.</span>
+          </label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">R</span>
+            <input type="number" class="form-control setup-input" [(ngModel)]="form.otherAssets" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Other Liabilities -->
+        <div class="form-group-row">
+          <label class="setup-label">
+            <i class="bi bi-exclamation-circle"></i> Other Liabilities
+            <span class="setup-hint">Loans, deferred income, SARS obligations etc.</span>
+          </label>
+          <div class="input-prefix-wrap">
+            <span class="input-prefix">R</span>
+            <input type="number" class="form-control setup-input" [(ngModel)]="form.otherLiabilities" min="0" step="0.01" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group-row">
+          <label class="setup-label"><i class="bi bi-chat-text"></i> Notes</label>
+          <textarea class="form-control setup-input" [(ngModel)]="form.notes" rows="2" placeholder="Optional notes about this opening balance..."></textarea>
+        </div>
+
+        <!-- Net Position Summary -->
+        <div class="net-position-box" [class.net-positive]="netOpeningPosition >= 0" [class.net-negative]="netOpeningPosition < 0">
+          <div class="net-position-label">Net Opening Position</div>
+          <div class="net-position-value">R {{ netOpeningPosition | number:'1.2-2' }}</div>
+          <div class="net-position-formula">Cash + Debtors &minus; Creditors + Other Assets &minus; Other Liabilities</div>
+        </div>
+
+        <button class="btn btn-primary btn-save" (click)="save()" [disabled]="saving">
+          <i class="bi bi-check-circle me-1"></i>
+          {{ saving ? 'Saving...' : 'Save Opening Balance' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- History Card -->
+    <div class="setup-history-card">
+      <h3 class="card-section-title"><i class="bi bi-clock-history"></i> Year History</h3>
+      <div *ngIf="allBalances.length === 0" class="history-empty">
+        <i class="bi bi-inbox"></i>
+        <p>No opening balances set yet</p>
+      </div>
+      <div *ngFor="let b of allBalances" class="history-item" [class.history-selected]="b.year === selectedYear" (click)="selectedYear = b.year; loadForYear(b.year)">
+        <div class="history-year">{{ b.year }}</div>
+        <div class="history-net" [class.positive]="b.netOpeningPosition >= 0" [class.negative]="b.netOpeningPosition < 0">
+          R {{ b.netOpeningPosition | number:'1.0-0' }}
+        </div>
+        <div class="history-cash">Cash: R {{ b.cashBalance | number:'1.0-0' }}</div>
+      </div>
+    </div>
+  </div>
+</div>

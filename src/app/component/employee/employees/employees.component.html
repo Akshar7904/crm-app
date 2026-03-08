@@ -2,212 +2,183 @@
   <ng-container *ngSwitchCase="DataState.LOADED">
     <section>
       <div class="container-fluid">
+
         <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" style="margin-top: 8px">
+        <nav aria-label="breadcrumb" class="emp-breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a [routerLink]="['/']">Home</a>
-            </li>
+            <li class="breadcrumb-item"><a [routerLink]="['/']">Home</a></li>
             <li class="breadcrumb-item active">Employees</li>
           </ol>
         </nav>
 
-        <!-- Header Section -->
-        <div class="row mt-3">
-          <div class="col">
-            <h4 class="fw-bold text-start">Employees</h4>
+        <!-- Page Banner -->
+        <div class="emp-page-banner">
+          <div class="emp-banner-left">
+            <h1 class="emp-banner-title"><i class="bi bi-people"></i> Employees</h1>
+            <p class="emp-banner-subtitle">Manage your workforce</p>
           </div>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="row mb-3">
-          <div class="col-xm-12">
+          <div class="emp-banner-actions">
             <form
               #searchForm="ngForm"
               (ngSubmit)="searchEmployees(searchForm)"
-              class="row g-3 float-end"
+              class="d-flex gap-2 align-items-center"
             >
-              <div class="col-auto">
-                <label for="name" class="visually-hidden">Search</label>
+              <div class="emp-search-wrap">
+                <i class="bi bi-search emp-search-icon"></i>
                 <input
                   type="text"
                   ngModel
                   name="name"
-                  #name
-                  class="form-control"
+                  class="form-control form-control-sm emp-search"
                   placeholder="Search employees..."
                 />
               </div>
-              <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3">
-                  <i class="bi bi-search"></i> Search
-                </button>
-              </div>
-              <div class="col-auto">
-                <button
-                  type="button"
-                  class="btn btn-success mb-3"
-                  (click)="addNewEmployee()"
-                >
-                  <i class="bi bi-plus-circle"></i> Add Employee
-                </button>
-              </div>
+              <button type="button" class="btn-banner-emp btn-banner-emp-solid" (click)="addNewEmployee()">
+                <i class="bi bi-plus-circle"></i> Add Employee
+              </button>
             </form>
           </div>
         </div>
 
-        <!-- Employee Cards Grid -->
-        <div class="row">
-          <div
-            class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 col-sm-6 mb-4"
-            *ngFor="let employee of getEmployees(state)"
-          >
-            <div class="card member-card" (click)="selectEmployee(employee)">
-              <!-- Status Badge -->
-              <div class="member-status">
-                <span
-                  class="badge"
-                  [ngClass]="{
-                    'bg-success': employee.status === 'ACTIVE' || employee.status === 'Active',
-                    'bg-danger': employee.status === 'TERMINATED' || employee.status === 'Terminated',
-                    'bg-warning text-dark': employee.status === 'ON_LEAVE' || employee.status === 'On Leave',
-                    'bg-info': employee.status === 'PROBATION' || employee.status === 'Probation',
-                    'bg-secondary': employee.status === 'INACTIVE' || employee.status === 'Inactive'
-                  }"
-                >
-                  {{ employee.status }}
-                </span>
-              </div>
+        <!-- Employees Table -->
+        <div class="emp-table-card" *ngIf="hasEmployees(state)">
+          <div class="table-responsive">
+            <table class="table emp-table mb-0">
+              <thead>
+                <tr>
+                  <th>Employee</th>
+                  <th>Department</th>
+                  <th>Employee ID</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Joined</th>
+                  <th>Status</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let employee of getEmployees(state)" (click)="selectEmployee(employee)" class="emp-row">
 
-              <div class="card-body text-center">
-                <!-- Avatar -->
-                <div class="member-avatar">
-                  <img
-                    *ngIf="!brokenImages[employee.id]"
-                    [src]="getProfileImageUrl(employee.id)"
-                    [alt]="employee.firstName + ' ' + employee.lastName"
-                    class="avatar-img"
-                    (error)="onProfileImageError(employee.id)"
-                  />
-                  <div *ngIf="brokenImages[employee.id]" class="avatar-initials">
-                    {{ getInitials(employee.firstName, employee.lastName) }}
-                  </div>
-                </div>
+                  <!-- Employee avatar + name + designation -->
+                  <td>
+                    <div class="emp-identity">
+                      <div class="emp-avatar-sm">
+                        <img
+                          *ngIf="!brokenImages[employee.id]"
+                          [src]="getProfileImageUrl(employee.id)"
+                          [alt]="employee.firstName + ' ' + employee.lastName"
+                          class="emp-avatar-img"
+                          (error)="onProfileImageError(employee.id)"
+                        />
+                        <div *ngIf="brokenImages[employee.id]" class="emp-avatar-initials">
+                          {{ getInitials(employee.firstName, employee.lastName) }}
+                        </div>
+                      </div>
+                      <div>
+                        <div class="emp-name">{{ employee.firstName }} {{ employee.lastName }}</div>
+                        <div class="emp-designation">{{ employee.designationTitle || 'N/A' }}</div>
+                      </div>
+                    </div>
+                  </td>
 
-                <!-- Name & Title -->
-                <h6 class="member-name">
-                  {{ employee.firstName }} {{ employee.lastName }}
-                </h6>
-                <p class="member-title">{{ employee.designationTitle || 'N/A' }}</p>
+                  <td>
+                    <span class="emp-dept">
+                      <i class="bi bi-building"></i>
+                      {{ employee.departmentName || '—' }}
+                    </span>
+                  </td>
 
-                <!-- Info Pills -->
-                <div class="member-info">
-                  <span class="info-pill">
-                    <i class="bi bi-building"></i>
-                    {{ employee.departmentName || 'N/A' }}
-                  </span>
-                  <span class="info-pill">
-                    <i class="bi bi-person-badge"></i>
-                    {{ employee.employeeId || 'N/A' }}
-                  </span>
-                </div>
+                  <td>
+                    <span class="emp-id-badge">{{ employee.employeeId || '—' }}</span>
+                  </td>
 
-                <!-- Contact Details -->
-                <div class="member-contact">
-                  <div class="contact-item">
-                    <i class="bi bi-envelope"></i>
-                    <span>{{ employee.email }}</span>
-                  </div>
-                  <div class="contact-item">
-                    <i class="bi bi-telephone"></i>
-                    <span>{{ employee.phone || 'N/A' }}</span>
-                  </div>
-                </div>
+                  <td>
+                    <span class="emp-meta-text">{{ employee.email }}</span>
+                  </td>
 
-                <!-- Hire Date -->
-                <div class="member-meta">
-                  <small class="text-muted">
-                    <i class="bi bi-calendar-check"></i>
-                    Joined {{ formatDate(employee.hireDate) }}
-                  </small>
-                </div>
-              </div>
+                  <td>
+                    <span class="emp-meta-text">{{ employee.phone || '—' }}</span>
+                  </td>
 
-              <!-- Card Footer Actions -->
-              <div class="card-footer">
-                <button
-                  type="button"
-                  (click)="selectEmployee(employee); $event.stopPropagation()"
-                  class="btn btn-outline-primary btn-sm w-100"
-                >
-                  <i class="bi bi-eye"></i> View Profile
-                </button>
-              </div>
-            </div>
-          </div>
+                  <td>
+                    <span class="emp-date">
+                      <i class="bi bi-calendar-check"></i>
+                      {{ formatDate(employee.hireDate) }}
+                    </span>
+                  </td>
 
-          <!-- Empty State -->
-          <div *ngIf="!hasEmployees(state)" class="col-12">
-            <div class="empty-state text-center py-5">
-              <i class="bi bi-people" style="font-size: 4rem; color: #ccc"></i>
-              <h4 class="mt-3">No Employees Found</h4>
-              <p class="text-muted">
-                Get started by adding your first employee
-              </p>
-              <button class="btn btn-primary mt-3" (click)="addNewEmployee()">
-                <i class="bi bi-plus-circle"></i> Add Employee
-              </button>
-            </div>
+                  <td>
+                    <span class="emp-status-badge"
+                      [ngClass]="{
+                        'status-active':      employee.status === 'ACTIVE'      || employee.status === 'Active',
+                        'status-terminated':  employee.status === 'TERMINATED'  || employee.status === 'Terminated',
+                        'status-on-leave':    employee.status === 'ON_LEAVE'    || employee.status === 'On Leave',
+                        'status-probation':   employee.status === 'PROBATION'   || employee.status === 'Probation',
+                        'status-inactive':    employee.status === 'INACTIVE'    || employee.status === 'Inactive'
+                      }">
+                      {{ employee.status | titlecase }}
+                    </span>
+                  </td>
+
+                  <td class="text-center" (click)="$event.stopPropagation()">
+                    <button
+                      type="button"
+                      class="emp-action-btn"
+                      (click)="selectEmployee(employee)"
+                      title="View Profile"
+                    >
+                      <i class="bi bi-eye"></i> View
+                    </button>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
+        <!-- Empty State -->
+        <div *ngIf="!hasEmployees(state)" class="emp-empty">
+          <i class="bi bi-people emp-empty-icon"></i>
+          <h5 class="mt-3 mb-1">No Employees Found</h5>
+          <p class="text-muted mb-3">Get started by adding your first employee</p>
+          <button class="emp-btn-primary" (click)="addNewEmployee()">
+            <i class="bi bi-plus-circle"></i> Add Employee
+          </button>
+        </div>
+
         <!-- Pagination -->
-        <nav *ngIf="hasEmployees(state)" aria-label="Page navigation">
-          <ul class="pagination justify-content-end">
-            <li
-              [ngClass]="0 == (currentPage$ | async) ? ' disabled' : ''"
-              class="page-item pointer"
-            >
-              <a
-                (click)="goToNextOrPreviousPage('backward', searchForm.value.name)"
-                class="page-link"
-              >
+        <nav *ngIf="hasEmployees(state)" aria-label="Page navigation" class="emp-pagination-wrap">
+          <ul class="pagination justify-content-end mb-0">
+            <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+              <a (click)="goToNextOrPreviousPage('backward', searchForm.value.name)" class="page-link" style="cursor:pointer">
                 &laquo; Prev
               </a>
             </li>
             <li
-              *ngFor="
-                let pageNumber of getTotalPages(state)
-                  | ExtractArrayValue : 'number';
-                let i = index
-              "
-              class="page-item pointer"
+              *ngFor="let pageNumber of getTotalPages(state) | ExtractArrayValue:'number'; let i = index"
+              class="page-item"
             >
               <a
                 (click)="goToPage(i, searchForm.value.name)"
-                [ngClass]="i == (currentPage$ | async) ? ' active' : ''"
+                [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
                 class="page-link"
+                style="cursor:pointer"
               >
                 {{ i + 1 }}
               </a>
             </li>
             <li
-              [ngClass]="
-                getTotalPages(state) - 1 == (currentPage$ | async)
-                  ? ' disabled'
-                  : ''
-              "
-              class="page-item pointer"
+              [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''"
+              class="page-item"
             >
-              <a
-                (click)="goToNextOrPreviousPage('forward', searchForm.value.name)"
-                class="page-link"
-              >
+              <a (click)="goToNextOrPreviousPage('forward', searchForm.value.name)" class="page-link" style="cursor:pointer">
                 Next &raquo;
               </a>
             </li>
           </ul>
         </nav>
+
       </div>
     </section>
   </ng-container>
@@ -219,7 +190,7 @@
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="mt-3">Loading employees...</p>
+        <p class="mt-3 text-muted">Loading employees...</p>
       </div>
     </div>
   </ng-container>
@@ -227,13 +198,13 @@
   <!-- Error State -->
   <ng-container *ngSwitchCase="DataState.ERROR">
     <div class="container-fluid mt-5">
-      <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">
-          <i class="bi bi-exclamation-triangle"></i> Error Loading Employees
-        </h4>
-        <p>{{ state.error }}</p>
-        <hr />
-        <button class="btn btn-primary" (click)="ngOnInit()">
+      <div class="falcon-alert falcon-alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <div>
+          <strong>Error Loading Employees</strong>
+          <div>{{ state.error }}</div>
+        </div>
+        <button class="emp-btn-primary ms-auto" (click)="ngOnInit()">
           <i class="bi bi-arrow-clockwise"></i> Retry
         </button>
       </div>

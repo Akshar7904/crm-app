@@ -34,17 +34,12 @@ import { AppRoutingModule } from './app-routing.module';
 
 @NgModule({
   declarations: [
-    // Main App Component
     AppComponent,
-
-    // Attendance Components (not lazy-loaded)
     AttendanceListComponent,
     EditAttendanceModalComponent,
     MyAttendanceComponent,
-
-    // Leave Components (not lazy-loaded)
     EmployeeLeaveComponent,
-    AdminLeaveComponent
+    AdminLeaveComponent,
   ],
   imports: [
     // Angular Core

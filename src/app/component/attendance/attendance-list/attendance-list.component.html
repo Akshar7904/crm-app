@@ -1,188 +1,185 @@
-<div class="attendance-container" *ngIf="attendanceState$ | async as state">
-  <!-- Header Section -->
-  <div class="attendance-header">
-    <div class="header-left">
-      <h1 class="page-title">Attendance (Admin)</h1>
-      <div class="legend">
-        <span class="legend-item">
-          <span class="icon present">✓</span> Full Day Present
+<div class="att-wrap" *ngIf="attendanceState$ | async as state">
+
+  <!-- Falcon Banner -->
+  <div class="att-banner">
+    <div class="att-banner-left">
+      <h1 class="att-banner-title"><i class="bi bi-calendar3"></i> Attendance</h1>
+      <div class="att-legend">
+        <span class="att-legend-item">
+          <span class="att-dot att-dot--present">✓</span> Present
         </span>
-        <span class="legend-item">
-          <span class="icon half-day">◐</span> Half Day Present
+        <span class="att-legend-item">
+          <span class="att-dot att-dot--half">◐</span> Half Day
         </span>
-        <span class="legend-item">
-          <span class="icon absent">✗</span> Full Day Absence
+        <span class="att-legend-item">
+          <span class="att-dot att-dot--absent">✗</span> Absent
+        </span>
+        <span class="att-legend-item">
+          <span class="att-dot att-dot--leave">L</span> Leave
+        </span>
+        <span class="att-legend-item">
+          <span class="att-dot att-dot--weekend"></span> Weekend
+        </span>
+        <span class="att-legend-item">
+          <span class="att-dot att-dot--holiday">H</span> Holiday
         </span>
       </div>
     </div>
-
-    <div class="header-right">
-      <button class="btn btn-secondary" (click)="exportToExcel()">
-        <i class="fas fa-file-excel"></i> Export Excel
+    <div class="att-banner-actions">
+      <button class="btn-att-glass" (click)="exportToExcel()">
+        <i class="bi bi-file-earmark-excel"></i> Excel
       </button>
-      <button class="btn btn-secondary" (click)="exportToPDF()">
-        <i class="fas fa-file-pdf"></i> Export PDF
+      <button class="btn-att-glass" (click)="exportToPDF()">
+        <i class="bi bi-file-earmark-pdf"></i> PDF
       </button>
-      <button class="btn btn-primary" (click)="openAddAttendanceModal()">
-        <i class="fas fa-plus"></i> Add Attendance
+      <button class="btn-att-glass btn-att-glass--accent" (click)="openAddAttendanceModal()">
+        <i class="bi bi-plus-lg"></i> Add
       </button>
-      <div class="filter-dropdown">
-        <button class="btn btn-secondary">
-          <i class="fas fa-filter"></i> Filter
-          <i class="fas fa-chevron-down"></i>
-        </button>
-      </div>
     </div>
   </div>
 
-  <!-- Date Navigation -->
-  <div class="date-navigation">
-    <div class="nav-controls">
-      <button class="btn-icon" (click)="previousMonth()" title="Previous Month">
-        <i class="fas fa-chevron-left"></i>
+  <!-- Week Navigation -->
+  <div class="att-nav-card">
+    <div class="att-nav-controls">
+      <button class="att-nav-btn" (click)="previousWeek()" title="Previous Week">
+        <i class="bi bi-chevron-left"></i>
       </button>
 
-      <div class="date-selectors">
-        <select class="form-select" [(ngModel)]="selectedMonth" (ngModelChange)="onMonthChange($event)">
-          <option *ngFor="let month of months" [value]="month.value">
-            {{ month.label }}
-          </option>
-        </select>
-
-        <select class="form-select" [(ngModel)]="selectedYear" (ngModelChange)="onYearChange($event)">
-          <option *ngFor="let year of years" [value]="year">
-            {{ year }}
-          </option>
-        </select>
+      <div class="att-week-label">
+        <i class="bi bi-calendar-week"></i>
+        <span>{{getWeekRangeLabel()}}</span>
       </div>
 
-      <button class="btn-icon" (click)="nextMonth()" title="Next Month">
-        <i class="fas fa-chevron-right"></i>
+      <button class="att-nav-btn" (click)="nextWeek()" title="Next Week">
+        <i class="bi bi-chevron-right"></i>
       </button>
 
-      <button class="btn btn-secondary" (click)="goToToday()">
-        Today
+      <button class="att-this-week-btn" (click)="goToCurrentWeek()">
+        <i class="bi bi-skip-forward"></i> This Week
       </button>
     </div>
 
-    <div class="search-box">
-      <i class="fas fa-search"></i>
+    <div class="att-search-wrap">
+      <i class="bi bi-search att-search-icon"></i>
       <input
         type="text"
+        class="att-search-input"
         placeholder="Search employees..."
-        [(ngModel)]="searchQuery"
-        class="search-input"
-      >
+        [(ngModel)]="searchQuery">
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="state.loading" class="loading-container">
-    <div class="spinner"></div>
+  <!-- Loading -->
+  <div *ngIf="state.loading" class="att-loading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
     <p>Loading attendance data...</p>
   </div>
 
-  <!-- Error State -->
-  <div *ngIf="state.error" class="error-container">
-    <i class="fas fa-exclamation-triangle"></i>
-    <p>{{ state.error }}</p>
-    <button class="btn btn-primary" (click)="loadMonthlyAttendance()">
-      Retry
+  <!-- Error -->
+  <div *ngIf="state.error" class="att-error">
+    <i class="bi bi-exclamation-triangle att-error-icon"></i>
+    <p>{{state.error}}</p>
+    <button class="att-retry-btn" (click)="loadMonthlyAttendance()">
+      <i class="bi bi-arrow-clockwise"></i> Retry
     </button>
   </div>
 
   <!-- Attendance Table -->
-  <div *ngIf="!state.loading && !state.error" class="attendance-table-wrapper">
-    <table class="attendance-table">
-      <thead>
-      <tr>
-        <th class="employee-column sticky-column">EMPLOYEE</th>
-        <th *ngFor="let day of daysInMonth" class="day-column">
-          {{ day }}
-        </th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let employeeAttendance of filterEmployees(state.attendances)"
-          class="employee-row">
-        <td class="employee-cell sticky-column">
-          <div class="employee-info">
-            <div class="employee-name">{{ employeeAttendance.employeeName }}</div>
-            <div class="employee-meta" *ngIf="employeeAttendance.designation">
-              {{ employeeAttendance.designation }}
-            </div>
-          </div>
-        </td>
-        <td *ngFor="let day of daysInMonth"
-            class="attendance-cell"
-            (click)="openEditModal(employeeAttendance, day)">
-          <div class="attendance-indicator"
-               [class]="getAttendanceClass(getAttendanceType(employeeAttendance, day))">
-            {{ getAttendanceIcon(getAttendanceType(employeeAttendance, day)) }}
-          </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+  <div *ngIf="!state.loading && !state.error" class="att-table-card">
+    <div class="att-table-wrap">
+      <table class="att-table">
+        <thead>
+          <tr>
+            <th class="att-emp-col att-sticky-col">Employee</th>
+            <th *ngFor="let wd of weekDays"
+                class="att-day-col"
+                [class.att-today-col]="wd.isToday"
+                [class.att-weekend-col]="wd.isWeekend"
+                [class.att-holiday-col]="getHolidayName(wd)">
+              <div class="att-day-name">{{wd.dayName}}</div>
+              <div class="att-day-num" [class.att-today-num]="wd.isToday">{{wd.num}}</div>
+              <div class="att-day-month" *ngIf="wd.month !== weekDays[0].month">{{wd.label.split(' ')[1]}}</div>
+              <div class="att-holiday-label" *ngIf="getHolidayName(wd)" [title]="getHolidayName(wd)!">
+                <i class="bi bi-star-fill"></i>
+                <span>{{getHolidayName(wd)}}</span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ea of filterEmployees(state.attendances)" class="att-row">
+            <td class="att-emp-cell att-sticky-col">
+              <div class="att-emp-name">{{ea.employeeName}}</div>
+              <div class="att-emp-meta" *ngIf="ea.designation">{{ea.designation}}</div>
+            </td>
+            <td *ngFor="let wd of weekDays"
+                class="att-cell"
+                [class.att-weekend-cell]="wd.isWeekend"
+                [class.att-other-month]="wd.month !== weekDays[0].month"
+                (click)="openEditModal(ea, wd)">
+              <div class="att-indicator"
+                   [ngClass]="getAttendanceClass(getAttendanceTypeForDay(ea, wd), wd.isWeekend)">
+                <span *ngIf="!wd.isWeekend || getAttendanceTypeForDay(ea, wd)">
+                  {{getAttendanceIcon(getAttendanceTypeForDay(ea, wd))}}
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-    <!-- Empty State -->
-    <div *ngIf="filterEmployees(state.attendances).length === 0" class="empty-state">
-      <i class="fas fa-calendar-times"></i>
-      <h3>No Attendance Records</h3>
-      <p *ngIf="searchQuery">No employees found matching "{{ searchQuery }}"</p>
-      <p *ngIf="!searchQuery">No attendance data available for {{ getMonthName(selectedMonth) }} {{ selectedYear }}</p>
-    </div>
-  </div>
-
-  <!-- Summary Section -->
-  <div *ngIf="!state.loading && !state.error && state.attendances.length > 0" class="attendance-summary">
-    <h3>Monthly Summary</h3>
-    <div class="summary-cards">
-      <div class="summary-card">
-        <div class="summary-icon present">
-          <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="summary-content">
-          <div class="summary-label">Total Present Days</div>
-          <div class="summary-value">
-          </div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon half-day">
-          <i class="fas fa-adjust"></i>
-        </div>
-        <div class="summary-content">
-          <div class="summary-label">Total Half Days</div>
-          <div class="summary-value">
-          </div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon absent">
-          <i class="fas fa-times-circle"></i>
-        </div>
-        <div class="summary-content">
-          <div class="summary-label">Total Absences</div>
-          <div class="summary-value">
-          </div>
-        </div>
-      </div>
-
-      <div class="summary-card">
-        <div class="summary-icon leave">
-          <i class="fas fa-umbrella-beach"></i>
-        </div>
-        <div class="summary-content">
-          <div class="summary-label">Total Leaves</div>
-          <div class="summary-value">
-          </div>
-        </div>
+      <!-- Empty State -->
+      <div *ngIf="filterEmployees(state.attendances).length === 0" class="att-empty">
+        <i class="bi bi-calendar-x att-empty-icon"></i>
+        <h5 class="mt-3 mb-1">No Attendance Records</h5>
+        <p *ngIf="searchQuery" class="text-muted">No employees found matching "{{searchQuery}}"</p>
+        <p *ngIf="!searchQuery" class="text-muted">No attendance data for week of {{getWeekRangeLabel()}}</p>
       </div>
     </div>
   </div>
+
+  <!-- Summary -->
+  <div *ngIf="!state.loading && !state.error && state.attendances.length > 0" class="att-summary-grid">
+    <div class="att-summary-card">
+      <div class="att-summary-icon att-summary-icon--present">
+        <i class="bi bi-check-circle-fill"></i>
+      </div>
+      <div class="att-summary-body">
+        <div class="att-summary-label">Present Days</div>
+        <div class="att-summary-value">—</div>
+      </div>
+    </div>
+    <div class="att-summary-card">
+      <div class="att-summary-icon att-summary-icon--half">
+        <i class="bi bi-circle-half"></i>
+      </div>
+      <div class="att-summary-body">
+        <div class="att-summary-label">Half Days</div>
+        <div class="att-summary-value">—</div>
+      </div>
+    </div>
+    <div class="att-summary-card">
+      <div class="att-summary-icon att-summary-icon--absent">
+        <i class="bi bi-x-circle-fill"></i>
+      </div>
+      <div class="att-summary-body">
+        <div class="att-summary-label">Absences</div>
+        <div class="att-summary-value">—</div>
+      </div>
+    </div>
+    <div class="att-summary-card">
+      <div class="att-summary-icon att-summary-icon--leave">
+        <i class="bi bi-umbrella-fill"></i>
+      </div>
+      <div class="att-summary-body">
+        <div class="att-summary-label">On Leave</div>
+        <div class="att-summary-value">—</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Edit Attendance Modal -->

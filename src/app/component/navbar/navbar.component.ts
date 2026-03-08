@@ -8,6 +8,7 @@ import { ThemeService, Theme } from 'src/app/service/theme.service';
 import { Observable } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],

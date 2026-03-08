@@ -1,61 +1,68 @@
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">
-            <i class="bi bi-currency-dollar me-2"></i>Employee Salaries
-          </h4>
-        </div>
-        <div class="card-body">
-          <div class="row mb-3">
-            <div class="col-md-6">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Search employees..."
-                [(ngModel)]="searchTerm"
-                (ngModelChange)="onSearchChange()">
-            </div>
-          </div>
+<!-- ─── Page Banner ─── -->
+<div class="page-banner">
+  <div class="banner-left">
+    <h1 class="banner-title"><i class="bi bi-cash-coin me-2"></i>Employee Salaries</h1>
+    <p class="banner-subtitle">Overview of all employee base salary information</p>
+  </div>
+</div>
 
-          <div *ngIf="isLoading" class="text-center py-5">
-            <div class="spinner-border text-primary"></div>
-            <p class="mt-3">Loading employees...</p>
-          </div>
+<!-- ─── Table Card ─── -->
+<div class="es-wrap">
+  <div class="table-card">
 
-          <div *ngIf="!isLoading" class="table-responsive">
-            <table class="table table-hover">
-              <thead>
-              <tr>
-                <th>Employee Number</th>
-                <th>Name</th>
-                <th>Department</th>
-                <th>Designation</th>
-                <th>Salary</th>
-                <th>Status</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr *ngFor="let employee of employees">
-                <td>{{ employee.employeeId }}</td>
-                <td>{{ employee.firstName }} {{ employee.lastName }}</td>
-                <td>{{ employee.departmentName || 'N/A' }}</td>
-                <td>{{ employee.designationTitle || 'N/A' }}</td>
-                <td>{{ formatCurrency(employee.baseSalary || 0) }}</td>
-                <td><span class="badge bg-success">{{ employee.status }}</span></td>
-              </tr>
-              <tr *ngIf="employees.length === 0">
-                <td colspan="6" class="text-center py-4">
-                  <i class="bi bi-inbox display-4 d-block mb-3 text-muted"></i>
-                  <p class="text-muted">No employees found</p>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <!-- Search bar -->
+    <div class="es-toolbar">
+      <div class="es-search-wrap">
+        <i class="bi bi-search es-search-icon"></i>
+        <input type="text" class="es-search-input" placeholder="Search by name, ID or department..."
+               [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()">
       </div>
     </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="es-loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <span>Loading employees...</span>
+    </div>
+
+    <!-- Table -->
+    <div *ngIf="!isLoading" class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Emp #</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Designation</th>
+            <th>Base Salary</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let employee of employees">
+            <td><span class="es-emp-id">{{ employee.employeeId }}</span></td>
+            <td>
+              <div class="es-name">{{ employee.firstName }} {{ employee.lastName }}</div>
+            </td>
+            <td>{{ employee.departmentName || '—' }}</td>
+            <td>{{ employee.designationTitle || '—' }}</td>
+            <td><span class="es-salary">{{ formatCurrency(employee.baseSalary || 0) }}</span></td>
+            <td>
+              <span class="badge-soft-active" *ngIf="employee.status === 'Active'">Active</span>
+              <span class="badge-soft-inactive" *ngIf="employee.status !== 'Active'">{{ employee.status }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="employees.length === 0">
+            <td colspan="6" class="empty-state-cell">
+              <i class="bi bi-inbox"></i>
+              <p>No employees found</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 </div>

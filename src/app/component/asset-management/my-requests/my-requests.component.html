@@ -1,176 +1,129 @@
 <ng-container *ngIf="requestsState$ | async as state" [ngSwitch]="state.dataState">
   <ng-container *ngSwitchCase="DataState.LOADED">
-    <!-- Navbar rendered by app.component -->
-    <section>
+    <section class="my-requests-page">
       <div class="container-fluid">
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb" style="margin-top: 8px">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-              <a [routerLink]="['/']">Home</a>
-            </li>
-            <li class="breadcrumb-item active">My Requests</li>
-          </ol>
-        </nav>
 
-        <!-- Header Section -->
-        <div class="row mt-3">
-          <div class="col">
-            <h4 class="fw-bold text-start">My Asset Requests</h4>
+        <!-- Page Banner -->
+        <div class="page-banner">
+          <div class="banner-left">
+            <h1 class="banner-title"><i class="bi bi-inbox"></i> My Asset Requests</h1>
+            <p class="banner-subtitle">Track the status of your submitted requests</p>
           </div>
-          <div class="col text-end">
-            <button class="btn btn-primary" (click)="newRequest()">
+          <div class="banner-actions">
+            <button class="btn-banner" (click)="newRequest()">
               <i class="bi bi-plus-circle"></i> New Request
             </button>
           </div>
         </div>
 
         <!-- Requests List -->
-        <div class="row mt-4" *ngIf="hasRequests(state)">
-          <div class="col-12">
-            <div class="card mb-3" *ngFor="let request of getRequests(state)">
-              <div class="card-body">
-                <div class="row align-items-center">
-                  <div class="col-md-1 text-center">
-                    <i class="bi {{ getStatusIcon(request.status) }} fs-2" [ngClass]="{
-                      'text-warning': request.status === 'PENDING',
-                      'text-info': request.status === 'APPROVED',
-                      'text-danger': request.status === 'REJECTED',
-                      'text-secondary': request.status === 'CANCELLED',
-                      'text-success': request.status === 'FULFILLED'
-                    }"></i>
-                  </div>
-                  <div class="col-md-3">
-                    <h6 class="mb-1">{{ request.assetCategory | titlecase }}</h6>
-                    <small class="text-muted">{{ request.requestType | titlecase }} request</small>
-                  </div>
-                  <div class="col-md-2">
-                    <span class="badge {{ getStatusClass(request.status) }}">
-                      {{ request.status }}
-                    </span>
-                  </div>
-                  <div class="col-md-3">
-                    <small class="text-muted d-block">Submitted</small>
-                    {{ formatDate(request.createdAt) }}
-                  </div>
-                  <div class="col-md-3 text-end">
-                    <button
-                      class="btn btn-outline-danger btn-sm"
-                      *ngIf="request.status === 'PENDING'"
-                      (click)="cancelRequest(request)"
-                      [disabled]="isLoading$ | async"
-                    >
-                      <i class="bi bi-x-lg"></i> Cancel
-                    </button>
-                    <span *ngIf="request.status === 'FULFILLED'" class="text-success">
-                      <i class="bi bi-check-lg"></i> Asset: {{ request.assignedAssetTag }}
-                    </span>
-                    <span *ngIf="request.status === 'REJECTED'" class="text-danger">
-                      <small>{{ request.rejectionReason }}</small>
-                    </span>
-                  </div>
-                </div>
-
-                <!-- Expanded details for approved/fulfilled -->
-                <div class="row mt-3" *ngIf="request.status === 'APPROVED' || request.status === 'FULFILLED'">
-                  <div class="col-md-11 offset-md-1">
-                    <div class="alert alert-light mb-0 py-2">
-                      <div class="row">
-                        <div class="col-md-4" *ngIf="request.approvedByName">
-                          <small class="text-muted">Approved by</small><br>
-                          {{ request.approvedByName }} on {{ formatDate(request.approvalDate) }}
-                        </div>
-                        <div class="col-md-4" *ngIf="request.fulfilledByName">
-                          <small class="text-muted">Fulfilled by</small><br>
-                          {{ request.fulfilledByName }} on {{ formatDate(request.fulfillmentDate) }}
-                        </div>
-                        <div class="col-md-4" *ngIf="request.approvalNotes">
-                          <small class="text-muted">Notes</small><br>
-                          {{ request.approvalNotes }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Justification -->
-                <div class="row mt-2">
-                  <div class="col-md-11 offset-md-1">
-                    <small class="text-muted">Justification: {{ request.justification }}</small>
-                  </div>
-                </div>
+        <div *ngIf="hasRequests(state)">
+          <div class="request-card falcon-card mb-3" *ngFor="let request of getRequests(state)">
+            <div class="request-card-header">
+              <div class="request-status-icon">
+                <i class="bi {{ getStatusIcon(request.status) }}"
+                  [ngClass]="{
+                    'text-warning': request.status === 'PENDING',
+                    'text-info':    request.status === 'APPROVED',
+                    'text-danger':  request.status === 'REJECTED',
+                    'text-muted':   request.status === 'CANCELLED',
+                    'text-success': request.status === 'FULFILLED'
+                  }"></i>
+              </div>
+              <div class="request-card-meta">
+                <h6 class="request-category">{{ request.assetCategory | titlecase }}</h6>
+                <small class="text-muted">{{ request.requestType | titlecase }} request</small>
+              </div>
+              <div class="request-card-status">
+                <span class="badge-soft {{ getStatusClass(request.status) }}">{{ request.status }}</span>
+              </div>
+              <div class="request-card-date">
+                <small class="text-muted d-block">Submitted</small>
+                <span style="font-size:0.84rem">{{ formatDate(request.createdAt) }}</span>
+              </div>
+              <div class="request-card-actions">
+                <button class="btn-action delete" *ngIf="request.status === 'PENDING'"
+                  (click)="cancelRequest(request)" [disabled]="isLoading$ | async" title="Cancel Request">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+                <span *ngIf="request.status === 'FULFILLED'" class="text-success d-flex align-items-center gap-1" style="font-size:0.82rem">
+                  <i class="bi bi-check-lg"></i> {{ request.assignedAssetTag }}
+                </span>
+                <span *ngIf="request.status === 'REJECTED'" class="text-danger" style="font-size:0.78rem">
+                  {{ request.rejectionReason }}
+                </span>
               </div>
             </div>
+
+            <!-- Expanded details (approved / fulfilled) -->
+            <div class="request-card-details" *ngIf="request.status === 'APPROVED' || request.status === 'FULFILLED'">
+              <div *ngIf="request.approvedByName" class="detail-item">
+                <span class="detail-label">Approved by</span>
+                <span>{{ request.approvedByName }} on {{ formatDate(request.approvalDate) }}</span>
+              </div>
+              <div *ngIf="request.fulfilledByName" class="detail-item">
+                <span class="detail-label">Fulfilled by</span>
+                <span>{{ request.fulfilledByName }} on {{ formatDate(request.fulfillmentDate) }}</span>
+              </div>
+              <div *ngIf="request.approvalNotes" class="detail-item">
+                <span class="detail-label">Notes</span>
+                <span>{{ request.approvalNotes }}</span>
+              </div>
+            </div>
+
+            <!-- Justification footer -->
+            <div class="request-card-justification">
+              <span class="detail-label me-2">Justification:</span>{{ request.justification }}
+            </div>
           </div>
+
+          <!-- Pagination -->
+          <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-end">
+              <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+                <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor:pointer">&laquo;</a>
+              </li>
+              <li *ngFor="let p of getTotalPages(state) | ExtractArrayValue:'number'; let i = index" class="page-item">
+                <a (click)="goToPage(i)" [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
+                   class="page-link" style="cursor:pointer">{{ i + 1 }}</a>
+              </li>
+              <li [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
+                <a (click)="goToNextOrPreviousPage('forward')" class="page-link" style="cursor:pointer">&raquo;</a>
+              </li>
+            </ul>
+          </nav>
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="!hasRequests(state)" class="text-center py-5">
-          <i class="bi bi-inbox" style="font-size: 4rem; color: #ccc"></i>
-          <h4 class="mt-3">No Requests Found</h4>
-          <p class="text-muted">You haven't submitted any asset requests yet</p>
-          <button class="btn btn-primary mt-3" (click)="newRequest()">
-            <i class="bi bi-plus-circle"></i> Submit a Request
-          </button>
+        <div *ngIf="!hasRequests(state)" class="table-card mt-2">
+          <div class="empty-cell">
+            <i class="bi bi-inbox"></i>
+            <p>No requests yet</p>
+            <a class="empty-link" (click)="newRequest()">Submit your first request</a>
+          </div>
         </div>
 
-        <!-- Pagination -->
-        <nav *ngIf="hasRequests(state)" aria-label="Page navigation">
-          <ul class="pagination justify-content-end">
-            <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
-              <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor: pointer;">
-                &laquo; Prev
-              </a>
-            </li>
-            <li
-              *ngFor="let pageNumber of getTotalPages(state) | ExtractArrayValue:'number'; let i = index"
-              class="page-item"
-            >
-              <a
-                (click)="goToPage(i)"
-                [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
-                class="page-link"
-                style="cursor: pointer;"
-              >
-                {{ i + 1 }}
-              </a>
-            </li>
-            <li [ngClass]="getTotalPages(state) - 1 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
-              <a (click)="goToNextOrPreviousPage('forward')" class="page-link" style="cursor: pointer;">
-                Next &raquo;
-              </a>
-            </li>
-          </ul>
-        </nav>
       </div>
     </section>
   </ng-container>
 
-  <!-- Loading State -->
+  <!-- Loading -->
   <ng-container *ngSwitchCase="DataState.LOADING">
-    <!-- Navbar rendered by app.component -->
-    <div class="container-fluid mt-5">
-      <div class="text-center">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-        <p class="mt-3">Loading your requests...</p>
-      </div>
+    <div class="container-fluid p-4">
+      <div class="page-banner skeleton-box" style="height:80px"></div>
+      <div class="skeleton-box mt-3" style="height:100px; border-radius:12px"></div>
+      <div class="skeleton-box mt-2" style="height:100px; border-radius:12px"></div>
     </div>
   </ng-container>
 
-  <!-- Error State -->
+  <!-- Error -->
   <ng-container *ngSwitchCase="DataState.ERROR">
-    <!-- Navbar rendered by app.component -->
-    <div class="container-fluid mt-5">
-      <div class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">
-          <i class="bi bi-exclamation-triangle"></i> Error Loading Requests
-        </h4>
-        <p>{{ state.error }}</p>
-        <hr />
-        <button class="btn btn-primary" (click)="ngOnInit()">
-          <i class="bi bi-arrow-clockwise"></i> Retry
+    <div class="container-fluid p-4">
+      <div class="alert alert-danger">
+        <h5><i class="bi bi-exclamation-triangle me-2"></i>Error Loading Requests</h5>
+        <p class="mb-2">{{ state.error }}</p>
+        <button class="btn btn-primary btn-sm" (click)="ngOnInit()">
+          <i class="bi bi-arrow-clockwise me-1"></i>Retry
         </button>
       </div>
     </div>

@@ -8,6 +8,7 @@ import { NotificationService } from 'src/app/service/notification.service';
 import { EmployeeService } from 'src/app/service/employee.service';
 
 @Component({
+  standalone: false,
   selector: 'app-assign-asset',
   templateUrl: './assign-asset.component.html',
   styleUrls: ['./assign-asset.component.scss'],

@@ -1,0 +1,61 @@
+<div class="expenses-claims">
+  <div class="page-banner">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-file-earmark-medical"></i> Expense Claims</h1>
+      <p class="banner-subtitle">{{ totalElements }} total claims</p>
+    </div>
+    <div class="banner-actions">
+      <div class="status-tabs">
+        <button class="tab-btn" [class.active]="selectedStatus === 'ALL'" (click)="setStatus('ALL')">All</button>
+        <button class="tab-btn" [class.active]="selectedStatus === 'PENDING'" (click)="setStatus('PENDING')">Pending</button>
+        <button class="tab-btn" [class.active]="selectedStatus === 'APPROVED'" (click)="setStatus('APPROVED')">Approved</button>
+        <button class="tab-btn" [class.active]="selectedStatus === 'PAID'" (click)="setStatus('PAID')">Paid</button>
+        <button class="tab-btn" [class.active]="selectedStatus === 'REJECTED'" (click)="setStatus('REJECTED')">Rejected</button>
+      </div>
+      <a routerLink="/expense-claims/new" class="btn-banner">
+        <i class="bi bi-plus-lg"></i> Submit Claim
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="text-center p-4"><div class="spinner-border text-primary"></div></div>
+      <table class="table table-hover mb-0" *ngIf="!loading">
+        <thead>
+          <tr>
+            <th>Claim #</th>
+            <th>Employee</th>
+            <th>Date</th>
+            <th>Purpose</th>
+            <th>Total</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let claim of claims">
+            <td><code>{{ claim.claimNumber }}</code></td>
+            <td>{{ claim.employeeName }}</td>
+            <td>{{ claim.claimDate }}</td>
+            <td>{{ claim.purpose }}</td>
+            <td><strong>{{ formatCurrency(claim.totalAmount) }}</strong></td>
+            <td><span class="status-badge" [ngClass]="getStatusClass(claim.status)">{{ claim.status }}</span></td>
+          </tr>
+          <tr *ngIf="claims.length === 0">
+            <td colspan="6" class="empty-cell">
+              <i class="bi bi-file-earmark-x"></i>
+              <p>No claims found for the selected filter.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center" *ngIf="totalPages > 1">
+      <small class="text-muted">Page {{ currentPage + 1 }} of {{ totalPages }}</small>
+      <div>
+        <button class="btn btn-sm btn-outline-secondary me-1" (click)="prevPage()" [disabled]="currentPage === 0">Prev</button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Next</button>
+      </div>
+    </div>
+  </div>
+</div>
