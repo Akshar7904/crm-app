@@ -1,5 +1,5 @@
 {
-  "buildCommand": "node src/environments/set-env.js && npm run build -- --configuration production",
+  "buildCommand": "node src/environments/set-env.js && npx ng build --configuration production",
   "outputDirectory": "dist/securecapitaapp",
   "framework": null,
   "installCommand": "npm install",
