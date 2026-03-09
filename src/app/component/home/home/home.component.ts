@@ -10,6 +10,8 @@ import { AttendanceService } from 'src/app/service/attendance.service';
 import { LeaveService } from 'src/app/service/leave.service';
 import { AnnouncementService } from 'src/app/service/announcement.service';
 import { ExpensesService } from 'src/app/component/expenses/services/expenses.service';
+import { InternAttendanceService } from 'src/app/service/intern-attendance.service';
+import { InternAttendance } from 'src/app/interface/intern-attendance';
 import { Attendance } from 'src/app/interface/attendance-state';
 import { Leave } from 'src/app/interface/leave-state';
 import { Holiday } from 'src/app/component/holiday/holiday.model';
@@ -102,6 +104,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private leaveService: LeaveService,
     private announcementService: AnnouncementService,
     private expensesService: ExpensesService,
+    private internAttendanceService: InternAttendanceService,
     private notification: NotificationService,
     private router: Router,
     private cdr: ChangeDetectorRef
@@ -531,16 +534,18 @@ export class HomeComponent implements OnInit, OnDestroy {
       attendance: this.attendanceService.getAttendanceByDateRange(startDate, endDate),
       leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC'),
       announcements: this.announcementService.getAnnouncements$(0, 5).pipe(catchError(() => of(null))),
-      financial: this.expensesService.getSummary(now.getFullYear(), now.getMonth() + 1).pipe(catchError(() => of(null)))
+      financial: this.expensesService.getSummary(now.getFullYear(), now.getMonth() + 1).pipe(catchError(() => of(null))),
+      internSchoolDays: this.internAttendanceService.getByDateRange(startDate, endDate).pipe(catchError(() => of([])))
     }).pipe(
-      map(({ stats, holidays, attendance, leaves, announcements, financial }) => {
+      map(({ stats, holidays, attendance, leaves, announcements, financial, internSchoolDays }) => {
         const dashboardStats = stats.data.stats;
         this.buildAdminStatsCards(dashboardStats);
         this.buildAdminCharts(dashboardStats);
         this.buildAdminCalendar(
           holidays.data.holidays,
           attendance.data?.attendances || [],
-          leaves || []
+          leaves || [],
+          internSchoolDays || []
         );
         this.recentAnnouncements = announcements?.data?.announcements || [];
         this.financialSummary = financial?.data || null;
@@ -733,7 +738,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   /**
    * Build admin calendar with holidays, attendance, and leave data
    */
-  private buildAdminCalendar(holidays: Holiday[], attendances: Attendance[], leaves: Leave[]): void {
+  private buildAdminCalendar(holidays: Holiday[], attendances: Attendance[], leaves: Leave[], internSchoolDays: InternAttendance[] = []): void {
     this.upcomingEvents = [];
 
     // Add holidays
@@ -818,6 +823,31 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       }
       this.upcomingEvents.push(...leaveEvents);
+    }
+
+    // Add approved intern school days
+    if (internSchoolDays && internSchoolDays.length > 0) {
+      for (const ia of internSchoolDays) {
+        if (ia.status !== 'APPROVED') continue;
+        const start = new Date(ia.startDate);
+        const end = new Date(ia.endDate);
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          this.upcomingEvents.push({
+            id: ia.id,
+            title: `${ia.employeeName || 'Intern'} — ${ia.institutionName || 'School Day'}`,
+            date: this.formatDateISO(new Date(d)),
+            type: 'intern-school' as const,
+            status: 'APPROVED',
+            description: ia.subjectOrModule || ia.reason || '',
+            metadata: {
+              employeeName: ia.employeeName,
+              institutionName: ia.institutionName,
+              subjectOrModule: ia.subjectOrModule,
+              numberOfDays: ia.numberOfDays
+            }
+          });
+        }
+      }
     }
 
     // Sort by date
@@ -1008,8 +1038,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       } else {
         this.router.navigate(['/attendance/my'], { queryParams: { date: event.date } });
       }
+    } else if (event.type === 'intern-school') {
+      this.router.navigate(['/admin/intern-attendance/admin']);
     } else if (event.type === 'event') {
-      // Navigate to company event detail (if implemented)
       console.log('Company event clicked:', event);
       this.notification.onInfo('Event details coming soon');
     }

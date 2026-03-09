@@ -60,6 +60,23 @@ const routes: Routes = [
   },
 
   // =============================================
+  // INTERN ATTENDANCE
+  // Must be before 'employee' lazy module to avoid prefix-match collision
+  // =============================================
+  {
+    path: 'intern/attendance',
+    loadChildren: () => import('./component/intern-attendance/intern-attendance.module').then(m => m.InternAttendanceModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'My School Attendance' }
+  },
+  {
+    path: 'admin/intern-attendance',
+    loadChildren: () => import('./component/intern-attendance/intern-attendance.module').then(m => m.InternAttendanceModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Intern Attendance Management' }
+  },
+
+  // =============================================
   // LEAVE MANAGEMENT
   // NOTE: Must be before the 'employee' lazy module — Angular prefix-matches
   // 'employee' first and would swallow 'employee/leave' if placed after it.

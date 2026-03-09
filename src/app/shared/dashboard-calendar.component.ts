@@ -7,7 +7,7 @@ export interface CalendarEvent {
   id?: number;
   title: string;
   date: string;
-  type: 'holiday' | 'leave' | 'event' | 'announcement' | 'attendance';
+  type: 'holiday' | 'leave' | 'event' | 'announcement' | 'attendance' | 'intern-school';
   description?: string;
   status?: string;
   isRecurring?: boolean;
@@ -168,27 +168,29 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
   }
 
   openPopup(day: CalendarDay, event: MouseEvent): void {
-    const popupW = 340;
-    const popupMaxH = 400;
-    const margin = 12;
+    const popupW = 320;
+    const popupMaxH = 380;
+    const margin = 8;
     const viewW = window.innerWidth;
     const viewH = window.innerHeight;
 
-    let x = event.clientX;
-    let y = event.clientY;
+    // Use the cell's bounding rect for precise positioning
+    const cell = (event.currentTarget as Element) || (event.target as Element);
+    const rect = cell?.getBoundingClientRect?.() ?? { left: event.clientX, right: event.clientX, top: event.clientY, bottom: event.clientY };
 
-    // Try right of click
-    let left = x + margin;
+    // Prefer showing popup below the cell, aligned to its left edge
+    let left = rect.left;
+    let top = rect.bottom + 6;
+
+    // Flip left if popup would overflow right edge
     if (left + popupW > viewW - margin) {
-      // Flip to left
-      left = x - popupW - margin;
+      left = rect.right - popupW;
     }
     if (left < margin) left = margin;
 
-    // Try below click
-    let top = y - 40;
+    // Flip up if popup would overflow bottom
     if (top + popupMaxH > viewH - margin) {
-      top = viewH - popupMaxH - margin;
+      top = rect.top - popupMaxH - 6;
     }
     if (top < margin) top = margin;
 
@@ -229,6 +231,7 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
       case 'event': return 'event-event';
       case 'announcement': return 'event-announcement';
       case 'attendance': return 'event-attendance';
+      case 'intern-school': return 'event-intern-school';
       default: return 'event-default';
     }
   }
@@ -243,6 +246,7 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
       case 'event': return '#005c8f';
       case 'announcement': return '#6610f2';
       case 'attendance': return '#28a745';
+      case 'intern-school': return '#6f42c1';
       default: return '#6c757d';
     }
   }
@@ -257,6 +261,7 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
       case 'event': return 'Event';
       case 'announcement': return 'Announcement';
       case 'attendance': return 'Attendance';
+      case 'intern-school': return 'School Day';
       default: return '';
     }
   }
@@ -306,6 +311,8 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
       case 'leave': return 'bi-calendar-x';
       case 'event': return 'bi-megaphone-fill';
       case 'announcement': return 'bi-bell-fill';
+      case 'attendance': return 'bi-person-check-fill';
+      case 'intern-school': return 'bi-mortarboard-fill';
       default: return 'bi-circle-fill';
     }
   }

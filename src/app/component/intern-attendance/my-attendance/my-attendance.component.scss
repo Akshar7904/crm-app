@@ -1,0 +1,221 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.container-fluid {
+  padding: $spacing-md $spacing-lg;
+}
+
+// ── KPI stat cards ────────────────────────────────────────
+.kpi-stat {
+  background: var(--bg-card, #fff);
+  border-radius: $border-radius-xl;
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  animation: fadeInUp 0.4s ease both;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+
+  .kpi-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: $border-radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 4px;
+  }
+
+  .kpi-value {
+    font-size: 1.75rem;
+    font-weight: $font-weight-bold;
+    color: var(--text-primary, #1a1a2e);
+    line-height: 1;
+  }
+
+  .kpi-label {
+    font-size: $font-size-xs;
+    color: var(--text-muted, #6c757d);
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+// ── Falcon card form ──────────────────────────────────────
+.falcon-card {
+  background: var(--bg-card, #fff);
+  border-radius: $border-radius-xl;
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  overflow: hidden;
+
+  .card-header {
+    background: var(--bg-sidebar, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+    padding: 14px 20px;
+  }
+
+  .card-body {
+    padding: 24px 20px;
+  }
+}
+
+// Form control spacing & focus
+.form-control,
+.form-select {
+  border-radius: $border-radius-md;
+  border-color: var(--border-color, #dee2e6);
+  font-size: $font-size-sm;
+  padding: 10px 12px;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.15);
+  }
+
+  &.bg-light { background: var(--bg-body, #f8f9fa) !important; }
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 70px;
+}
+
+.form-label {
+  font-size: $font-size-sm;
+  margin-bottom: 6px;
+  color: var(--text-secondary, #495057);
+}
+
+// Row spacing within the form
+.row.g-3 { row-gap: 1rem; }
+
+// ── Table card ────────────────────────────────────────────
+.table-card {
+  background: var(--bg-card, #fff);
+  border-radius: $border-radius-xl;
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  overflow: hidden;
+
+  .card-header {
+    background: var(--bg-sidebar, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+    padding: 14px 20px;
+
+    h6 { font-weight: $font-weight-semibold; color: var(--text-primary, #1a1a2e); }
+  }
+
+  .table {
+    margin-bottom: 0;
+
+    thead th {
+      background: var(--table-header-bg, #f8f9fa);
+      border-bottom: 2px solid var(--border-color, #dee2e6);
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted, #6c757d);
+      padding: 12px 16px;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 12px 16px;
+      vertical-align: middle;
+      font-size: $font-size-sm;
+      border-color: var(--border-color, #f0f0f0);
+      color: var(--text-primary, #1a1a2e);
+    }
+
+    &.table-hover tbody tr:hover {
+      background: var(--table-hover, rgba(0,0,0,0.02));
+    }
+  }
+}
+
+// ── Soft badges ───────────────────────────────────────────
+.badge-soft {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: $font-weight-semibold;
+  letter-spacing: 0.3px;
+
+  &.badge-soft-success  { background: rgba(25,135,84,0.12); color: #198754; }
+  &.badge-soft-warning  { background: rgba(255,193,7,0.15);  color: #cc9800; }
+  &.badge-soft-danger   { background: rgba(220,53,69,0.12);  color: #dc3545; }
+  &.badge-soft-secondary{ background: rgba(108,117,125,0.12); color: #6c757d; }
+}
+
+// Empty state
+.empty-state-cell {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--text-muted, #6c757d);
+}
+
+// Page banner
+.page-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card, #fff);
+  border-radius: $border-radius-xl;
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  padding: $spacing-lg $spacing-xl;
+  margin-bottom: $spacing-lg;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, #6f42c1 0%, #9b5de5 100%);
+    border-radius: $border-radius-xl 0 0 $border-radius-xl;
+  }
+
+  .banner-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary, #1a1a2e);
+    margin: 0;
+    i { color: #6f42c1; }
+  }
+
+  .banner-subtitle {
+    font-size: $font-size-sm;
+    color: var(--text-muted, #6c757d);
+    margin: 4px 0 0 0;
+  }
+
+  .btn-banner {
+    background: #6f42c1;
+    border: none;
+    border-radius: $border-radius-md;
+    color: #fff;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-sm;
+    padding: 10px 20px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: darken(#6f42c1, 8%);
+      transform: translateY(-1px);
+    }
+  }
+}

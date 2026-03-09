@@ -122,6 +122,25 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
+      label: 'Intern',
+      icon: 'bi-mortarboard-fill',
+      expanded: false,
+      children: [
+        {
+          label: 'My School Days',
+          icon: 'bi-mortarboard',
+          route: '/intern/attendance/my'
+        },
+        {
+          label: 'All School Requests',
+          icon: 'bi-list-check',
+          route: '/admin/intern-attendance/admin',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          excludeRoles: ['ROLE_USER']
+        }
+      ]
+    },
+    {
       label: 'Attendance',
       icon: 'bi-clock-history',
       expanded: false,

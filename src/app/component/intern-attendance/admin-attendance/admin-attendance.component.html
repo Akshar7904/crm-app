@@ -1,0 +1,207 @@
+<div class="container-fluid py-4">
+
+  <!-- Page Banner -->
+  <div class="page-banner mb-4">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-mortarboard-fill me-2"></i>Intern School Attendance</h1>
+      <p class="banner-subtitle">Review and approve intern school/university attendance requests</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn btn-banner" (click)="loadAll()">
+        <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+      </button>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-sm-4">
+      <div class="kpi-stat">
+        <div class="kpi-icon" style="background:rgba(111,66,193,0.12);color:#6f42c1">
+          <i class="bi bi-mortarboard"></i>
+        </div>
+        <div class="kpi-value">{{ totalCount }}</div>
+        <div class="kpi-label">Total Requests</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="kpi-stat">
+        <div class="kpi-icon" style="background:rgba(255,193,7,0.12);color:#e6ac00">
+          <i class="bi bi-hourglass-split"></i>
+        </div>
+        <div class="kpi-value">{{ pendingCount }}</div>
+        <div class="kpi-label">Pending Approval</div>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="kpi-stat">
+        <div class="kpi-icon" style="background:rgba(25,135,84,0.12);color:#198754">
+          <i class="bi bi-check-circle-fill"></i>
+        </div>
+        <div class="kpi-value">{{ approvedCount }}</div>
+        <div class="kpi-label">Approved</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+    <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <h6 class="mb-0">All Requests</h6>
+        <div class="btn-group btn-group-sm" role="group">
+          <button class="btn" [class.btn-primary]="activeTab==='all'"
+            [class.btn-outline-secondary]="activeTab!=='all'" (click)="activeTab='all'">All</button>
+          <button class="btn" [class.btn-warning]="activeTab==='PENDING'"
+            [class.btn-outline-secondary]="activeTab!=='PENDING'" (click)="activeTab='PENDING'">
+            Pending <span *ngIf="pendingCount > 0" class="badge bg-warning text-dark ms-1">{{ pendingCount }}</span>
+          </button>
+          <button class="btn" [class.btn-success]="activeTab==='APPROVED'"
+            [class.btn-outline-secondary]="activeTab!=='APPROVED'" (click)="activeTab='APPROVED'">Approved</button>
+          <button class="btn" [class.btn-danger]="activeTab==='REJECTED'"
+            [class.btn-outline-secondary]="activeTab!=='REJECTED'" (click)="activeTab='REJECTED'">Rejected</button>
+        </div>
+      </div>
+      <div class="input-group" style="max-width:280px">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search employee, institution..."
+          [(ngModel)]="searchQuery">
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Employee</th>
+              <th>Institution</th>
+              <th>Subject / Module</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Days</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of filteredAttendances">
+              <td>
+                <div class="fw-medium">{{ item.employeeName }}</div>
+                <div class="text-muted small">{{ item.employeeEmail }}</div>
+              </td>
+              <td>{{ item.institutionName || '—' }}</td>
+              <td>{{ item.subjectOrModule || '—' }}</td>
+              <td>{{ item.startDate | date:'dd MMM yyyy' }}</td>
+              <td>{{ item.endDate | date:'dd MMM yyyy' }}</td>
+              <td><span class="fw-bold">{{ item.numberOfDays }}</span></td>
+              <td>
+                <span class="badge-soft" [ngClass]="getStatusClass(item.status)">{{ item.status }}</span>
+              </td>
+              <td class="text-muted small">{{ item.createdAt | date:'dd MMM yyyy' }}</td>
+              <td>
+                <div class="action-btn-group">
+                  <button *ngIf="item.status === 'PENDING'"
+                    class="btn btn-sm btn-outline-success"
+                    (click)="openApproveModal(item)" title="Approve">
+                    <i class="bi bi-check-lg"></i>
+                  </button>
+                  <button *ngIf="item.status === 'PENDING'"
+                    class="btn btn-sm btn-outline-danger"
+                    (click)="openRejectModal(item)" title="Reject">
+                    <i class="bi bi-x-lg"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary"
+                    (click)="deleteRecord(item.id!)" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredAttendances.length === 0">
+              <td colspan="9" class="empty-state-cell">
+                <i class="bi bi-mortarboard fs-2 d-block mb-2 text-muted"></i>
+                No attendance requests found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Approve Modal -->
+<div class="modal fade" [class.show]="showApproveModal" [style.display]="showApproveModal ? 'block' : 'none'"
+  tabindex="-1" role="dialog" *ngIf="showApproveModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-check-circle text-success me-2"></i>Approve Request</h5>
+        <button type="button" class="btn-close" (click)="closeModals()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Approve school attendance for <strong>{{ selectedAttendance?.employeeName }}</strong>?</p>
+        <p class="text-muted small">
+          {{ selectedAttendance?.institutionName }}
+          <span *ngIf="selectedAttendance?.subjectOrModule"> — {{ selectedAttendance?.subjectOrModule }}</span><br>
+          {{ selectedAttendance?.startDate | date:'dd MMM yyyy' }} → {{ selectedAttendance?.endDate | date:'dd MMM yyyy' }}
+          ({{ selectedAttendance?.numberOfDays }} days)
+        </p>
+        <form [formGroup]="approvalForm">
+          <label class="form-label">Remarks (optional)</label>
+          <textarea class="form-control" formControlName="remarks" rows="2"
+            placeholder="Add any remarks..."></textarea>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeModals()">Cancel</button>
+        <button type="button" class="btn btn-success" (click)="confirmApprove()" [disabled]="processing">
+          <span *ngIf="processing" class="spinner-border spinner-border-sm me-1"></span>
+          Approve
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showApproveModal" *ngIf="showApproveModal"></div>
+
+<!-- Reject Modal -->
+<div class="modal fade" [class.show]="showRejectModal" [style.display]="showRejectModal ? 'block' : 'none'"
+  tabindex="-1" role="dialog" *ngIf="showRejectModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-x-circle text-danger me-2"></i>Reject Request</h5>
+        <button type="button" class="btn-close" (click)="closeModals()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Reject school attendance for <strong>{{ selectedAttendance?.employeeName }}</strong>?</p>
+        <form [formGroup]="approvalForm">
+          <div class="mb-3">
+            <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+            <textarea class="form-control" formControlName="rejectionReason" rows="3"
+              placeholder="Provide a reason for rejection..."></textarea>
+          </div>
+          <div>
+            <label class="form-label">Remarks (optional)</label>
+            <textarea class="form-control" formControlName="remarks" rows="2"
+              placeholder="Additional remarks..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" (click)="closeModals()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmReject()" [disabled]="processing">
+          <span *ngIf="processing" class="spinner-border spinner-border-sm me-1"></span>
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade" [class.show]="showRejectModal" *ngIf="showRejectModal"></div>
