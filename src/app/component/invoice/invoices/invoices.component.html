@@ -10,23 +10,19 @@
           </ol>
         </nav>
 
-        <!-- Page Header -->
-        <div class="page-header mb-4">
-          <div class="row align-items-center">
-            <div class="col">
-              <h4 class="page-title">
-                <i class="bi bi-receipt me-2"></i>Invoices
-              </h4>
-              <p class="text-muted mb-0">Manage your invoices and billing</p>
-            </div>
-            <div class="col-auto">
-              <button class="btn btn-outline-success me-2" title="Export to Excel">
-                <i class="bi bi-file-earmark-excel"></i>
-              </button>
-              <a [routerLink]="['/invoices/new']" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create Invoice
-              </a>
-            </div>
+        <!-- Page Banner -->
+        <div class="page-banner mb-4">
+          <div class="banner-left">
+            <h1 class="banner-title"><i class="bi bi-receipt"></i> Invoices</h1>
+            <p class="banner-subtitle">Manage your invoices and billing</p>
+          </div>
+          <div class="banner-actions">
+            <button class="btn btn-outline-secondary btn-sm" title="Export to Excel">
+              <i class="bi bi-file-earmark-excel me-1"></i> Export
+            </button>
+            <a [routerLink]="['/invoices/new']" class="btn btn-banner">
+              <i class="bi bi-plus-circle me-1"></i> Create Invoice
+            </a>
           </div>
         </div>
 
@@ -78,88 +74,74 @@
           </div>
         </div>
 
-        <!-- Invoice Cards Grid -->
-        <div class="row">
-          <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 mb-4"
-               *ngFor="let invoice of state?.appData?.data?.page?.content">
-            <div class="card invoice-card">
-              <!-- Card Header with Status -->
-              <div class="card-header">
-                <span class="invoice-number">#{{ invoice.invoiceNumber }}</span>
-                <span class="badge status-badge"
-                      [ngClass]="{
-                        'bg-success-subtle text-success': invoice.status === 'PAID',
-                        'bg-primary-subtle text-primary': invoice.status === 'PENDING',
-                        'bg-danger-subtle text-danger': invoice.status === 'CANCELED',
-                        'bg-warning-subtle text-warning': invoice.status === 'OVERDUE'
-                      }">
-                  <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
-                  {{ invoice.status }}
-                </span>
-              </div>
-
-              <!-- Card Body -->
-              <div class="card-body">
-                <!-- Customer Info -->
-                <div class="customer-section">
-                  <div class="customer-avatar">
-                    {{ getCustomerInitial(invoice) }}
-                  </div>
-                  <div class="customer-details">
-                    <h6 class="customer-name">{{ getCustomerName(invoice) }}</h6>
-                    <p class="invoice-service">{{ invoice.services?.split(',')[0] || 'Services' }}</p>
-                  </div>
-                </div>
-
-                <!-- Invoice Details -->
-                <div class="invoice-details">
-                  <div class="detail-row">
-                    <span class="detail-label">
-                      <i class="bi bi-calendar3 me-2"></i>Date
+        <!-- Invoice Table -->
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Invoice #</th>
+                  <th>Customer</th>
+                  <th>Service</th>
+                  <th>Date</th>
+                  <th>Total (incl. VAT)</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let invoice of state?.appData?.data?.page?.content">
+                  <td><strong class="text-primary">#{{ invoice.invoiceNumber }}</strong></td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="customer-avatar-sm">{{ getCustomerInitial(invoice) }}</div>
+                      <span class="fw-medium">{{ getCustomerName(invoice) }}</span>
+                    </div>
+                  </td>
+                  <td class="text-muted">{{ invoice.services?.split(',')[0] || '—' }}</td>
+                  <td>{{ invoice.date | date: 'mediumDate' }}</td>
+                  <td><strong>{{ formatCurrency(invoice.total) }}</strong></td>
+                  <td>
+                    <span class="badge-soft"
+                          [ngClass]="{
+                            'badge-soft-success': invoice.status === 'PAID',
+                            'badge-soft-primary': invoice.status === 'PENDING',
+                            'badge-soft-danger': invoice.status === 'CANCELED',
+                            'badge-soft-warning': invoice.status === 'OVERDUE'
+                          }">
+                      {{ invoice.status }}
                     </span>
-                    <span class="detail-value">{{ invoice.date | date: 'mediumDate' }}</span>
-                  </div>
-                  <div class="detail-row">
-                    <span class="detail-label">
-                      <i class="bi bi-cash-stack me-2"></i>Total (incl. VAT)
-                    </span>
-                    <span class="detail-value amount">{{ formatCurrency(invoice.total) }}</span>
-                  </div>
-                </div>
-              </div>
+                  </td>
+                  <td>
+                    <div class="action-btn-group">
+                      <button class="btn btn-sm btn-outline-primary"
+                              [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
+                              title="View Invoice">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-secondary"
+                              [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
+                              [queryParams]="{edit: true}"
+                              title="Edit Invoice">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-info"
+                              (click)="sendInvoice(invoice, $event)"
+                              title="Send Invoice to {{ invoice.customerName }}">
+                        <i class="bi bi-send"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
 
-              <!-- Card Footer with Actions -->
-              <div class="card-footer">
-                <button class="btn btn-sm btn-light action-btn"
-                        [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
-                        title="View Invoice">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-light action-btn"
-                        [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
-                        [queryParams]="{edit: true}"
-                        title="Edit Invoice">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-light action-btn"
-                        (click)="sendInvoice(invoice, $event)"
-                        title="Send Invoice to {{ invoice.customerName }}">
-                  <i class="bi bi-send"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div *ngIf="!state?.appData?.data?.page?.content?.length" class="col-12">
-            <div class="empty-state">
-              <i class="bi bi-receipt"></i>
-              <h5>No Invoices Found</h5>
-              <p class="text-muted">Get started by creating your first invoice</p>
-              <a [routerLink]="['/invoices/new']" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Create Invoice
-              </a>
-            </div>
+                <tr *ngIf="!state?.appData?.data?.page?.content?.length">
+                  <td colspan="7" class="empty-state-cell">
+                    <i class="bi bi-receipt fs-2 d-block mb-2 text-muted"></i>
+                    No invoices found. <a [routerLink]="['/invoices/new']">Create your first invoice</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 

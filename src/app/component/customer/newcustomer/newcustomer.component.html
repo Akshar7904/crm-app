@@ -11,20 +11,16 @@
           </ol>
         </nav>
 
-        <!-- Page Header -->
-        <div class="page-header mb-4">
-          <div class="row align-items-center">
-            <div class="col">
-              <h4 class="page-title">
-                <i class="bi bi-person-plus me-2"></i>New Client
-              </h4>
-              <p class="text-muted mb-0">Add a new client to your database</p>
-            </div>
-            <div class="col-auto">
-              <button class="btn btn-outline-secondary" [routerLink]="['/customers']">
-                <i class="bi bi-arrow-left me-1"></i> Back to Clients
-              </button>
-            </div>
+        <!-- Page Banner -->
+        <div class="page-banner mb-4">
+          <div class="banner-left">
+            <h1 class="banner-title"><i class="bi bi-person-plus"></i> New Client</h1>
+            <p class="banner-subtitle">Add a new client to your database</p>
+          </div>
+          <div class="banner-actions">
+            <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/customers']">
+              <i class="bi bi-arrow-left me-1"></i> Back to Clients
+            </button>
           </div>
         </div>
 
@@ -33,7 +29,7 @@
           <div class="col-lg-8">
             <div class="card form-card">
               <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Client Information</h6>
+                <h6 class="mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Client Information</h6>
               </div>
               <div class="card-body">
                 <!-- Error Alert -->

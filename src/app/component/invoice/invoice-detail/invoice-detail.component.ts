@@ -35,6 +35,11 @@ export class InvoiceDetailComponent implements OnInit {
   isEditMode: boolean = false;
   editInvoice: any = {};
 
+  // Send confirmation
+  showSendConfirm = false;
+  sendTargetCustomer: any = null;
+  sendTargetInvoiceNumber: string = '';
+
   // Line items for edit mode
   editLineItems: InvoiceLineItem[] = [];
   editSubtotal: number = 0;
@@ -225,7 +230,20 @@ export class InvoiceDetailComponent implements OnInit {
       });
   }
 
-  sendInvoice(): void {
+  openSendConfirm(customer: any): void {
+    this.sendTargetCustomer = customer;
+    this.sendTargetInvoiceNumber = this.dataSubject.value?.data['invoice']?.invoiceNumber || '';
+    this.showSendConfirm = true;
+    this.cdr.markForCheck();
+  }
+
+  closeSendConfirm(): void {
+    this.showSendConfirm = false;
+    this.sendTargetCustomer = null;
+    this.cdr.markForCheck();
+  }
+
+  confirmSendInvoice(): void {
     const invoiceId = this.dataSubject.value?.data['invoice']?.id;
     if (!invoiceId) {
       this.notification.onError('Invoice not found');
@@ -238,6 +256,7 @@ export class InvoiceDetailComponent implements OnInit {
         next: (response) => {
           this.notification.onSuccess(response.message || 'Invoice sent successfully');
           this.isSendingSubject.next(false);
+          this.showSendConfirm = false;
           this.cdr.markForCheck();
         },
         error: (error) => {

@@ -1,61 +1,158 @@
-<div class="expenses-claims">
-  <div class="page-banner">
+<div class="claims-page">
+
+  <!-- Page Banner -->
+  <div class="page-banner mb-4">
     <div class="banner-left">
       <h1 class="banner-title"><i class="bi bi-file-earmark-medical"></i> Expense Claims</h1>
-      <p class="banner-subtitle">{{ totalElements }} total claims</p>
+      <p class="banner-subtitle">Track and manage all submitted expense claims</p>
     </div>
     <div class="banner-actions">
-      <div class="status-tabs">
-        <button class="tab-btn" [class.active]="selectedStatus === 'ALL'" (click)="setStatus('ALL')">All</button>
-        <button class="tab-btn" [class.active]="selectedStatus === 'PENDING'" (click)="setStatus('PENDING')">Pending</button>
-        <button class="tab-btn" [class.active]="selectedStatus === 'APPROVED'" (click)="setStatus('APPROVED')">Approved</button>
-        <button class="tab-btn" [class.active]="selectedStatus === 'PAID'" (click)="setStatus('PAID')">Paid</button>
-        <button class="tab-btn" [class.active]="selectedStatus === 'REJECTED'" (click)="setStatus('REJECTED')">Rejected</button>
-      </div>
-      <a routerLink="/expense-claims/new" class="btn-banner">
-        <i class="bi bi-plus-lg"></i> Submit Claim
+      <a routerLink="/expense-claims/new" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-lg me-1"></i> Submit Claim
       </a>
     </div>
   </div>
 
-  <div class="card">
-    <div class="card-body p-0">
-      <div *ngIf="loading" class="text-center p-4"><div class="spinner-border text-primary"></div></div>
-      <table class="table table-hover mb-0" *ngIf="!loading">
+  <!-- Stat Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-primary-subtle">
+          <i class="bi bi-file-earmark-text text-primary"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">{{ totalElements }}</p>
+          <p class="stat-label">Total Claims</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-warning-subtle">
+          <i class="bi bi-hourglass-split text-warning"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">{{ pendingCount }}</p>
+          <p class="stat-label">Pending</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-success-subtle">
+          <i class="bi bi-check-circle text-success"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">{{ approvedCount }}</p>
+          <p class="stat-label">Approved</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-info-subtle">
+          <i class="bi bi-cash-stack text-info"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">{{ paidCount }}</p>
+          <p class="stat-label">Paid</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="table-card">
+
+    <!-- Card Header: filter tabs + search -->
+    <div class="table-card-header">
+      <div class="filter-tabs">
+        <button class="filter-tab" [class.active]="selectedStatus === 'ALL'" (click)="setStatus('ALL')">All</button>
+        <button class="filter-tab" [class.active]="selectedStatus === 'PENDING'" (click)="setStatus('PENDING')">Pending</button>
+        <button class="filter-tab" [class.active]="selectedStatus === 'APPROVED'" (click)="setStatus('APPROVED')">Approved</button>
+        <button class="filter-tab" [class.active]="selectedStatus === 'PAID'" (click)="setStatus('PAID')">Paid</button>
+        <button class="filter-tab" [class.active]="selectedStatus === 'REJECTED'" (click)="setStatus('REJECTED')">Rejected</button>
+      </div>
+      <div class="input-group search-box">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search claims…"
+               [(ngModel)]="searchQuery" (input)="onSearch()">
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="load-state">
+      <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+      <span class="ms-2 text-muted">Loading claims…</span>
+    </div>
+
+    <!-- Table -->
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
             <th>Claim #</th>
-            <th>Employee</th>
+            <th *ngIf="isAdmin">Employee</th>
             <th>Date</th>
             <th>Purpose</th>
-            <th>Total</th>
+            <th class="text-end">Amount</th>
             <th>Status</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let claim of claims">
-            <td><code>{{ claim.claimNumber }}</code></td>
-            <td>{{ claim.employeeName }}</td>
-            <td>{{ claim.claimDate }}</td>
-            <td>{{ claim.purpose }}</td>
-            <td><strong>{{ formatCurrency(claim.totalAmount) }}</strong></td>
-            <td><span class="status-badge" [ngClass]="getStatusClass(claim.status)">{{ claim.status }}</span></td>
+          <tr *ngFor="let claim of filteredClaims">
+            <td>
+              <span class="claim-number">{{ claim.claimNumber }}</span>
+            </td>
+            <td *ngIf="isAdmin">
+              <div class="d-flex align-items-center gap-2">
+                <div class="emp-avatar">{{ getInitials(claim.employeeName) }}</div>
+                <span class="fw-medium" style="font-size:0.85rem">{{ claim.employeeName }}</span>
+              </div>
+            </td>
+            <td class="text-muted" style="font-size:0.83rem; white-space:nowrap">{{ claim.claimDate }}</td>
+            <td style="font-size:0.85rem; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">
+              {{ claim.purpose }}
+            </td>
+            <td class="text-end fw-semibold" style="font-size:0.88rem; white-space:nowrap">
+              {{ formatCurrency(claim.totalAmount) }}
+            </td>
+            <td>
+              <span class="badge-soft" [ngClass]="getStatusClass(claim.status)">{{ claim.status }}</span>
+            </td>
           </tr>
-          <tr *ngIf="claims.length === 0">
-            <td colspan="6" class="empty-cell">
+
+          <!-- Empty state -->
+          <tr *ngIf="filteredClaims.length === 0">
+            <td [attr.colspan]="isAdmin ? 6 : 5" class="empty-state-cell">
               <i class="bi bi-file-earmark-x"></i>
-              <p>No claims found for the selected filter.</p>
+              <p>No claims found for <strong>{{ selectedStatus === 'ALL' ? 'any status' : selectedStatus }}</strong></p>
+              <a *ngIf="selectedStatus !== 'ALL'" class="btn btn-sm btn-outline-primary mt-2" (click)="setStatus('ALL')">
+                Show all claims
+              </a>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
-    <div class="card-footer d-flex justify-content-between align-items-center" *ngIf="totalPages > 1">
-      <small class="text-muted">Page {{ currentPage + 1 }} of {{ totalPages }}</small>
-      <div>
-        <button class="btn btn-sm btn-outline-secondary me-1" (click)="prevPage()" [disabled]="currentPage === 0">Prev</button>
-        <button class="btn btn-sm btn-outline-secondary" (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">Next</button>
+
+    <!-- Pagination -->
+    <div class="table-card-footer" *ngIf="totalPages > 1">
+      <small class="text-muted">
+        Showing page <strong>{{ currentPage + 1 }}</strong> of <strong>{{ totalPages }}</strong>
+        &nbsp;·&nbsp; {{ totalElements }} total
+      </small>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-secondary"
+                (click)="prevPage()" [disabled]="currentPage === 0">
+          <i class="bi bi-chevron-left"></i> Prev
+        </button>
+        <button class="btn btn-sm btn-outline-secondary"
+                (click)="nextPage()" [disabled]="currentPage >= totalPages - 1">
+          Next <i class="bi bi-chevron-right"></i>
+        </button>
       </div>
     </div>
+
   </div>
 </div>

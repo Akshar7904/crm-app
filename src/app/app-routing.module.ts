@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './component/home/home/home.component';
+import { DocumentationComponent } from './component/documentation/documentation.component';
 import { AuthenticationGuard } from './guard/authentication.guard';
 import { AttendanceListComponent } from "./component/attendance/attendance-list/attendance-list.component";
 import { MyAttendanceComponent } from "./component/attendance/my-attendance/my-attendance.component";
@@ -204,6 +205,16 @@ const routes: Routes = [
     loadChildren: () => import('./component/notification/notification.module').then(m => m.UserNotificationModule),
     canActivate: [AuthenticationGuard],
     data: { title: 'Notifications' }
+  },
+
+  // =============================================
+  // DOCUMENTATION
+  // =============================================
+  {
+    path: 'documentation',
+    component: DocumentationComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Documentation' }
   },
 
   // =============================================

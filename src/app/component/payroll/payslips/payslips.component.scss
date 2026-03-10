@@ -4,15 +4,27 @@
 
 // ── Send Payslip Emails trigger card ────────────────────────────────────────
 .trigger-card {
-  border: 1px solid #d0e8ff;
-  box-shadow: 0 0.125rem 0.5rem rgba(13, 110, 253, 0.08);
+  border: 1px solid var(--border-color, #e9ecef);
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  border-radius: $border-radius-xl;
 }
 
 .trigger-header {
-  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-  color: white;
-  font-weight: 600;
-  border-bottom: none;
+  background: var(--bg-card, #fff);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary, #1a1a2e);
+  position: relative;
+  padding-left: 20px;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, $primary 0%, $primary-light 100%);
+    border-radius: $border-radius-xl 0 0 0;
+  }
 }
 
 .trigger-select {
@@ -24,30 +36,33 @@
 }
 
 .btn-load {
-  background: #6c757d;
-  color: white;
-  border: none;
+  background: var(--bg-body, #f8f9fa);
+  color: var(--text-secondary, #495057);
+  border: 1px solid var(--border-color, #dee2e6);
   padding: 0.5rem 1.25rem;
-  font-weight: 600;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-md;
 
   &:hover:not(:disabled) {
-    background: #5c636a;
-    color: white;
+    background: var(--table-hover);
+    color: var(--text-primary);
   }
 
   &:disabled { opacity: 0.65; cursor: not-allowed; }
 }
 
 .btn-send {
-  background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
-  color: white;
+  background: $primary;
+  color: #fff;
   border: none;
   padding: 0.5rem 1.25rem;
-  font-weight: 600;
+  font-weight: $font-weight-medium;
+  border-radius: $border-radius-md;
 
   &:hover:not(:disabled) {
-    background: linear-gradient(135deg, #0a58ca 0%, #084298 100%);
-    color: white;
+    background: $primary-medium;
+    color: #fff;
+    transform: translateY(-1px);
   }
 
   &:disabled { opacity: 0.65; cursor: not-allowed; }
@@ -87,12 +102,12 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #0d6efd, #0a58ca);
-  color: white;
+  background: rgba($primary, 0.12);
+  color: $primary;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: $font-weight-bold;
   font-size: 0.85rem;
   flex-shrink: 0;
 }
@@ -105,14 +120,16 @@
 }
 
 .card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  border: none;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
 }
 
 .card-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-bottom: none;
+  background: var(--bg-card, #fff);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  color: var(--text-primary, #1a1a2e);
+  font-weight: $font-weight-semibold;
 }
 
 .form-label {
@@ -129,8 +146,8 @@
 }
 
 .form-select:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  border-color: $primary;
+  box-shadow: 0 0 0 3px rgba($primary, 0.15);
 }
 
 .table {
@@ -138,32 +155,26 @@
 }
 
 .table thead th {
-  border-bottom: 2px solid #dee2e6;
-  font-weight: 600;
-  color: #495057;
-  background-color: #f8f9fa;
-  padding: 1rem 0.75rem;
+  border-bottom: 2px solid var(--border-color, #dee2e6);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  background-color: var(--table-header-bg, #f8f9fa);
+  padding: 12px 16px;
 }
 
 .table tbody td {
-  padding: 1rem 0.75rem;
+  padding: 12px 16px;
   vertical-align: middle;
+  font-size: $font-size-sm;
+  color: var(--text-primary);
 }
 
 .table-hover tbody tr:hover {
-  background-color: rgba(102, 126, 234, 0.05);
+  background-color: var(--table-hover, rgba(0,0,0,0.02));
   cursor: pointer;
-}
-
-.btn-outline-primary {
-  border-color: #667eea;
-  color: #667eea;
-}
-
-.btn-outline-primary:hover {
-  background-color: #667eea;
-  border-color: #667eea;
-  color: white;
 }
 
 .spinner-border {

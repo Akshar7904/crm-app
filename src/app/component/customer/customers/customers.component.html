@@ -10,23 +10,19 @@
           </ol>
         </nav>
 
-        <!-- Page Header -->
-        <div class="page-header mb-4">
-          <div class="row align-items-center">
-            <div class="col">
-              <h4 class="page-title">
-                <i class="bi bi-people me-2"></i>Clients
-              </h4>
-              <p class="text-muted mb-0">Manage your clients and customers</p>
-            </div>
-            <div class="col-auto">
-              <button class="btn btn-outline-success me-2" title="Export to Excel">
-                <i class="bi bi-file-earmark-excel"></i>
-              </button>
-              <a [routerLink]="['/customers/new']" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Add Client
-              </a>
-            </div>
+        <!-- Page Banner -->
+        <div class="page-banner mb-4">
+          <div class="banner-left">
+            <h1 class="banner-title"><i class="bi bi-people"></i> Our Clients</h1>
+            <p class="banner-subtitle">Manage your clients and customers</p>
+          </div>
+          <div class="banner-actions">
+            <button class="btn btn-outline-secondary btn-sm" title="Export to Excel">
+              <i class="bi bi-file-earmark-excel me-1"></i> Export
+            </button>
+            <a [routerLink]="['/customers/new']" class="btn btn-banner">
+              <i class="bi bi-plus-circle me-1"></i> Add Client
+            </a>
           </div>
         </div>
 
@@ -101,102 +97,94 @@
           </div>
         </div>
 
-        <!-- Clients Grid -->
-        <div class="row">
-          <div class="col-xxl-3 col-xl-4 col-lg-4 col-md-6 mb-4"
-               *ngFor="let customer of state?.appData?.data?.page?.content">
-            <div class="card client-card">
-              <!-- Card Header with Status -->
-              <div class="card-header">
-                <span class="client-type">{{ customer.type || 'Client' }}</span>
-                <span class="badge status-badge"
-                      [ngClass]="{
-                        'bg-success-subtle text-success': customer.status === 'ACTIVE',
-                        'bg-primary-subtle text-primary': customer.status === 'PENDING',
-                        'bg-danger-subtle text-danger': customer.status === 'BANNED',
-                        'bg-info-subtle text-info': customer.status === 'INACTIVE'
-                      }">
-                  <i class="bi bi-circle-fill me-1" style="font-size: 8px;"></i>
-                  {{ customer.status }}
-                </span>
-              </div>
+        <!-- Clients Table -->
+        <div class="table-card">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Type</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Address</th>
+                  <th>Invoices</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let customer of state?.appData?.data?.page?.content">
+                  <td>
+                    <div class="d-flex align-items-center gap-3">
+                      <div class="client-avatar-cell">
+                        <img *ngIf="customer.imageUrl"
+                             [src]="customer.imageUrl"
+                             [alt]="customer.name"
+                             class="client-avatar-img">
+                        <div *ngIf="!customer.imageUrl" class="client-avatar-placeholder-sm">
+                          {{ getInitials(customer.name) }}
+                        </div>
+                      </div>
+                      <div>
+                        <div class="fw-semibold">{{ customer.name }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="text-muted small">{{ customer.type || 'Client' }}</td>
+                  <td>
+                    <a [href]="'mailto:' + customer.email" class="text-muted small text-decoration-none">
+                      <i class="bi bi-envelope me-1"></i>{{ customer.email }}
+                    </a>
+                  </td>
+                  <td>
+                    <a [href]="'tel:' + customer.phone" class="text-muted small text-decoration-none">
+                      <i class="bi bi-telephone me-1"></i>{{ customer.phone }}
+                    </a>
+                  </td>
+                  <td class="text-muted small">{{ customer.address || '—' }}</td>
+                  <td>
+                    <span *ngIf="customer.invoices?.length > 0" class="invoice-count-badge">
+                      <i class="bi bi-receipt me-1"></i>{{ customer.invoices.length }}
+                    </span>
+                    <span *ngIf="!customer.invoices?.length" class="text-muted">—</span>
+                  </td>
+                  <td>
+                    <span class="badge-soft"
+                          [ngClass]="{
+                            'badge-soft-success': customer.status === 'ACTIVE',
+                            'badge-soft-primary': customer.status === 'PENDING',
+                            'badge-soft-danger':  customer.status === 'BANNED',
+                            'badge-soft-secondary': customer.status === 'INACTIVE'
+                          }">
+                      {{ customer.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-btn-group">
+                      <button class="btn btn-sm btn-outline-primary"
+                              [routerLink]="['/customers', customer.id]"
+                              title="View Client">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-secondary"
+                              [routerLink]="['/invoices/new']"
+                              [queryParams]="{customerId: customer.id}"
+                              title="Create Invoice">
+                        <i class="bi bi-receipt"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
 
-              <!-- Card Body -->
-              <div class="card-body text-center">
-                <!-- Client Avatar -->
-                <div class="client-avatar-wrapper mb-3">
-                  <img *ngIf="customer.imageUrl"
-                       [src]="customer.imageUrl"
-                       [alt]="customer.name"
-                       class="client-avatar">
-                  <div *ngIf="!customer.imageUrl" class="client-avatar-placeholder">
-                    {{ getInitials(customer.name) }}
-                  </div>
-                </div>
-
-                <!-- Client Info -->
-                <h5 class="client-name">{{ customer.name }}</h5>
-
-                <!-- Client Details -->
-                <div class="client-details">
-                  <div class="detail-item">
-                    <i class="bi bi-envelope"></i>
-                    <span>{{ customer.email }}</span>
-                  </div>
-                  <div class="detail-item">
-                    <i class="bi bi-telephone"></i>
-                    <span>{{ customer.phone }}</span>
-                  </div>
-                  <div class="detail-item" *ngIf="customer.address">
-                    <i class="bi bi-geo-alt"></i>
-                    <span>{{ customer.address }}</span>
-                  </div>
-                </div>
-
-                <!-- Invoices Count -->
-                <div class="invoices-badge" *ngIf="customer.invoices?.length > 0">
-                  <i class="bi bi-receipt me-1"></i>
-                  {{ customer.invoices.length }} Invoice{{ customer.invoices.length > 1 ? 's' : '' }}
-                </div>
-              </div>
-
-              <!-- Card Footer with Actions -->
-              <div class="card-footer">
-                <button class="btn btn-sm btn-light action-btn"
-                        [routerLink]="['/customers', customer.id]"
-                        title="View Client">
-                  <i class="bi bi-eye"></i>
-                </button>
-                <button class="btn btn-sm btn-light action-btn"
-                        [routerLink]="['/invoices/new']"
-                        [queryParams]="{customerId: customer.id}"
-                        title="Create Invoice">
-                  <i class="bi bi-receipt"></i>
-                </button>
-                <a class="btn btn-sm btn-light action-btn"
-                   [href]="'mailto:' + customer.email"
-                   title="Send Email">
-                  <i class="bi bi-envelope"></i>
-                </a>
-                <a class="btn btn-sm btn-light action-btn"
-                   [href]="'tel:' + customer.phone"
-                   title="Call">
-                  <i class="bi bi-telephone"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <!-- Empty State -->
-          <div *ngIf="!state?.appData?.data?.page?.content?.length" class="col-12">
-            <div class="empty-state">
-              <i class="bi bi-people"></i>
-              <h5>No Clients Found</h5>
-              <p class="text-muted">Get started by adding your first client</p>
-              <a [routerLink]="['/customers/new']" class="btn btn-primary">
-                <i class="bi bi-plus-circle me-2"></i>Add Client
-              </a>
-            </div>
+                <tr *ngIf="!state?.appData?.data?.page?.content?.length">
+                  <td colspan="8" class="empty-state-cell">
+                    <i class="bi bi-people fs-2 d-block mb-2 text-muted"></i>
+                    No clients found. <a [routerLink]="['/customers/new']">Add your first client</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 

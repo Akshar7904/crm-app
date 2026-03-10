@@ -11,38 +11,37 @@
           </ol>
         </nav>
 
-        <!-- Page Header -->
-        <div class="page-header mb-4 no-print">
-          <div class="row align-items-center">
-            <div class="col">
-              <h4 class="page-title">
-                <i class="bi bi-receipt me-2"></i>Invoice #{{ state?.appData?.data?.invoice.invoiceNumber }}
-              </h4>
-              <p class="text-muted mb-0">{{ isEditMode ? 'Edit invoice details' : 'View invoice details' }}</p>
-            </div>
-            <div class="col-auto">
-              <button class="btn btn-outline-secondary me-2" [routerLink]="['/invoices']">
-                <i class="bi bi-arrow-left me-1"></i> Back
+        <!-- Page Banner -->
+        <div class="page-banner mb-4 no-print">
+          <div class="banner-left">
+            <h1 class="banner-title">
+              <i class="bi bi-receipt-cutoff"></i>
+              Invoice #{{ state?.appData?.data?.invoice.invoiceNumber }}
+            </h1>
+            <p class="banner-subtitle">{{ isEditMode ? 'Edit invoice details' : 'View invoice details' }}</p>
+          </div>
+          <div class="banner-actions">
+            <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/invoices']">
+              <i class="bi bi-arrow-left me-1"></i> Back
+            </button>
+            <ng-container *ngIf="!isEditMode">
+              <button class="btn btn-outline-primary btn-sm" (click)="toggleEditMode()">
+                <i class="bi bi-pencil me-1"></i> Edit
               </button>
-              <ng-container *ngIf="!isEditMode">
-                <button class="btn btn-outline-primary me-2" (click)="toggleEditMode()">
-                  <i class="bi bi-pencil me-1"></i> Edit
-                </button>
-                <button class="btn btn-outline-success me-2"
-                        (click)="sendInvoice()"
-                        [disabled]="isSending$ | async">
-                  <span *ngIf="isSending$ | async" class="spinner-border spinner-border-sm me-1"></span>
-                  <i *ngIf="!(isSending$ | async)" class="bi bi-send me-1"></i>
-                  {{ (isSending$ | async) ? 'Sending...' : 'Send to ' + state?.appData?.data?.customer.name }}
-                </button>
-                <button class="btn btn-outline-secondary me-2" (click)="printInvoice()">
-                  <i class="bi bi-printer me-1"></i> Print
-                </button>
-                <button class="btn btn-primary" (click)="exportAsPDF()">
-                  <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
-                </button>
-              </ng-container>
-            </div>
+              <button class="btn btn-outline-success btn-sm"
+                      (click)="openSendConfirm(state?.appData?.data?.customer)"
+                      [disabled]="isSending$ | async">
+                <span *ngIf="isSending$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                <i *ngIf="!(isSending$ | async)" class="bi bi-send me-1"></i>
+                {{ (isSending$ | async) ? 'Sending...' : 'Send' }}
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" (click)="printInvoice()">
+                <i class="bi bi-printer me-1"></i> Print
+              </button>
+              <button class="btn btn-banner" (click)="exportAsPDF()">
+                <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+              </button>
+            </ng-container>
           </div>
         </div>
 
@@ -416,6 +415,55 @@
       </div>
     </section>
   </ng-container>
+
+  <!-- Send Confirmation Modal -->
+  <div *ngIf="showSendConfirm"
+       class="modal fade show d-block"
+       style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content send-confirm-modal">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-send me-2 text-primary"></i>Send Invoice
+          </h5>
+          <button class="btn-close" (click)="closeSendConfirm()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="send-warning">
+            <div class="send-warning-icon">
+              <i class="bi bi-envelope-arrow-up"></i>
+            </div>
+            <p class="send-warning-text">
+              You are about to send <strong>Invoice #{{ sendTargetInvoiceNumber }}</strong> to:
+            </p>
+            <div class="send-recipient">
+              <div class="send-recipient-avatar">{{ sendTargetCustomer?.name?.charAt(0) | uppercase }}</div>
+              <div>
+                <div class="fw-semibold">{{ sendTargetCustomer?.name }}</div>
+                <div class="text-muted small">{{ sendTargetCustomer?.email }}</div>
+              </div>
+            </div>
+            <p class="text-muted small mt-3 mb-0">
+              <i class="bi bi-info-circle me-1"></i>
+              An email will be sent to the client with the invoice details.
+            </p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" (click)="closeSendConfirm()">
+            Cancel
+          </button>
+          <button class="btn btn-success"
+                  (click)="confirmSendInvoice()"
+                  [disabled]="isSending$ | async">
+            <span *ngIf="isSending$ | async" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!(isSending$ | async)" class="bi bi-send me-1"></i>
+            {{ (isSending$ | async) ? 'Sending...' : 'Yes, Send Invoice' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Loading State -->
   <ng-container *ngSwitchCase="DataState.LOADING">
