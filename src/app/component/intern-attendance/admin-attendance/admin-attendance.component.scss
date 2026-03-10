@@ -1,1 +1,219 @@
+// admin-attendance Component - SCSS
 @import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ─── Log form card ─────────────────────────────────────────────────────────────
+.falcon-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+
+  .card-header {
+    background: var(--bg-card, #fff);
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+    border-radius: $border-radius-xl $border-radius-xl 0 0;
+    padding: 14px 20px;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: linear-gradient(180deg, $primary 0%, $primary-light 100%);
+      border-radius: $border-radius-xl 0 0 0;
+    }
+
+    h5 {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary, #1a1a2e);
+    }
+  }
+
+  .card-body { padding: $spacing-lg; }
+}
+
+// ─── Table card ────────────────────────────────────────────────────────────────
+.table-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  overflow: hidden;
+
+  .card-header {
+    background: var(--bg-card, #fff);
+    border-bottom: 1px solid var(--border-color, #e9ecef);
+    padding: 14px $spacing-lg;
+
+    h6 {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary, #1a1a2e);
+      margin: 0;
+    }
+  }
+}
+
+// ─── Table ─────────────────────────────────────────────────────────────────────
+.table {
+  margin-bottom: 0;
+
+  thead th {
+    background: var(--table-header-bg, #f8f9fa);
+    border-bottom: 2px solid var(--border-color, #dee2e6);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    padding: 12px 16px;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    font-size: $font-size-sm;
+    color: var(--text-primary);
+    border-color: var(--border-color, #f0f0f0);
+  }
+
+  &.table-hover tbody tr:hover {
+    background: var(--table-hover, rgba(0,0,0,0.02));
+  }
+}
+
+// ─── Form controls ─────────────────────────────────────────────────────────────
+.form-control,
+.form-select {
+  border-radius: $border-radius-md;
+  border-color: var(--border-color, #dee2e6);
+  font-size: $font-size-sm;
+  padding: 9px 12px;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+  }
+}
+
+.form-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-secondary, #495057);
+  margin-bottom: 6px;
+}
+
+// ─── KPI Cards ─────────────────────────────────────────────────────────────────
+.kpi-stat {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: $spacing-lg;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  transition: transform $transition-base;
+
+  &:hover { transform: translateY(-2px); }
+}
+
+.kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: $border-radius-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.kpi-value {
+  font-size: 1.6rem;
+  font-weight: $font-weight-bold;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+// ─── Soft badges ───────────────────────────────────────────────────────────────
+.badge-soft {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.badge-soft-success  { background: rgba(25,135,84,0.12);  color: #198754; }
+.badge-soft-warning  { background: rgba(255,193,7,0.15);  color: #cc9800; }
+.badge-soft-danger   { background: rgba(220,53,69,0.12);  color: #dc3545; }
+.badge-soft-secondary{ background: rgba(108,117,125,0.12);color: #6c757d; }
+
+// ─── Action buttons ─────────────────────────────────────────────────────────────
+.action-btn-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+// ─── Empty state ───────────────────────────────────────────────────────────────
+.empty-state-cell {
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-muted);
+  font-size: $font-size-sm;
+}
+
+// ─── Modal ─────────────────────────────────────────────────────────────────────
+.modal-content {
+  border: none;
+  border-radius: $border-radius-xl;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  overflow: hidden;
+}
+
+.modal-header {
+  background: var(--bg-card, #fff);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  padding: 16px 24px;
+
+  .modal-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.modal-body {
+  background: var(--bg-body, #f8f9fa);
+  padding: 20px 24px;
+}
+
+.modal-footer {
+  background: var(--bg-card, #fff);
+  border-top: 1px solid var(--border-color, #e9ecef);
+  padding: 12px 24px;
+  gap: 8px;
+}
+
+// ─── Responsive ────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .table { font-size: 0.8rem; }
+}

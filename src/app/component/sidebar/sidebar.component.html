@@ -2,65 +2,72 @@
        [class.collapsed]="collapsed"
        [class.mobile-open]="mobileOpen">
 
-  <!-- Logo Section -->
-  <div class="sidebar-header">
+  <!-- Logo Floating Card -->
+  <div class="sidebar-logo-card">
     <a routerLink="/" class="logo-link">
       <img src="../../../assets/logo.png" alt="LKCentrix" class="logo-image">
-      <!-- Logo text hidden - using only the company logo image -->
-      <!-- <span class="logo-text">LKCentrix</span> -->
     </a>
   </div>
 
-  <!-- Menu Items -->
-  <nav class="sidebar-menu">
-    <ul class="menu-list">
-      <li *ngFor="let item of filteredMenuItems" class="menu-item-wrapper">
-        <!-- Parent Menu Item -->
-        <a class="menu-item"
-           [class.active]="isActive(item.route)"
-           [class.has-children]="item.children"
-           [class.expanded]="item.expanded"
-           (click)="toggleMenu(item)"
-           [attr.title]="collapsed ? item.label : null">
-          <span class="menu-icon">
-            <i class="bi" [ngClass]="item.icon"></i>
-          </span>
-          <span class="menu-label">{{ item.label }}</span>
+  <!-- Menu Floating Card -->
+  <div class="sidebar-menu-card">
+    <nav class="sidebar-menu">
+      <ul class="menu-list">
+        <li *ngFor="let item of filteredMenuItems" class="menu-item-wrapper">
 
-          <!-- Badge -->
-          <span *ngIf="item.badge?.count" class="menu-badge" [ngClass]="'badge-' + item.badge.type">
-            {{ item.badge.count }}
-          </span>
+          <!-- Parent Menu Item -->
+          <a class="menu-item"
+             [class.active]="isActive(item.route)"
+             [class.has-children]="item.children"
+             [class.expanded]="item.expanded"
+             (click)="toggleMenu(item)"
+             [attr.title]="collapsed ? item.label : null">
+            <span class="menu-icon">
+              <i class="bi" [ngClass]="item.icon"></i>
+            </span>
+            <span class="menu-label">{{ item.label }}</span>
 
-          <!-- Expand/Collapse Icon -->
-          <span *ngIf="item.children" class="expand-icon">
-            <i class="bi" [ngClass]="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
-          </span>
-        </a>
+            <span *ngIf="item.badge?.count" class="menu-badge" [ngClass]="'badge-' + item.badge.type">
+              {{ item.badge.count }}
+            </span>
 
-        <!-- Submenu Items -->
-        <ul class="submenu" *ngIf="item.children" [class.show]="item.expanded">
-          <li *ngFor="let child of item.children" class="submenu-item-wrapper">
-            <a class="submenu-item"
-               [class.active]="isActive(child.route)"
-               (click)="onChildClick($event, child)"
-               [attr.title]="collapsed ? child.label : null">
-              <span class="menu-icon">
-                <i class="bi" [ngClass]="child.icon"></i>
-              </span>
-              <span class="menu-label">{{ child.label }}</span>
-              <span *ngIf="child.badge?.count" class="menu-badge" [ngClass]="'badge-' + child.badge.type">
-                {{ child.badge.count }}
-              </span>
-            </a>
-          </li>
-        </ul>
-      </li>
-    </ul>
-  </nav>
+            <span *ngIf="item.children" class="expand-icon">
+              <i class="bi" [ngClass]="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+            </span>
+          </a>
 
-  <!-- Footer with Logout -->
-  <div class="sidebar-footer">
+          <!-- Submenu -->
+          <ul class="submenu" *ngIf="item.children" [class.show]="item.expanded">
+            <li *ngFor="let child of item.children" class="submenu-item-wrapper">
+              <a class="submenu-item"
+                 [class.active]="isActive(child.route)"
+                 (click)="onChildClick($event, child)"
+                 [attr.title]="collapsed ? child.label : null">
+                <span class="menu-icon">
+                  <i class="bi" [ngClass]="child.icon"></i>
+                </span>
+                <span class="menu-label">{{ child.label }}</span>
+                <span *ngIf="child.badge?.count" class="menu-badge" [ngClass]="'badge-' + child.badge.type">
+                  {{ child.badge.count }}
+                </span>
+              </a>
+            </li>
+          </ul>
+
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Footer Floating Card -->
+  <div class="sidebar-footer-card">
+    <a class="menu-item"
+       routerLink="/documentation"
+       routerLinkActive="active"
+       [attr.title]="collapsed ? 'Documentation' : null">
+      <span class="menu-icon"><i class="bi bi-book"></i></span>
+      <span class="menu-label">Documentation</span>
+    </a>
     <a class="logout-btn" (click)="onLogout()" [attr.title]="collapsed ? 'Logout' : null">
       <span class="menu-icon">
         <i class="bi bi-box-arrow-left"></i>
@@ -68,4 +75,5 @@
       <span class="menu-label">Logout</span>
     </a>
   </div>
+
 </aside>

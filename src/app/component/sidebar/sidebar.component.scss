@@ -18,14 +18,41 @@
               left $transition-slow cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   border-right: 1px solid var(--sidebar-border, $gray-200);
+  gap: 0;
 }
 
 // ========================================
-// LOGO HEADER
+// FLOATING CARD SECTIONS
 // ========================================
-.sidebar-header {
-  padding: 16px $spacing-md;
-  border-bottom: 1px solid var(--sidebar-header-border, $gray-200);
+.sidebar-logo-card {
+  margin: 10px 8px 6px;
+  padding: 10px $spacing-md;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  flex-shrink: 0;
+}
+
+.sidebar-menu-card {
+  margin: 0 8px;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.sidebar-footer-card {
+  margin: 6px 8px 10px;
+  padding: $spacing-sm 10px;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-xl;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
 }
 
@@ -55,7 +82,7 @@
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: $spacing-md 10px;
+  padding: $spacing-sm 10px;
 
   &::-webkit-scrollbar { width: 3px; }
   &::-webkit-scrollbar-track { background: transparent; }
@@ -97,13 +124,13 @@
   min-height: 42px;
 
   &:hover {
-    background: var(--sidebar-hover, rgba($primary, 0.05));
-    color: var(--sidebar-text-hover, $gray-900);
-    .menu-icon i { color: var(--sidebar-text-hover, $gray-900); }
+    background: var(--sidebar-hover, rgba($primary, 0.12));
+    color: var(--sidebar-text-hover, $primary);
+    .menu-icon i { color: var(--sidebar-text-hover, $primary); }
   }
 
   &.active {
-    background: var(--sidebar-active-bg, rgba($primary, 0.08));
+    background: var(--sidebar-active-bg, rgba($primary, 0.14));
     color: var(--sidebar-text-active, $primary);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 
@@ -217,9 +244,9 @@
   }
 
   &:hover {
-    background: var(--sidebar-hover, rgba($primary, 0.05));
-    color: var(--sidebar-text-hover, $gray-900);
-    &::before { background: var(--sidebar-text-hover, $gray-900); }
+    background: var(--sidebar-hover, rgba($primary, 0.12));
+    color: var(--sidebar-text-hover, $primary);
+    &::before { background: var(--sidebar-text-hover, $primary); }
   }
 
   &.active {
@@ -238,12 +265,6 @@
 // ========================================
 // FOOTER - LOGOUT
 // ========================================
-.sidebar-footer {
-  padding: $spacing-md 10px;
-  border-top: 1px solid var(--sidebar-footer-border, $gray-200);
-  flex-shrink: 0;
-}
-
 .logout-btn {
   display: flex;
   align-items: center;
@@ -299,7 +320,9 @@
 
   .submenu { display: none; }
 
-  .sidebar-header { padding: 16px 10px; }
+  .sidebar-logo-card { padding: 8px 6px; margin: 8px 6px 4px; }
+  .sidebar-menu-card { margin: 0 6px; }
+  .sidebar-footer-card { margin: 4px 6px 8px; padding: $spacing-sm 6px; }
   .logo-link { justify-content: center; }
   .logo-image { height: 36px; max-width: 48px; }
 
@@ -364,7 +387,9 @@
       .menu-icon { width: 22px; height: 22px; i { font-size: 1.1rem; } }
 
       .submenu { display: block; }
-      .sidebar-header { padding: 16px $spacing-md; }
+      .sidebar-logo-card { padding: 10px $spacing-md; margin: 10px 8px 6px; }
+      .sidebar-menu-card { margin: 0 8px; }
+      .sidebar-footer-card { margin: 6px 8px 10px; }
       .logo-link { justify-content: flex-start; }
       .logo-image { height: 48px; max-width: 180px; }
 

@@ -25,6 +25,9 @@ import { MyAttendanceComponent } from './component/attendance/my-attendance/my-a
 import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 
+// Documentation
+import { DocumentationComponent } from './component/documentation/documentation.component';
+
 // Services
 import { DashboardService } from "./service/dashboard.service";
 
@@ -35,6 +38,7 @@ import { AppRoutingModule } from './app-routing.module';
 @NgModule({
   declarations: [
     AppComponent,
+    DocumentationComponent,
     AttendanceListComponent,
     EditAttendanceModalComponent,
     MyAttendanceComponent,

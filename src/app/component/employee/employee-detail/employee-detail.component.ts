@@ -601,14 +601,24 @@ export class EmployeeDetailComponent implements OnInit {
     }
   }
 
-  downloadDocument(documentId: number): void {
-    if (documentId) {
-      // Download from database via document ID
-      const downloadUrl = `${this.SERVER_URL}/employee/documents/download/${documentId}`;
-      window.open(downloadUrl, '_blank');
-    } else {
+  downloadDocument(documentId: number, documentName?: string): void {
+    if (!documentId) {
       this.notification.onError('Document ID not available');
+      return;
     }
+    this.employeeService.downloadDocumentById$(documentId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = documentName || `document-${documentId}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => this.notification.onError('Failed to download document. Please try again.')
+    });
   }
 
   getDocumentIcon(fileExtension: string): string {

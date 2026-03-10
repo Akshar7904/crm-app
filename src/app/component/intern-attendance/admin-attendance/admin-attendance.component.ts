@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { UserService } from '../../../service/user.service';
 import { InternAttendanceService } from '../../../service/intern-attendance.service';
+import { EmployeeService } from '../../../service/employee.service';
+import { NotificationService } from '../../../service/notification.service';
 import { InternAttendance } from '../../../interface/intern-attendance';
 
 @Component({
@@ -26,21 +28,41 @@ export class AdminInternAttendanceComponent implements OnInit {
   approvalForm: FormGroup;
   processing = false;
 
+  // Log request on behalf of intern
+  showLogForm = false;
+  submitting = false;
+  submitError: string | null = null;
+  employees: any[] = [];
+  loadingEmployees = false;
+  logForm: FormGroup;
+
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private userService: UserService,
-    private internAttendanceService: InternAttendanceService
+    private internAttendanceService: InternAttendanceService,
+    private employeeService: EmployeeService,
+    private notification: NotificationService
   ) {
     this.approvalForm = this.fb.group({
       remarks: [''],
       rejectionReason: ['']
     });
+    this.logForm = this.fb.group({
+      employeeId: ['', Validators.required],
+      startDate: ['', Validators.required],
+      endDate: ['', Validators.required],
+      numberOfDays: [{ value: 0, disabled: true }],
+      institutionName: ['', Validators.required],
+      subjectOrModule: [''],
+      reason: ['']
+    });
   }
 
   ngOnInit(): void {
+    this.loadEmployees();
     this.userService.profile$()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -50,6 +72,67 @@ export class AdminInternAttendanceComponent implements OnInit {
         },
         error: () => this.loadAll()
       });
+  }
+
+  loadEmployees(): void {
+    this.loadingEmployees = true;
+    this.employeeService.employees$(0).subscribe({
+      next: (res: any) => {
+        const all = res?.data?.page?.content || [];
+        this.employees = all.filter((e: any) =>
+          (e.employmentType || '').toUpperCase() === 'INTERN' ||
+          (e.designationTitle || '').toLowerCase().includes('intern')
+        );
+        this.loadingEmployees = false;
+      },
+      error: () => { this.loadingEmployees = false; }
+    });
+  }
+
+  toggleLogForm(): void {
+    this.showLogForm = !this.showLogForm;
+    if (!this.showLogForm) {
+      this.logForm.reset();
+      this.submitError = null;
+    }
+  }
+
+  onLogDateChange(): void {
+    const start = this.logForm.get('startDate')?.value;
+    const end = this.logForm.get('endDate')?.value;
+    if (start && end) {
+      const days = this.internAttendanceService.calculateBusinessDays(new Date(start), new Date(end));
+      this.logForm.patchValue({ numberOfDays: days }, { emitEvent: false });
+    }
+  }
+
+  submitLogRequest(): void {
+    this.logForm.markAllAsTouched();
+    if (this.logForm.invalid) return;
+    this.submitError = null;
+    this.submitting = true;
+    const val = this.logForm.getRawValue();
+    this.internAttendanceService.createRequest({
+      employeeId: Number(val.employeeId),
+      startDate: val.startDate,
+      endDate: val.endDate,
+      numberOfDays: val.numberOfDays || 1,
+      institutionName: val.institutionName,
+      subjectOrModule: val.subjectOrModule,
+      reason: val.reason
+    }).subscribe({
+      next: () => {
+        this.submitting = false;
+        this.showLogForm = false;
+        this.logForm.reset();
+        this.notification.onSuccess('School attendance request logged successfully.');
+        this.loadAll();
+      },
+      error: (err) => {
+        this.submitting = false;
+        this.submitError = err?.error?.message || 'Failed to log request. Please try again.';
+      }
+    });
   }
 
   loadAll(): void {
