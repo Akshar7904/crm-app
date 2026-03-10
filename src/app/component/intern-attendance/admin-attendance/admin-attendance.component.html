@@ -6,10 +6,99 @@
       <h1 class="banner-title"><i class="bi bi-mortarboard-fill me-2"></i>Intern School Attendance</h1>
       <p class="banner-subtitle">Review and approve intern school/university attendance requests</p>
     </div>
-    <div class="banner-actions">
-      <button class="btn btn-banner" (click)="loadAll()">
+    <div class="banner-actions d-flex gap-2">
+      <button class="btn btn-banner" (click)="toggleLogForm()">
+        <i class="bi me-1" [class.bi-plus-circle]="!showLogForm" [class.bi-x-circle]="showLogForm"></i>
+        {{ showLogForm ? 'Cancel' : 'Log Request' }}
+      </button>
+      <button class="btn btn-outline-secondary btn-sm" (click)="loadAll()">
         <i class="bi bi-arrow-clockwise me-1"></i>Refresh
       </button>
+    </div>
+  </div>
+
+  <!-- Admin Log Request Form -->
+  <div class="falcon-card mb-4" *ngIf="showLogForm">
+    <div class="card-header">
+      <h5 class="mb-0"><i class="bi bi-pencil-square me-2 text-primary"></i>Log School Attendance on Behalf of Intern</h5>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="logForm" (ngSubmit)="submitLogRequest()">
+        <!-- Row 1: Employee -->
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <label class="form-label fw-medium">Intern / Employee <span class="text-danger">*</span></label>
+            <select class="form-select" formControlName="employeeId">
+              <option value="">— Select employee —</option>
+              <option *ngFor="let emp of employees" [value]="emp.id">
+                {{ emp.firstName }} {{ emp.lastName }}
+                <span *ngIf="emp.email"> ({{ emp.email }})</span>
+              </option>
+            </select>
+            <div *ngIf="loadingEmployees" class="form-text text-muted">Loading employees...</div>
+            <div *ngIf="logForm.get('employeeId')?.invalid && logForm.get('employeeId')?.touched"
+              class="form-text text-danger">Please select an employee</div>
+          </div>
+        </div>
+        <!-- Row 2: Dates -->
+        <div class="row g-3 mb-3">
+          <div class="col-sm-4">
+            <label class="form-label fw-medium">Start Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="startDate" (change)="onLogDateChange()">
+            <div *ngIf="logForm.get('startDate')?.invalid && logForm.get('startDate')?.touched"
+              class="form-text text-danger">Start date is required</div>
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label fw-medium">End Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" formControlName="endDate" (change)="onLogDateChange()">
+            <div *ngIf="logForm.get('endDate')?.invalid && logForm.get('endDate')?.touched"
+              class="form-text text-danger">End date is required</div>
+          </div>
+          <div class="col-sm-4">
+            <label class="form-label fw-medium">Business Days</label>
+            <div class="input-group">
+              <input type="number" class="form-control bg-light" formControlName="numberOfDays" readonly>
+              <span class="input-group-text text-muted small">weekdays</span>
+            </div>
+          </div>
+        </div>
+        <!-- Row 3: Institution -->
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <label class="form-label fw-medium">Institution Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="institutionName"
+              placeholder="e.g. University of Pretoria, UNISA, Boston City Campus">
+            <div *ngIf="logForm.get('institutionName')?.invalid && logForm.get('institutionName')?.touched"
+              class="form-text text-danger">Institution name is required</div>
+          </div>
+        </div>
+        <!-- Row 4: Subject + Reason -->
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label fw-medium">Subject / Module</label>
+            <input type="text" class="form-control" formControlName="subjectOrModule"
+              placeholder="e.g. Software Engineering 302">
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label fw-medium">Reason / Notes</label>
+            <textarea class="form-control" formControlName="reason" rows="2"
+              placeholder="Any additional notes..."></textarea>
+          </div>
+        </div>
+
+        <div *ngIf="submitError" class="alert alert-danger py-2 mb-3">
+          <i class="bi bi-exclamation-circle me-1"></i>{{ submitError }}
+        </div>
+
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-primary px-4" [disabled]="logForm.invalid || submitting">
+            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!submitting" class="bi bi-send me-1"></i>
+            Submit Request
+          </button>
+          <button type="button" class="btn btn-outline-secondary" (click)="toggleLogForm()">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
