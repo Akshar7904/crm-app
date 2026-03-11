@@ -241,7 +241,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.isClockingIn = false;
-          this.notification.onError(error || 'Failed to clock in');
+          this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to clock in');
           this.cdr.markForCheck();
         }
       });
@@ -282,7 +282,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           this.isClockingIn = false;
-          this.notification.onError(error || 'Failed to clock out');
+          this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to clock out');
           this.cdr.markForCheck();
         }
       });
@@ -325,7 +325,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.breakLoading = false;
-        this.notification.onError(error || 'Failed to start break');
+        this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to start break');
         this.cdr.markForCheck();
       }
     });
@@ -350,7 +350,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.breakLoading = false;
-        this.notification.onError(error || 'Failed to end break');
+        this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to end break');
         this.cdr.markForCheck();
       }
     });
@@ -566,11 +566,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       }),
       catchError(error => {
         console.error('Admin dashboard error:', error);
-        this.notification.onError(error || 'Failed to load admin dashboard');
+        this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to load admin dashboard');
         return of({
           dataState: DataState.ERROR,
           user,
-          error: error || 'Failed to load admin dashboard'
+          error: error?.error?.reason || error?.error?.message || 'Failed to load admin dashboard'
         });
       })
     );
@@ -598,7 +598,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }),
       catchError(error => {
         console.error('Employee dashboard error:', error);
-        this.notification.onError(error || 'Failed to load employee dashboard');
+        this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to load employee dashboard');
         return of({
           dataState: DataState.ERROR,
           user,
