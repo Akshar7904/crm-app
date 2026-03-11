@@ -172,3 +172,14 @@
   &:focus { background: var(--bg-card); border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.15); }
   &::placeholder { color: var(--text-light); }
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .asset-requests-page { padding: $spacing-sm $spacing-md; }
+  .filter-pills-bar { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 4px; }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .req-actions { flex-wrap: wrap; gap: 4px; }
+  .table-footer { justify-content: center; }
+  .requester-email { display: none; }
+  .modal-body { padding: $spacing-md; }
+}

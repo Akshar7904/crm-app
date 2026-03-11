@@ -34,3 +34,11 @@
 .pay-kpi-value { font-size: 1.4rem; font-weight: 700; color: var(--text-primary, #333); }
 
 .pay-loading { text-align: center; padding: 60px; color: var(--text-muted, #888); font-size: 0.9rem; }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .pay-kpi-row { padding: 0 $spacing-md $spacing-md; gap: $spacing-sm; }
+  .pay-kpi-card { padding: 12px 14px; gap: 10px; min-width: 130px; }
+  .pay-kpi-value { font-size: 1.2rem; }
+  .pay-kpi-icon { width: 36px; height: 36px; font-size: 1rem; }
+}

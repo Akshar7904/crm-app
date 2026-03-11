@@ -91,6 +91,14 @@
   flex-shrink: 0;
 }
 
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .asset-detail-page { padding: $spacing-sm $spacing-md; }
+  .detail-key { width: auto; min-width: 100px; }
+  .quick-actions { flex-direction: row; flex-wrap: wrap; }
+  .quick-action-btn { flex: 1; min-width: 140px; }
+}
+
 // ─── Quick actions ────────────────────────────────────────────────────────────
 .quick-actions {
   display: flex;

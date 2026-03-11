@@ -405,6 +405,11 @@
     left: -300px;
     &.mobile-open { left: 0; }
   }
+
+  // Pad the sidebar menu so last items clear the bottom nav bar
+  .sidebar-menu {
+    padding-bottom: 70px;
+  }
 }
 
 // ========================================

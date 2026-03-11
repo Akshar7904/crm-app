@@ -81,3 +81,10 @@
     &.btn-outline-secondary:hover:not(:disabled) { transform: translateY(-1px); }
   }
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .expense-entry { padding: $spacing-sm $spacing-md; }
+  .form-actions { flex-direction: column-reverse; }
+  .form-actions .btn { width: 100%; }
+}

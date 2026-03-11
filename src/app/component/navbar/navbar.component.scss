@@ -412,95 +412,68 @@
   }
 }
 
-// Tablets and below
-@include respond-to('lg') {
-  .navbar {
-    left: 0;
-  }
-
-  :host-context(.sidebar-collapsed) .navbar {
-    left: 0;
-  }
-
-  .navbar-container {
-    padding: 0 $spacing-md;
-  }
-
-  .user-info {
-    display: none !important;
-  }
-
-  .dropdown-arrow {
-    display: none !important;
-  }
-
-  .user-profile-btn {
-    padding: 4px;
-    border-radius: 50%;
+// ─── Mobile logo (hidden by default, shown on phones) ─────────────────────────
+.mobile-nav-logo {
+  display: none;
+  text-decoration: none;
+  .mobile-nav-logo-img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
   }
 }
 
-// Small screens
+// Tablet-only hamburger (hidden by default, shown on tablets 768–992px)
+.hamburger-btn.tablet-only {
+  display: none;
+}
+
+// ─── Tablets and below (< 992px) ──────────────────────────────────────────────
+@include respond-to('lg') {
+  .navbar { left: 0; }
+  :host-context(.sidebar-collapsed) .navbar { left: 0; }
+  .navbar-container { padding: 0 $spacing-md; }
+  .user-info { display: none !important; }
+  .dropdown-arrow { display: none !important; }
+  .user-profile-btn { padding: 4px; border-radius: 50%; }
+
+  // Show hamburger on tablets
+  .hamburger-btn.tablet-only { display: flex; }
+}
+
+// ─── Phones (< 768px) — LinkedIn mobile style ────────────────────────────────
 @include respond-to('md') {
   .navbar {
     height: 56px;
+    // Solid white background on mobile (like LinkedIn)
+    background: var(--bg-card, #fff) !important;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08) !important;
+    border-bottom: 1px solid var(--border-color, #e9ecef) !important;
   }
 
-  .navbar-container {
-    padding: 0 12px;
-  }
+  .navbar-container { padding: 0 14px; padding-top: 0; }
 
-  .hamburger-btn {
-    width: 34px;
-    height: 34px;
-  }
+  // Show logo on mobile instead of hamburger
+  .mobile-nav-logo { display: flex; align-items: center; }
+
+  // Hide hamburger on phones (bottom nav handles sidebar toggle)
+  .hamburger-btn.tablet-only { display: none !important; }
 
   .nav-action-btn {
     width: 34px;
     height: 34px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-
-    i {
-      font-size: 1rem;
-    }
+    i { font-size: 1rem; }
   }
 
-  .user-avatar {
-    width: 30px;
-    height: 30px;
-  }
-
-  .navbar-right {
-    gap: 2px;
-  }
-
-  .dropdown-menu {
-    min-width: 220px;
-    right: -8px !important;
-  }
+  .user-avatar { width: 30px; height: 30px; }
+  .navbar-right { gap: 4px; }
+  .dropdown-menu { min-width: 220px; right: -8px !important; }
 }
 
-// Extra small
+// ─── Extra small (< 576px) ───────────────────────────────────────────────────
 @include respond-to('sm') {
-  .navbar-container {
-    padding: 0 $spacing-sm;
-  }
-
-  .navbar-left {
-    gap: $spacing-sm;
-  }
-
-  .hamburger-btn {
-    width: 32px;
-    height: 32px;
-  }
-
-  .hamburger-icon {
-    width: 18px;
-    height: 12px;
-
-    span:nth-child(2) {
-      margin: 3px 0;
-    }
-  }
+  .navbar-container { padding: 0 12px; }
+  .navbar-left { gap: $spacing-sm; }
+  .mobile-nav-logo-img { height: 34px; }
 }

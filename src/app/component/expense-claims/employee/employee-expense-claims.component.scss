@@ -170,3 +170,12 @@
   padding: 5px 12px;
   font-size: 0.8rem;
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .ec-wrap { padding: 0 $spacing-md $spacing-md; }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .ec-modal-body { padding: $spacing-md; }
+  .ec-modal-footer { padding: 10px $spacing-md; }
+  .ec-items-table { font-size: 0.78rem; }
+}

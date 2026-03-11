@@ -83,4 +83,11 @@
   
   .fg-bitbucket {
     color: #4f096a !important;
-  }  
+  }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .mini-stat { padding: 10px; margin-bottom: 12px; }
+  .mini-stat-icon { width: 44px; height: 44px; line-height: 44px; font-size: 22px; }
+  .mini-stat-info span { font-size: 22px; }
+}

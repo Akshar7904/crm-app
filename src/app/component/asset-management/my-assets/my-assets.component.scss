@@ -80,3 +80,10 @@ code {
   color: $success;
   padding: 8px;
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .my-assets-page { padding: $spacing-sm $spacing-md; }
+  // Bootstrap col-md-4 already handles the grid — ensure 2-col on phones
+  .asset-card { margin-bottom: $spacing-md; }
+}

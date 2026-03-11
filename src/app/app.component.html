@@ -34,6 +34,32 @@
       </div>
     </div>
 
+    <!-- Mobile Bottom Navigation (LinkedIn-style, phones only) -->
+    <nav class="mobile-bottom-nav">
+      <a class="mobile-bottom-item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">
+        <i class="bi bi-house-door"></i>
+        <span>Home</span>
+      </a>
+      <a class="mobile-bottom-item" routerLink="/attendance/my" routerLinkActive="active">
+        <i class="bi bi-clock-history"></i>
+        <span>Attendance</span>
+      </a>
+      <a class="mobile-bottom-item"
+         [routerLink]="isAdminUser(user) ? '/announcements/admin' : '/announcements'"
+         routerLinkActive="active">
+        <i class="bi bi-megaphone"></i>
+        <span>News</span>
+      </a>
+      <a class="mobile-bottom-item" routerLink="/notifications" routerLinkActive="active">
+        <i class="bi bi-bell"></i>
+        <span>Alerts</span>
+      </a>
+      <button class="mobile-bottom-item" (click)="toggleSidebar()">
+        <i class="bi bi-grid-3x3-gap"></i>
+        <span>Menu</span>
+      </button>
+    </nav>
+
   </ng-container>
 
   <!-- Unauthenticated View (Login/Register pages) -->

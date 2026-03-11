@@ -71,3 +71,11 @@
   background: rgba(255,255,255,0.1) !important;
   border-color: rgba(255,255,255,0.2) !important;
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .pay-form-card { margin: 0 $spacing-sm $spacing-md; padding: $spacing-md; }
+  .pay-form-actions { flex-direction: column-reverse; }
+  .pay-form-actions .btn { width: 100%; }
+  .pay-input-prefix span { padding: 0 8px; font-size: 0.82rem; }
+}
