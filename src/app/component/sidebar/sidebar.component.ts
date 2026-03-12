@@ -158,6 +158,13 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           route: '/attendance/my'
         },
         {
+          label: 'WhatsApp Attendance',
+          icon: 'bi-whatsapp',
+          route: '/attendance/whatsapp',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          excludeRoles: ['ROLE_USER']
+        },
+        {
           label: 'Holidays',
           icon: 'bi-calendar-week',
           route: '/holidays'

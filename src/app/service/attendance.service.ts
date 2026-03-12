@@ -119,6 +119,17 @@ export class AttendanceService {
     );
   }
 
+  // Get WhatsApp attendance records
+  getWhatsAppAttendance(startDate?: string, endDate?: string): Observable<CustomHttpResponse<{ attendances: Attendance[] }>> {
+    let params = new HttpParams();
+    if (startDate) params = params.set('startDate', startDate);
+    if (endDate) params = params.set('endDate', endDate);
+    return this.http.get<CustomHttpResponse<{ attendances: Attendance[] }>>(
+      `${this.API_URL}/whatsapp`,
+      { params }
+    );
+  }
+
   // Search attendance with filters
   searchAttendance(filter: AttendanceFilter): Observable<CustomHttpResponse<{ page: Page<Attendance> }>> {
     let params = new HttpParams()

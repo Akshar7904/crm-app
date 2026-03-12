@@ -299,7 +299,7 @@ section {
   padding: 14px 24px;
   font-size: $font-size-base;
   font-weight: $font-weight-semibold;
-  color: $white;
+  color: $white !important;
   background: $gradient-primary;
   border: none;
   border-radius: $border-radius-lg;
@@ -313,7 +313,7 @@ section {
     background: $gradient-primary-hover;
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba($primary, 0.3);
-    color: $white;
+    color: $white !important;
   }
 
   &:active:not(:disabled) {
@@ -392,13 +392,14 @@ section {
 .step-number {
   width: 28px;
   height: 28px;
-  background: $gradient-primary;
-  color: $white;
+  background: rgba($primary, 0.12);
+  color: #1e293b;
   border-radius: 50%;
   @include flex-center;
-  font-weight: $font-weight-semibold;
+  font-weight: 700;
   font-size: 0.85rem;
   flex-shrink: 0;
+  border: 2px solid rgba($primary, 0.3);
 }
 
 // Pending Approval Styles
