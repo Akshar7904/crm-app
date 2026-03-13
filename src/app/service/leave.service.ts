@@ -437,6 +437,36 @@ export class LeaveService {
     );
   }
 
+  // Get leave balances for employees hired in a specific year (for admin allocation management)
+  getAllBalancesForHireYear(hireYear: number): Observable<LeaveBalance[]> {
+    return this.http.get<LeaveHttpResponse<LeaveBalance[]>>(`${this.apiUrl}/balance/allocation?hireYear=${hireYear}`).pipe(
+      map(response => response.data || []),
+      catchError(error => {
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // Admin: update leave entitlement for an employee
+  updateLeaveEntitlement(employeeId: number, leaveType: string, year: number, entitlement: number): Observable<LeaveBalance> {
+    const params = new HttpParams()
+      .set('employeeId', employeeId.toString())
+      .set('leaveType', leaveType)
+      .set('year', year.toString())
+      .set('entitlement', Number(entitlement).toString());
+    return this.http.put<LeaveHttpResponse<LeaveBalance>>(`${this.apiUrl}/balance/update`, {}, { params }).pipe(
+      map(response => {
+        if (!response.success || !response.data) {
+          throw new Error(response.message || 'Failed to update leave entitlement');
+        }
+        return response.data;
+      }),
+      catchError(error => {
+        return throwError(() => error);
+      })
+    );
+  }
+
   // Get doctor's note download URL
   getDoctorNoteUrl(leaveId: number): string {
     return `${this.apiUrl}/${leaveId}/doctor-note`;

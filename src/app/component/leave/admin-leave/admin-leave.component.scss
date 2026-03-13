@@ -771,6 +771,83 @@ textarea.form-control { resize: vertical; }
   }
 }
 
+// ─── Leave Allocation Section
+.leave-allocation-section {
+  margin-top: $spacing-md;
+}
+
+.leave-alloc-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  background: var(--bg-card);
+  border-radius: $border-radius-lg;
+  box-shadow: var(--card-shadow);
+  margin-bottom: $spacing-md;
+}
+
+.leave-alloc-table-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.leave-alloc-employee-card {
+  background: var(--bg-card);
+  border-radius: $border-radius-lg;
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+
+.leave-alloc-employee-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: var(--table-header-bg);
+  font-size: 0.95rem;
+  border-bottom: 1px solid var(--border-color);
+
+  i { color: $primary; font-size: 1.2rem; }
+}
+
+.leave-alloc-table {
+  margin: 0;
+
+  thead th {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: $font-weight-semibold;
+  }
+
+  tbody td {
+    padding: 10px 16px;
+    vertical-align: middle;
+    font-size: 0.88rem;
+    border-bottom: 1px solid var(--border-color);
+
+    &:last-child { border-bottom: none; }
+  }
+}
+
+.leave-alloc-input {
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-radius: $border-radius;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.15);
+  }
+}
+
 // ─── Responsive
 @include respond-to('md') {
   .leave-admin-wrap { padding: $spacing-md; }

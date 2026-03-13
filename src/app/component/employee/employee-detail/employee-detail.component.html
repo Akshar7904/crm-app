@@ -116,6 +116,30 @@
                 </button>
               </div>
             </div>
+
+            <!-- Role Management Card (admin only) -->
+            <div class="prof-card mt-3" *ngIf="!isMyDetailsPage">
+              <div class="info-section-header px-3 pt-3">
+                <div class="info-section-icon"><i class="bi bi-shield-lock"></i></div>
+                <h6 class="info-section-title">Change System Role</h6>
+              </div>
+              <div class="p-3">
+                <p class="text-muted small mb-2">Assign a new role to this user. This takes effect immediately.</p>
+                <div class="d-flex gap-2 align-items-center">
+                  <select class="form-select form-select-sm" [(ngModel)]="selectedRole" name="roleSelect">
+                    <option value="" disabled>Select role...</option>
+                    <option *ngFor="let role of availableRoles" [value]="role.value">{{ role.label }}</option>
+                  </select>
+                  <button class="btn btn-sm btn-primary flex-shrink-0"
+                    [disabled]="!selectedRole || isChangingRole"
+                    (click)="changeUserRole(state?.appData?.data?.employee?.userId || state?.appData?.data?.employee?.id)">
+                    <span *ngIf="isChangingRole" class="spinner-border spinner-border-sm me-1"></span>
+                    <i *ngIf="!isChangingRole" class="bi bi-check-lg me-1"></i>
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- ── Right Column: Tabs ── -->

@@ -18,6 +18,8 @@ interface MenuItem {
   requiredRole?: string;
   requiredRoles?: string[];
   excludeRoles?: string[];
+  /** Show only if user has one of these employment types (OR with requiredRoles) */
+  allowedEmploymentTypes?: string[];
   badge?: {
     count: number;
     type: BadgeType;
@@ -125,6 +127,9 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Intern',
       icon: 'bi-mortarboard-fill',
       expanded: false,
+      // Visible to admins/managers OR employees whose employment type is INTERN
+      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+      allowedEmploymentTypes: ['INTERN'],
       children: [
         {
           label: 'My School Days',
@@ -135,8 +140,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           label: 'All School Requests',
           icon: 'bi-list-check',
           route: '/admin/intern-attendance/admin',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
         }
       ]
     },
@@ -491,14 +495,15 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     const userRole = this.user.roleName;
+    const employmentType = (this.user.employmentType || '').toUpperCase();
     console.log('User:', this.user.firstName, this.user.lastName);
-    console.log('User role:', userRole);
+    console.log('User role:', userRole, '| Employment type:', employmentType);
 
     this.filteredMenuItems = this.fullMenuStructure
-      .filter(item => this.canShowMenuItem(item, userRole))
+      .filter(item => this.canShowMenuItem(item, userRole, employmentType))
       .map(item => {
         if (item.children) {
-          const filteredChildren = item.children.filter(child => this.canShowMenuItem(child, userRole));
+          const filteredChildren = item.children.filter(child => this.canShowMenuItem(child, userRole, employmentType));
 
           // Only show parent if it has visible children
           if (filteredChildren.length === 0 && item.children.length > 0) {
@@ -541,21 +546,25 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     this.cdr.markForCheck();
   }
 
-  private canShowMenuItem(item: MenuItem, userRole: string): boolean {
+  private canShowMenuItem(item: MenuItem, userRole: string, employmentType: string = ''): boolean {
     // PRIORITY 1: Check if role is explicitly excluded
     if (item.excludeRoles && item.excludeRoles.includes(userRole)) {
       console.log(`"${item.label}" - EXCLUDED for role ${userRole}`);
       return false;
     }
 
-    // PRIORITY 2: Check if specific roles are required
+    // PRIORITY 2: Check if specific roles are required.
+    // If allowedEmploymentTypes is also set, either condition grants access (OR logic).
     if (item.requiredRoles && item.requiredRoles.length > 0) {
       const hasRole = item.requiredRoles.includes(userRole);
-      if (!hasRole) {
-        console.log(`"${item.label}" - requires one of [${item.requiredRoles.join(', ')}], user has ${userRole}`);
+      const hasEmploymentType = item.allowedEmploymentTypes
+        ? item.allowedEmploymentTypes.includes(employmentType)
+        : false;
+
+      if (!hasRole && !hasEmploymentType) {
+        console.log(`"${item.label}" - requires role [${item.requiredRoles.join(', ')}] or employmentType [${item.allowedEmploymentTypes?.join(', ')}], user has role=${userRole} type=${employmentType}`);
         return false;
       }
-      console.log(`"${item.label}" - role ${userRole} matches required roles`);
       return true;
     }
 
@@ -566,7 +575,16 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
         console.log(`"${item.label}" - requires ${item.requiredRole}, user has ${userRole}`);
         return false;
       }
-      console.log(`"${item.label}" - role ${userRole} matches required role`);
+      return true;
+    }
+
+    // PRIORITY 4: allowedEmploymentTypes alone (no requiredRoles set)
+    if (item.allowedEmploymentTypes && item.allowedEmploymentTypes.length > 0) {
+      const hasEmploymentType = item.allowedEmploymentTypes.includes(employmentType);
+      if (!hasEmploymentType) {
+        console.log(`"${item.label}" - requires employmentType [${item.allowedEmploymentTypes.join(', ')}], user has ${employmentType}`);
+        return false;
+      }
       return true;
     }
 

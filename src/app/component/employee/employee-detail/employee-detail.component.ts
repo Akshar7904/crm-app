@@ -48,6 +48,16 @@ export class EmployeeDetailComponent implements OnInit {
   // Tab state
   activeTab: 'overview' | 'edit' | 'documents' = 'overview';
 
+  // Role management (admin only)
+  availableRoles = [
+    { value: 'ROLE_USER', label: 'User' },
+    { value: 'ROLE_MANAGER', label: 'Manager' },
+    { value: 'ROLE_ADMIN', label: 'Admin' },
+    { value: 'ROLE_SYSADMIN', label: 'System Admin' }
+  ];
+  selectedRole: string = '';
+  isChangingRole: boolean = false;
+
   setTab(tab: 'overview' | 'edit' | 'documents'): void {
     this.activeTab = tab;
   }
@@ -654,6 +664,29 @@ export class EmployeeDetailComponent implements OnInit {
    */
   goBack(): void {
     this.router.navigate(['/employee']);
+  }
+
+  /**
+   * Change user role (admin only) — calls PATCH /api/v1/user/admin/update-role
+   */
+  changeUserRole(userId: number): void {
+    if (!this.selectedRole) {
+      this.notification.onError('Please select a role');
+      return;
+    }
+    this.isChangingRole = true;
+    this.userService.updateUserRoleAsAdmin$(userId, this.selectedRole).subscribe({
+      next: (response: any) => {
+        this.isChangingRole = false;
+        this.notification.onSuccess(response.message || 'Role updated successfully');
+        this.cdr.markForCheck();
+      },
+      error: (error: any) => {
+        this.isChangingRole = false;
+        this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to update role');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   onDesignationChange(event: Event): void {

@@ -78,10 +78,12 @@ export class AdminInternAttendanceComponent implements OnInit {
     this.loadingEmployees = true;
     this.employeeService.employees$(0).subscribe({
       next: (res: any) => {
-        const all = res?.data?.page?.content || [];
+        // Backend /list returns data.employees (not data.page.content)
+        const all: any[] = res?.data?.employees || res?.data?.page?.content || [];
         this.employees = all.filter((e: any) =>
           (e.employmentType || '').toUpperCase() === 'INTERN' ||
-          (e.designationTitle || '').toLowerCase().includes('intern')
+          (e.designationTitle || '').toLowerCase().includes('intern') ||
+          (e.roleName || '').toUpperCase().includes('INTERN')
         );
         this.loadingEmployees = false;
       },

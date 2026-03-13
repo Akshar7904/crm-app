@@ -71,7 +71,7 @@
   </div>
 
   <!-- Filters -->
-  <div class="leave-filters-card">
+  <div class="leave-filters-card" *ngIf="activeTab !== 'allocate'">
     <div class="leave-search-wrap">
       <i class="bi bi-search leave-search-icon"></i>
       <input
@@ -119,10 +119,97 @@
       <i class="bi bi-list-ul"></i> All
       <span class="leave-tab-badge leave-tab-badge--primary">{{allLeaves.length}}</span>
     </button>
+    <button class="leave-tab" [class.active]="activeTab === 'allocate'" (click)="setActiveTab('allocate')">
+      <i class="bi bi-sliders"></i> Leave Allocation
+    </button>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="currentDataState === dataState.LOADING" class="leave-loading">
+  <!-- =================== LEAVE ALLOCATION TAB =================== -->
+  <div *ngIf="activeTab === 'allocate'" class="leave-allocation-section">
+    <div class="leave-alloc-toolbar">
+      <div class="d-flex align-items-center gap-2">
+        <label class="fw-semibold text-muted small mb-0">Hired in year:</label>
+        <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="allocationYear" (change)="loadAllocationData()">
+          <option *ngFor="let y of [2021,2022,2023,2024,2025,2026]" [value]="y">{{ y }}</option>
+        </select>
+      </div>
+      <span class="text-muted small">
+        <i class="bi bi-info-circle me-1"></i>
+        Shows employees hired in the selected year. Leave accrues monthly with each pay cycle ({{ (15/12) | number:'1.2-2' }} days/month for annual leave). Adjust entitlements to correct missed accruals.
+      </span>
+    </div>
+
+    <!-- Allocation Loading -->
+    <div *ngIf="allocationLoading" class="leave-loading">
+      <div class="spinner-border text-primary" role="status"></div>
+      <p class="mt-2 text-muted">Loading leave balances...</p>
+    </div>
+
+    <!-- No balances -->
+    <div *ngIf="!allocationLoading && groupedBalances.length === 0" class="leave-empty">
+      <i class="bi bi-person-x leave-empty-icon"></i>
+      <h5 class="mt-3 mb-1">No Employees Found for {{ allocationYear }}</h5>
+      <p class="text-muted">No employees were hired in {{ allocationYear }}, or their leave has not accrued yet.<br>Leave accrues on the 1st of each month for the previous month's work.</p>
+    </div>
+
+    <!-- Employee allocation table -->
+    <div *ngIf="!allocationLoading && groupedBalances.length > 0" class="leave-alloc-table-wrap">
+      <ng-container *ngFor="let group of groupedBalances">
+        <div class="leave-alloc-employee-card">
+          <div class="leave-alloc-employee-header">
+            <i class="bi bi-person-circle"></i>
+            <strong>{{ group.employeeName }}</strong>
+            <span class="text-muted small ms-2">· Hired {{ allocationYear }} · Accruing monthly</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-sm table-borderless leave-alloc-table">
+              <thead>
+                <tr>
+                  <th>Leave Type</th>
+                  <th>Entitled Days</th>
+                  <th>Used</th>
+                  <th>Pending</th>
+                  <th>Available</th>
+                  <th>Carried Over</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let b of group.balances">
+                  <td>
+                    <span class="badge-soft badge-soft-primary">{{ leaveTypeLabels[b.leaveType] || b.leaveType }}</span>
+                  </td>
+                  <td>
+                    <input type="number"
+                      class="form-control form-control-sm leave-alloc-input"
+                      [(ngModel)]="b.totalEntitled"
+                      min="0" step="0.5"
+                      style="width:80px">
+                  </td>
+                  <td class="text-muted">{{ b.used }}</td>
+                  <td class="text-warning">{{ b.pending }}</td>
+                  <td class="text-success fw-semibold">{{ b.available }}</td>
+                  <td class="text-muted">{{ b.carriedOver ?? 0 }}</td>
+                  <td>
+                    <button class="btn btn-sm btn-outline-primary"
+                      [disabled]="savingBalanceId === (b.employeeId + '-' + b.leaveType)"
+                      (click)="saveEntitlement(b)">
+                      <span *ngIf="savingBalanceId === (b.employeeId + '-' + b.leaveType)" class="spinner-border spinner-border-sm"></span>
+                      <i *ngIf="savingBalanceId !== (b.employeeId + '-' + b.leaveType)" class="bi bi-check-lg"></i>
+                      Save
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Loading (for other tabs) -->
+  <div *ngIf="activeTab !== 'allocate' && currentDataState === dataState.LOADING" class="leave-loading">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
@@ -130,7 +217,7 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length === 0" class="leave-empty">
+  <div *ngIf="activeTab !== 'allocate' && currentDataState === dataState.LOADED && filteredLeaves.length === 0" class="leave-empty">
     <i class="bi bi-inbox leave-empty-icon"></i>
     <ng-container [ngSwitch]="activeTab">
       <ng-container *ngSwitchCase="'pending'">
@@ -157,7 +244,7 @@
   </div>
 
   <!-- Leave Table Card -->
-  <div *ngIf="currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="leave-table-card">
+  <div *ngIf="activeTab !== 'allocate' && currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="leave-table-card">
     <div class="table-responsive">
       <table class="table leave-table mb-0">
         <thead>

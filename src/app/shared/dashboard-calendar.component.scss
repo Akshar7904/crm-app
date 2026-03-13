@@ -14,6 +14,7 @@
   background: #ffffff;
   border-radius: 8px;
   position: relative;
+  overflow: visible; // allow day-popup to render outside calendar-layout bounds
 }
 
 /* ========================================
