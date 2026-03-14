@@ -46,7 +46,7 @@ export class EmployeeDetailComponent implements OnInit {
   currentUserId: number | null = null; // Store current user's ID for permission checks
 
   // Tab state
-  activeTab: 'overview' | 'edit' | 'documents' = 'overview';
+  activeTab: 'overview' | 'edit' | 'documents' | 'security' = 'overview';
 
   // Role management (admin only)
   availableRoles = [
@@ -58,7 +58,12 @@ export class EmployeeDetailComponent implements OnInit {
   selectedRole: string = '';
   isChangingRole: boolean = false;
 
-  setTab(tab: 'overview' | 'edit' | 'documents'): void {
+  // Password reset (admin)
+  resetPasswordData = { newPassword: '', confirmPassword: '' };
+  isResettingPassword: boolean = false;
+  resetPasswordError: string = '';
+
+  setTab(tab: 'overview' | 'edit' | 'documents' | 'security'): void {
     this.activeTab = tab;
   }
 
@@ -437,6 +442,47 @@ export class EmployeeDetailComponent implements OnInit {
           }
         });
     }
+  }
+
+  // ========== PASSWORD RESET ==========
+
+  submitResetPassword(): void {
+    this.resetPasswordError = '';
+
+    if (!this.resetPasswordData.newPassword) {
+      this.resetPasswordError = 'New password is required.';
+      return;
+    }
+    if (this.resetPasswordData.newPassword.length < 8) {
+      this.resetPasswordError = 'Password must be at least 8 characters.';
+      return;
+    }
+    if (this.resetPasswordData.newPassword !== this.resetPasswordData.confirmPassword) {
+      this.resetPasswordError = 'Passwords do not match.';
+      return;
+    }
+
+    const employeeId = this.dataSubject.value?.data?.employee?.id;
+    if (!employeeId) return;
+
+    this.isResettingPassword = true;
+
+    this.http.put(`${this.SERVER_URL}/employee/${employeeId}/reset-password`, {
+      newPassword: this.resetPasswordData.newPassword,
+      confirmPassword: this.resetPasswordData.confirmPassword
+    }).subscribe({
+      next: () => {
+        this.isResettingPassword = false;
+        this.resetPasswordData = { newPassword: '', confirmPassword: '' };
+        this.notification.onSuccess('Password reset successfully');
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.isResettingPassword = false;
+        this.resetPasswordError = err?.error?.message || 'Failed to reset password.';
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   // ========== DOCUMENT MANAGEMENT ==========

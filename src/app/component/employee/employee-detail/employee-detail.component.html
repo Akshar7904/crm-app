@@ -157,6 +157,9 @@
                 <i class="bi bi-folder"></i> Documents
                 <span *ngIf="documents.length > 0" class="prof-tab-badge">{{ documents.length }}</span>
               </button>
+              <button class="prof-tab" [class.active]="activeTab === 'security'" (click)="setTab('security')" type="button" *ngIf="!isMyDetailsPage">
+                <i class="bi bi-shield-lock"></i> Security
+              </button>
             </div>
 
             <div class="prof-tab-content">
@@ -651,6 +654,52 @@
 
                 </div>
               </div>
+
+              <!-- ── Security Tab ── -->
+              <div *ngIf="activeTab === 'security'">
+                <div class="edit-card">
+                  <div class="edit-section">
+                    <div class="edit-section-header">
+                      <div class="edit-section-icon"><i class="bi bi-key-fill"></i></div>
+                      <div>
+                        <h6 class="edit-section-title">Reset Password</h6>
+                        <p class="edit-section-sub">Set a new password for this employee. They will be able to log in immediately.</p>
+                      </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                      <div class="col-md-6">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control"
+                               [(ngModel)]="resetPasswordData.newPassword"
+                               name="newPassword"
+                               placeholder="Min. 8 characters"
+                               [disabled]="isResettingPassword">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control"
+                               [(ngModel)]="resetPasswordData.confirmPassword"
+                               name="confirmPassword"
+                               placeholder="Repeat new password"
+                               [disabled]="isResettingPassword">
+                      </div>
+                      <div class="col-12" *ngIf="resetPasswordError">
+                        <div class="alert alert-danger py-2 mb-0">
+                          <i class="bi bi-exclamation-triangle me-2"></i>{{ resetPasswordError }}
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <button class="btn btn-primary px-4" (click)="submitResetPassword()" [disabled]="isResettingPassword">
+                          <span *ngIf="isResettingPassword" class="spinner-border spinner-border-sm me-2"></span>
+                          <i *ngIf="!isResettingPassword" class="bi bi-key me-2"></i>
+                          {{ isResettingPassword ? 'Resetting...' : 'Reset Password' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
