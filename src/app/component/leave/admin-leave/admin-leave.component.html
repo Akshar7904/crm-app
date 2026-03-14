@@ -86,11 +86,11 @@
     </div>
     <select [(ngModel)]="selectedStatus" (change)="applyFilters()" class="form-select leave-filter-select">
       <option value="all">All Status</option>
-      <option *ngFor="let status of leaveStatuses" [value]="status">{{leaveStatusLabels[status]}}</option>
+      <option *ngFor="let status of leaveStatuses; trackBy: trackByValue" [value]="status">{{leaveStatusLabels[status]}}</option>
     </select>
     <select [(ngModel)]="selectedType" (change)="applyFilters()" class="form-select leave-filter-select">
       <option value="all">All Types</option>
-      <option *ngFor="let type of leaveTypes" [value]="type">{{leaveTypeLabels[type]}}</option>
+      <option *ngFor="let type of leaveTypes; trackBy: trackByValue" [value]="type">{{leaveTypeLabels[type]}}</option>
     </select>
     <button class="btn-leave-secondary" (click)="clearFilters()">
       <i class="bi bi-arrow-counterclockwise"></i> Reset
@@ -130,7 +130,7 @@
       <div class="d-flex align-items-center gap-2">
         <label class="fw-semibold text-muted small mb-0">Hired in year:</label>
         <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="allocationYear" (change)="loadAllocationData()">
-          <option *ngFor="let y of [2021,2022,2023,2024,2025,2026]" [value]="y">{{ y }}</option>
+          <option *ngFor="let y of [2021,2022,2023,2024,2025,2026]; trackBy: trackByValue" [value]="y">{{ y }}</option>
         </select>
       </div>
       <span class="text-muted small">
@@ -154,7 +154,7 @@
 
     <!-- Employee allocation table -->
     <div *ngIf="!allocationLoading && groupedBalances.length > 0" class="leave-alloc-table-wrap">
-      <ng-container *ngFor="let group of groupedBalances">
+      <ng-container *ngFor="let group of groupedBalances; trackBy: trackByEmployeeId">
         <div class="leave-alloc-employee-card">
           <div class="leave-alloc-employee-header">
             <i class="bi bi-person-circle"></i>
@@ -175,7 +175,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let b of group.balances">
+                <tr *ngFor="let b of group.balances; trackBy: trackByBalance">
                   <td>
                     <span class="badge-soft badge-soft-primary">{{ leaveTypeLabels[b.leaveType] || b.leaveType }}</span>
                   </td>
@@ -259,7 +259,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let leave of filteredLeaves" (click)="viewLeaveDetails(leave)" class="leave-row">
+          <tr *ngFor="let leave of filteredLeaves; trackBy: trackById" (click)="viewLeaveDetails(leave)" class="leave-row">
 
             <td>
               <div class="leave-employee-cell">

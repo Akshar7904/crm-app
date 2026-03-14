@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { Observable, Subject, BehaviorSubject, of } from 'rxjs';
 import { takeUntil, map, startWith, catchError, switchMap, tap } from 'rxjs/operators';
 import { AnnouncementService } from 'src/app/service/announcement.service';
@@ -16,7 +16,8 @@ interface AnnouncementListState {
   standalone: false,
   selector: 'app-announcement-list',
   templateUrl: './announcement-list.component.html',
-  styleUrls: ['./announcement-list.component.scss']
+  styleUrls: ['./announcement-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AnnouncementListComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -40,7 +41,7 @@ export class AnnouncementListComponent implements OnInit, OnDestroy {
     { value: 'URGENT', label: 'Urgent' }
   ];
 
-  constructor(private announcementService: AnnouncementService) {}
+  constructor(private announcementService: AnnouncementService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.loadAnnouncements();
@@ -133,4 +134,7 @@ export class AnnouncementListComponent implements OnInit, OnDestroy {
     if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
     return this.formatDate(dateString);
   }
+
+  trackById(index: number, item: any): any { return item?.id ?? index; }
+  trackByValue(index: number, value: any): any { return value ?? index; }
 }

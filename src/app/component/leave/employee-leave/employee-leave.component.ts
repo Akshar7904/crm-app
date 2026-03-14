@@ -3,7 +3,7 @@ import { environment } from '@env/environment';
 // ✅ UPDATED: Uses /api/v1/employee/me for self-service access
 // No special permissions needed - employees can access their own data
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -27,7 +27,8 @@ import {
   standalone: false,
   selector: 'app-employee-leave',
   templateUrl: './employee-leave.component.html',
-  styleUrls: ['./employee-leave.component.scss']
+  styleUrls: ['./employee-leave.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeeLeaveComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -68,7 +69,8 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
     private http: HttpClient,
     private leaveService: LeaveService,
     private notificationService: NotificationService,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {
     this.leaveForm = this.createLeaveForm();
   }
@@ -172,11 +174,13 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
         next: (leaves) => {
           this.leaves = leaves;
           this.currentDataState = DataState.LOADED;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('❌ Error loading leaves:', error);
           this.currentDataState = DataState.ERROR;
           this.notificationService.onError('Failed to load leaves');
+          this.cdr.markForCheck();
         }
       });
   }
@@ -189,9 +193,11 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (balances) => {
           this.leaveBalances = balances;
+          this.cdr.markForCheck();
         },
         error: (error) => {
           console.error('❌ Error loading leave balances:', error);
+          this.cdr.markForCheck();
         }
       });
   }
@@ -485,4 +491,8 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
   getEmployeeCode(): string {
     return this.currentUser?.employeeId || 'N/A';
   }
+
+  trackById(index: number, item: any): any { return item?.id ?? index; }
+  trackByValue(index: number, value: any): any { return value ?? index; }
+  trackByIndex(index: number, _item: any): number { return index; }
 }

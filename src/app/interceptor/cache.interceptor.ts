@@ -16,7 +16,6 @@ export class CacheInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> | Observable<HttpResponse<unknown>> {
     // Skip caching for authentication and verification endpoints only
-    // Profile is now cached - cache is evicted on any non-GET request (PUT/PATCH/POST)
     if (request.url.includes('verify') || request.url.includes('login') || request.url.includes('register')
       || request.url.includes('refresh') || request.url.includes('resetpassword')
       || request.url.includes('new/password')) {
@@ -29,14 +28,18 @@ export class CacheInterceptor implements HttpInterceptor {
       return next.handle(cleanedRequest);
     }
 
-    // Clear cache for non-GET requests, downloads, and blob exports
+    // For non-GET requests: evict only the affected resource, not the entire cache
     if (request.method !== 'GET' || request.url.includes('download') || request.url.includes('export')) {
-      this.httpCache.evictAll();
+      const resource = this.getResourceKey(request.url);
+      if (resource) {
+        this.httpCache.evictByPrefix(resource);
+      } else {
+        this.httpCache.evictAll();
+      }
       return next.handle(request);
     }
 
-    // ✅ CRITICAL: Use FULL URL with query parameters as cache key
-    // This prevents data collision between different endpoints
+    // Use full URL with query parameters as cache key
     const cacheKey = `__${request.urlWithParams}__`;
     const cachedResponse: HttpResponse<any> = this.httpCache.get(cacheKey);
 
@@ -56,9 +59,16 @@ export class CacheInterceptor implements HttpInterceptor {
       .pipe(
         tap(response => {
           if (response instanceof HttpResponse && request.method !== 'DELETE') {
-            this.httpCache.put(cacheKey, response);
+            const ttl = this.httpCache.getTtl(request.url);
+            this.httpCache.put(cacheKey, response, ttl);
           }
         })
       );
+  }
+
+  /** Extract the resource segment from the URL: /api/v1/attendance/... -> 'attendance' */
+  private getResourceKey(url: string): string {
+    const match = url.match(/\/api\/v1\/([^\/]+)/);
+    return match ? match[1] : '';
   }
 }

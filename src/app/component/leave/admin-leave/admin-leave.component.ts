@@ -2,7 +2,7 @@ import { environment } from '@env/environment';
 // admin-leave.component.ts
 // Updated to fetch admin/manager information from authenticated user using correct endpoint
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -27,7 +27,8 @@ import {
   standalone: false,
   selector: 'app-admin-leave',
   templateUrl: './admin-leave.component.html',
-  styleUrls: ['./admin-leave.component.scss']
+  styleUrls: ['./admin-leave.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminLeaveComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -77,7 +78,8 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
     private leaveService: LeaveService,
     private userService: UserService,
     private notificationService: NotificationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {
     this.approvalForm = this.createApprovalForm();
   }
@@ -153,16 +155,18 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
           this.allLeaves = leaves;
           this.currentDataState = DataState.LOADED;
           this.error = null;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.currentDataState = DataState.ERROR;
           this.error = err?.message || 'Failed to load leave requests';
+          this.cdr.markForCheck();
         }
       });
 
     this.leaveService.getUpcomingLeaves(30)
       .pipe(takeUntil(this.destroy$))
-      .subscribe((leaves: Leave[]) => this.upcomingLeaves = leaves);
+      .subscribe((leaves: Leave[]) => { this.upcomingLeaves = leaves; this.cdr.markForCheck(); });
   }
 
   // ─── Computed counts per tab
@@ -208,6 +212,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
       grouped.get(b.employeeId)!.balances.push(b);
     }
     this.groupedBalances = Array.from(grouped.values()).sort((a, b) => a.employeeName.localeCompare(b.employeeName));
+    this.cdr.markForCheck();
   }
 
   saveEntitlement(balance: LeaveBalance): void {
@@ -458,4 +463,9 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   exportToExcel(): void {
     console.log('Export to Excel - to be implemented');
   }
+
+  trackById(index: number, item: any): any { return item?.id ?? index; }
+  trackByValue(index: number, value: any): any { return value ?? index; }
+  trackByEmployeeId(index: number, item: any): any { return item?.employeeId ?? index; }
+  trackByBalance(index: number, item: any): any { return item?.id ?? item?.leaveType ?? index; }
 }

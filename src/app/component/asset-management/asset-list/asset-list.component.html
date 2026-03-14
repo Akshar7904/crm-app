@@ -39,7 +39,7 @@
                 'LAPTOP','DESKTOP','TABLET','PHONE','MONITOR',
                 'KEYBOARD','MOUSE','HEADSET','PRINTER','SCANNER',
                 'PROJECTOR','CAMERA','FURNITURE','VEHICLE','SOFTWARE_LICENSE','OTHER'
-              ]" [value]="cat">{{ cat | titlecase }}</option>
+              ]; trackBy: trackByValue" [value]="cat">{{ cat | titlecase }}</option>
             </select>
           </div>
           <div class="col-md-4">
@@ -47,7 +47,7 @@
               <option value="">All Statuses</option>
               <option *ngFor="let status of [
                 'AVAILABLE','ASSIGNED','RESERVED','UNDER_MAINTENANCE','RETIRED','LOST','DAMAGED'
-              ]" [value]="status">{{ status | titlecase }}</option>
+              ]; trackBy: trackByValue" [value]="status">{{ status | titlecase }}</option>
             </select>
           </div>
         </div>
@@ -69,7 +69,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let asset of getAssets(state)" (click)="selectAsset(asset)" style="cursor:pointer">
+                <tr *ngFor="let asset of getAssets(state); trackBy: trackById" (click)="selectAsset(asset)" style="cursor:pointer">
                   <td><code>{{ asset.assetTag }}</code></td>
                   <td>
                     <div class="asset-name-cell">
@@ -118,7 +118,7 @@
                 <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
                   <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor:pointer">&laquo;</a>
                 </li>
-                <li *ngFor="let p of getTotalPages(state) | ExtractArrayValue:'number'; let i = index" class="page-item">
+                <li *ngFor="let p of getTotalPages(state) | ExtractArrayValue:'number'; let i = index; trackBy: trackByIndex" class="page-item">
                   <a (click)="goToPage(i)" [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
                      class="page-link" style="cursor:pointer">{{ i + 1 }}</a>
                 </li>

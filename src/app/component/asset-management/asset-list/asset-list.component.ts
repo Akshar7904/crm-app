@@ -244,4 +244,8 @@ export class AssetListComponent implements OnInit {
       day: 'numeric'
     });
   }
+
+  trackById(index: number, item: any): any { return item?.id ?? index; }
+  trackByValue(index: number, value: any): any { return value ?? index; }
+  trackByIndex(index: number, _item: any): number { return index; }
 }
