@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
 import { Injectable } from '@angular/core';
 import { NotifierService } from '../notifier/notifier.service';
 import { HttpErrorResponse } from "@angular/common/http";

@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Observable, catchError, map, of, startWith } from 'rxjs';

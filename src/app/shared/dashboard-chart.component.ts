@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild, ElementRef, ChangeDetectionStrategy } from '@angular/core';
 import { Chart, ChartConfiguration, ChartType, registerables, ChartDataset, DefaultDataPoint } from 'chart.js';
 

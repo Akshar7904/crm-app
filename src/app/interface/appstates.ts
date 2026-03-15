@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
 import { DataState } from "../enum/datastate.enum";
 import { CustomerModel } from "../component/customer/customer.model";
 import { Employee } from "../component/employee/employee.model";

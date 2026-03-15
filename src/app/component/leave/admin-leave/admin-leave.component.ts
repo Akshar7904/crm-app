@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
 import { environment } from '@env/environment';
 // admin-leave.component.ts
 // Updated to fetch admin/manager information from authenticated user using correct endpoint
