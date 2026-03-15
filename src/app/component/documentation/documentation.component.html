@@ -64,6 +64,7 @@
       <!-- Print cover page -->
       <div class="print-header">
         <div class="print-cover">
+          <img src="assets/logo.png" alt="LKCentrix Logo" class="print-cover-logo" />
           <div class="print-cover-divider"></div>
           <h1>LKCentrix HR &amp; Payroll Management System</h1>
           <h2>{{ activeTab === 'admin' ? 'Administrator Guide' : 'Employee User Guide' }}</h2>
@@ -310,7 +311,15 @@
               <p>On the employee profile, navigate to the <strong>Documents</strong> tab. Click <strong>Upload Document</strong> to add files (e.g. signed contract, SARS tax certificate). Select document type, add a description, choose the file, and click <strong>Upload</strong>. Admins can verify documents by clicking <strong>Verify</strong>, marking them as confirmed.</p>
             </div>
             <div class="step">
-              <span class="step-num">Step 6 — Deactivate an Employee</span>
+              <span class="step-num">Step 6 — Upload or Change Profile Photo</span>
+              <p>On the employee profile page, click the profile photo or the camera icon to upload a new photo on behalf of the employee. Supported formats: JPG, PNG (max 5 MB). ADMIN and SYSADMIN can update any employee's photo from the employee profile page.</p>
+            </div>
+            <div class="step">
+              <span class="step-num">Step 7 — Reset Employee Password (Admin)</span>
+              <p>Open the employee profile and navigate to the <strong>Security</strong> tab (visible to ADMIN and SYSADMIN only — not shown on your own profile). Enter the new password in the <strong>New Password</strong> field, confirm it in <strong>Confirm Password</strong>, and click <strong>Reset Password</strong>. This does not require the employee's current password. Use this when an employee is locked out or has forgotten their credentials. Notify the employee of their new password through a secure channel.</p>
+            </div>
+            <div class="step">
+              <span class="step-num">Step 8 — Deactivate an Employee</span>
               <p>When an employee leaves, set their status to <strong>Inactive</strong> on their profile — do not delete. This preserves all payroll, leave, and document history. The system login is automatically disabled when the account is deactivated.</p>
             </div>
           </div>
@@ -731,6 +740,14 @@
             <div class="step">
               <span class="step-num">Session &amp; Security</span>
               <p>Sessions use JWT tokens stored in browser local storage. Sessions expire after a period of inactivity. If a user's account needs to be disabled immediately (e.g. an employee who leaves), set their employee status to <strong>Inactive</strong> on their profile. They will no longer be able to authenticate.</p>
+            </div>
+            <div class="step">
+              <span class="step-num">Admin Password Reset</span>
+              <p>ADMIN and SYSADMIN users can reset any employee's password without requiring the employee's current password. Open the employee profile, click the <strong>Security</strong> tab, enter a new password (minimum 8 characters), confirm it, and click <strong>Reset Password</strong>. A confirmation message is shown on success. Communicate the new password to the employee securely — the system does not send an automatic email for admin-initiated resets.</p>
+            </div>
+            <div class="step">
+              <span class="step-num">New User Registration Notifications</span>
+              <p>When a new user registers or an employee account is created, an email notification is sent to <strong>all SYSADMIN users</strong> in the system. If there are no SYSADMIN accounts, it falls back to notifying all ADMIN users. This ensures that account creation is always visible to system administrators.</p>
             </div>
             <div class="step">
               <span class="step-num">Notifications</span>
