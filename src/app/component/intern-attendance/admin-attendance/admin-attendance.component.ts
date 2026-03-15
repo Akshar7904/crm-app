@@ -244,4 +244,20 @@ export class AdminInternAttendanceComponent implements OnInit {
       default: return 'badge-soft-secondary';
     }
   }
+
+  downloadReport(): void {
+    this.internAttendanceService.downloadReport$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `intern-attendance-report-${new Date().toISOString().split('T')[0]}.xlsx`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: () => this.notification.onError('Failed to download intern attendance report')
+      });
+  }
 }

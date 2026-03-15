@@ -18,6 +18,9 @@
       <button class="btn-banner-leave" (click)="exportToExcel()">
         <i class="bi bi-download"></i> Export
       </button>
+      <button class="btn-banner-leave" (click)="downloadReport()">
+        <i class="bi bi-file-earmark-excel"></i> Download Report
+      </button>
     </div>
   </div>
 
@@ -129,13 +132,21 @@
     <div class="leave-alloc-toolbar">
       <div class="d-flex align-items-center gap-2">
         <label class="fw-semibold text-muted small mb-0">Hired in year:</label>
-        <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="allocationYear" (change)="loadAllocationData()">
+        <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="allocationYear" (change)="loadAllocationData()" [disabled]="showAllEmployees">
           <option *ngFor="let y of [2021,2022,2023,2024,2025,2026]; trackBy: trackByValue" [value]="y">{{ y }}</option>
         </select>
+        <button class="btn btn-sm"
+          [class.btn-primary]="showAllEmployees"
+          [class.btn-outline-primary]="!showAllEmployees"
+          (click)="toggleShowAll()">
+          <i class="bi bi-people me-1"></i>{{ showAllEmployees ? 'Show by Hire Year' : 'Show All Employees' }}
+        </button>
       </div>
       <span class="text-muted small">
         <i class="bi bi-info-circle me-1"></i>
-        Shows employees hired in the selected year. Leave accrues monthly with each pay cycle ({{ (15/12) | number:'1.2-2' }} days/month for annual leave). Adjust entitlements to correct missed accruals.
+        <span *ngIf="!showAllEmployees">Shows employees hired in the selected year.</span>
+        <span *ngIf="showAllEmployees">Shows all employees for the current year.</span>
+        Leave accrues monthly with each pay cycle ({{ (15/12) | number:'1.2-2' }} days/month for annual leave). Adjust entitlements to correct missed accruals.
       </span>
     </div>
 

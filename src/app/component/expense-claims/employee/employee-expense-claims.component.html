@@ -207,6 +207,22 @@
                       name="remarks" rows="3"
                       placeholder="Any additional information"></textarea>
           </div>
+
+          <!-- Receipt Upload (only for existing/saved claims) -->
+          <div class="mt-3" *ngIf="editingClaim?.id">
+            <label class="form-label fw-semibold">Upload Receipt</label>
+            <div class="input-group">
+              <input type="file" class="form-control" (change)="onReceiptSelected($event)" accept=".pdf,.jpg,.jpeg,.png">
+              <button class="btn btn-outline-primary" type="button" (click)="uploadReceipt()" [disabled]="!selectedReceiptFile">
+                <i class="bi bi-upload me-1"></i> Upload
+              </button>
+            </div>
+            <small class="text-muted">PDF, JPG, PNG accepted</small>
+            <div *ngIf="editingClaim?.receiptUrl" class="mt-1">
+              <i class="bi bi-paperclip text-success me-1"></i>
+              <a [href]="editingClaim.receiptUrl" target="_blank" class="small">View Receipt</a>
+            </div>
+          </div>
         </form>
       </div>
 

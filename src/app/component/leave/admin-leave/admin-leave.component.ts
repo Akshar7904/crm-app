@@ -76,6 +76,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   groupedBalances: { employeeName: string; employeeId: number; balances: LeaveBalance[] }[] = [];
   allocationLoading: boolean = false;
   savingBalanceId: string = ''; // key: employeeId-leaveType
+  showAllEmployees: boolean = false;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -466,6 +467,49 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
 
   exportToExcel(): void {
     console.log('Export to Excel - to be implemented');
+  }
+
+  downloadReport(): void {
+    this.leaveService.downloadReport$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob: Blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `leave-report-${new Date().toISOString().split('T')[0]}.xlsx`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: () => this.notificationService.onError('Failed to download leave report')
+      });
+  }
+
+  toggleShowAll(): void {
+    this.showAllEmployees = !this.showAllEmployees;
+    if (this.showAllEmployees) {
+      this.loadAllBalances();
+    } else {
+      this.loadAllocationData();
+    }
+  }
+
+  loadAllBalances(): void {
+    this.allocationLoading = true;
+    const year = new Date().getFullYear();
+    this.leaveService.getAllBalancesForYear$(year)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response: any) => {
+          this.allBalances = response.data || [];
+          this.allocationLoading = false;
+          this.buildGroupedBalances();
+        },
+        error: () => {
+          this.allocationLoading = false;
+          this.notificationService.onError('Failed to load all leave balances');
+        }
+      });
   }
 
   trackById(index: number, item: any): any { return item?.id ?? index; }

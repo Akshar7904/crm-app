@@ -431,4 +431,28 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
   getEmployeeCode(): string {
     return this.currentUser?.employeeId || 'N/A';
   }
+
+  selectedReceiptFile: File | null = null;
+
+  onReceiptSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedReceiptFile = input.files?.[0] || null;
+  }
+
+  uploadReceipt(): void {
+    if (!this.selectedReceiptFile || !this.editingClaim?.id) return;
+    this.expenseClaimService.uploadReceipt$(this.editingClaim.id, this.selectedReceiptFile)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          this.notificationService.onSuccess('Receipt uploaded successfully');
+          if (this.editingClaim) {
+            this.editingClaim.receiptUrl = res.data?.receiptUrl;
+          }
+          this.selectedReceiptFile = null;
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => this.notificationService.onError(err?.error?.message || 'Failed to upload receipt')
+      });
+  }
 }

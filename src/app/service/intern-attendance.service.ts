@@ -68,6 +68,13 @@ export class InternAttendanceService {
     return this.http.get<any>(`${this.apiUrl}/pending-count`).pipe(map(r => r.count || 0));
   }
 
+  downloadReport$(employeeId?: number, status?: string): Observable<Blob> {
+    const params: any = {};
+    if (employeeId) params['employeeId'] = employeeId.toString();
+    if (status) params['status'] = status;
+    return this.http.get(`${this.apiUrl}/download/report`, { params, responseType: 'blob' });
+  }
+
   calculateBusinessDays(start: Date, end: Date): number {
     let days = 0;
     const current = new Date(start);
