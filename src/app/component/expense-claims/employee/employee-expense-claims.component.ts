@@ -1,3 +1,7 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
 // employee-expense-claims.component.ts
 // ✅ UPDATED: Simplified to use UserModel directly (no separate employee fetch)
 // Since User and Employee are now merged, user.id IS the employee ID

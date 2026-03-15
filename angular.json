@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "securecapitaapp": {
+    "payroll-orion": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -20,7 +20,7 @@
             "allowedCommonJsDependencies": [
               "jspdf"
             ],
-            "outputPath": "dist/securecapitaapp",
+            "outputPath": "dist/payroll-orion",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -76,10 +76,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "securecapitaapp:build:production"
+              "browserTarget": "payroll-orion:build:production"
             },
             "development": {
-              "browserTarget": "securecapitaapp:build:development"
+              "browserTarget": "payroll-orion:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -87,7 +87,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "securecapitaapp:build"
+            "browserTarget": "payroll-orion:build"
           }
         },
         "test": {
