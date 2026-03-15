@@ -265,6 +265,10 @@ export class PayrollDetailComponent implements OnInit {
     return `${months[date.getMonth()]} ${date.getFullYear()}`;
   }
 
+  get isIntern(): boolean {
+    return this.employee?.employmentType?.toUpperCase() === 'INTERN';
+  }
+
   maskAccountNumber(accountNumber: string | null | undefined): string {
     if (!accountNumber || accountNumber.length < 4) {
       return '****';

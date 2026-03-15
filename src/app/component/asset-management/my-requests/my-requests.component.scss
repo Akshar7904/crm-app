@@ -101,3 +101,12 @@
   text-decoration: underline;
   &:hover { opacity: 0.8; }
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .my-requests-page { padding: $spacing-sm $spacing-md; }
+  .request-card-header { padding: $spacing-sm $spacing-md; gap: $spacing-sm; }
+  .request-card-date { display: none; } // shown in detail row instead
+  .request-card-details { padding: 8px $spacing-md; }
+  .request-card-justification { padding: 6px $spacing-md; }
+}

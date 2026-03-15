@@ -112,3 +112,12 @@
   font-size: $font-size-sm;
   gap: 8px;
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .expenses-reports { padding: $spacing-sm $spacing-md; }
+  .export-row { flex-direction: column; align-items: flex-start; }
+  .export-controls { width: 100%; }
+  .export-controls .form-select { flex: 1; }
+  .export-controls .btn { width: 100%; }
+}

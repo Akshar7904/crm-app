@@ -150,4 +150,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.profileLoaded = false;
     this.loadProfile();
   }
+
+  /** Role helper used in templates */
+  isAdminUser(user: UserModel): boolean {
+    return ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_MANAGER'].includes(user?.roleName);
+  }
 }

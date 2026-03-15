@@ -1,10 +1,15 @@
 <nav class="navbar">
   <div class="navbar-container">
 
-    <!-- LEFT: Hamburger (mobile only) -->
+    <!-- LEFT: Logo (mobile) + Hamburger (tablet) -->
     <div class="navbar-left">
+      <!-- Mobile logo — shown on phones only, replaces hamburger -->
+      <a routerLink="/" class="mobile-nav-logo">
+        <img src="assets/logo.png" alt="LKCentrix" class="mobile-nav-logo-img">
+      </a>
+      <!-- Hamburger — shown on tablet only (768–992px range) -->
       <button
-        class="hamburger-btn d-lg-none"
+        class="hamburger-btn tablet-only"
         type="button"
         aria-label="Toggle sidebar"
         (click)="onToggleSidebar()"

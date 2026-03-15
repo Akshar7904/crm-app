@@ -116,6 +116,30 @@
                 </button>
               </div>
             </div>
+
+            <!-- Role Management Card (admin only) -->
+            <div class="prof-card mt-3" *ngIf="!isMyDetailsPage">
+              <div class="info-section-header px-3 pt-3">
+                <div class="info-section-icon"><i class="bi bi-shield-lock"></i></div>
+                <h6 class="info-section-title">Change System Role</h6>
+              </div>
+              <div class="p-3">
+                <p class="text-muted small mb-2">Assign a new role to this user. This takes effect immediately.</p>
+                <div class="d-flex gap-2 align-items-center">
+                  <select class="form-select form-select-sm" [(ngModel)]="selectedRole" name="roleSelect">
+                    <option value="" disabled>Select role...</option>
+                    <option *ngFor="let role of availableRoles" [value]="role.value">{{ role.label }}</option>
+                  </select>
+                  <button class="btn btn-sm btn-primary flex-shrink-0"
+                    [disabled]="!selectedRole || isChangingRole"
+                    (click)="changeUserRole(state?.appData?.data?.employee?.userId || state?.appData?.data?.employee?.id)">
+                    <span *ngIf="isChangingRole" class="spinner-border spinner-border-sm me-1"></span>
+                    <i *ngIf="!isChangingRole" class="bi bi-check-lg me-1"></i>
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- ── Right Column: Tabs ── -->
@@ -132,6 +156,9 @@
               <button class="prof-tab" [class.active]="activeTab === 'documents'" (click)="setTab('documents')" type="button">
                 <i class="bi bi-folder"></i> Documents
                 <span *ngIf="documents.length > 0" class="prof-tab-badge">{{ documents.length }}</span>
+              </button>
+              <button class="prof-tab" [class.active]="activeTab === 'security'" (click)="setTab('security')" type="button" *ngIf="!isMyDetailsPage">
+                <i class="bi bi-shield-lock"></i> Security
               </button>
             </div>
 
@@ -627,6 +654,52 @@
 
                 </div>
               </div>
+
+              <!-- ── Security Tab ── -->
+              <div *ngIf="activeTab === 'security'">
+                <div class="edit-card">
+                  <div class="edit-section">
+                    <div class="edit-section-header">
+                      <div class="edit-section-icon"><i class="bi bi-key-fill"></i></div>
+                      <div>
+                        <h6 class="edit-section-title">Reset Password</h6>
+                        <p class="edit-section-sub">Set a new password for this employee. They will be able to log in immediately.</p>
+                      </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                      <div class="col-md-6">
+                        <label class="form-label">New Password</label>
+                        <input type="password" class="form-control"
+                               [(ngModel)]="resetPasswordData.newPassword"
+                               name="newPassword"
+                               placeholder="Min. 8 characters"
+                               [disabled]="isResettingPassword">
+                      </div>
+                      <div class="col-md-6">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" class="form-control"
+                               [(ngModel)]="resetPasswordData.confirmPassword"
+                               name="confirmPassword"
+                               placeholder="Repeat new password"
+                               [disabled]="isResettingPassword">
+                      </div>
+                      <div class="col-12" *ngIf="resetPasswordError">
+                        <div class="alert alert-danger py-2 mb-0">
+                          <i class="bi bi-exclamation-triangle me-2"></i>{{ resetPasswordError }}
+                        </div>
+                      </div>
+                      <div class="col-12">
+                        <button class="btn btn-primary px-4" (click)="submitResetPassword()" [disabled]="isResettingPassword">
+                          <span *ngIf="isResettingPassword" class="spinner-border spinner-border-sm me-2"></span>
+                          <i *ngIf="!isResettingPassword" class="bi bi-key me-2"></i>
+                          {{ isResettingPassword ? 'Resetting...' : 'Reset Password' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 

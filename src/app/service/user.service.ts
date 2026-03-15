@@ -108,6 +108,14 @@ export class UserService {
         catchError(this.handleError)
       );
 
+  updateUserRoleAsAdmin$ = (userId: number, roleName: string) => <Observable<CustomHttpResponse<any>>>
+    this.http.patch<CustomHttpResponse<any>>
+      (`${this.server}/user/admin/update-role?userId=${userId}&roleName=${roleName}`, {})
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
   updateAccountSettings$ = (settings: { enabled: boolean, notLocked: boolean }) => <Observable<CustomHttpResponse<Profile>>>
     this.http.patch<CustomHttpResponse<Profile>>
       (`${this.server}/user/update/settings`, settings)

@@ -69,7 +69,7 @@ export class AssetFormComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (error) => {
-        this.notification.onError(error);
+        this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to load asset');
         this.isLoadingSubject.next(false);
         this.router.navigate(['/assets']);
       }
@@ -120,7 +120,7 @@ export class AssetFormComponent implements OnInit {
           this.router.navigate(['/assets', this.assetId]);
         },
         error: (error) => {
-          this.notification.onError(error);
+          this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to update asset');
           this.isLoadingSubject.next(false);
         }
       });
@@ -133,7 +133,7 @@ export class AssetFormComponent implements OnInit {
           this.router.navigate(['/assets', newAsset.id]);
         },
         error: (error) => {
-          this.notification.onError(error);
+          this.notification.onError(error?.error?.reason || error?.error?.message || 'Failed to create asset');
           this.isLoadingSubject.next(false);
         }
       });

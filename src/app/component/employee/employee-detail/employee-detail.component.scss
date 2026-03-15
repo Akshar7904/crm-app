@@ -110,11 +110,11 @@
 
   i { font-size: 7px; }
 
-  &.status-active     { background: rgba($success, 0.22); border: 1px solid rgba($success, 0.4); color: #fff; }
-  &.status-terminated { background: rgba($danger, 0.22);  border: 1px solid rgba($danger, 0.4);  color: #fff; }
-  &.status-on-leave   { background: rgba($warning, 0.25); border: 1px solid rgba($warning, 0.4); color: #fff; }
-  &.status-inactive   { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); }
-  &.status-probation  { background: rgba($info, 0.22);    border: 1px solid rgba($info, 0.4);    color: #fff; }
+  &.status-active     { background: rgba($success, 0.15); border: 1px solid rgba($success, 0.35); color: darken($success, 10%); }
+  &.status-terminated { background: rgba($danger, 0.12);  border: 1px solid rgba($danger, 0.3);  color: darken($danger, 8%); }
+  &.status-on-leave   { background: rgba($warning, 0.15); border: 1px solid rgba($warning, 0.3); color: darken($warning, 25%); }
+  &.status-inactive   { background: rgba($gray-500, 0.12); border: 1px solid rgba($gray-500, 0.25); color: $gray-700; }
+  &.status-probation  { background: rgba($info, 0.12);    border: 1px solid rgba($info, 0.3);    color: darken($info, 15%); }
 }
 
 // ─── Profile Card (left) ──────────────────────────────────────────────────────

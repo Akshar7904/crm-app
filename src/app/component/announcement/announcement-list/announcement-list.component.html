@@ -15,7 +15,7 @@
 
   <!-- Category Filter Tabs -->
   <div class="ann-filter-bar">
-    <button *ngFor="let cat of categories"
+    <button *ngFor="let cat of categories; trackBy: trackByValue"
             [class]="selectedCategory === cat.value ? 'ann-tab ann-tab-active' : 'ann-tab'"
             (click)="onCategoryChange(cat.value)">
       {{ cat.label }}
@@ -39,7 +39,7 @@
           <i class="bi bi-pin-angle-fill me-1"></i> Pinned
         </div>
         <div class="ann-card-grid">
-          <div *ngFor="let a of state.pinnedAnnouncements" class="ann-card ann-card-pinned" (click)="viewAnnouncement(a)">
+          <div *ngFor="let a of state.pinnedAnnouncements; trackBy: trackById" class="ann-card ann-card-pinned" (click)="viewAnnouncement(a)">
             <div class="ann-card-top">
               <span [class]="'ann-badge ann-badge-' + (a.category | lowercase)">{{ a.category }}</span>
               <i class="bi bi-pin-fill ann-pin-icon"></i>
@@ -60,7 +60,7 @@
           <i class="bi bi-list-ul me-1"></i> Recent Announcements
         </div>
         <div class="ann-card-grid">
-          <div *ngFor="let a of state.announcements" class="ann-card" (click)="viewAnnouncement(a)">
+          <div *ngFor="let a of state.announcements; trackBy: trackById" class="ann-card" (click)="viewAnnouncement(a)">
             <div class="ann-card-top">
               <span [class]="'ann-badge ann-badge-' + (a.category | lowercase)">{{ a.category }}</span>
               <span *ngIf="a.priority === 'URGENT'" class="ann-badge ann-badge-urgent">URGENT</span>

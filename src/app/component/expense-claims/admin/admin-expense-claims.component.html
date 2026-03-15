@@ -1,330 +1,355 @@
-<!-- admin-expense-claims.component.html -->
+<div class="claims-admin-page">
 
-<div class="container-fluid mt-4">
-  <div class="row">
-    <div class="col-md-12">
-      <div class="card">
-        <div class="claims-banner">
-          <div class="claims-banner-left">
-            <h1 class="claims-banner-title"><i class="bi bi-receipt-cutoff"></i> Expense Claims Management</h1>
-            <p class="claims-banner-subtitle">Review and approve employee expense claims</p>
-          </div>
-          <div class="claims-banner-actions">
-            <button class="claims-btn-banner" (click)="downloadReport()">
-              <i class="bi bi-download"></i> Download Report
-            </button>
-          </div>
+  <!-- ── Page Banner ──────────────────────────────────────────────────────── -->
+  <div class="page-banner mb-4">
+    <div class="banner-left">
+      <h1 class="banner-title"><i class="bi bi-receipt-cutoff"></i> Expense Claims</h1>
+      <p class="banner-subtitle">Review, approve and track all employee expense claims</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn-banner" (click)="downloadReport()">
+        <i class="bi bi-download"></i> Export Report
+      </button>
+    </div>
+  </div>
+
+  <!-- ── KPI Stat Cards ───────────────────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-primary-subtle">
+          <i class="bi bi-file-earmark-text text-primary"></i>
         </div>
-
-        <div class="card-body">
-
-          <!-- Filters -->
-          <div class="row mb-3">
-            <div class="col-md-4">
-              <label class="form-label">Filter by Status</label>
-              <select class="form-select"
-                      [(ngModel)]="filterStatus"
-                      (change)="onFilterChange()">
-                <option value="all">All Claims</option>
-                <option [value]="ExpenseClaimStatus.PENDING">Pending</option>
-                <option [value]="ExpenseClaimStatus.APPROVED">Approved</option>
-                <option [value]="ExpenseClaimStatus.REJECTED">Rejected</option>
-                <option [value]="ExpenseClaimStatus.PAID">Paid</option>
-                <option [value]="ExpenseClaimStatus.CANCELLED">Cancelled</option>
-              </select>
-            </div>
-
-            <div class="col-md-8">
-              <label class="form-label">Search</label>
-              <div class="input-group">
-                <input type="text"
-                       class="form-control"
-                       [(ngModel)]="searchQuery"
-                       (keyup.enter)="onSearch()"
-                       placeholder="Search by employee name, email, or claim number">
-                <button class="btn btn-outline-secondary" (click)="onSearch()">
-                  <i class="bi bi-search"></i>
-                </button>
-                <button class="btn btn-outline-secondary" (click)="clearSearch()">
-                  <i class="bi bi-x"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- STATE HANDLING -->
-          <ng-container *ngIf="expenseClaimsState$ | async as state">
-
-            <!-- LOADING -->
-            <div *ngIf="state.dataState === DataState.LOADING" class="text-center p-5">
-              <div class="spinner-border text-primary"></div>
-            </div>
-
-            <!-- ERROR -->
-            <div *ngIf="state.dataState === DataState.ERROR"
-                 class="alert alert-danger">
-              {{ state.error }}
-            </div>
-
-            <!-- LOADED -->
-            <ng-container *ngIf="state.dataState === DataState.LOADED">
-
-              <!-- TABLE -->
-              <div class="table-responsive">
-                <table class="table table-hover">
-                  <thead class="table-light">
-                  <tr>
-                    <th>Claim #</th>
-                    <th>Employee</th>
-                    <th>Date</th>
-                    <th>Purpose</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Submitted</th>
-                    <th>Actions</th>
-                  </tr>
-                  </thead>
-
-                  <tbody>
-                  <tr *ngFor="let claim of getClaims()">
-                    <td><strong>{{ claim.claimNumber }}</strong></td>
-                    <td>
-                      {{ claim.employeeName }}<br>
-                      <small class="text-muted">{{ claim.employeeEmail }}</small>
-                    </td>
-                    <td>{{ claim.claimDate | date:'mediumDate' }}</td>
-                    <td>{{ claim.purpose || '-' }}</td>
-                    <td><strong>R {{ claim.totalAmount | number:'1.2-2' }}</strong></td>
-                    <td>
-                      <span class="badge" [ngClass]="getStatusClass(claim.status)">
-                        {{ claim.status }}
-                      </span>
-                    </td>
-                    <td>{{ claim.createdAt | date:'short' }}</td>
-                    <td>
-                      <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-primary"
-                                (click)="viewClaimDetails(claim)">
-                          <i class="bi bi-eye"></i>
-                        </button>
-
-                        <button *ngIf="canApprove(claim)"
-                                class="btn btn-outline-success"
-                                (click)="openApprovalModal(claim, 'approve')">
-                          <i class="bi bi-check-circle"></i>
-                        </button>
-
-                        <button *ngIf="canApprove(claim)"
-                                class="btn btn-outline-danger"
-                                (click)="openApprovalModal(claim, 'reject')">
-                          <i class="bi bi-x-circle"></i>
-                        </button>
-
-<!--                        <button *ngIf="canMarkAsPaid(claim)"-->
-<!--                                class="btn btn-outline-info"-->
-<!--                                (click)="openApprovalModal(claim, 'paid')">-->
-<!--                          <i class="bi bi-cash"></i>-->
-<!--                        </button>-->
-                        <button *ngIf="canDelete(claim)"
-                                class="btn btn-outline-danger"
-                                (click)="deleteClaim(claim)"
-                                title="Delete claim">
-                          <i class="bi bi-trash"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  <tr *ngIf="getClaims().length === 0">
-                    <td colspan="8" class="text-center p-4 text-muted">
-                      No expense claims found
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- PAGINATION -->
-              <ng-container *ngIf="currentPage$ | async as currentPage">
-                <nav *ngIf="getTotalPages() > 1">
-                  <ul class="pagination justify-content-center">
-
-                    <li class="page-item" [class.disabled]="currentPage === 0">
-                      <a class="page-link" (click)="goToPage(currentPage - 1)">
-                        Previous
-                      </a>
-                    </li>
-
-                    <li class="page-item"
-                        *ngFor="let _ of [].constructor(getTotalPages()); let i = index"
-                        [class.active]="i === currentPage">
-                      <a class="page-link" (click)="goToPage(i)">
-                        {{ i + 1 }}
-                      </a>
-                    </li>
-
-                    <li class="page-item"
-                        [class.disabled]="currentPage >= getTotalPages() - 1">
-                      <a class="page-link" (click)="goToPage(currentPage + 1)">
-                        Next
-                      </a>
-                    </li>
-
-                  </ul>
-                </nav>
-              </ng-container>
-
-            </ng-container>
-          </ng-container>
-
+        <div class="stat-info">
+          <p class="stat-value">{{ getTotalElements() }}</p>
+          <p class="stat-label">Total Claims</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-warning-subtle">
+          <i class="bi bi-hourglass-split text-warning"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">{{ getPendingCount() }}</p>
+          <p class="stat-label">Pending Review</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-success-subtle">
+          <i class="bi bi-currency-exchange text-success"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">R {{ getVisibleTotal() | number:'1.2-2' }}</p>
+          <p class="stat-label">Value (Current View)</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="stat-card">
+        <div class="stat-icon bg-info-subtle">
+          <i class="bi bi-list-columns text-info"></i>
+        </div>
+        <div class="stat-info">
+          <p class="stat-value">{{ getClaims().length }}</p>
+          <p class="stat-label">Showing</p>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- DETAILS MODAL -->
+  <!-- ── Table Card ────────────────────────────────────────────────────────── -->
+  <div class="table-card">
+
+    <!-- Header: filter tabs + search -->
+    <div class="table-card-header">
+      <div class="filter-tabs">
+        <button class="filter-tab" [class.active]="activeTab === 'all'"      (click)="setActiveTab('all')">All</button>
+        <button class="filter-tab" [class.active]="activeTab === 'pending'"  (click)="setActiveTab('pending')">
+          Pending
+          <span class="pending-badge" *ngIf="getPendingCount() > 0">{{ getPendingCount() }}</span>
+        </button>
+        <button class="filter-tab" [class.active]="activeTab === 'approved'" (click)="setActiveTab('approved')">Approved</button>
+        <button class="filter-tab" [class.active]="activeTab === 'rejected'" (click)="setActiveTab('rejected')">Rejected</button>
+        <button class="filter-tab" [class.active]="activeTab === 'paid'"     (click)="setActiveTab('paid')">Paid</button>
+      </div>
+      <div class="input-group search-box">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control"
+               placeholder="Search name, email, claim #…"
+               [(ngModel)]="searchQuery"
+               (input)="onSearch()"
+               (keyup.enter)="onSearch()">
+        <button class="btn btn-outline-secondary" *ngIf="searchQuery" (click)="clearSearch()">
+          <i class="bi bi-x"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- State container -->
+    <ng-container *ngIf="expenseClaimsState$ | async as state">
+
+      <!-- Loading -->
+      <div *ngIf="state.dataState === DataState.LOADING" class="load-state">
+        <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+        <span class="text-muted">Loading claims…</span>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="state.dataState === DataState.ERROR" class="load-state">
+        <i class="bi bi-exclamation-circle text-danger me-2 fs-5"></i>
+        <span class="text-danger">{{ state.error }}</span>
+      </div>
+
+      <!-- Loaded -->
+      <ng-container *ngIf="state.dataState === DataState.LOADED">
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Claim #</th>
+                <th>Employee</th>
+                <th>Date</th>
+                <th>Purpose</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Submitted</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let claim of getClaims()">
+                <td><span class="claim-number">{{ claim.claimNumber }}</span></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <div class="emp-avatar">{{ getInitials(claim.employeeName) }}</div>
+                    <div>
+                      <div class="emp-name">{{ claim.employeeName }}</div>
+                      <div class="emp-email">{{ claim.employeeEmail }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-nowrap cell-secondary">{{ claim.claimDate | date:'d MMM yyyy' }}</td>
+                <td class="cell-secondary">{{ claim.purpose || '—' }}</td>
+                <td><span class="amount-value">R {{ claim.totalAmount | number:'1.2-2' }}</span></td>
+                <td>
+                  <span class="badge-soft" [ngClass]="getStatusClass(claim.status)">{{ claim.status }}</span>
+                </td>
+                <td class="cell-secondary text-nowrap">{{ claim.createdAt | date:'d MMM, HH:mm' }}</td>
+                <td>
+                  <div class="action-btn-group justify-content-end">
+                    <button class="action-btn" title="View Details" (click)="viewClaimDetails(claim)">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                    <button *ngIf="canApprove(claim)" class="action-btn action-btn-success" title="Approve"
+                            (click)="openApprovalModal(claim, 'approve')">
+                      <i class="bi bi-check-lg"></i>
+                    </button>
+                    <button *ngIf="canApprove(claim)" class="action-btn action-btn-danger" title="Reject"
+                            (click)="openApprovalModal(claim, 'reject')">
+                      <i class="bi bi-x-lg"></i>
+                    </button>
+                    <button *ngIf="canDelete(claim)" class="action-btn action-btn-danger" title="Delete"
+                            (click)="deleteClaim(claim)">
+                      <i class="bi bi-trash3"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Empty state -->
+              <tr *ngIf="getClaims().length === 0">
+                <td colspan="8">
+                  <div class="empty-state-cell">
+                    <i class="bi bi-receipt"></i>
+                    <p>No expense claims found</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination footer -->
+        <ng-container *ngIf="currentPage$ | async as currentPage">
+          <div class="table-card-footer" *ngIf="getTotalPages() > 1">
+            <span class="text-muted" style="font-size:0.8rem">
+              Page {{ currentPage + 1 }} of {{ getTotalPages() }}
+            </span>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn btn-sm btn-outline-secondary"
+                      [disabled]="currentPage === 0"
+                      (click)="goToPage(currentPage - 1)">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <button class="btn btn-sm btn-outline-secondary"
+                      *ngFor="let _ of [].constructor(getTotalPages()); let i = index"
+                      [class.btn-primary]="i === currentPage"
+                      [class.btn-outline-secondary]="i !== currentPage"
+                      (click)="goToPage(i)">
+                {{ i + 1 }}
+              </button>
+              <button class="btn btn-sm btn-outline-secondary"
+                      [disabled]="currentPage >= getTotalPages() - 1"
+                      (click)="goToPage(currentPage + 1)">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+      </ng-container>
+    </ng-container>
+
+  </div><!-- /table-card -->
+
+</div><!-- /claims-admin-page -->
+
+
+<!-- ══ DETAILS MODAL ══════════════════════════════════════════════════════════ -->
 <ng-container *ngIf="showDetailModal$ | async as showDetails">
   <div *ngIf="showDetails && selectedClaim"
        class="modal fade show d-block"
-       style="background-color: rgba(0,0,0,0.5);">
+       style="background:rgba(0,0,0,0.45)">
 
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+      <div class="modal-content falcon-modal">
 
-        <div class="modal-header">
-          <h5 class="modal-title">
-            <i class="bi bi-receipt me-2"></i>Expense Claim Details
-          </h5>
+        <div class="falcon-modal-header">
+          <div class="d-flex align-items-center gap-2">
+            <div class="modal-icon-wrap">
+              <i class="bi bi-receipt text-primary"></i>
+            </div>
+            <div>
+              <h5 class="modal-title">Expense Claim Details</h5>
+              <p class="modal-subtitle">{{ selectedClaim.claimNumber }}</p>
+            </div>
+          </div>
           <button class="btn-close" (click)="closeDetailModal()"></button>
         </div>
 
-        <div class="modal-body">
-          <div class="row">
-            <!-- Left Column - Claim Info -->
+        <div class="modal-body p-4" style="background:var(--bg-body,#f8f9fa)">
+          <div class="row g-3">
+
+            <!-- Left: Claim + Employee info -->
             <div class="col-md-6">
-              <div class="card mb-3">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="bi bi-info-circle me-2"></i>Claim Information</h6>
+              <div class="detail-card mb-3">
+                <div class="detail-card-header">
+                  <i class="bi bi-info-circle text-primary"></i> Claim Information
                 </div>
-                <div class="card-body">
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Claim Number:</div>
-                    <div class="col-7 fw-bold">{{ selectedClaim.claimNumber }}</div>
+                <div class="detail-card-body">
+                  <div class="detail-row">
+                    <span class="detail-label">Claim Number</span>
+                    <span class="claim-number">{{ selectedClaim.claimNumber }}</span>
                   </div>
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Status:</div>
-                    <div class="col-7">
-                      <span class="badge" [ngClass]="getStatusClass(selectedClaim.status)">
-                        {{ selectedClaim.status }}
-                      </span>
-                    </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Status</span>
+                    <span class="badge-soft" [ngClass]="getStatusClass(selectedClaim.status)">{{ selectedClaim.status }}</span>
                   </div>
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Claim Date:</div>
-                    <div class="col-7">{{ selectedClaim.claimDate | date:'mediumDate' }}</div>
+                  <div class="detail-row">
+                    <span class="detail-label">Claim Date</span>
+                    <span>{{ selectedClaim.claimDate | date:'d MMMM yyyy' }}</span>
                   </div>
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Submitted:</div>
-                    <div class="col-7">{{ selectedClaim.createdAt | date:'medium' }}</div>
+                  <div class="detail-row">
+                    <span class="detail-label">Submitted</span>
+                    <span>{{ selectedClaim.createdAt | date:'d MMM yyyy, HH:mm' }}</span>
                   </div>
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Purpose:</div>
-                    <div class="col-7">{{ selectedClaim.purpose || 'N/A' }}</div>
+                  <div class="detail-row" *ngIf="selectedClaim.purpose">
+                    <span class="detail-label">Purpose</span>
+                    <span>{{ selectedClaim.purpose }}</span>
                   </div>
                 </div>
               </div>
 
-              <div class="card">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="bi bi-person me-2"></i>Employee Information</h6>
+              <div class="detail-card">
+                <div class="detail-card-header">
+                  <i class="bi bi-person text-primary"></i> Employee
                 </div>
-                <div class="card-body">
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Name:</div>
-                    <div class="col-7 fw-bold">{{ selectedClaim.employeeName }}</div>
+                <div class="detail-card-body">
+                  <div class="detail-row">
+                    <span class="detail-label">Name</span>
+                    <strong>{{ selectedClaim.employeeName }}</strong>
                   </div>
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Email:</div>
-                    <div class="col-7">{{ selectedClaim.employeeEmail }}</div>
+                  <div class="detail-row">
+                    <span class="detail-label">Email</span>
+                    <span>{{ selectedClaim.employeeEmail }}</span>
                   </div>
-                  <div class="row mb-2" *ngIf="selectedClaim.departmentName">
-                    <div class="col-5 text-muted">Department:</div>
-                    <div class="col-7">{{ selectedClaim.departmentName }}</div>
+                  <div class="detail-row" *ngIf="selectedClaim.departmentName">
+                    <span class="detail-label">Department</span>
+                    <span>{{ selectedClaim.departmentName }}</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Right Column - Financial Info -->
+            <!-- Right: Financial + Approval info -->
             <div class="col-md-6">
-              <div class="card mb-3">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="bi bi-currency-dollar me-2"></i>Financial Details</h6>
+              <div class="detail-card mb-3">
+                <div class="detail-card-header">
+                  <i class="bi bi-cash-coin text-primary"></i> Financial Details
                 </div>
-                <div class="card-body">
-                  <div class="row mb-2">
-                    <div class="col-5 text-muted">Total Amount:</div>
-                    <div class="col-7 fw-bold text-success fs-5">
-                      R {{ selectedClaim.totalAmount | number:'1.2-2' }}
-                    </div>
+                <div class="detail-card-body">
+                  <div class="detail-row">
+                    <span class="detail-label">Total Amount</span>
+                    <span class="amount-value fs-5">R {{ selectedClaim.totalAmount | number:'1.2-2' }}</span>
                   </div>
-                  <div class="row mb-2" *ngIf="selectedClaim.category">
-                    <div class="col-5 text-muted">Category:</div>
-                    <div class="col-7">{{ selectedClaim.category }}</div>
+                  <div class="detail-row" *ngIf="selectedClaim.category">
+                    <span class="detail-label">Category</span>
+                    <span>{{ selectedClaim.category }}</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Approval Info (if approved/rejected) -->
-              <div class="card" *ngIf="selectedClaim.status !== 'PENDING'">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="bi bi-clipboard-check me-2"></i>Approval Information</h6>
+              <div class="detail-card mb-3" *ngIf="selectedClaim.status !== 'PENDING'">
+                <div class="detail-card-header">
+                  <i class="bi bi-clipboard-check text-primary"></i> Approval Information
                 </div>
-                <div class="card-body">
-                  <div class="row mb-2" *ngIf="selectedClaim.approvedByName">
-                    <div class="col-5 text-muted">Processed By:</div>
-                    <div class="col-7">{{ selectedClaim.approvedByName }}</div>
+                <div class="detail-card-body">
+                  <div class="detail-row" *ngIf="selectedClaim.approvedByName">
+                    <span class="detail-label">Processed By</span>
+                    <span>{{ selectedClaim.approvedByName }}</span>
                   </div>
-                  <div class="row mb-2" *ngIf="selectedClaim.approvalDate">
-                    <div class="col-5 text-muted">Processed Date:</div>
-                    <div class="col-7">{{ selectedClaim.approvalDate | date:'medium' }}</div>
+                  <div class="detail-row" *ngIf="selectedClaim.approvalDate">
+                    <span class="detail-label">Processed On</span>
+                    <span>{{ selectedClaim.approvalDate | date:'d MMM yyyy, HH:mm' }}</span>
                   </div>
-                  <div class="row mb-2" *ngIf="selectedClaim.remarks">
-                    <div class="col-5 text-muted">Remarks:</div>
-                    <div class="col-7">{{ selectedClaim.remarks }}</div>
+                  <div class="detail-row" *ngIf="selectedClaim.remarks">
+                    <span class="detail-label">Remarks</span>
+                    <span>{{ selectedClaim.remarks }}</span>
                   </div>
-                  <div class="row mb-2" *ngIf="selectedClaim.rejectionReason">
-                    <div class="col-5 text-muted">Rejection Reason:</div>
-                    <div class="col-7 text-danger">{{ selectedClaim.rejectionReason }}</div>
+                  <div class="detail-row" *ngIf="selectedClaim.rejectionReason">
+                    <span class="detail-label">Rejection Reason</span>
+                    <span class="text-danger">{{ selectedClaim.rejectionReason }}</span>
                   </div>
                 </div>
               </div>
 
-              <!-- Description -->
-              <div class="card mt-3" *ngIf="selectedClaim.description">
-                <div class="card-header bg-light">
-                  <h6 class="mb-0"><i class="bi bi-file-text me-2"></i>Description</h6>
+              <div class="detail-card" *ngIf="selectedClaim.description">
+                <div class="detail-card-header">
+                  <i class="bi bi-file-text text-primary"></i> Description
                 </div>
-                <div class="card-body">
-                  <p class="mb-0">{{ selectedClaim.description }}</p>
+                <div class="detail-card-body">
+                  <p class="mb-0" style="font-size:0.875rem;color:var(--text-secondary)">{{ selectedClaim.description }}</p>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
-        <div class="modal-footer">
-          <button class="btn btn-secondary" (click)="closeDetailModal()">
+        <div class="falcon-modal-footer">
+          <button class="btn btn-sm btn-outline-secondary" (click)="closeDetailModal()">
             <i class="bi bi-x-lg me-1"></i> Close
           </button>
-          <button *ngIf="canApprove(selectedClaim)"
-                  class="btn btn-success"
+          <button *ngIf="canApprove(selectedClaim)" class="btn btn-sm btn-success"
                   (click)="closeDetailModal(); openApprovalModal(selectedClaim, 'approve')">
             <i class="bi bi-check-circle me-1"></i> Approve
           </button>
-          <button *ngIf="canApprove(selectedClaim)"
-                  class="btn btn-danger"
+          <button *ngIf="canApprove(selectedClaim)" class="btn btn-sm btn-danger"
                   (click)="closeDetailModal(); openApprovalModal(selectedClaim, 'reject')">
             <i class="bi bi-x-circle me-1"></i> Reject
           </button>
@@ -335,56 +360,60 @@
   </div>
 </ng-container>
 
-<!-- APPROVAL MODAL -->
+
+<!-- ══ APPROVAL MODAL ═════════════════════════════════════════════════════════ -->
 <ng-container *ngIf="showApprovalModal$ | async as showApproval">
   <div *ngIf="showApproval && selectedClaim"
        class="modal fade show d-block"
-       style="background-color: rgba(0,0,0,0.5);">
+       style="background:rgba(0,0,0,0.45)">
 
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content falcon-modal">
 
-        <div class="modal-header text-white"
-             [style.background-color]="
-               approvalAction === 'approve' ? '#28a745' :
-               approvalAction === 'reject' ? '#dc3545' : '#17a2b8'
-             ">
-          <h5 class="modal-title">
-            {{ approvalAction | titlecase }} Expense Claim
-          </h5>
-          <button class="btn-close btn-close-white"
-                  (click)="closeApprovalModal()"></button>
+        <div class="falcon-modal-header"
+             [class.header-approve]="approvalAction === 'approve'"
+             [class.header-reject]="approvalAction === 'reject'">
+          <div class="d-flex align-items-center gap-2">
+            <div class="modal-icon-wrap"
+                 [class.icon-approve]="approvalAction === 'approve'"
+                 [class.icon-reject]="approvalAction === 'reject'">
+              <i class="bi" [ngClass]="approvalAction === 'approve' ? 'bi-check-circle text-success' : 'bi-x-circle text-danger'"></i>
+            </div>
+            <div>
+              <h5 class="modal-title">{{ approvalAction === 'approve' ? 'Approve' : 'Reject' }} Claim</h5>
+              <p class="modal-subtitle">{{ selectedClaim.claimNumber }} · R {{ selectedClaim.totalAmount | number:'1.2-2' }}</p>
+            </div>
+          </div>
+          <button class="btn-close" (click)="closeApprovalModal()"></button>
         </div>
 
-        <div class="modal-body">
+        <div class="modal-body p-4">
           <form [formGroup]="approvalForm">
-            <div *ngIf="approvalAction !== 'paid'" class="mb-3">
-              <label class="form-label">Remarks</label>
-              <textarea class="form-control" formControlName="remarks"></textarea>
+            <div class="mb-3">
+              <label class="form-label">Remarks <span class="text-muted fw-normal">(optional)</span></label>
+              <textarea class="form-control" rows="3"
+                        placeholder="Add a note for the employee…"
+                        formControlName="remarks"></textarea>
             </div>
-
-            <div *ngIf="approvalAction === 'reject'" class="mb-3">
-              <label class="form-label">Rejection Reason *</label>
-              <textarea class="form-control"
+            <div *ngIf="approvalAction === 'reject'" class="mb-1">
+              <label class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+              <textarea class="form-control" rows="3"
+                        placeholder="Explain why this claim is being rejected…"
                         formControlName="rejectionReason"></textarea>
             </div>
           </form>
         </div>
 
-        <div class="modal-footer">
-          <button class="btn btn-secondary"
-                  (click)="closeApprovalModal()">
-            Cancel
-          </button>
-
-          <button class="btn"
-                  [ngClass]="approvalAction === 'approve' ? 'btn-success' :
-                             approvalAction === 'reject' ? 'btn-danger' : 'btn-info'"
+        <div class="falcon-modal-footer">
+          <button class="btn btn-sm btn-outline-secondary" (click)="closeApprovalModal()">Cancel</button>
+          <button class="btn btn-sm"
+                  [class.btn-success]="approvalAction === 'approve'"
+                  [class.btn-danger]="approvalAction === 'reject'"
                   [disabled]="isLoading$ | async"
                   (click)="submitApproval()">
-            <span *ngIf="isLoading$ | async"
-                  class="spinner-border spinner-border-sm me-2"></span>
-            Confirm
+            <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi me-1" [ngClass]="approvalAction === 'approve' ? 'bi-check-lg' : 'bi-x-lg'"></i>
+            Confirm {{ approvalAction === 'approve' ? 'Approval' : 'Rejection' }}
           </button>
         </div>
 

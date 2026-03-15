@@ -30,20 +30,14 @@ export class ThemeService {
   }
 
   private getStoredTheme(): Theme {
-    const stored = localStorage.getItem(Key.THEME) as Theme;
-    return stored && ['light', 'dark', 'system'].includes(stored) ? stored : 'system';
+    return 'light';
   }
 
   private applyTheme(theme: Theme): void {
-    if (theme === 'system') {
-      this.applyResolvedTheme();
-    } else {
-      document.documentElement.setAttribute('data-theme', theme);
-    }
+    document.documentElement.setAttribute('data-theme', 'light');
   }
 
   private applyResolvedTheme(): void {
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', 'light');
   }
 }

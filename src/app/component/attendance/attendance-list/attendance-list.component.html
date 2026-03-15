@@ -93,7 +93,7 @@
         <thead>
           <tr>
             <th class="att-emp-col att-sticky-col">Employee</th>
-            <th *ngFor="let wd of weekDays"
+            <th *ngFor="let wd of weekDays; trackBy: trackByValue"
                 class="att-day-col"
                 [class.att-today-col]="wd.isToday"
                 [class.att-weekend-col]="wd.isWeekend"
@@ -109,12 +109,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let ea of filterEmployees(state.attendances)" class="att-row">
+          <tr *ngFor="let ea of filterEmployees(state.attendances); trackBy: trackById" class="att-row">
             <td class="att-emp-cell att-sticky-col">
               <div class="att-emp-name">{{ea.employeeName}}</div>
               <div class="att-emp-meta" *ngIf="ea.designation">{{ea.designation}}</div>
             </td>
-            <td *ngFor="let wd of weekDays"
+            <td *ngFor="let wd of weekDays; trackBy: trackByValue"
                 class="att-cell"
                 [class.att-weekend-cell]="wd.isWeekend"
                 [class.att-other-month]="wd.month !== weekDays[0].month"

@@ -5,6 +5,7 @@ import { DocumentationComponent } from './component/documentation/documentation.
 import { AuthenticationGuard } from './guard/authentication.guard';
 import { AttendanceListComponent } from "./component/attendance/attendance-list/attendance-list.component";
 import { MyAttendanceComponent } from "./component/attendance/my-attendance/my-attendance.component";
+import { WhatsAppAttendanceComponent } from "./component/attendance/whatsapp-attendance/whatsapp-attendance.component";
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
 
@@ -119,6 +120,12 @@ const routes: Routes = [
     component: MyAttendanceComponent,
     canActivate: [AuthenticationGuard],
     data: { title: 'My Attendance' }
+  },
+  {
+    path: 'attendance/whatsapp',
+    component: WhatsAppAttendanceComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'WhatsApp Attendance' }
   },
   {
     path: 'holidays',

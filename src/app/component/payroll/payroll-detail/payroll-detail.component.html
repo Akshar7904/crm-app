@@ -37,6 +37,12 @@
         <td class="ps-label">Designation</td>
         <td class="ps-value">{{ employee?.designationTitle || 'N/A' }}</td>
       </tr>
+      <tr>
+        <td class="ps-label">Employment Type</td>
+        <td class="ps-value">{{ employee?.employmentType || 'FULL-TIME' }}</td>
+        <td class="ps-label">Pay Period</td>
+        <td class="ps-value">{{ getPayPeriod() }}</td>
+      </tr>
     </table>
   </div>
 
@@ -46,18 +52,18 @@
     <!-- Earnings -->
     <div class="ps-col">
       <div class="ps-col-header ps-earnings-header">
-        <span>Earnings</span><span>Amount (R)</span>
+        <span>{{ isIntern ? 'Stipend Breakdown' : 'Earnings' }}</span><span>Amount (R)</span>
       </div>
       <table class="ps-items-table">
-        <tr><td>Basic Salary</td><td>{{ formatAmount(payroll.basicSalary) }}</td></tr>
-        <tr><td>Allowance</td><td>{{ formatAmount(payroll.allowances) }}</td></tr>
-        <tr><td>Transport Allowance</td><td>0.00</td></tr>
-        <tr><td>Medical Reimbursement</td><td>0.00</td></tr>
-        <tr><td>Special Allowance</td><td>{{ formatAmount(payroll.bonus) }}</td></tr>
-        <tr><td>Overtime</td><td>{{ formatAmount(payroll.overtimePay) }}</td></tr>
+        <tr><td>{{ isIntern ? 'Monthly Stipend' : 'Basic Salary' }}</td><td>{{ formatAmount(payroll.basicSalary) }}</td></tr>
+        <tr *ngIf="!isIntern"><td>Allowance</td><td>{{ formatAmount(payroll.allowances) }}</td></tr>
+        <tr *ngIf="!isIntern"><td>Transport Allowance</td><td>0.00</td></tr>
+        <tr *ngIf="!isIntern"><td>Medical Reimbursement</td><td>0.00</td></tr>
+        <tr *ngIf="!isIntern"><td>Special Allowance</td><td>{{ formatAmount(payroll.bonus) }}</td></tr>
+        <tr *ngIf="!isIntern"><td>Overtime</td><td>{{ formatAmount(payroll.overtimePay) }}</td></tr>
       </table>
       <div class="ps-col-total">
-        <span>Total Earnings</span><span>{{ formatAmount(payroll.grossSalary) }}</span>
+        <span>{{ isIntern ? 'Gross Stipend' : 'Total Earnings' }}</span><span>{{ formatAmount(payroll.grossSalary) }}</span>
       </div>
     </div>
 
@@ -67,12 +73,13 @@
         <span>Deductions</span><span>Amount (R)</span>
       </div>
       <table class="ps-items-table">
-        <tr><td>Loan</td><td>0.00</td></tr>
-        <tr><td>Provident Fund</td><td>{{ formatAmount(payroll.pensionFund) }}</td></tr>
-        <tr><td>PAYE Tax</td><td>{{ formatAmount(payroll.payeTax) }}</td></tr>
+        <tr *ngIf="!isIntern"><td>Loan</td><td>0.00</td></tr>
+        <tr *ngIf="!isIntern"><td>Provident Fund</td><td>{{ formatAmount(payroll.pensionFund) }}</td></tr>
+        <tr *ngIf="!isIntern"><td>PAYE Tax</td><td>{{ formatAmount(payroll.payeTax) }}</td></tr>
         <tr><td>UIF</td><td>{{ formatAmount(payroll.uif) }}</td></tr>
-        <tr><td>Medical Aid</td><td>{{ formatAmount(payroll.medicalAid) }}</td></tr>
-        <tr><td>Other Deductions</td><td>0.00</td></tr>
+        <tr *ngIf="!isIntern"><td>Medical Aid</td><td>{{ formatAmount(payroll.medicalAid) }}</td></tr>
+        <tr *ngIf="isIntern"><td>Other Deductions</td><td>{{ formatAmount(payroll.totalDeductions) }}</td></tr>
+        <tr *ngIf="!isIntern"><td>Other Deductions</td><td>0.00</td></tr>
       </table>
       <div class="ps-col-total">
         <span>Total Deductions</span><span>{{ formatAmount(payroll.totalDeductions) }}</span>
@@ -82,7 +89,7 @@
 
   <!-- Net Pay -->
   <div class="ps-net-pay">
-    <span class="ps-net-label">Net Pay</span>
+    <span class="ps-net-label">{{ isIntern ? 'Net Stipend' : 'Net Pay' }}</span>
     <span class="ps-net-amount">R {{ formatAmount(payroll.netSalary) }}</span>
   </div>
 

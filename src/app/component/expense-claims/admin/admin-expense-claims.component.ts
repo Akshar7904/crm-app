@@ -383,13 +383,29 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
 
   getStatusClass(status: ExpenseClaimStatus): string {
     const classes = {
-      [ExpenseClaimStatus.PENDING]: 'bg-warning text-dark',
-      [ExpenseClaimStatus.APPROVED]: 'bg-success',
-      [ExpenseClaimStatus.REJECTED]: 'bg-danger',
-      [ExpenseClaimStatus.PAID]: 'bg-info',
-      [ExpenseClaimStatus.CANCELLED]: 'bg-secondary'
+      [ExpenseClaimStatus.PENDING]:   'badge-pending',
+      [ExpenseClaimStatus.APPROVED]:  'badge-approved',
+      [ExpenseClaimStatus.REJECTED]:  'badge-rejected',
+      [ExpenseClaimStatus.PAID]:      'badge-paid',
+      [ExpenseClaimStatus.CANCELLED]: 'badge-cancelled'
     };
-    return classes[status] || 'bg-secondary';
+    return classes[status] || 'badge-cancelled';
+  }
+
+  getTotalElements(): number {
+    return this.dataSubject.value?.data?.page?.totalElements || 0;
+  }
+
+  getVisibleTotal(): number {
+    return this.getClaims().reduce((sum, c) => sum + (c.totalAmount || 0), 0);
+  }
+
+  getInitials(name: string): string {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    return parts.length >= 2
+      ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
+      : name.substring(0, 2).toUpperCase();
   }
 
   formatDate(dateString: string): string {

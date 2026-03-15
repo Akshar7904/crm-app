@@ -168,34 +168,39 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
   }
 
   openPopup(day: CalendarDay, event: MouseEvent): void {
-    const popupW = 320;
-    const popupMaxH = 380;
-    const margin = 8;
-    const viewW = window.innerWidth;
-    const viewH = window.innerHeight;
+    const popupW = 300;
+    const popupMaxH = 360;
+    const margin = 6;
 
-    // Use the cell's bounding rect for precise positioning
+    // Use absolute positioning relative to .ms-calendar (position:relative)
+    // so CSS transforms on ancestor cards don't break placement.
+    const calendarEl = this.elementRef.nativeElement as HTMLElement;
+    const calendarRect = calendarEl.getBoundingClientRect();
+
     const cell = (event.currentTarget as Element) || (event.target as Element);
-    const rect = cell?.getBoundingClientRect?.() ?? { left: event.clientX, right: event.clientX, top: event.clientY, bottom: event.clientY };
+    const cellRect = cell?.getBoundingClientRect?.() ?? {
+      left: event.clientX, right: event.clientX,
+      top: event.clientY, bottom: event.clientY
+    };
 
-    // Prefer showing popup below the cell, aligned to its left edge
-    let left = rect.left;
-    let top = rect.bottom + 6;
+    // Popup opens below the cell, left-aligned to it — both relative to .ms-calendar
+    let left = cellRect.left - calendarRect.left;
+    let top = cellRect.bottom - calendarRect.top + 4;
 
-    // Flip left if popup would overflow right edge
-    if (left + popupW > viewW - margin) {
-      left = rect.right - popupW;
+    // Flip left if popup would overflow calendar right edge
+    if (left + popupW > calendarRect.width - margin) {
+      left = cellRect.right - calendarRect.left - popupW;
     }
     if (left < margin) left = margin;
 
-    // Flip up if popup would overflow bottom
-    if (top + popupMaxH > viewH - margin) {
-      top = rect.top - popupMaxH - 6;
+    // Flip up if popup would overflow calendar bottom edge
+    if (top + popupMaxH > calendarRect.height - margin) {
+      top = cellRect.top - calendarRect.top - popupMaxH - 4;
     }
     if (top < margin) top = margin;
 
     this.popupStyle = {
-      position: 'fixed',
+      position: 'absolute',
       top: top + 'px',
       left: left + 'px',
       width: popupW + 'px',

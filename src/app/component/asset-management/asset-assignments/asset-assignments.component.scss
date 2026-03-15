@@ -73,3 +73,12 @@ code {
   &:focus { background: var(--bg-card); border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.15); }
   &::placeholder { color: var(--text-light); }
 }
+
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .asset-assignments-page { padding: $spacing-sm $spacing-md; }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .active-toggle { padding: 4px 10px; font-size: 0.8rem; }
+  .table-footer { justify-content: center; }
+  .modal-body { padding: $spacing-md; }
+}

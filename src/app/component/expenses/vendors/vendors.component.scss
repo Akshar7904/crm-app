@@ -77,6 +77,14 @@
   align-items: center;
 }
 
+// ─── Mobile ────────────────────────────────────────────────────────────────────
+@include respond-to('md') {
+  .vendors-page { padding: $spacing-sm $spacing-md; }
+  .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .vendor-name-cell { gap: 7px; }
+  .vendor-initials { width: 28px; height: 28px; font-size: 0.6rem; }
+}
+
 // ─── Modal styling ────────────────────────────────────────────────────────────
 .modal-backdrop { background: rgba(0,0,0,0.4); backdrop-filter: blur(3px); }
 

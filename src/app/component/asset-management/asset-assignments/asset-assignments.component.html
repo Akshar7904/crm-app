@@ -40,7 +40,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let assignment of getAssignments(state)">
+                <tr *ngFor="let assignment of getAssignments(state); trackBy: trackById">
                   <td>
                     <a [routerLink]="['/assets', assignment.assetId]" class="text-decoration-none">
                       <code>{{ assignment.assetTag }}</code><br>
@@ -88,7 +88,7 @@
                 <li [ngClass]="0 == (currentPage$ | async) ? 'disabled' : ''" class="page-item">
                   <a (click)="goToNextOrPreviousPage('backward')" class="page-link" style="cursor:pointer">&laquo;</a>
                 </li>
-                <li *ngFor="let p of getTotalPages(state) | ExtractArrayValue:'number'; let i = index" class="page-item">
+                <li *ngFor="let p of getTotalPages(state) | ExtractArrayValue:'number'; let i = index; trackBy: trackByIndex" class="page-item">
                   <a (click)="goToPage(i)" [ngClass]="i == (currentPage$ | async) ? 'active' : ''"
                      class="page-link" style="cursor:pointer">{{ i + 1 }}</a>
                 </li>
@@ -128,7 +128,7 @@
             <div class="mb-3">
               <label class="form-label">Condition on Return <span class="text-danger">*</span></label>
               <select class="form-select" [(ngModel)]="returnCondition">
-                <option *ngFor="let cond of conditions" [value]="cond">{{ cond | titlecase }}</option>
+                <option *ngFor="let cond of conditions; trackBy: trackByValue" [value]="cond">{{ cond | titlecase }}</option>
               </select>
             </div>
             <div class="mb-3">

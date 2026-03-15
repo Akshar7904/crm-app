@@ -6,16 +6,18 @@ interface CacheEntry {
   expiresAt: number;
 }
 
-const CACHE_TTL_MS = 3 * 60 * 1000; // 3 minutes
+const DEFAULT_TTL_MS = 3 * 60 * 1000;       // 3 minutes — default
+const STATIC_TTL_MS  = 60 * 60 * 1000;      // 1 hour   — departments, designations, holidays
+const MEDIUM_TTL_MS  = 10 * 60 * 1000;      // 10 minutes — announcements
 
 @Injectable()
 export class HttpCacheService {
     private httpResponseCache: { [key: string]: CacheEntry } = {};
 
-    put = (key: string, httpResponse: HttpResponse<any>): void => {
+    put = (key: string, httpResponse: HttpResponse<any>, ttl: number = DEFAULT_TTL_MS): void => {
         this.httpResponseCache[key] = {
             response: httpResponse,
-            expiresAt: Date.now() + CACHE_TTL_MS
+            expiresAt: Date.now() + ttl
         };
     }
 
@@ -33,6 +35,24 @@ export class HttpCacheService {
 
     evictAll = (): void => {
         this.httpResponseCache = {};
+    }
+
+    evictByPrefix = (prefix: string): void => {
+        Object.keys(this.httpResponseCache).forEach(key => {
+            if (key.includes(prefix)) {
+                delete this.httpResponseCache[key];
+            }
+        });
+    }
+
+    getTtl = (url: string): number => {
+        if (url.includes('/department') || url.includes('/designation') || url.includes('/holiday')) {
+            return STATIC_TTL_MS;
+        }
+        if (url.includes('/announcement')) {
+            return MEDIUM_TTL_MS;
+        }
+        return DEFAULT_TTL_MS;
     }
 
     logCache = (): void => console.log(this.httpResponseCache);

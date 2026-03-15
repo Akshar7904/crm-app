@@ -858,3 +858,147 @@ thead {
     display: none !important;
   }
 }
+
+// ============================================================
+// GLOBAL MOBILE RESPONSIVENESS — LinkedIn-style (≤ 768px)
+// ============================================================
+@media (max-width: 768px) {
+
+  // ── Page banner ─────────────────────────────────────────
+  .page-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px !important;
+
+    .banner-actions {
+      width: 100%;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .btn, button, a.btn {
+        flex: 1;
+        min-width: 0;
+        justify-content: center;
+        font-size: 0.78rem;
+        padding: 7px 12px;
+      }
+    }
+
+    .banner-title { font-size: 1rem !important; }
+    .banner-subtitle { font-size: 0.78rem !important; }
+  }
+
+  // ── Falcon card ─────────────────────────────────────────
+  .falcon-card, .table-card {
+    border-radius: 10px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  // ── Tables: horizontal scroll ────────────────────────────
+  .table-responsive, .table-card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Compact table cells on mobile
+  .table-card table thead th,
+  .table-card table tbody td,
+  table.table thead th,
+  table.table tbody td {
+    padding: 8px 10px !important;
+    font-size: 0.78rem !important;
+    white-space: nowrap;
+  }
+
+  // ── KPI / Stat cards ────────────────────────────────────
+  .row .col-md-3,
+  .row .col-lg-3,
+  .row .col-xl-3 {
+    margin-bottom: 10px;
+  }
+
+  .kpi-stat {
+    padding: 14px 16px !important;
+    .kpi-value { font-size: 1.4rem !important; }
+    .kpi-label { font-size: 0.7rem !important; }
+  }
+
+  // ── Form layouts: single column ──────────────────────────
+  .row > [class*="col-md-"],
+  .row > [class*="col-lg-"],
+  .row > [class*="col-xl-"] {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  // ── Modal: full screen on mobile ─────────────────────────
+  .modal-dialog {
+    margin: 0 !important;
+    max-width: 100% !important;
+    height: 100%;
+  }
+
+  .modal-content {
+    border-radius: 16px 16px 0 0 !important;
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 92vh;
+    overflow-y: auto;
+    border: none !important;
+  }
+
+  // ── Action button groups ─────────────────────────────────
+  .action-btn-group {
+    flex-wrap: wrap;
+    gap: 6px;
+
+    button, a.btn {
+      flex: 1;
+      min-width: 80px;
+      justify-content: center;
+      font-size: 0.78rem;
+    }
+  }
+
+  // ── Roles grid / feature grids ───────────────────────────
+  .roles-grid { grid-template-columns: 1fr !important; }
+
+  // ── py-4 padding reduction on mobile ─────────────────────
+  .container-fluid.py-4 { padding-top: 12px !important; padding-bottom: 12px !important; }
+
+  // ── Badge pill font size ─────────────────────────────────
+  .badge-soft { font-size: 0.65rem !important; padding: 2px 8px !important; }
+
+  // ── Dropdown menus: full width on phone ──────────────────
+  .dropdown-menu {
+    width: calc(100vw - 24px) !important;
+    max-width: 340px;
+  }
+
+  // ── Stat summary rows become 2-col grid ──────────────────
+  .row.g-3 > .col-md-3, .row.g-3 > .col-sm-6 {
+    width: 50%;
+    flex: 0 0 50%;
+  }
+
+  // ── Hide non-critical table columns (use .mobile-hide) ───
+  .mobile-hide { display: none !important; }
+
+  // ── Scrollable tabs ─────────────────────────────────────
+  .nav-tabs, .doc-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  // ── Full-width inputs on forms ───────────────────────────
+  .input-group, .form-control, .form-select {
+    font-size: 16px !important; // prevent iOS zoom on focus
+  }
+}

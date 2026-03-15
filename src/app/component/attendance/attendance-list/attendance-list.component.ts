@@ -288,6 +288,9 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
     );
   }
 
+  trackById(index: number, item: any): any { return item?.employeeId ?? item?.id ?? index; }
+  trackByValue(index: number, value: any): any { return value ?? index; }
+
   // ─── Export
 
   exporting = false;

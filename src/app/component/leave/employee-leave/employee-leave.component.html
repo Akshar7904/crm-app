@@ -27,7 +27,7 @@
 
     <!-- ─── Balance KPI Cards ─── -->
     <div class="el-balance-grid">
-      <div class="el-balance-card" *ngFor="let balance of leaveBalances; let i = index"
+      <div class="el-balance-card" *ngFor="let balance of leaveBalances; let i = index; trackBy: trackByIndex"
            [class]="'el-balance-card el-balance-' + i">
         <div class="el-balance-icon-wrap">
           <i class="bi bi-calendar-event"></i>
@@ -97,7 +97,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let leave of filteredLeaves">
+            <tr *ngFor="let leave of filteredLeaves; trackBy: trackById">
               <td>
                 <span class="el-type-badge">{{ leaveTypeLabels[leave.leaveType] }}</span>
               </td>
@@ -173,7 +173,7 @@
               <select formControlName="leaveType" class="form-control"
                       [class.is-invalid]="leaveForm.get('leaveType')?.invalid && leaveForm.get('leaveType')?.touched">
                 <option value="">Select leave type</option>
-                <option *ngFor="let type of leaveTypes" [value]="type">{{ leaveTypeLabels[type] }}</option>
+                <option *ngFor="let type of leaveTypes; trackBy: trackByValue" [value]="type">{{ leaveTypeLabels[type] }}</option>
               </select>
               <div *ngIf="leaveForm.get('leaveType')?.value" class="el-balance-hint mt-1">
                 <i class="bi bi-info-circle me-1"></i>

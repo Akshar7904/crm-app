@@ -2,7 +2,7 @@ import { environment } from '@env/environment';
 // admin-leave.component.ts
 // Updated to fetch admin/manager information from authenticated user using correct endpoint
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -15,6 +15,7 @@ import { CustomHttpResponse } from '../../../interface/appstates';
 import { UserModel } from '../../profile/user.model';
 import {
   Leave,
+  LeaveBalance,
   LeaveStatus,
   LeaveType,
   LEAVE_TYPE_LABELS,
@@ -26,7 +27,8 @@ import {
   standalone: false,
   selector: 'app-admin-leave',
   templateUrl: './admin-leave.component.html',
-  styleUrls: ['./admin-leave.component.scss']
+  styleUrls: ['./admin-leave.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminLeaveComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -51,7 +53,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   approvalAction: 'approve' | 'reject' = 'approve';
 
   // Filters
-  activeTab: 'all' | 'pending' | 'approved' | 'rejected' | 'upcoming' = 'pending';
+  activeTab: 'all' | 'pending' | 'approved' | 'rejected' | 'upcoming' | 'allocate' = 'pending';
   searchQuery: string = '';
   selectedStatus: LeaveStatus | 'all' = 'all';
   selectedType: LeaveType | 'all' = 'all';
@@ -63,12 +65,21 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   leaveStatusLabels = LEAVE_STATUS_LABELS;
   LeaveStatus = LeaveStatus;
 
+  // ─── Leave Allocation
+  // hireYear filter: show employees who started working in this year
+  allocationYear: number = new Date().getFullYear();
+  allBalances: LeaveBalance[] = [];
+  groupedBalances: { employeeName: string; employeeId: number; balances: LeaveBalance[] }[] = [];
+  allocationLoading: boolean = false;
+  savingBalanceId: string = ''; // key: employeeId-leaveType
+
   constructor(
     private formBuilder: FormBuilder,
     private leaveService: LeaveService,
     private userService: UserService,
     private notificationService: NotificationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {
     this.approvalForm = this.createApprovalForm();
   }
@@ -144,16 +155,18 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
           this.allLeaves = leaves;
           this.currentDataState = DataState.LOADED;
           this.error = null;
+          this.cdr.markForCheck();
         },
         error: (err) => {
           this.currentDataState = DataState.ERROR;
           this.error = err?.message || 'Failed to load leave requests';
+          this.cdr.markForCheck();
         }
       });
 
     this.leaveService.getUpcomingLeaves(30)
       .pipe(takeUntil(this.destroy$))
-      .subscribe((leaves: Leave[]) => this.upcomingLeaves = leaves);
+      .subscribe((leaves: Leave[]) => { this.upcomingLeaves = leaves; this.cdr.markForCheck(); });
   }
 
   // ─── Computed counts per tab
@@ -163,12 +176,68 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   get upcomingCount(): number { return this.upcomingLeaves.length; }
 
   // ─── Tab
-  setActiveTab(tab: 'all' | 'pending' | 'approved' | 'rejected' | 'upcoming'): void {
+  setActiveTab(tab: 'all' | 'pending' | 'approved' | 'rejected' | 'upcoming' | 'allocate'): void {
     this.activeTab = tab;
     this.searchQuery = '';
     this.selectedStatus = 'all';
     this.selectedType = 'all';
+    if (tab === 'allocate') {
+      this.loadAllocationData();
+    }
   }
+
+  loadAllocationData(): void {
+    this.allocationLoading = true;
+    this.leaveService.getAllBalancesForHireYear(this.allocationYear)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (balances: LeaveBalance[]) => {
+          this.allBalances = balances;
+          this.allocationLoading = false;
+          this.buildGroupedBalances();
+        },
+        error: () => {
+          this.allocationLoading = false;
+          this.notificationService.onError('Failed to load leave balances');
+        }
+      });
+  }
+
+  private buildGroupedBalances(): void {
+    const grouped = new Map<number, { employeeName: string; employeeId: number; balances: LeaveBalance[] }>();
+    for (const b of this.allBalances) {
+      if (!grouped.has(b.employeeId)) {
+        grouped.set(b.employeeId, { employeeName: b.employeeName || 'Unknown', employeeId: b.employeeId, balances: [] });
+      }
+      grouped.get(b.employeeId)!.balances.push(b);
+    }
+    this.groupedBalances = Array.from(grouped.values()).sort((a, b) => a.employeeName.localeCompare(b.employeeName));
+    this.cdr.markForCheck();
+  }
+
+  saveEntitlement(balance: LeaveBalance): void {
+    if (!balance.employeeId || !balance.leaveType) return;
+    const key = `${balance.employeeId}-${balance.leaveType}`;
+    this.savingBalanceId = key;
+    // balance.year is the actual DB record year (e.g. 2026); allocationYear is the hire-year filter
+    const balanceYear = balance.year || new Date().getFullYear();
+    this.leaveService.updateLeaveEntitlement(
+      balance.employeeId, balance.leaveType as string, balanceYear, balance.totalEntitled
+    ).pipe(takeUntil(this.destroy$))
+    .subscribe({
+      next: () => {
+        this.savingBalanceId = '';
+        this.notificationService.onSuccess('Leave entitlement updated');
+        // Reload from DB so the table shows the authoritative available/entitled values
+        this.loadAllocationData();
+      },
+      error: (error: any) => {
+        this.savingBalanceId = '';
+        this.notificationService.onError(error?.error?.message || 'Failed to update entitlement');
+      }
+    });
+  }
+
 
   // ─── Filter / search (all client-side)
   onSearch(): void { /* triggers filteredLeaves getter */ }
@@ -282,6 +351,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
 
   // ─── Filtered leaves (fully client-side)
   get filteredLeaves(): Leave[] {
+    if (this.activeTab === 'allocate') return [];
     let result = [...this.allLeaves];
 
     // Tab filter
@@ -318,7 +388,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   get activeTabLabel(): string {
     const labels: Record<string, string> = {
       pending: 'pending', approved: 'approved', rejected: 'rejected',
-      upcoming: 'upcoming', all: ''
+      upcoming: 'upcoming', all: '', allocate: ''
     };
     return labels[this.activeTab] || '';
   }
@@ -393,4 +463,9 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   exportToExcel(): void {
     console.log('Export to Excel - to be implemented');
   }
+
+  trackById(index: number, item: any): any { return item?.id ?? index; }
+  trackByValue(index: number, value: any): any { return value ?? index; }
+  trackByEmployeeId(index: number, item: any): any { return item?.employeeId ?? index; }
+  trackByBalance(index: number, item: any): any { return item?.id ?? item?.leaveType ?? index; }
 }
