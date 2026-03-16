@@ -456,6 +456,18 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
       });
   }
 
+  viewReceipt(receiptUrl: string): void {
+    this.expenseClaimService.downloadFile$(receiptUrl)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        },
+        error: () => this.notificationService.onError('Could not open receipt')
+      });
+  }
+
   onReceiptSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.selectedReceiptFile = input.files?.[0] || null;

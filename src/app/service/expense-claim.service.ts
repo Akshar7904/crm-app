@@ -214,6 +214,9 @@ export class ExpenseClaimService {
     return this.http.post<any>(`${this.server}/expense-claims/${claimId}/receipt`, formData);
   };
 
+  downloadFile$ = (relativePath: string) =>
+    this.http.get(`${environment.apiUrl}${relativePath}`, { responseType: 'blob' });
+
   /**
    * Get expense claim statistics
    * GET /expense-claims/statistics
