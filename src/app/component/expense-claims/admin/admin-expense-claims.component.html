@@ -337,14 +337,26 @@
                 </div>
               </div>
 
-              <div class="detail-card mt-3" *ngIf="selectedClaim.receiptUrl">
+              <div class="detail-card mt-3">
                 <div class="detail-card-header">
                   <i class="bi bi-paperclip text-primary"></i> Receipt
                 </div>
                 <div class="detail-card-body">
-                  <a [href]="selectedClaim.receiptUrl" target="_blank" class="btn btn-sm btn-outline-success">
-                    <i class="bi bi-eye me-1"></i> View Receipt
-                  </a>
+                  <div *ngIf="selectedClaim.receiptUrl" class="mb-2">
+                    <a [href]="apiUrl + selectedClaim.receiptUrl" target="_blank" class="btn btn-sm btn-outline-success me-2">
+                      <i class="bi bi-eye me-1"></i> View Receipt
+                    </a>
+                  </div>
+                  <div class="input-group input-group-sm">
+                    <input type="file" class="form-control form-control-sm"
+                           (change)="onReceiptSelected($event)"
+                           accept=".pdf,.jpg,.jpeg,.png">
+                    <button class="btn btn-outline-primary btn-sm" type="button"
+                            (click)="uploadReceipt()" [disabled]="!selectedReceiptFile">
+                      <i class="bi bi-upload me-1"></i> Upload
+                    </button>
+                  </div>
+                  <small class="text-muted">PDF, JPG, PNG accepted</small>
                 </div>
               </div>
             </div>

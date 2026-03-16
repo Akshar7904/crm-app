@@ -13,6 +13,7 @@ import { ExpenseClaimService } from '../../../service/expense-claim.service';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
 import { UserModel } from '../../profile/user.model';
+import { environment } from '@env/environment';
 
 @Component({
   standalone: false,
@@ -48,6 +49,7 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
 
   readonly DataState = DataState;
   readonly ExpenseClaimStatus = ExpenseClaimStatus;
+  readonly apiUrl = environment.apiUrl;
 
   currentUser: UserModel | null = null;
   currentEmployeeId: number | null = null;
@@ -55,6 +57,7 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
   approvalForm: FormGroup;
   selectedClaim: ExpenseClaim | null = null;
   approvalAction: 'approve' | 'reject' = 'approve';
+  selectedReceiptFile: File | null = null;
   activeTab: 'all' | 'pending' | 'approved' | 'rejected' | 'paid' = 'pending';
   searchQuery: string = '';
   filterStatus: ExpenseClaimStatus | 'all' = 'all';
@@ -450,6 +453,29 @@ export class AdminExpenseClaimsComponent implements OnInit, OnDestroy {
           this.refreshClaimsList();
         },
         error: (err) => this.notificationService.onError(err?.error?.message || 'Failed to delete claim')
+      });
+  }
+
+  onReceiptSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedReceiptFile = input.files?.[0] || null;
+  }
+
+  uploadReceipt(): void {
+    if (!this.selectedReceiptFile || !this.selectedClaim?.id) return;
+    this.expenseClaimService.uploadReceipt$(this.selectedClaim.id, this.selectedReceiptFile)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          this.notificationService.onSuccess('Receipt uploaded successfully');
+          if (this.selectedClaim) {
+            this.selectedClaim.receiptUrl = res.data?.receiptUrl;
+            this.selectedClaim.receiptAttached = true;
+          }
+          this.selectedReceiptFile = null;
+          this.cdr.markForCheck();
+        },
+        error: (err: any) => this.notificationService.onError(err?.error?.message || 'Failed to upload receipt')
       });
   }
 }
