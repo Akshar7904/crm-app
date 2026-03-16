@@ -336,6 +336,17 @@
                   <p class="mb-0" style="font-size:0.875rem;color:var(--text-secondary)">{{ selectedClaim.description }}</p>
                 </div>
               </div>
+
+              <div class="detail-card mt-3" *ngIf="selectedClaim.receiptUrl">
+                <div class="detail-card-header">
+                  <i class="bi bi-paperclip text-primary"></i> Receipt
+                </div>
+                <div class="detail-card-body">
+                  <a [href]="selectedClaim.receiptUrl" target="_blank" class="btn btn-sm btn-outline-success">
+                    <i class="bi bi-eye me-1"></i> View Receipt
+                  </a>
+                </div>
+              </div>
             </div>
 
           </div>

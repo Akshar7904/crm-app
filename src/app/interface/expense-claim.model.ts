@@ -21,6 +21,8 @@ export interface ExpenseClaim {
   approvedAt?: string;
   paidAt?: string;
   expenseItems: ExpenseItem[];
+  receiptUrl?: string;
+  receiptAttached?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

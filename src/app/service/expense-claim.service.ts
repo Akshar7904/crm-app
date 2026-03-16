@@ -205,6 +205,16 @@ export class ExpenseClaimService {
   };
 
   /**
+   * Upload receipt for an expense claim
+   * POST /expense-claims/{id}/receipt
+   */
+  uploadReceipt$ = (claimId: number, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<any>(`${this.server}/expense-claims/${claimId}/receipt`, formData);
+  };
+
+  /**
    * Get expense claim statistics
    * GET /expense-claims/statistics
    */

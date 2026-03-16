@@ -451,6 +451,22 @@ export class LeaveService {
     );
   }
 
+  // Get ALL employees' leave balances for a given year (no hire year filter)
+  getAllBalancesForYear$ = (year: number) =>
+    this.http.get<any>(`${this.apiUrl}/balance/allocation/all?year=${year}`);
+
+  // Download leave report as Excel blob
+  downloadReport$ = (employeeId?: number, status?: string, startDate?: string, endDate?: string) =>
+    this.http.get(`${this.apiUrl}/download/report`, {
+      params: {
+        ...(employeeId && { employeeId: employeeId.toString() }),
+        ...(status && { status }),
+        ...(startDate && { startDate }),
+        ...(endDate && { endDate })
+      },
+      responseType: 'blob'
+    });
+
   // Admin: update leave entitlement for an employee
   updateLeaveEntitlement(employeeId: number, leaveType: string, year: number, entitlement: number): Observable<LeaveBalance> {
     const params = new HttpParams()
