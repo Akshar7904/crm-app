@@ -18,7 +18,9 @@
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
             "allowedCommonJsDependencies": [
-              "jspdf"
+              "jspdf",
+              "html2canvas",
+              "file-saver"
             ],
             "outputPath": "dist/payroll-orion",
             "index": "src/index.html",
