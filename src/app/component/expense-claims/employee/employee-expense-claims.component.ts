@@ -57,6 +57,8 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
   currentEmployeeId: number | null = null;
   newClaim: ExpenseClaim = this.initializeNewClaim();
   editingClaim: ExpenseClaim | null = null;
+  selectedClaim: ExpenseClaim | null = null;
+  showDetailModal = false;
   private shouldOpenModal = false;
 
   constructor(
@@ -361,12 +363,21 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('Claim details:', response.data.expenseClaim);
+          this.selectedClaim = response.data?.expenseClaim ?? claim;
+          this.showDetailModal = true;
+          this.cdr.markForCheck();
         },
-        error: (error) => {
-          this.notificationService.onError('Failed to load claim details');
+        error: () => {
+          this.selectedClaim = claim;
+          this.showDetailModal = true;
+          this.cdr.markForCheck();
         }
       });
+  }
+
+  closeDetailModal(): void {
+    this.showDetailModal = false;
+    this.selectedClaim = null;
   }
 
   downloadMyReport(): void {

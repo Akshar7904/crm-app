@@ -103,6 +103,116 @@
   </div>
 </div>
 
+<!-- ─── View Detail Modal ─── -->
+<div class="modal fade show d-block ec-modal-backdrop" *ngIf="showDetailModal && selectedClaim" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content ec-modal">
+      <div class="ec-modal-header">
+        <h5 class="ec-modal-title">
+          <i class="bi bi-receipt me-2"></i>
+          Claim {{ selectedClaim.claimNumber }}
+        </h5>
+        <button type="button" class="ec-modal-close" (click)="closeDetailModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="modal-body ec-modal-body">
+        <!-- Summary row -->
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-md-3">
+            <div class="detail-meta-label">Date</div>
+            <div class="detail-meta-value">{{ selectedClaim.claimDate | date:'mediumDate' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="detail-meta-label">Total Amount</div>
+            <div class="detail-meta-value fw-bold">R {{ selectedClaim.totalAmount | number:'1.2-2' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="detail-meta-label">Status</div>
+            <div class="detail-meta-value">
+              <span [ngClass]="getStatusClass(selectedClaim.status)">{{ selectedClaim.status }}</span>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="detail-meta-label">Purpose</div>
+            <div class="detail-meta-value">{{ selectedClaim.purpose || '—' }}</div>
+          </div>
+        </div>
+
+        <!-- Expense items table -->
+        <div class="ec-items-card mb-3">
+          <div class="ec-items-header">
+            <span class="ec-items-title"><i class="bi bi-list-ul me-1"></i>Expense Items</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered ec-items-table mb-0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Pay To</th>
+                  <th>Description</th>
+                  <th class="text-end">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of selectedClaim.expenseItems">
+                  <td>{{ item.expenseDate | date:'mediumDate' }}</td>
+                  <td>{{ item.payTo }}</td>
+                  <td>{{ item.description }}</td>
+                  <td class="text-end">R {{ item.amount | number:'1.2-2' }}</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="ec-items-total">
+                  <td colspan="3" class="text-end">Total:</td>
+                  <td class="text-end"><strong>R {{ selectedClaim.totalAmount | number:'1.2-2' }}</strong></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+
+        <!-- Remarks -->
+        <div class="mb-3" *ngIf="selectedClaim.remarks">
+          <div class="detail-meta-label">Remarks</div>
+          <div class="detail-meta-value">{{ selectedClaim.remarks }}</div>
+        </div>
+
+        <!-- Rejection reason -->
+        <div class="mb-3" *ngIf="selectedClaim.rejectionReason">
+          <div class="detail-meta-label text-danger">Rejection Reason</div>
+          <div class="detail-meta-value text-danger">{{ selectedClaim.rejectionReason }}</div>
+        </div>
+
+        <!-- Receipt attachment -->
+        <div class="detail-card" *ngIf="selectedClaim.receiptUrl">
+          <div class="detail-card-header">
+            <i class="bi bi-paperclip text-success me-1"></i> Attachment
+          </div>
+          <div class="detail-card-body">
+            <a [href]="selectedClaim.receiptUrl" target="_blank" class="btn btn-sm btn-outline-success">
+              <i class="bi bi-eye me-1"></i> View Receipt
+            </a>
+          </div>
+        </div>
+        <div class="text-muted small mt-2" *ngIf="!selectedClaim.receiptUrl">
+          <i class="bi bi-paperclip me-1"></i> No receipt attached
+        </div>
+      </div>
+
+      <div class="modal-footer ec-modal-footer">
+        <button type="button" class="btn btn-light" (click)="closeDetailModal()">Close</button>
+        <button *ngIf="selectedClaim.status === ExpenseClaimStatus.PENDING"
+                type="button" class="btn btn-primary"
+                (click)="closeDetailModal(); openEditModal(selectedClaim)">
+          <i class="bi bi-pencil me-1"></i> Edit
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ─── Create / Edit Modal ─── -->
 <div class="modal fade show d-block ec-modal-backdrop" *ngIf="showModal$ | async" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
