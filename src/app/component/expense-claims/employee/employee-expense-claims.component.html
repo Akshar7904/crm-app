@@ -191,9 +191,9 @@
             <i class="bi bi-paperclip text-success me-1"></i> Attachment
           </div>
           <div class="detail-card-body">
-            <a [href]="apiUrl + selectedClaim.receiptUrl" target="_blank" class="btn btn-sm btn-outline-success">
+            <button class="btn btn-sm btn-outline-success" (click)="viewReceipt(selectedClaim.receiptUrl)">
               <i class="bi bi-eye me-1"></i> View Receipt
-            </a>
+            </button>
           </div>
         </div>
         <div class="text-muted small mt-2" *ngIf="!selectedClaim.receiptUrl">
@@ -318,8 +318,8 @@
                       placeholder="Any additional information"></textarea>
           </div>
 
-          <!-- Receipt Upload (only for existing/saved claims) -->
-          <div class="mt-3" *ngIf="editingClaim?.id">
+          <!-- Receipt Upload -->
+          <div class="mt-3">
             <label class="form-label fw-semibold">Upload Receipt</label>
             <div class="input-group">
               <input type="file" class="form-control" (change)="onReceiptSelected($event)" accept=".pdf,.jpg,.jpeg,.png">
@@ -330,7 +330,7 @@
             <small class="text-muted">PDF, JPG, PNG accepted</small>
             <div *ngIf="editingClaim?.receiptUrl" class="mt-1">
               <i class="bi bi-paperclip text-success me-1"></i>
-              <a [href]="apiUrl + editingClaim.receiptUrl" target="_blank" class="small">View Receipt</a>
+              <a href="javascript:void(0)" (click)="viewReceipt(editingClaim.receiptUrl)" class="small">View Receipt</a>
             </div>
           </div>
         </form>

@@ -299,6 +299,14 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
     operation$.pipe(
       switchMap((response) => {
         this.notificationService.onSuccess(response.message);
+        // Auto-upload receipt if file selected on new claim creation
+        const savedId = response.data?.expenseClaim?.id;
+        if (this.selectedReceiptFile && savedId) {
+          this.expenseClaimService.uploadReceipt$(savedId, this.selectedReceiptFile)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({ error: () => {} });
+          this.selectedReceiptFile = null;
+        }
         this.closeModal();
         return this.expenseClaimService.expenseClaimsByEmployee$(
           this.currentEmployeeId,
@@ -380,6 +388,18 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
   closeDetailModal(): void {
     this.showDetailModal = false;
     this.selectedClaim = null;
+  }
+
+  viewReceipt(receiptUrl: string): void {
+    this.expenseClaimService.downloadFile$(receiptUrl)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          window.open(url, '_blank');
+        },
+        error: () => this.notificationService.onError('Could not open receipt')
+      });
   }
 
   downloadMyReport(): void {
