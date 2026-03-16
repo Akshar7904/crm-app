@@ -18,6 +18,7 @@ import { UserService } from '../../../service/user.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { UserModel } from '../../profile/user.model';
+import { environment } from '@env/environment';
 
 @Component({
   standalone: false,
@@ -51,6 +52,7 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
 
   readonly DataState = DataState;
   readonly ExpenseClaimStatus = ExpenseClaimStatus;
+  readonly apiUrl = environment.apiUrl;
 
   // ✅ SIMPLIFIED: Only need current user (which has employee data)
   currentUser: UserModel | null = null;
