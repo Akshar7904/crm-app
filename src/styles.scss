@@ -937,18 +937,34 @@ thead {
   .modal-dialog {
     margin: 0 !important;
     max-width: 100% !important;
-    height: 100%;
+    height: auto;
+    display: flex;
+    align-items: flex-end;
   }
 
   .modal-content {
     border-radius: 16px 16px 0 0 !important;
-    position: fixed !important;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    max-height: 92vh;
-    overflow-y: auto;
+    width: 100%;
+    max-height: 92dvh;
+    display: flex;
+    flex-direction: column;
     border: none !important;
+    overflow: hidden;
+  }
+
+  .modal-header {
+    flex-shrink: 0;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+    flex: 1 1 auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-footer {
+    flex-shrink: 0;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
   // ── Action button groups ─────────────────────────────────
