@@ -457,14 +457,19 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
     return leave.status === LeaveStatus.PENDING || leave.status === LeaveStatus.APPROVED;
   }
 
-  getDoctorNoteDownloadUrl(leave: Leave): string {
-    if (leave.id && leave.doctorNoteUrl) {
-      if (leave.doctorNoteUrl.startsWith('/api/')) {
-        return '' + leave.doctorNoteUrl;
+  viewDoctorNote(leave: Leave): void {
+    if (!leave.id) return;
+    const url = `${environment.apiUrl}/api/v1/leave/${leave.id}/doctor-note`;
+    this.http.get(url, { responseType: 'blob' }).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (blob: Blob) => {
+        const objectUrl = window.URL.createObjectURL(blob);
+        window.open(objectUrl, '_blank');
+        setTimeout(() => window.URL.revokeObjectURL(objectUrl), 10000);
+      },
+      error: () => {
+        alert('Unable to load attachment. It may not have been uploaded yet.');
       }
-      return leave.doctorNoteUrl;
-    }
-    return '';
+    });
   }
 
   /**

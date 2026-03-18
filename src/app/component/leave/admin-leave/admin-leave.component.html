@@ -274,13 +274,9 @@
 
             <td>
               <div class="leave-employee-cell">
-                <div class="leave-avatar" *ngIf="!leave.employeePhotoUrl">
+                <div class="leave-avatar">
                   <i class="bi bi-person"></i>
                 </div>
-                <img *ngIf="leave.employeePhotoUrl"
-                     [src]="leave.employeePhotoUrl"
-                     [alt]="leave.employeeName"
-                     class="leave-avatar-img">
                 <div>
                   <div class="leave-emp-name">{{leave.employeeName}}</div>
                   <div class="leave-emp-email">{{leave.employeeEmail}}</div>
@@ -417,12 +413,12 @@
         <div *ngIf="selectedLeave.doctorNoteAttached" class="leave-doctor-note">
           <i class="bi bi-file-medical-fill"></i>
           <span>Medical certificate attached{{ selectedLeave.doctorNoteFilename ? ': ' + selectedLeave.doctorNoteFilename : '' }}</span>
-          <a *ngIf="selectedLeave.doctorNoteUrl"
-             [href]="getDoctorNoteDownloadUrl(selectedLeave)"
-             target="_blank"
-             class="leave-view-link">
+          <button *ngIf="selectedLeave.doctorNoteAttached"
+                  type="button"
+                  class="leave-view-link"
+                  (click)="viewDoctorNote(selectedLeave)">
             View <i class="bi bi-box-arrow-up-right"></i>
-          </a>
+          </button>
         </div>
 
         <!-- Approval Form -->

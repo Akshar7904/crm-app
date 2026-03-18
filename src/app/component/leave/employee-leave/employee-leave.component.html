@@ -111,10 +111,9 @@
                 <span class="el-reason">{{ leave.reason || '—' }}</span>
                 <div *ngIf="leave.doctorNoteAttached" class="el-doc-note mt-1">
                   <i class="bi bi-file-earmark-medical text-success"></i>
-                  <a *ngIf="leave.doctorNoteUrl" [href]="getDoctorNoteDownloadUrl(leave)" target="_blank" class="ms-1">
+                  <a (click)="viewDoctorNote(leave)" style="cursor:pointer" class="ms-1">
                     {{ leave.doctorNoteFilename || "Doctor's note" }}
                   </a>
-                  <span *ngIf="!leave.doctorNoteUrl" class="ms-1">Doctor's note attached</span>
                 </div>
                 <div *ngIf="leave.rejectionReason" class="el-rejection mt-1">
                   <i class="bi bi-exclamation-circle"></i>
