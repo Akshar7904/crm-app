@@ -91,7 +91,7 @@
              [class.msg-row--unread]="!notification.isRead"
              [class.msg-row--selected]="isSelected(notification.id)"
              [class.msg-row--last]="last"
-             (click)="toggleSelection(notification.id)">
+             (click)="openDetail(notification)">
 
           <!-- Checkbox -->
           <div class="msg-check-wrap" (click)="$event.stopPropagation()">
@@ -170,4 +170,55 @@
     </div>
 
   </ng-container>
+</div>
+
+<!-- ─── Message Detail Modal ─── -->
+<div class="msg-detail-overlay" *ngIf="selectedNotification" (click)="closeDetail()">
+  <div class="msg-detail-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="msg-detail-header" [ngClass]="'msg-detail-header--' + selectedNotification.priority?.toLowerCase()">
+      <div class="msg-detail-header-left">
+        <div class="msg-detail-icon-wrap">
+          <i [class]="getIcon(selectedNotification.type)"></i>
+        </div>
+        <div>
+          <span class="msg-detail-type">{{ selectedNotification.type }}</span>
+          <span class="msg-priority-badge ms-2"
+                [ngClass]="{
+                  'badge--low':    selectedNotification.priority === 'LOW',
+                  'badge--normal': selectedNotification.priority === 'NORMAL',
+                  'badge--high':   selectedNotification.priority === 'HIGH',
+                  'badge--urgent': selectedNotification.priority === 'URGENT'
+                }">{{ selectedNotification.priority }}</span>
+        </div>
+      </div>
+      <button class="msg-detail-close" (click)="closeDetail()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="msg-detail-body">
+      <h4 class="msg-detail-title">{{ selectedNotification.title }}</h4>
+      <p class="msg-detail-time">
+        <i class="bi bi-clock me-1"></i>{{ getTimeAgo(selectedNotification.createdAt) }}
+        &nbsp;·&nbsp;{{ formatDate(selectedNotification.createdAt) }}
+      </p>
+      <div class="msg-detail-divider"></div>
+      <p class="msg-detail-message">{{ selectedNotification.message }}</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="msg-detail-footer">
+      <button class="msg-detail-btn msg-detail-btn--delete"
+              (click)="deleteNotification(selectedNotification.id); closeDetail()">
+        <i class="bi bi-trash"></i> Delete
+      </button>
+      <button class="msg-detail-btn msg-detail-btn--close" (click)="closeDetail()">
+        Close
+      </button>
+    </div>
+
+  </div>
 </div>
