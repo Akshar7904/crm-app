@@ -32,6 +32,7 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   pageSize = 20;
   selectedFilter: NotificationType | 'ALL' = 'ALL';
   selectedIds = new Set<number>();
+  selectedNotification: Notification | null = null;
 
   readonly DataState = DataState;
   readonly filters: { value: NotificationType | 'ALL'; label: string }[] = [
@@ -78,6 +79,18 @@ export class NotificationListComponent implements OnInit, OnDestroy {
   refresh(): void {
     this.selectedIds.clear();
     this.refreshTrigger$.next();
+  }
+
+  // ─── Detail Modal
+  openDetail(notification: Notification): void {
+    this.selectedNotification = notification;
+    if (!notification.isRead) {
+      this.markAsRead(notification);
+    }
+  }
+
+  closeDetail(): void {
+    this.selectedNotification = null;
   }
 
   // ─── Selection
