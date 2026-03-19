@@ -44,6 +44,7 @@ export class InvoiceDetailComponent implements OnInit {
   showSendConfirm = false;
   sendTargetCustomer: any = null;
   sendTargetInvoiceNumber: string = '';
+  customMessage: string = '';
 
   // Line items for edit mode
   editLineItems: InvoiceLineItem[] = [];
@@ -237,7 +238,9 @@ export class InvoiceDetailComponent implements OnInit {
 
   openSendConfirm(customer: any): void {
     this.sendTargetCustomer = customer;
-    this.sendTargetInvoiceNumber = this.dataSubject.value?.data['invoice']?.invoiceNumber || '';
+    const invoice = this.dataSubject.value?.data['invoice'];
+    this.sendTargetInvoiceNumber = invoice?.invoiceNumber || '';
+    this.customMessage = this.getDefaultMessage(customer, invoice);
     this.showSendConfirm = true;
     this.cdr.markForCheck();
   }
@@ -245,30 +248,95 @@ export class InvoiceDetailComponent implements OnInit {
   closeSendConfirm(): void {
     this.showSendConfirm = false;
     this.sendTargetCustomer = null;
+    this.customMessage = '';
     this.cdr.markForCheck();
+  }
+
+  private getDefaultMessage(customer: any, invoice: any): string {
+    const name     = customer?.name || 'Valued Client';
+    const num      = invoice?.invoiceNumber || '';
+    const total    = invoice?.total ? this.formatCurrency(invoice.total) : '';
+    const status   = (invoice?.status || 'PENDING').toUpperCase();
+
+    const closing = `\nShould you have any questions, please do not hesitate to contact us.\n\nKind regards,\nLKCentrix Solutions (PTY) LTD\ninfo@lkcentrix.co.za | +27 (11) 568 8322`;
+
+    switch (status) {
+      case 'PAID':
+        return `Good day ${name},\n\nThank you for your payment. Please find the receipt for Invoice #${num} (${total}) attached for your records.\n\nWe appreciate your prompt settlement and look forward to continuing our partnership.${closing}`;
+      case 'OVERDUE':
+        return `Good day ${name},\n\nThis is a reminder that Invoice #${num} totalling ${total} is now overdue.\n\nPlease find the invoice attached and arrange payment at your earliest convenience to avoid any late-payment charges. If payment has already been made, please disregard this notice.${closing}`;
+      case 'CANCELED':
+        return `Good day ${name},\n\nPlease find attached the cancelled Invoice #${num} for your records.\n\nIf you believe this cancellation was made in error or would like to discuss further, please contact us at your earliest convenience.${closing}`;
+      default: // PENDING
+        return `Good day ${name},\n\nPlease find attached Invoice #${num} totalling ${total} for services rendered.\n\nPayment is due within 30 days of the invoice date. Kindly use the invoice number as your payment reference.\n\nBank: First National Bank | Account: LKCentrix Solutions | Account No: 123456789 | Branch: 250655${closing}`;
+    }
   }
 
   confirmSendInvoice(): void {
     const invoiceId = this.dataSubject.value?.data['invoice']?.id;
+    const invoiceNumber = this.dataSubject.value?.data['invoice']?.invoiceNumber;
     if (!invoiceId) {
       this.notification.onError('Invoice not found');
       return;
     }
 
+    const element = document.getElementById('invoice');
+    if (!element) {
+      this.notification.onError('Could not capture invoice for attachment');
+      return;
+    }
+
     this.isSendingSubject.next(true);
-    this.customerService.sendInvoice$(invoiceId)
-      .subscribe({
-        next: (response) => {
-          this.notification.onSuccess(response.message || 'Invoice sent successfully');
-          this.isSendingSubject.next(false);
-          this.showSendConfirm = false;
-          this.cdr.markForCheck();
-        },
-        error: (error) => {
-          this.notification.onError(error);
-          this.isSendingSubject.next(false);
-          this.cdr.markForCheck();
+    this.cdr.markForCheck();
+
+    // Generate the PDF from the live invoice view (same as Export PDF)
+    html2canvas(element, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false })
+      .then(canvas => {
+        const doc = new pdf('p', 'mm', 'a4');
+        const margin = 10;
+        const pageWidth  = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const printableW = pageWidth  - margin * 2;
+        const printableH = pageHeight - margin * 2;
+        const pxPerMm    = canvas.width / printableW;
+        const pageHeightPx = printableH * pxPerMm;
+        let yOffset = 0;
+
+        while (yOffset < canvas.height) {
+          const sliceH = Math.min(pageHeightPx, canvas.height - yOffset);
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width  = canvas.width;
+          sliceCanvas.height = sliceH;
+          const ctx = sliceCanvas.getContext('2d')!;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+          ctx.drawImage(canvas, 0, yOffset, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+          if (yOffset > 0) doc.addPage();
+          doc.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, printableW, sliceH / pxPerMm);
+          yOffset += pageHeightPx;
         }
+
+        // Convert to Blob and send to backend for email attachment
+        const pdfBlob = doc.output('blob');
+        this.customerService.sendInvoice$(invoiceId, pdfBlob, this.customMessage)
+          .subscribe({
+            next: (response) => {
+              this.notification.onSuccess(response.message || 'Invoice sent successfully');
+              this.isSendingSubject.next(false);
+              this.showSendConfirm = false;
+              this.cdr.markForCheck();
+            },
+            error: (error) => {
+              this.notification.onError(error);
+              this.isSendingSubject.next(false);
+              this.cdr.markForCheck();
+            }
+          });
+      })
+      .catch(() => {
+        this.notification.onError('Failed to generate PDF for email attachment');
+        this.isSendingSubject.next(false);
+        this.cdr.markForCheck();
       });
   }
 
