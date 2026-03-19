@@ -13,6 +13,7 @@ import { State } from 'src/app/interface/state';
 import { UserModel } from 'src/app/component/profile/user.model';
 import { CustomerService } from 'src/app/service/customer.service';
 import { jsPDF as pdf } from 'jspdf';
+import html2canvas from 'html2canvas';
 import { NotificationService } from 'src/app/service/notification.service';
 import { NgForm } from '@angular/forms';
 import { InvoiceLineItem } from '../invoice.model';
@@ -280,13 +281,44 @@ export class InvoiceDetailComponent implements OnInit {
   }
 
   exportAsPDF(): void {
+    const element = document.getElementById('invoice');
+    if (!element) return;
     const filename = `invoice-${this.dataSubject.value.data['invoice'].invoiceNumber}.pdf`;
-    const doc = new pdf();
-    doc.html(document.getElementById('invoice'), {
-      margin: 5,
-      windowWidth: 1000,
-      width: 200,
-      callback: (invoice) => invoice.save(filename)
+
+    html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false
+    }).then(canvas => {
+      const doc = new pdf('p', 'mm', 'a4');
+      const margin = 10;
+      const pageWidth  = doc.internal.pageSize.getWidth();   // 210mm
+      const pageHeight = doc.internal.pageSize.getHeight();  // 297mm
+      const printableW = pageWidth  - margin * 2;
+      const printableH = pageHeight - margin * 2;
+      const pxPerMm    = canvas.width / printableW;
+      const pageHeightPx = printableH * pxPerMm;
+      let yOffset = 0;
+
+      while (yOffset < canvas.height) {
+        const sliceH = Math.min(pageHeightPx, canvas.height - yOffset);
+        const sliceCanvas = document.createElement('canvas');
+        sliceCanvas.width  = canvas.width;
+        sliceCanvas.height = sliceH;
+        const ctx = sliceCanvas.getContext('2d')!;
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+        ctx.drawImage(canvas, 0, yOffset, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+
+        if (yOffset > 0) doc.addPage();
+        doc.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, printableW, sliceH / pxPerMm);
+        yOffset += pageHeightPx;
+      }
+
+      doc.save(filename);
+      this.cdr.markForCheck();
     });
   }
 
@@ -338,6 +370,15 @@ export class InvoiceDetailComponent implements OnInit {
   getVatRate(invoice: any): number {
     if (!invoice) return 15;
     return invoice.vatRate || 15;
+  }
+
+  // Calculate number of days between invoice date and due date
+  getDueDays(invoice: any): number {
+    if (!invoice?.date || !invoice?.dueDate) return 30;
+    const start = new Date(invoice.date);
+    const end   = new Date(invoice.dueDate);
+    const diff  = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 30;
   }
 
   // Get VAT amount

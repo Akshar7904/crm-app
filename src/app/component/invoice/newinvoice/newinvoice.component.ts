@@ -45,6 +45,13 @@ export class NewinvoiceComponent implements OnInit {
   // Invoice date
   invoiceDate: string = new Date().toISOString().split('T')[0];
 
+  // Due date — defaults to 30 days after invoice date
+  dueDate: string = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split('T')[0];
+  })();
+
   // Notes and terms
   notes: string = '';
   terms: string = 'NET 30 Days. Finance Charge of 1.5% will be made on unpaid balances after 30 days.';
@@ -158,6 +165,7 @@ export class NewinvoiceComponent implements OnInit {
     const invoiceData: InvoiceModel = {
       services: this.buildServicesString(),
       date: this.invoiceDate,
+      dueDate: this.dueDate,
       status: newInvoiceForm.value.status || 'PENDING',
       subtotal: this.subtotal,
       vatRate: this.taxRate,
@@ -190,6 +198,9 @@ export class NewinvoiceComponent implements OnInit {
     this.addLineItem();
     this.selectedCustomer = null;
     this.invoiceDate = new Date().toISOString().split('T')[0];
+    const due = new Date();
+    due.setDate(due.getDate() + 30);
+    this.dueDate = due.toISOString().split('T')[0];
     this.notes = '';
     this.discount = 0;
     this.calculateTotals();

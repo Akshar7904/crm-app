@@ -257,16 +257,43 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
     this.leaveForm.reset();
   }
 
-  onDateChange(): void {
-    const startDate = this.leaveForm.get('startDate')?.value;
-    const endDate = this.leaveForm.get('endDate')?.value;
+  calculatedBusinessDays: number = 0;
 
-    if (startDate && endDate) {
-      const days = this.leaveService.calculateBusinessDays(
-        new Date(startDate),
-        new Date(endDate)
+  private nextWeekday(dateStr: string): string {
+    const d = new Date(dateStr + 'T12:00:00'); // noon to avoid timezone shift
+    const day = d.getDay();
+    if (day === 6) d.setDate(d.getDate() + 2); // Saturday → Monday
+    if (day === 0) d.setDate(d.getDate() + 1); // Sunday → Monday
+    return d.toISOString().slice(0, 10);
+  }
+
+  onDateChange(): void {
+    let startVal = this.leaveForm.get('startDate')?.value;
+    let endVal = this.leaveForm.get('endDate')?.value;
+
+    // Auto-bump weekend dates to next Monday
+    if (startVal) {
+      const adjusted = this.nextWeekday(startVal);
+      if (adjusted !== startVal) {
+        this.leaveForm.get('startDate')?.setValue(adjusted, { emitEvent: false });
+        startVal = adjusted;
+      }
+    }
+    if (endVal) {
+      const adjusted = this.nextWeekday(endVal);
+      if (adjusted !== endVal) {
+        this.leaveForm.get('endDate')?.setValue(adjusted, { emitEvent: false });
+        endVal = adjusted;
+      }
+    }
+
+    if (startVal && endVal) {
+      this.calculatedBusinessDays = this.leaveService.calculateBusinessDays(
+        new Date(startVal + 'T12:00:00'),
+        new Date(endVal + 'T12:00:00')
       );
-      console.log('Business days:', days);
+    } else {
+      this.calculatedBusinessDays = 0;
     }
   }
 

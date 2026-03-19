@@ -50,7 +50,7 @@
 .invoice-content {
   position: relative;
   z-index: 1;
-  padding: 40px 45px;
+  padding: 40px 45px 30px;
 }
 
 /* ---- Header ---- */
@@ -93,6 +93,13 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 20px;
+}
+
+/* Extra breathing room between the FROM/DATE row and the BILL TO/BALANCE row */
+.info-section-bill-to {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color, #eee);
 }
 
 .info-left { flex: 1; }
@@ -242,28 +249,101 @@
   .totals-value { color: #fff; font-size: 16px; font-weight: $font-weight-bold; }
 }
 
-/* ---- Footer ---- */
-.invoice-footer {
-  display: flex;
-  justify-content: space-between;
-  gap: 30px;
-  margin-top: 30px;
-  padding-top: 20px;
-  border-top: 1px solid var(--border-color, #eee);
+/* ---- Issuer line in FROM section ---- */
+.issuer-line {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border-color, #e0e0e0);
 }
-.footer-left, .footer-right { flex: 1; }
-
-.notes-title {
-  font-size: 13px;
+.issuer-label {
+  display: block;
+  font-size: 10px;
   font-weight: $font-weight-bold;
-  color: var(--text-primary);
-  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: $primary;
+  margin-bottom: 3px;
 }
-.notes-text {
+.issuer-email {
   font-size: 12px;
   color: var(--text-muted);
-  line-height: 1.6;
-  margin: 0 0 6px;
+}
+
+/* ---- Footer Bar ---- */
+/* Sits outside .invoice-content so it spans the full card width.
+   The parent .invoice-page has overflow:hidden + border-radius, so the
+   bottom corners are clipped cleanly without needing radius here. */
+.invoice-footer-bar {
+  position: relative;
+  z-index: 1;
+  background: $primary;
+}
+
+.footer-bar-accent {
+  height: 3px;
+  background: linear-gradient(90deg, $gray-400, $gray-200, $gray-400);
+  opacity: 0.5;
+}
+
+.footer-bar-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding: 20px 28px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.footer-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.footer-col-title {
+  font-size: 11px;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.88);
+  margin-bottom: 6px;
+}
+
+.footer-col-line {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.7;
+}
+
+.footer-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgb(255, 255, 255);
+  margin: 0 22px;
+  flex-shrink: 0;
+}
+
+.footer-col-brand {
+  align-items: center;
+  text-align: center;
+  flex: 0 0 auto;
+  min-width: 160px;
+}
+
+.footer-brand-logo {
+  max-height: 74px;
+  max-width: 180px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.85;
+  margin-bottom: 6px;
+}
+
+.footer-brand-name {
+  font-size: 11px;
+  font-weight: $font-weight-semibold;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 2px;
 }
 
 /* ========== Edit Mode ========== */
@@ -613,17 +693,79 @@
 @page { size: A4; margin: 10mm; }
 
 @media print {
-  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
-  html, body { width: 100% !important; height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; box-sizing: border-box; }
+
+  html, body { width: 100% !important; height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; background: #fff !important; font-family: 'Poppins', sans-serif !important; }
+
   .no-print, .page-banner, nav, .edit-card, .btn, .loading-container, .alert, .send-confirm-modal { display: none !important; }
+
   .invoice-detail-page { padding: 0 !important; margin: 0 !important; }
   .container-fluid { padding: 0 !important; margin: 0 !important; max-width: 100% !important; }
-  .invoice-page { box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; max-width: 100% !important; width: 100% !important; }
+
+  .invoice-page {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    overflow: visible !important;
+    position: relative !important;
+  }
+
+  /* Keep decorative backgrounds and footer */
+  .invoice-bg-top, .invoice-bg-bottom { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .invoice-footer-bar { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; background: $primary !important; }
+  .footer-bar-body { color: rgba(255,255,255,0.95) !important; }
+  .footer-brand-logo { filter: brightness(0) invert(1) !important; }
+
   .invoice-content { padding: 30px 35px !important; }
-  .items-table thead tr { background: $primary !important; }
-  .items-table thead th { color: #fff !important; }
-  .items-table tbody tr.row-alt { background: var(--table-hover, #f7f8fc) !important; }
-  .totals-final { background: $primary !important; .totals-label { color: rgba(255,255,255,0.85) !important; } .totals-value { color: #fff !important; } }
+
+  /* Table header */
+  .items-table thead tr { background: $primary !important; -webkit-print-color-adjust: exact !important; }
+  .items-table thead th { color: #fff !important; background: $primary !important; }
+  .items-table tbody tr.row-alt { background: #f7f8fc !important; }
+
+  /* Totals total row */
+  .totals-final {
+    background: $primary !important;
+    -webkit-print-color-adjust: exact !important;
+    .totals-label { color: rgba(255,255,255,0.85) !important; }
+    .totals-value { color: #fff !important; }
+  }
+
+  /* Status badges */
+  .badge-paid     { background: rgba(#2ecc71, 0.12) !important; color: #2ecc71 !important; }
+  .badge-pending  { background: rgba($primary, 0.12) !important; color: $primary !important; }
+  .badge-overdue  { background: rgba(#f39c12, 0.15) !important; color: darken(#f39c12, 15%) !important; }
+  .badge-canceled { background: rgba(#e74c3c, 0.12) !important; color: #e74c3c !important; }
+
+  /* Ensure text colours are black where vars may not resolve */
+  .info-text, .totals-label, .totals-value, .info-value { color: #222 !important; }
+  .info-label { color: $primary !important; }
+  .balance-due { color: #1a1a2e !important; }
+  .invoice-title { color: #1a1a2e !important; }
+
+  /* No page-break inside invoice */
+  .invoice-page { page-break-inside: avoid; break-inside: avoid; }
+  .items-table tbody tr { page-break-inside: avoid; break-inside: avoid; }
+
+  /* ── Override responsive rules that collapse layouts when print is narrow ── */
+  .invoice-header     { flex-direction: row !important; align-items: flex-start !important; }
+  .header-right       { text-align: right !important; }
+  .info-section       { flex-direction: row !important; gap: 0 !important; }
+  .info-section-bill-to { margin-top: 24px !important; padding-top: 20px !important; border-top: 1px solid #eee !important; }
+  .info-right         { text-align: right !important; align-items: flex-end !important; }
+  .date-row .info-label { text-align: right !important; }
+  .invoice-totals     { display: flex !important; justify-content: flex-end !important; }
+  .footer-bar-body    { flex-direction: row !important; }
+  .invoice-title      { font-size: 34px !important; }
+  .balance-due        { font-size: 28px !important; }
+
+  /* Table — prevent Bootstrap .table-responsive from hiding overflow */
+  .table-responsive   { overflow: visible !important; }
+  .items-table        { width: 100% !important; table-layout: fixed !important; }
+  .items-table thead th,
+  .items-table tbody td { display: table-cell !important; }
 }
 
 /* ========== Responsive ========== */

@@ -89,7 +89,11 @@
                 </div>
                 <div class="col-md-4">
                   <label class="form-label">Due Date</label>
-                  <input type="text" class="form-control" value="NET 30 Days" readonly>
+                  <input type="date"
+                         class="form-control"
+                         [(ngModel)]="dueDate"
+                         name="dueDate"
+                         required>
                 </div>
               </div>
 

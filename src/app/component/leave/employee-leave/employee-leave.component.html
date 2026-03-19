@@ -194,6 +194,14 @@
                      [class.is-invalid]="leaveForm.get('endDate')?.invalid && leaveForm.get('endDate')?.touched">
             </div>
 
+            <!-- Business days indicator -->
+            <div class="col-12" *ngIf="calculatedBusinessDays > 0">
+              <small class="el-balance-hint">
+                <i class="bi bi-calendar-check me-1"></i>
+                This leave covers <strong>{{ calculatedBusinessDays }} business day(s)</strong> (weekends excluded)
+              </small>
+            </div>
+
             <!-- Reason -->
             <div class="col-12">
               <label class="form-label fw-semibold">Reason</label>
