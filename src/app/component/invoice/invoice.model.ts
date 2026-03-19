@@ -8,6 +8,9 @@ export interface InvoiceModel {
     services: string;
     status: string;
     date: Date | string;
+    dueDate?: Date | string;
+    issuedByName?: string;
+    issuedByEmail?: string;
     // Amount excluding VAT
     subtotal?: number;
     // VAT rate (default 15% for South Africa)

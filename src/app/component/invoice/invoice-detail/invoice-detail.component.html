@@ -308,6 +308,11 @@
                   info@lkcentrix.co.za<br>
                   +27 (11) 568 8322
                 </p>
+                <p class="info-text issuer-line">
+                  <span class="issuer-label">Issued by</span>
+                  <strong>{{ state?.appData?.data?.invoice?.issuedByName || (state?.appData?.data?.user?.firstName + ' ' + state?.appData?.data?.user?.lastName) }}</strong><br>
+                  <span class="issuer-email">{{ state?.appData?.data?.invoice?.issuedByEmail || state?.appData?.data?.user?.email }}</span>
+                </p>
               </div>
               <div class="info-right">
                 <div class="date-row">
@@ -316,13 +321,15 @@
                 </div>
                 <div class="date-row">
                   <span class="info-label">DUE ON</span>
-                  <span class="info-value">NET 30 Days</span>
+                  <span class="info-value">
+                    {{ state?.appData?.data?.invoice?.dueDate ? (state?.appData?.data?.invoice?.dueDate | date:'mediumDate') : 'NET 30 Days' }}
+                  </span>
                 </div>
               </div>
             </div>
 
             <!-- Bill To / Balance Due -->
-            <div class="info-section">
+            <div class="info-section info-section-bill-to">
               <div class="info-left">
                 <h6 class="info-label">BILL TO</h6>
                 <p class="info-text">
@@ -392,22 +399,31 @@
               </div>
             </div>
 
-            <!-- Payment Info & Notes -->
-            <div class="invoice-footer">
-              <div class="footer-left">
-                <h6 class="info-label">Payment Information</h6>
-                <p class="info-text">
-                  Bank: First National Bank<br>
-                  Account Name: LKCentrix Solutions<br>
-                  Account Number: 123456789<br>
-                  Branch Code: 250655
-                </p>
+          </div>
+
+          <!-- Footer Bar: Payment Info + Notes — outside invoice-content so it spans full width -->
+          <div class="invoice-footer-bar">
+            <div class="footer-bar-accent"></div>
+            <div class="footer-bar-body">
+              <div class="footer-col">
+                <span class="footer-col-title"><i class="bi bi-bank me-1"></i>Payment Information</span>
+                <span class="footer-col-line">Bank: First National Bank</span>
+                <span class="footer-col-line">Account Name: LKCentrix Solutions</span>
+                <span class="footer-col-line">Account Number: 123456789</span>
+                <span class="footer-col-line">Branch Code: 250655</span>
               </div>
-              <div class="footer-right">
-                <h6 class="notes-title">Notes</h6>
-                <p class="notes-text">Thank you for your business.</p>
-                <p class="notes-text">Payment is due within 30 days of invoice date.<br>
-                Please include invoice number with payment.</p>
+              <div class="footer-divider"></div>
+              <div class="footer-col">
+                <span class="footer-col-title"><i class="bi bi-chat-square-text me-1"></i>Notes</span>
+                <span class="footer-col-line">Thank you for your business.</span>
+                <span class="footer-col-line">Payment is due within {{ getDueDays(state?.appData?.data?.invoice) }} days of invoice date.</span>
+                <span class="footer-col-line">Please include invoice number with payment.</span>
+              </div>
+              <div class="footer-divider"></div>
+              <div class="footer-col footer-col-brand">
+                <img src="assets/logo.png" alt="LKCentrix" class="footer-brand-logo">
+                <span class="footer-brand-name">LKCentrix Solutions</span>
+                <span class="footer-col-line">www.lkcentrix.co.za</span>
               </div>
             </div>
           </div>
