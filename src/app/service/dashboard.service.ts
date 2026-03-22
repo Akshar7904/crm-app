@@ -22,6 +22,8 @@ export interface DashboardStats {
   totalCustomers?: number;
   totalInvoices?: number;
   totalBilled?: number;
+  totalProducts?: number;
+  activeProducts?: number;
   totalPayroll?: number;
   pendingPayroll?: number;
   processedPayroll?: number;

@@ -295,6 +295,21 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
+      label: 'Accounting',
+      icon: 'bi-journal-text',
+      expanded: false,
+      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+      excludeRoles: ['ROLE_USER'],
+      children: [
+        {
+          label: 'Products & Services',
+          icon: 'bi-box-seam',
+          route: '/accounting/products',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        }
+      ]
+    },
+    {
       label: 'Expenses',
       icon: 'bi-receipt',
       expanded: false,
