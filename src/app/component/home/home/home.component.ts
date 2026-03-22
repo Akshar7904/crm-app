@@ -678,6 +678,34 @@ export class HomeComponent implements OnInit, OnDestroy {
         icon: 'bi-file-earmark-text-fill',
         iconClass: 'info',
         route: '/invoices'
+      },
+      {
+        label: 'Unpaid Bills',
+        value: stats.unpaidBills || 0,
+        icon: 'bi-receipt-cutoff',
+        iconClass: 'warning',
+        route: '/accounting/bills'
+      },
+      {
+        label: 'Overdue Bills',
+        value: stats.overdueBills || 0,
+        icon: 'bi-exclamation-triangle-fill',
+        iconClass: 'danger',
+        route: '/accounting/bills'
+      },
+      {
+        label: 'Open Quotes',
+        value: stats.openQuotes || 0,
+        icon: 'bi-file-text',
+        iconClass: 'primary',
+        route: '/accounting/quotes'
+      },
+      {
+        label: 'Active Products',
+        value: stats.activeProducts || 0,
+        icon: 'bi-box-seam',
+        iconClass: 'success',
+        route: '/accounting/products'
       }
     ];
   }

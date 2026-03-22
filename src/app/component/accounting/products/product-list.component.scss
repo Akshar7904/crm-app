@@ -1,0 +1,118 @@
+@import '../../../../styles/variables';
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kpi-stat {
+  background: white;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 1px solid #f0f0f0;
+  transition: box-shadow 0.2s;
+
+  &:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+}
+
+.kpi-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+
+  &.info    { background: linear-gradient(135deg, #98BDFF, #7978E9); color: white; }
+  &.success { background: linear-gradient(135deg, #7DA0FA, #4B49AC); color: white; }
+  &.primary { background: linear-gradient(135deg, #4B49AC, #2A2968); color: white; }
+  &.warning { background: linear-gradient(135deg, #FFD93D, #F7971E); color: white; }
+  &.danger  { background: linear-gradient(135deg, #F3797E, #E84A5F); color: white; }
+}
+
+.kpi-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #2c3e50;
+  line-height: 1;
+}
+
+.kpi-label {
+  font-size: 0.8rem;
+  color: #7f8c8d;
+  margin-top: 2px;
+}
+
+.search-box {
+  position: relative;
+  .search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+    font-size: 14px;
+  }
+  .search-input { padding-left: 32px; min-width: 220px; }
+}
+
+.table-card-footer {
+  padding: 0.75rem 1.25rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+// Modal
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 1040;
+}
+
+.modal-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  z-index: 1050;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.modal-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0f0f0;
+
+  .modal-panel-title {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    i { margin-right: 8px; color: #484c7f; }
+  }
+}
+
+.modal-panel-body { padding: 1.5rem; }
+
+.modal-panel-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f0f0f0;
+}
