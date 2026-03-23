@@ -302,6 +302,12 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       excludeRoles: ['ROLE_USER'],
       children: [
         {
+          label: 'Overview',
+          icon: 'bi-grid-1x2',
+          route: '/accounting/overview',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
           label: 'Products & Services',
           icon: 'bi-box-seam',
           route: '/accounting/products',
@@ -317,6 +323,24 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           label: 'Quotes & Estimates',
           icon: 'bi-file-text',
           route: '/accounting/quotes',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Credit Notes',
+          icon: 'bi-credit-card',
+          route: '/accounting/credit-notes',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'VAT Returns',
+          icon: 'bi-percent',
+          route: '/accounting/vat-returns',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Reports',
+          icon: 'bi-file-earmark-bar-graph',
+          route: '/accounting/reports',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
         }
       ]

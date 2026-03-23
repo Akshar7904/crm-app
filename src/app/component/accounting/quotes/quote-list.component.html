@@ -14,40 +14,35 @@
 </div>
 
 <!-- KPI Cards -->
-<div class="kpi-row">
-  <div class="kpi-stat">
-    <div class="kpi-icon info"><i class="bi bi-file-earmark-text"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.totalQuotes }}</div>
-      <div class="kpi-label">Total Quotes</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-info-subtle"><i class="bi bi-file-earmark-text text-info"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.totalQuotes }}</p><p class="stat-label">Total Quotes</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon primary"><i class="bi bi-send"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ openQuotesCount }}</div>
-      <div class="kpi-label">Open (Sent + Accepted)</div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-primary-subtle"><i class="bi bi-send text-primary"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ openQuotesCount }}</p><p class="stat-label">Open Quotes</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon success"><i class="bi bi-check-circle-fill"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.acceptedQuotes }}</div>
-      <div class="kpi-label">Accepted</div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-success-subtle"><i class="bi bi-check-circle-fill text-success"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.acceptedQuotes }}</p><p class="stat-label">Accepted</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon warning"><i class="bi bi-arrow-repeat"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.convertedQuotes }}</div>
-      <div class="kpi-label">Converted</div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-warning-subtle"><i class="bi bi-arrow-repeat text-warning"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.convertedQuotes }}</p><p class="stat-label">Converted</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon accent"><i class="bi bi-percent"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ (stats.conversionRate || 0) | number:'1.0-1' }}%</div>
-      <div class="kpi-label">Conversion Rate</div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-danger-subtle"><i class="bi bi-percent text-danger"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ (stats.conversionRate || 0) | number:'1.0-1' }}%</p><p class="stat-label">Conversion Rate</p></div>
     </div>
   </div>
 </div>
@@ -55,20 +50,18 @@
 <!-- Table Card -->
 <div class="table-card">
   <div class="table-card-header">
-    <div class="status-tabs">
+    <div class="filter-tabs">
       <button *ngFor="let tab of statusTabs"
-              class="status-tab"
+              class="filter-tab"
               [class.active]="statusFilter === tab.value"
               (click)="onStatusFilter(tab.value)">
         {{ tab.label }}
       </button>
     </div>
-    <div class="table-card-actions">
-      <div class="search-box">
-        <i class="bi bi-search search-icon"></i>
-        <input type="text" class="form-control search-input" placeholder="Search customer or services..."
-               [value]="searchTerm" (input)="onSearch($any($event.target).value)" />
-      </div>
+    <div class="input-group search-box">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="text" class="form-control" placeholder="Search customer or services..."
+             [value]="searchTerm" (input)="onSearch($any($event.target).value)" />
     </div>
   </div>
 
@@ -107,41 +100,31 @@
           <td class="text-truncate" style="max-width:200px">{{ q.services }}</td>
           <td class="fw-semibold">R {{ q.total | number:'1.2-2' }}</td>
           <td>
-            <span class="badge-soft" [ngClass]="getStatusClass(q.status)">{{ q.status }}</span>
+            <span class="badge-soft" [ngClass]="getStatusClass(q.status)">{{ getStatusLabel(q.status) }}</span>
           </td>
           <td>
-            <div class="action-btn-group justify-content-end">
-              <!-- DRAFT: Edit, Send, Delete -->
+            <div class="action-btn-group">
+              <button class="action-btn" [routerLink]="['/accounting/quotes', q.id]" title="View"><i class="bi bi-eye"></i></button>
               <ng-container *ngIf="q.status === 'DRAFT'">
-                <button class="btn btn-sm btn-outline-primary" (click)="openEdit(q)" title="Edit">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-info" (click)="markSent(q)" title="Mark as Sent">
-                  <i class="bi bi-send"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteQuote(q)" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <button class="action-btn" (click)="openEdit(q)" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="action-btn action-btn-info" (click)="markSent(q)" title="Send to Client"><i class="bi bi-send"></i></button>
+                <button class="action-btn action-btn-danger" (click)="deleteQuote(q)" title="Delete"><i class="bi bi-trash"></i></button>
               </ng-container>
-
-              <!-- SENT: Accept, Reject -->
               <ng-container *ngIf="q.status === 'SENT'">
-                <button class="btn btn-sm btn-outline-success" (click)="acceptQuote(q)" title="Accept">
-                  <i class="bi bi-check-lg"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="rejectQuote(q)" title="Reject">
-                  <i class="bi bi-x-lg"></i>
-                </button>
+                <button class="action-btn" (click)="openEdit(q)" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="action-btn action-btn-success" (click)="acceptQuote(q)" title="Mark Accepted"><i class="bi bi-check-lg"></i></button>
+                <button class="action-btn action-btn-danger" (click)="rejectQuote(q)" title="Reject"><i class="bi bi-x-lg"></i></button>
               </ng-container>
-
-              <!-- ACCEPTED: Convert to Invoice -->
               <ng-container *ngIf="q.status === 'ACCEPTED'">
-                <button class="btn btn-sm btn-outline-success btn-convert" (click)="openConvertModal(q)" title="Convert to Invoice">
-                  <i class="bi bi-arrow-right-circle me-1"></i>Convert
-                </button>
+                <button class="action-btn" (click)="openEdit(q)" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="btn-convert-sm" (click)="openConvertModal(q)" title="Convert to Invoice"><i class="bi bi-arrow-right-circle"></i>Convert</button>
               </ng-container>
-
-              <!-- REJECTED / EXPIRED / CONVERTED: no actions -->
+              <ng-container *ngIf="q.status === 'REJECTED' || q.status === 'EXPIRED'">
+                <button class="action-btn action-btn-danger" (click)="deleteQuote(q)" title="Delete"><i class="bi bi-trash"></i></button>
+              </ng-container>
+              <ng-container *ngIf="q.status === 'CONVERTED'">
+                <span class="text-muted small"><i class="bi bi-check-circle-fill text-success me-1"></i>INV #{{ q.convertedToInvoiceId }}</span>
+              </ng-container>
             </div>
           </td>
         </tr>
@@ -169,15 +152,16 @@
 
 <!-- Create/Edit Modal -->
 <div class="modal-backdrop-custom" *ngIf="showModal" (click)="closeModal()"></div>
-<div class="modal-panel" *ngIf="showModal">
-  <div class="modal-panel-header">
-    <h5 class="modal-panel-title">
-      <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
-      {{ isEditMode ? 'Edit Quote' : 'New Quote' }}
-    </h5>
-    <button class="btn-close" (click)="closeModal()"></button>
+<div class="falcon-modal-wrap" *ngIf="showModal">
+  <div class="falcon-modal-header">
+    <div class="modal-icon-wrap"><i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square text-primary' : 'bi-plus-circle text-primary'"></i></div>
+    <div>
+      <p class="modal-title">{{ isEditMode ? 'Edit Quote' : 'New Quote' }}</p>
+      <p class="modal-subtitle">{{ isEditMode ? 'Update quote details' : 'Create a new client quote or estimate' }}</p>
+    </div>
+    <button class="btn-close ms-auto" (click)="closeModal()"></button>
   </div>
-  <div class="modal-panel-body">
+  <div class="falcon-modal-body">
     <form [formGroup]="quoteForm" (ngSubmit)="onSubmit()">
       <div class="row g-3">
         <div class="col-md-6">
@@ -248,27 +232,29 @@
           <input type="text" class="form-control" formControlName="notes" placeholder="Optional notes or terms..." />
         </div>
       </div>
-      <div class="modal-panel-actions mt-4">
-        <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="quoteForm.invalid || submitting">
-          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
-          {{ isEditMode ? 'Update' : 'Create Quote' }}
-        </button>
-      </div>
     </form>
+  </div>
+  <div class="falcon-modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="quoteForm.invalid || submitting" (click)="onSubmit()">
+      <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isEditMode ? 'Update Quote' : 'Create Quote' }}
+    </button>
   </div>
 </div>
 
 <!-- Convert to Invoice Confirmation Modal -->
 <div class="modal-backdrop-custom" *ngIf="showConvertModal" (click)="closeModal()"></div>
-<div class="modal-panel modal-panel-sm" *ngIf="showConvertModal">
-  <div class="modal-panel-header">
-    <h5 class="modal-panel-title">
-      <i class="bi bi-arrow-right-circle me-2 text-success"></i>Convert to Invoice
-    </h5>
-    <button class="btn-close" (click)="closeModal()"></button>
+<div class="falcon-modal-wrap" *ngIf="showConvertModal" style="width: min(92vw, 460px);">
+  <div class="falcon-modal-header header-success">
+    <div class="modal-icon-wrap icon-success"><i class="bi bi-arrow-right-circle text-success"></i></div>
+    <div>
+      <p class="modal-title">Convert to Invoice</p>
+      <p class="modal-subtitle">{{ convertingQuote?.quoteNumber }}</p>
+    </div>
+    <button class="btn-close ms-auto" (click)="closeModal()"></button>
   </div>
-  <div class="modal-panel-body">
+  <div class="falcon-modal-body">
     <p class="text-muted mb-1">You are about to convert:</p>
     <p class="fw-semibold mb-1">{{ convertingQuote?.quoteNumber }}</p>
     <p class="text-muted small mb-3">
@@ -276,13 +262,13 @@
       Total: R {{ convertingQuote?.total | number:'1.2-2' }}
     </p>
     <p class="mb-0 text-muted">This will create a new Invoice from this quote and mark the quote as <strong>Converted</strong>. This action cannot be undone.</p>
-    <div class="modal-panel-actions mt-4">
-      <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
-      <button type="button" class="btn btn-success" (click)="confirmConvert()" [disabled]="submitting">
-        <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
-        <i *ngIf="!submitting" class="bi bi-arrow-right-circle me-1"></i>
-        Confirm Convert
-      </button>
-    </div>
+  </div>
+  <div class="falcon-modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+    <button type="button" class="btn btn-success" (click)="confirmConvert()" [disabled]="submitting">
+      <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!submitting" class="bi bi-arrow-right-circle me-1"></i>
+      Confirm Convert
+    </button>
   </div>
 </div>

@@ -26,6 +26,8 @@ export interface Quote {
   total?: number;
   discount?: number;
   notes?: string;
+  issuedByName?: string;
+  issuedByEmail?: string;
   convertedToInvoiceId?: number;
   createdAt?: string;
   updatedAt?: string;

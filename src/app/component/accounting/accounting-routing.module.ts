@@ -7,12 +7,22 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProductListComponent } from './products/product-list.component';
 import { BillListComponent } from './bills/bill-list.component';
 import { QuoteListComponent } from './quotes/quote-list.component';
+import { QuoteDetailComponent } from './quotes/quote-detail/quote-detail.component';
+import { CreditNoteListComponent } from './credit-notes/credit-note-list.component';
+import { VatReturnsComponent } from './vat-returns/vat-returns.component';
+import { AccountingOverviewComponent } from './overview/accounting-overview.component';
+import { AccountingReportsComponent } from './reports/accounting-reports.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: 'products', pathMatch: 'full' },
+  { path: '', redirectTo: 'overview', pathMatch: 'full' },
+  { path: 'overview', component: AccountingOverviewComponent },
   { path: 'products', component: ProductListComponent },
   { path: 'bills', component: BillListComponent },
-  { path: 'quotes', component: QuoteListComponent }
+  { path: 'quotes', component: QuoteListComponent },
+  { path: 'quotes/:id', component: QuoteDetailComponent },
+  { path: 'credit-notes', component: CreditNoteListComponent },
+  { path: 'vat-returns', component: VatReturnsComponent },
+  { path: 'reports', component: AccountingReportsComponent }
 ];
 
 @NgModule({

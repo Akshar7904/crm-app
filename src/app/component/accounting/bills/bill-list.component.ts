@@ -9,6 +9,8 @@ import { Bill, BillStats, BillStatus } from '../models/bill.model';
 import { NotificationService } from '../../../service/notification.service';
 import { VendorService } from '../../expenses/services/vendor.service';
 import { ChartOfAccountService } from '../../expenses/services/chart-of-account.service';
+import { ExpenseClaimService } from '../../../service/expense-claim.service';
+import { ExpenseClaim, ExpenseClaimStatus } from '../../../interface/expense-claim.model';
 
 @Component({
   standalone: false,
@@ -36,6 +38,13 @@ export class BillListComponent implements OnInit {
   isEditMode = false;
   editingId: number | null = null;
   payingBill: Bill | null = null;
+  showViewModal = false;
+  viewingBill: Bill | null = null;
+
+  // AP Tabs
+  activeTab: 'bills' | 'claims' = 'bills';
+  apClaims: ExpenseClaim[] = [];
+  apClaimsLoading = false;
 
   billForm: FormGroup;
   payForm: FormGroup;
@@ -55,6 +64,7 @@ export class BillListComponent implements OnInit {
     private billService: BillService,
     private vendorService: VendorService,
     private accountService: ChartOfAccountService,
+    private expenseClaimService: ExpenseClaimService,
     private fb: FormBuilder,
     private notification: NotificationService,
     private cdr: ChangeDetectorRef
@@ -86,6 +96,7 @@ export class BillListComponent implements OnInit {
     this.loadBills();
     this.loadVendors();
     this.loadAccounts();
+    this.loadApClaims();
   }
 
   loadVendors(): void {
@@ -96,6 +107,30 @@ export class BillListComponent implements OnInit {
       },
       error: () => {}
     });
+  }
+
+  loadApClaims(): void {
+    this.apClaimsLoading = true;
+    this.cdr.markForCheck();
+    this.expenseClaimService.expenseClaimsByStatus$(ExpenseClaimStatus.APPROVED, 0, 200).subscribe({
+      next: (res: any) => {
+        this.apClaims = res.data?.page?.content ?? [];
+        this.apClaimsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.apClaimsLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  get apClaimsTotal(): number {
+    return this.apClaims.reduce((sum, c) => sum + (c.totalAmount ?? 0), 0);
+  }
+
+  get totalOutstanding(): number {
+    return (this.stats.outstanding ?? 0) + this.apClaimsTotal;
   }
 
   loadAccounts(): void {
@@ -254,6 +289,29 @@ export class BillListComponent implements OnInit {
       },
       error: (err: any) => this.notification.onError(err)
     });
+  }
+
+  viewBill(bill: Bill): void {
+    this.viewingBill = bill;
+    this.showViewModal = true;
+    this.cdr.markForCheck();
+  }
+
+  closeBillViewModal(): void {
+    this.showViewModal = false;
+    this.viewingBill = null;
+    this.cdr.markForCheck();
+  }
+
+  getStatusLabel(status: BillStatus): string {
+    const map: Record<BillStatus, string> = {
+      DRAFT: 'Draft',
+      RECEIVED: 'Received',
+      DUE: 'Due',
+      PAID: 'Paid',
+      OVERDUE: 'Overdue'
+    };
+    return map[status] ?? status;
   }
 
   getStatusClass(status: BillStatus): string {

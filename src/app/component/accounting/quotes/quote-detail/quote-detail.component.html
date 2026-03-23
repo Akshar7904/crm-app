@@ -1,0 +1,395 @@
+<!-- Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved. -->
+<section class="quote-detail-page">
+  <div class="container-fluid">
+
+    <!-- Page Banner -->
+    <div class="page-banner mb-4 no-print">
+      <div class="banner-left">
+        <nav class="breadcrumb-nav">
+          <a (click)="goBack()">Quotes</a> / {{ quote?.quoteNumber ?? 'Loading...' }}
+        </nav>
+        <h1 class="banner-title">
+          <i class="bi bi-file-text me-2"></i>
+          Quote {{ quote?.quoteNumber }}
+          <span class="badge-soft ms-2" *ngIf="quote" [ngClass]="getStatusClass(quote.status)">
+            {{ getStatusLabel(quote.status) }}
+          </span>
+        </h1>
+        <p class="banner-subtitle" *ngIf="quote">
+          Valid until {{ quote.validUntil | date:'dd MMMM yyyy' }}
+        </p>
+      </div>
+      <div class="banner-actions" *ngIf="quote">
+        <!-- Send — DRAFT only -->
+        <button *ngIf="quote.status === 'DRAFT'"
+                class="btn btn-outline-info btn-sm"
+                (click)="markSent()"
+                [disabled]="submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!submitting" class="bi bi-send me-1"></i>
+          Send
+        </button>
+
+        <!-- Accept / Reject — SENT only -->
+        <button *ngIf="quote.status === 'SENT'"
+                class="btn btn-outline-success btn-sm"
+                (click)="accept()"
+                [disabled]="submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!submitting" class="bi bi-check-lg me-1"></i>
+          Accept
+        </button>
+        <button *ngIf="quote.status === 'SENT'"
+                class="btn btn-outline-danger btn-sm"
+                (click)="reject()"
+                [disabled]="submitting">
+          <i class="bi bi-x-lg me-1"></i> Reject
+        </button>
+
+        <!-- Convert to Invoice — ACCEPTED only -->
+        <button *ngIf="quote.status === 'ACCEPTED'"
+                class="btn btn-success btn-sm"
+                (click)="openConvert()"
+                [disabled]="submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!submitting" class="bi bi-arrow-right-circle me-1"></i>
+          Convert to Invoice
+        </button>
+
+        <!-- Edit — DRAFT and SENT only -->
+        <button *ngIf="quote.status === 'DRAFT' || quote.status === 'SENT'"
+                class="btn btn-outline-primary btn-sm"
+                (click)="toggleEdit()">
+          <i class="bi" [ngClass]="isEditMode ? 'bi-x' : 'bi-pencil'"></i>
+          {{ isEditMode ? 'Cancel Edit' : 'Edit' }}
+        </button>
+
+        <!-- Print -->
+        <button class="btn btn-outline-secondary btn-sm" (click)="printQuote()">
+          <i class="bi bi-printer me-1"></i> Print
+        </button>
+
+        <!-- Back -->
+        <button class="btn btn-outline-secondary btn-sm" (click)="goBack()">
+          <i class="bi bi-arrow-left me-1"></i> Back
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-muted">Loading quote...</p>
+    </div>
+
+    <!-- ==================== VIEW MODE ==================== -->
+    <div *ngIf="quote && !isEditMode" class="quote-page" id="quote-doc">
+
+      <!-- Top gradient background -->
+      <div class="quote-bg-top"></div>
+      <!-- Bottom corner decoration -->
+      <div class="quote-bg-bottom"></div>
+
+      <div class="quote-content">
+
+        <!-- Header: Logo + QUOTE title -->
+        <div class="quote-header">
+          <div class="header-left">
+            <img src="assets/logo.png" alt="LKCentrix Solutions" class="company-logo">
+          </div>
+          <div class="header-right">
+            <h1 class="quote-title">QUOTE</h1>
+            <p class="quote-number">Quote #: {{ quote.quoteNumber }}</p>
+          </div>
+        </div>
+
+        <!-- FROM / Date Section -->
+        <div class="info-section">
+          <div class="info-left">
+            <h6 class="info-label">FROM</h6>
+            <p class="info-text">
+              <strong>LKCentrix Solutions (PTY) LTD</strong><br>
+              info@lkcentrix.co.za<br>
+              +27 (11) 568 8322<br>
+              4 Skeen BLVD Bedfordview, 2001
+            </p>
+            <p class="info-text mt-2">
+              <span class="info-label" style="font-size:11px;">ISSUED BY</span><br>
+              <strong>{{ quote.issuedByName || 'LKCentrix Team' }}</strong><br>
+              <span *ngIf="quote.issuedByEmail" style="font-size:12px;">{{ quote.issuedByEmail }}</span>
+            </p>
+          </div>
+          <div class="info-right">
+            <div class="date-row">
+              <span class="info-label">ISSUE DATE</span>
+              <span class="info-value">{{ quote.issueDate | date:'mediumDate' }}</span>
+            </div>
+            <div class="date-row">
+              <span class="info-label">VALID UNTIL</span>
+              <span class="info-value" [class.text-danger]="quote.status === 'EXPIRED'">
+                {{ quote.validUntil | date:'mediumDate' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TO / Quote Total Section -->
+        <div class="info-section info-section-quote-to">
+          <div class="info-left">
+            <h6 class="info-label">TO</h6>
+            <p class="info-text">
+              <strong>{{ quote.customer?.name ?? '—' }}</strong><br>
+              <span *ngIf="quote.customer?.email">{{ quote.customer?.email }}<br></span>
+            </p>
+          </div>
+          <div class="info-right">
+            <span class="info-label">QUOTE TOTAL</span>
+            <span class="quote-total-display">{{ formatCurrency(quote.total) }}</span>
+            <span class="badge status-badge mt-2" [ngClass]="getStatusClass(quote.status)">
+              {{ getStatusLabel(quote.status) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Services Description Block -->
+        <div class="services-block-wrapper">
+          <p class="services-block-label"><i class="bi bi-list-task me-1"></i>Services / Description</p>
+          <p class="services-block-text">{{ quote.services }}</p>
+        </div>
+
+        <!-- Totals -->
+        <div class="quote-totals">
+          <div class="totals-table">
+            <div class="totals-row">
+              <span class="totals-label">SUBTOTAL</span>
+              <span class="totals-value">{{ formatCurrency(quote.subtotal) }}</span>
+            </div>
+            <div class="totals-row">
+              <span class="totals-label">VAT ({{ quote.vatRate ?? 15 }}%)</span>
+              <span class="totals-value">{{ formatCurrency(quote.vatAmount) }}</span>
+            </div>
+            <div class="totals-row" *ngIf="(quote.discount ?? 0) > 0">
+              <span class="totals-label">DISCOUNT</span>
+              <span class="totals-value totals-discount">-{{ formatCurrency(quote.discount) }}</span>
+            </div>
+            <div class="totals-row totals-final">
+              <span class="totals-label">TOTAL</span>
+              <span class="totals-value">{{ formatCurrency(quote.total) }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /quote-content -->
+
+      <!-- Footer Bar -->
+      <div class="quote-footer-bar">
+        <div class="footer-bar-accent"></div>
+        <div class="footer-bar-body">
+          <div class="footer-col">
+            <span class="footer-col-title"><i class="bi bi-info-circle me-1"></i>Quote Info</span>
+            <span class="footer-col-line">Quote #: {{ quote.quoteNumber }}</span>
+            <span class="footer-col-line">
+              Status:
+              <strong>{{ getStatusLabel(quote.status) }}</strong>
+            </span>
+            <span class="footer-col-line" *ngIf="quote.status === 'CONVERTED' && quote.convertedToInvoiceId">
+              Converted to Invoice #{{ quote.convertedToInvoiceId }}
+            </span>
+          </div>
+          <div class="footer-divider"></div>
+          <div class="footer-col">
+            <span class="footer-col-title"><i class="bi bi-person-check me-1"></i>Issued By</span>
+            <span class="footer-col-line">
+              <strong>{{ quote.issuedByName || 'LKCentrix Team' }}</strong>
+            </span>
+            <span class="footer-col-line" *ngIf="quote.issuedByEmail">{{ quote.issuedByEmail }}</span>
+          </div>
+          <div class="footer-divider"></div>
+          <div class="footer-col">
+            <span class="footer-col-title"><i class="bi bi-chat-square-text me-1"></i>Notes</span>
+            <ng-container *ngIf="quote.notes; else defaultNotes">
+              <span class="footer-col-line">{{ quote.notes }}</span>
+            </ng-container>
+            <ng-template #defaultNotes>
+              <span class="footer-col-line">This quote is valid for 30 days from the issue date.</span>
+              <span class="footer-col-line">Prices are subject to change after expiry.</span>
+            </ng-template>
+          </div>
+          <div class="footer-divider"></div>
+          <div class="footer-col footer-col-brand">
+            <img src="assets/logo.png" alt="LKCentrix" class="footer-brand-logo">
+            <span class="footer-brand-name">LKCentrix Solutions</span>
+            <span class="footer-col-line">www.lkcentrix.co.za</span>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /quote-page -->
+
+    <!-- ==================== EDIT MODE ==================== -->
+    <div *ngIf="quote && isEditMode" class="no-print">
+
+      <div class="card edit-card mb-4">
+        <div class="card-body">
+
+          <!-- Customer (read-only) -->
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <h6 class="section-label">From</h6>
+              <div class="customer-info-box">
+                <h5 class="customer-name-box">LKCentrix Solutions (PTY) LTD</h5>
+                <p class="mb-0 text-muted" style="font-size:13px;">
+                  4 Skeen BLVD Bedfordview<br>
+                  Bedfordview Corporate Park, 2001<br>
+                  Phone: +27 (11) 568 8322
+                </p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h6 class="section-label">Customer (cannot be changed)</h6>
+              <div class="customer-info-box">
+                <h5 class="customer-name-box">{{ quote.customer?.name ?? '—' }}</h5>
+                <p class="mb-0 text-muted" style="font-size:13px;">
+                  <span *ngIf="quote.customer?.email">{{ quote.customer?.email }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Dates -->
+          <div class="row mb-4">
+            <div class="col-md-4">
+              <label class="form-label">Quote Number</label>
+              <input type="text" class="form-control" [value]="quote.quoteNumber" readonly>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Issue Date</label>
+              <input type="date" class="form-control" [(ngModel)]="editQuote.issueDate" name="issueDate">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Valid Until</label>
+              <input type="date" class="form-control" [(ngModel)]="editQuote.validUntil" name="validUntil">
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Services -->
+          <div class="mb-4">
+            <label class="form-label">Services / Description</label>
+            <textarea class="form-control"
+                      [(ngModel)]="editQuote.services"
+                      name="services"
+                      rows="4"
+                      placeholder="Describe the services or work to be provided..."></textarea>
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-4">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control"
+                      [(ngModel)]="editQuote.notes"
+                      name="notes"
+                      rows="2"
+                      placeholder="Optional notes or terms..."></textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Summary + Actions -->
+      <div class="row">
+        <div class="col-lg-6">
+          <div class="card summary-card mb-4">
+            <div class="card-header">
+              <h6 class="mb-0"><i class="bi bi-calculator me-2"></i>Quote Summary</h6>
+            </div>
+            <div class="card-body">
+              <div class="summary-row">
+                <span class="summary-label">
+                  Subtotal (excl. VAT)
+                  <div class="input-group discount-input ms-2">
+                    <span class="input-group-text">R</span>
+                    <input type="number"
+                           class="form-control"
+                           [(ngModel)]="editSubtotal"
+                           name="editSubtotal"
+                           (ngModelChange)="recalculate()"
+                           min="0"
+                           step="0.01">
+                  </div>
+                </span>
+                <span class="summary-value">{{ formatCurrency(editSubtotal) }}</span>
+              </div>
+
+              <div class="summary-row">
+                <span class="summary-label">
+                  Discount (R)
+                  <div class="input-group discount-input ms-2">
+                    <span class="input-group-text">R</span>
+                    <input type="number"
+                           class="form-control"
+                           [(ngModel)]="editDiscount"
+                           name="editDiscount"
+                           (ngModelChange)="recalculate()"
+                           min="0"
+                           step="0.01">
+                  </div>
+                </span>
+                <span class="summary-value" [class.text-danger]="editDiscount > 0">
+                  {{ editDiscount > 0 ? '-' : '' }}{{ formatCurrency(editDiscount) }}
+                </span>
+              </div>
+
+              <div class="summary-row">
+                <span class="summary-label">
+                  VAT
+                  <input type="number"
+                         class="tax-input ms-1"
+                         [(ngModel)]="editVatRate"
+                         name="editVatRate"
+                         (ngModelChange)="recalculate()"
+                         min="0"
+                         max="100">%
+                </span>
+                <span class="summary-value">{{ formatCurrency(editVatAmount) }}</span>
+              </div>
+
+              <hr>
+              <div class="summary-row total-row">
+                <span class="summary-label">Total (incl. VAT)</span>
+                <span class="summary-value total-value">{{ formatCurrency(editTotal) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card action-card">
+            <div class="card-body">
+              <div class="d-flex gap-2">
+                <button type="button" class="btn btn-outline-secondary flex-grow-1" (click)="toggleEdit()">
+                  <i class="bi bi-x-lg me-2"></i>Cancel
+                </button>
+                <button type="button"
+                        class="btn btn-primary flex-grow-1"
+                        (click)="saveEdit()"
+                        [disabled]="submitting">
+                  <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+                  <i *ngIf="!submitting" class="bi bi-check-lg me-2"></i>
+                  {{ submitting ? 'Saving...' : 'Save Changes' }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /edit mode -->
+
+  </div>
+</section>

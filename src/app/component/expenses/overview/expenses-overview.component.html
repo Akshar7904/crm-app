@@ -45,6 +45,22 @@
         <span class="kpi-value">{{ formatCurrency(summary?.netProfit) }}</span>
       </div>
     </div>
+    <div class="kpi-card ap">
+      <div class="kpi-icon"><i class="bi bi-receipt-cutoff"></i></div>
+      <div class="kpi-content">
+        <span class="kpi-label">Bills AP Outstanding</span>
+        <span class="kpi-value">{{ formatCurrency(summary?.apOutstanding) }}</span>
+        <span class="kpi-sub">Unpaid supplier bills</span>
+      </div>
+    </div>
+    <div class="kpi-card claims-ap">
+      <div class="kpi-icon"><i class="bi bi-person-lines-fill"></i></div>
+      <div class="kpi-content">
+        <span class="kpi-label">Claims AP Outstanding</span>
+        <span class="kpi-value">{{ formatCurrency(summary?.claimsOutstanding) }}</span>
+        <span class="kpi-sub">Approved, pending reimbursement</span>
+      </div>
+    </div>
   </div>
 
   <ng-template #loadingTpl>

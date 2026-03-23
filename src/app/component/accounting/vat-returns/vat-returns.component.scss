@@ -1,0 +1,251 @@
+// Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
+// LKCentrix HR & Payroll Management System — ORION
+// Unauthorised copying, distribution or modification is strictly prohibited.
+
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.vat-returns-page {
+  padding: 20px 0;
+}
+
+// ─── Stat Cards ─────────────────────────────────────────────────────────────
+.stat-card { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e9ecef); border-radius: $border-radius-xl; padding: $spacing-md $spacing-lg; display: flex; align-items: center; gap: $spacing-md; box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06)); transition: transform $transition-base, box-shadow $transition-base; &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.09); } }
+.stat-icon { width: 48px; height: 48px; border-radius: $border-radius-lg; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.stat-info { flex: 1; min-width: 0; }
+.stat-value { font-size: 1.5rem; font-weight: $font-weight-bold; color: var(--text-primary, #1a1a2e); margin: 0; line-height: 1.1; }
+.stat-label { font-size: 0.72rem; color: var(--text-muted, #6c757d); font-weight: $font-weight-medium; margin: 2px 0 0; }
+.bg-primary-subtle { background: rgba($primary, 0.1) !important; }
+.bg-success-subtle { background: rgba($success, 0.1) !important; }
+.bg-warning-subtle { background: rgba($warning, 0.14) !important; }
+.bg-info-subtle    { background: rgba(13,202,240,0.1) !important; }
+.bg-danger-subtle  { background: rgba($danger, 0.1) !important; }
+
+// ─── Action Buttons ──────────────────────────────────────────────────────────
+.action-btn-group { display: flex; align-items: center; gap: 4px; }
+.action-btn { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--border-color, #dee2e6); border-radius: $border-radius; background: var(--bg-card, #fff); color: var(--text-secondary, #495057); font-size: 0.8rem; cursor: pointer; transition: all $transition-base; &:hover { background: rgba($primary, 0.06); border-color: $primary; color: $primary; transform: translateY(-1px); } &.action-btn-success:hover { background: rgba($success, 0.1); border-color: $success; color: $success; } &.action-btn-danger:hover { background: rgba($danger, 0.1); border-color: $danger; color: $danger; } &:disabled { opacity: 0.45; pointer-events: none; } }
+
+/* ---- Calculator Panel ---- */
+.vat-calculator-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow);
+  padding: 28px 32px;
+}
+
+.calc-header {
+  margin-bottom: 20px;
+}
+
+.calc-title {
+  font-size: 1rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  margin: 0 0 4px;
+  i { color: $primary; }
+}
+
+.calc-subtitle {
+  font-size: $font-size-sm;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Period selector row */
+.period-selector-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.period-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.period-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.period-select {
+  min-width: 140px;
+  font-size: $font-size-sm;
+  border-color: var(--border-color, #dee2e6);
+  border-radius: 8px;
+
+  &:focus {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+  }
+}
+
+.period-btn {
+  height: 38px;
+  padding: 0 20px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+}
+
+/* Period badge */
+.vat201-period-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba($primary, 0.08);
+  color: $primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  padding: 6px 14px;
+  border-radius: $border-radius-full;
+}
+
+/* VAT201 table */
+.vat201-table {
+  max-width: 600px;
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+}
+
+.vat-section-header {
+  background: $primary;
+  color: #fff;
+  font-size: 11px;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 8px 16px;
+
+  &.vat-section-net {
+    background: darken($primary, 10%);
+  }
+}
+
+.vat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color, #eee);
+  background: var(--bg-card);
+
+  &:last-of-type { border-bottom: none; }
+}
+
+.vat-total-row {
+  background: var(--bg-body, #f8f9fa);
+  .vat-row-label { font-weight: $font-weight-semibold; }
+  .vat-row-value { font-weight: $font-weight-bold; }
+}
+
+.vat-row-label {
+  font-size: $font-size-sm;
+  color: var(--text-secondary);
+}
+
+.vat-row-value {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+}
+
+/* Net payable display */
+.net-payable-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: var(--bg-card);
+  text-align: center;
+
+  &.payable {
+    .net-amount { color: $danger; }
+    background: rgba($danger, 0.04);
+  }
+
+  &.refund {
+    .net-amount { color: $success; }
+    background: rgba($success, 0.04);
+  }
+}
+
+.net-amount {
+  font-size: 2.4rem;
+  font-weight: $font-weight-bold;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.net-label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  margin-top: 6px;
+  color: inherit;
+}
+
+.calc-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* ---- Table ---- */
+.table-loading {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  color: var(--text-muted);
+}
+
+.table-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border-color, #e9ecef);
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+// ─── Table card header ───────────────────────────────────────────────────────
+.table-card-header { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; padding: 14px 20px; border-bottom: 1px solid var(--border-color, #e9ecef); background: var(--bg-card, #fff); flex-wrap: wrap; }
+.table-card-title { font-size: 0.9rem; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }
+
+.pagination-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .vat-calculator-panel { padding: 20px; }
+  .period-selector-inner { flex-direction: column; align-items: stretch; }
+  .period-select { min-width: unset; width: 100%; }
+  .period-btn { width: 100%; }
+  .vat201-table { max-width: 100%; }
+  .net-amount { font-size: 1.8rem; }
+  .calc-actions { flex-direction: column; }
+}
+
+// ─── Falcon Modal ────────────────────────────────────────────────────────────
+.modal-backdrop-custom { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1040; backdrop-filter: blur(2px); }
+.falcon-modal-wrap { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--bg-card, #fff); border-radius: $border-radius-xl; width: min(92vw, 600px); max-height: 90vh; overflow: hidden; z-index: 1050; box-shadow: 0 24px 64px rgba(0,0,0,0.16); }
+.falcon-modal-header { display: flex; align-items: center; gap: 12px; padding: 18px 24px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border-color, #e9ecef); position: relative; &::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, $primary 0%, $primary-light 100%); } &.header-success::before { background: linear-gradient(180deg, $success 0%, lighten($success, 14%) 100%); } .modal-title { font-size: $font-size-base; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; } .modal-subtitle { font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 0; } }
+.modal-icon-wrap { width: 38px; height: 38px; border-radius: $border-radius-lg; background: rgba($primary, 0.1); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; &.icon-success { background: rgba($success, 0.1); } }
+.falcon-modal-body { padding: 20px 24px; max-height: calc(90vh - 140px); overflow-y: auto; }
+.falcon-modal-footer { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 14px 24px; background: var(--bg-card, #fff); border-top: 1px solid var(--border-color, #e9ecef); }
+
+// ─── Detail Card ─────────────────────────────────────────────────────────────
+.detail-card { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e9ecef); border-radius: $border-radius-lg; overflow: hidden; }
+.detail-card-header { display: flex; align-items: center; gap: 7px; padding: 10px 16px; background: var(--bg-body, #f8f9fa); border-bottom: 1px solid var(--border-color, #e9ecef); font-size: $font-size-sm; font-weight: $font-weight-semibold; color: var(--text-primary); }
+.detail-card-body { padding: 4px 16px 8px; }
+.detail-row { display: flex; align-items: center; gap: $spacing-md; padding: 9px 0; font-size: $font-size-sm; border-bottom: 1px solid var(--border-color, #f5f5f5); color: var(--text-primary); &:last-child { border-bottom: none; } }
+.detail-label { width: 160px; flex-shrink: 0; font-weight: $font-weight-medium; color: var(--text-muted, #6c757d); font-size: 0.8rem; }

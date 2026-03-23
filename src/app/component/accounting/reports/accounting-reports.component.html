@@ -1,0 +1,198 @@
+<!-- Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved. -->
+<div class="page-banner">
+  <div class="banner-left">
+    <h1 class="banner-title"><i class="bi bi-file-earmark-bar-graph me-2"></i>Accounting Reports</h1>
+    <p class="banner-subtitle">AP Aging, Income Statement and financial analysis</p>
+  </div>
+  <div class="banner-actions">
+    <button class="btn btn-banner btn-sm" (click)="printReport()">
+      <i class="bi bi-printer me-1"></i> Print
+    </button>
+    <button class="btn btn-banner btn-sm" (click)="exportPL()" [disabled]="exporting">
+      <span *ngIf="exporting" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!exporting" class="bi bi-file-earmark-excel me-1"></i>
+      Export P&amp;L (.xlsx)
+    </button>
+  </div>
+</div>
+
+<!-- Report Toggle Tabs -->
+<div class="filter-tabs mb-4">
+  <button class="filter-tab" [class.active]="activeReport === 'aging'" (click)="activeReport = 'aging'">
+    <i class="bi bi-clock-history"></i>AP Aging Report
+  </button>
+  <button class="filter-tab" [class.active]="activeReport === 'pl'" (click)="activeReport = 'pl'">
+    <i class="bi bi-file-earmark-bar-graph"></i>Income Statement
+  </button>
+</div>
+
+<!-- ─── AP AGING REPORT ──────────────────────────────────────────────────── -->
+<ng-container *ngIf="activeReport === 'aging'">
+
+  <!-- Aging Summary KPIs -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg">
+      <div class="stat-card">
+        <div class="stat-icon bg-primary-subtle"><i class="bi bi-receipt-cutoff text-primary"></i></div>
+        <div class="stat-info">
+          <p class="stat-value">{{ formatCurrency(totalUnpaidAP) }}</p>
+          <p class="stat-label">Total Unpaid AP</p>
+          <p class="stat-sub">{{ allBills.length }} bill{{ allBills.length !== 1 ? 's' : '' }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg">
+      <div class="stat-card">
+        <div class="stat-icon bg-danger-subtle"><i class="bi bi-exclamation-triangle-fill text-danger"></i></div>
+        <div class="stat-info">
+          <p class="stat-value text-danger">{{ formatCurrency(overdueAP) }}</p>
+          <p class="stat-label">Total Overdue</p>
+        </div>
+      </div>
+    </div>
+    <ng-container *ngFor="let bucket of agingBuckets">
+      <div class="col-6 col-lg">
+        <div class="stat-card aging-bucket-card" [ngClass]="'aging-card-' + bucket.colorClass">
+          <div class="stat-icon" [ngClass]="'bg-' + (bucket.colorClass === 'success' ? 'success' : bucket.colorClass === 'warning' ? 'warning' : 'danger') + '-subtle'">
+            <i class="bi" [ngClass]="bucket.colorClass === 'success' ? 'bi-check-circle text-success' : 'bi-hourglass-split text-danger'"></i>
+          </div>
+          <div class="stat-info">
+            <p class="stat-value" [class.text-danger]="bucket.colorClass !== 'success' && bucket.colorClass !== 'warning'">{{ formatCurrency(bucket.total) }}</p>
+            <p class="stat-label">{{ bucket.label }}</p>
+            <p class="stat-sub">{{ bucket.bills.length }} bill{{ bucket.bills.length !== 1 ? 's' : '' }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <!-- Aging Detail Tables -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <ng-container *ngIf="!loading">
+    <div class="aging-bucket-section" *ngFor="let bucket of agingBuckets" [class.hide-empty]="bucket.bills.length === 0">
+
+      <div class="aging-bucket-header" [class]="'aging-header-' + bucket.colorClass">
+        <span class="aging-bucket-title">{{ bucket.label }} — {{ bucket.range }}</span>
+        <span class="aging-bucket-total">{{ formatCurrency(bucket.total) }}</span>
+      </div>
+
+      <div *ngIf="bucket.bills.length === 0" class="aging-empty">
+        <i class="bi bi-check-circle-fill text-success me-2"></i>No bills in this category
+      </div>
+
+      <div *ngIf="bucket.bills.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle mb-0 small">
+          <thead>
+            <tr>
+              <th>Bill #</th>
+              <th>Vendor</th>
+              <th>Description</th>
+              <th>Issue Date</th>
+              <th>Due Date</th>
+              <th class="text-end">Total</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let b of bucket.bills">
+              <td><code class="text-primary fw-semibold">{{ b.billNumber }}</code></td>
+              <td>{{ b.vendor?.vendorName ?? '—' }}</td>
+              <td class="text-truncate" style="max-width:180px">{{ b.description }}</td>
+              <td>{{ b.issueDate | date:'dd MMM yyyy' }}</td>
+              <td [class.text-danger]="bucket.colorClass !== 'success'">{{ b.dueDate | date:'dd MMM yyyy' }}</td>
+              <td class="text-end fw-semibold">R {{ b.total | number:'1.2-2' }}</td>
+              <td><span class="badge-soft badge-soft-danger">{{ b.status }}</span></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="aging-subtotal">
+              <td colspan="5" class="text-end fw-semibold">Subtotal:</td>
+              <td class="text-end fw-bold">R {{ bucket.total | number:'1.2-2' }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>
+
+<!-- ─── INCOME STATEMENT ─────────────────────────────────────────────────── -->
+<ng-container *ngIf="activeReport === 'pl'">
+
+  <!-- Period Selector -->
+  <div class="pl-period-bar">
+    <span class="pl-period-label">Period:</span>
+    <select class="form-select form-select-sm" style="width:160px" [(ngModel)]="selectedMonth" (change)="onPeriodChange()">
+      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+    </select>
+    <select class="form-select form-select-sm" style="width:100px" [(ngModel)]="selectedYear" (change)="onPeriodChange()">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+    <button class="btn btn-sm btn-primary" (click)="exportPL()" [disabled]="exporting">
+      <span *ngIf="exporting" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!exporting" class="bi bi-file-earmark-excel me-1"></i>
+      Download .xlsx
+    </button>
+  </div>
+
+  <div *ngIf="loadingPL" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <!-- P&L Table -->
+  <div *ngIf="!loadingPL && profitLoss" class="pl-report-card">
+    <div class="pl-report-header">
+      <h5>LKCentrix — Income Statement</h5>
+      <span class="text-muted">{{ months[selectedMonth - 1]?.label }} {{ selectedYear }}</span>
+    </div>
+
+    <!-- Income -->
+    <div class="pl-section">
+      <div class="pl-section-title">INCOME</div>
+      <div *ngFor="let line of profitLoss.incomeLines"
+           class="pl-row" [class.pl-total-row]="line.bold">
+        <span class="pl-label">{{ line.accountCode ? '[' + line.accountCode + '] ' : '' }}{{ line.label }}</span>
+        <span class="pl-amount">{{ formatCurrency(line.amount) }}</span>
+      </div>
+    </div>
+
+    <!-- COGS -->
+    <div class="pl-section" *ngIf="profitLoss.cogsLines?.length > 0">
+      <div class="pl-section-title">COST OF GOODS SOLD</div>
+      <div *ngFor="let line of profitLoss.cogsLines"
+           class="pl-row" [class.pl-total-row]="line.bold">
+        <span class="pl-label">{{ line.accountCode ? '[' + line.accountCode + '] ' : '' }}{{ line.label }}</span>
+        <span class="pl-amount">{{ formatCurrency(line.amount) }}</span>
+      </div>
+    </div>
+
+    <div class="pl-row pl-gross-row">
+      <span class="pl-label">GROSS PROFIT</span>
+      <span class="pl-amount">{{ formatCurrency(profitLoss.grossProfit) }}</span>
+    </div>
+
+    <!-- Operating Expenses -->
+    <div class="pl-section">
+      <div class="pl-section-title">OPERATING EXPENSES</div>
+      <div *ngFor="let line of profitLoss.operatingExpenseLines"
+           class="pl-row" [class.pl-total-row]="line.bold">
+        <span class="pl-label">{{ line.accountCode ? '[' + line.accountCode + '] ' : '' }}{{ line.label }}</span>
+        <span class="pl-amount">{{ formatCurrency(line.amount) }}</span>
+      </div>
+    </div>
+
+    <div class="pl-row pl-net-row" [class.pl-profit]="isProfit" [class.pl-loss]="!isProfit">
+      <span class="pl-label">NET {{ isProfit ? 'PROFIT' : 'LOSS' }}</span>
+      <span class="pl-amount">{{ formatCurrency(profitLoss.netProfit) }}</span>
+    </div>
+  </div>
+
+  <div *ngIf="!loadingPL && !profitLoss" class="text-center py-5 text-muted">
+    <i class="bi bi-file-earmark-bar-graph fs-1 d-block mb-2"></i>
+    No data for selected period. Try a different month.
+  </div>
+</ng-container>

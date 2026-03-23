@@ -14,40 +14,29 @@
 </div>
 
 <!-- KPI Cards -->
-<div class="kpi-row">
-  <div class="kpi-stat">
-    <div class="kpi-icon info"><i class="bi bi-grid-3x3-gap-fill"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.total }}</div>
-      <div class="kpi-label">Total Items</div>
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-primary-subtle"><i class="bi bi-box-seam text-primary"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.total }}</p><p class="stat-label">Total Products</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon success"><i class="bi bi-check-circle-fill"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.active }}</div>
-      <div class="kpi-label">Active</div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-success-subtle"><i class="bi bi-check-circle text-success"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.active }}</p><p class="stat-label">Active</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon primary"><i class="bi bi-tools"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.services }}</div>
-      <div class="kpi-label">Services</div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-info-subtle"><i class="bi bi-briefcase text-info"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.services }}</p><p class="stat-label">Services</p></div>
     </div>
   </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon warning"><i class="bi bi-box2-fill"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.products }}</div>
-      <div class="kpi-label">Products</div>
-    </div>
-  </div>
-  <div class="kpi-stat">
-    <div class="kpi-icon danger"><i class="bi bi-collection-fill"></i></div>
-    <div class="kpi-body">
-      <div class="kpi-value">{{ stats.bundles }}</div>
-      <div class="kpi-label">Bundles</div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon bg-warning-subtle"><i class="bi bi-box text-warning"></i></div>
+      <div class="stat-info"><p class="stat-value">{{ stats.products }}</p><p class="stat-label">Products</p></div>
     </div>
   </div>
 </div>
@@ -57,9 +46,9 @@
   <div class="table-card-header">
     <h5 class="table-card-title">Catalog</h5>
     <div class="table-card-actions">
-      <div class="search-box">
-        <i class="bi bi-search search-icon"></i>
-        <input type="text" class="form-control search-input" placeholder="Search by name..."
+      <div class="input-group search-box">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search products..."
                [value]="searchTerm" (input)="onSearch($any($event.target).value)" />
       </div>
     </div>
@@ -85,36 +74,32 @@
       <tbody>
         <tr *ngIf="products.length === 0">
           <td colspan="7" class="empty-state-cell">
-            <i class="bi bi-box-seam fs-1 text-muted d-block mb-2"></i>
-            No products found. Add your first item.
+            <i class="bi bi-box-seam"></i>
+            <p>No products found. Add your first item.</p>
           </td>
         </tr>
-        <tr *ngFor="let p of products">
-          <td><code class="text-primary fw-semibold">{{ p.code }}</code></td>
+        <tr *ngFor="let product of products">
+          <td><code class="text-primary fw-semibold">{{ product.code }}</code></td>
           <td>
-            <div class="fw-semibold">{{ p.name }}</div>
-            <div *ngIf="p.description" class="text-muted small text-truncate" style="max-width:260px">{{ p.description }}</div>
+            <div class="fw-semibold">{{ product.name }}</div>
+            <div *ngIf="product.description" class="text-muted small text-truncate" style="max-width:260px">{{ product.description }}</div>
           </td>
-          <td><span class="badge-soft" [ngClass]="getTypeBadgeClass(p.type)">{{ p.type }}</span></td>
-          <td class="fw-semibold">R {{ p.unitPrice | number:'1.2-2' }}</td>
-          <td>{{ p.vatRate }}%</td>
+          <td><span class="badge-soft" [ngClass]="getTypeBadgeClass(product.type)">{{ product.type }}</span></td>
+          <td class="fw-semibold">R {{ product.unitPrice | number:'1.2-2' }}</td>
+          <td>{{ product.vatRate }}%</td>
           <td>
-            <span class="badge-soft" [ngClass]="p.isActive ? 'badge-soft-success' : 'badge-soft-secondary'">
-              {{ p.isActive ? 'Active' : 'Inactive' }}
+            <span class="badge-soft" [ngClass]="product.isActive ? 'badge-soft-success' : 'badge-soft-secondary'">
+              {{ product.isActive ? 'Active' : 'Inactive' }}
             </span>
           </td>
           <td>
-            <div class="action-btn-group justify-content-end">
-              <button class="btn btn-sm btn-outline-primary" (click)="openEdit(p)" title="Edit">
-                <i class="bi bi-pencil"></i>
+            <div class="action-btn-group">
+              <button class="action-btn" (click)="openEdit(product)" title="Edit"><i class="bi bi-pencil"></i></button>
+              <button class="action-btn" [class.action-btn-success]="!product.isActive" [class.action-btn-danger]="product.isActive"
+                      (click)="toggleActive(product)" [title]="product.isActive ? 'Deactivate' : 'Activate'">
+                <i class="bi" [class.bi-toggle-on]="product.isActive" [class.bi-toggle-off]="!product.isActive"></i>
               </button>
-              <button class="btn btn-sm" [ngClass]="p.isActive ? 'btn-outline-warning' : 'btn-outline-success'"
-                      (click)="toggleActive(p)" [title]="p.isActive ? 'Deactivate' : 'Activate'">
-                <i class="bi" [ngClass]="p.isActive ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
-              </button>
-              <button class="btn btn-sm btn-outline-danger" (click)="deleteProduct(p)" title="Delete">
-                <i class="bi bi-trash"></i>
-              </button>
+              <button class="action-btn action-btn-danger" (click)="deleteProduct(product)" title="Delete"><i class="bi bi-trash"></i></button>
             </div>
           </td>
         </tr>
@@ -123,7 +108,7 @@
   </div>
 
   <!-- Pagination -->
-  <div *ngIf="totalPages > 1" class="table-card-footer d-flex align-items-center justify-content-between">
+  <div *ngIf="totalPages > 1" class="table-card-footer">
     <span class="text-muted small">Showing {{ products.length }} of {{ totalElements }} items</span>
     <nav>
       <ul class="pagination pagination-sm mb-0">
@@ -141,17 +126,18 @@
   </div>
 </div>
 
-<!-- Modal -->
+<!-- Create/Edit Modal -->
 <div class="modal-backdrop-custom" *ngIf="showModal" (click)="closeModal()"></div>
-<div class="modal-panel" *ngIf="showModal">
-  <div class="modal-panel-header">
-    <h5 class="modal-panel-title">
-      <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
-      {{ isEditMode ? 'Edit Item' : 'Add New Item' }}
-    </h5>
-    <button class="btn-close" (click)="closeModal()"></button>
+<div class="falcon-modal-wrap" *ngIf="showModal">
+  <div class="falcon-modal-header">
+    <div class="modal-icon-wrap"><i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square text-primary' : 'bi-plus-circle text-primary'"></i></div>
+    <div>
+      <p class="modal-title">{{ isEditMode ? 'Edit Product / Service' : 'New Product / Service' }}</p>
+      <p class="modal-subtitle">{{ isEditMode ? 'Update product details' : 'Add a new item to your catalog' }}</p>
+    </div>
+    <button class="btn-close ms-auto" (click)="closeModal()"></button>
   </div>
-  <div class="modal-panel-body">
+  <div class="falcon-modal-body">
     <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
       <div class="row g-3">
         <div class="col-md-4">
@@ -162,14 +148,13 @@
         </div>
         <div class="col-md-8">
           <label class="form-label">Name <span class="text-danger">*</span></label>
-          <input type="text" class="form-control" formControlName="name" placeholder="e.g. Payroll Processing Fee"
+          <input type="text" class="form-control" formControlName="name" placeholder="Product or service name"
                  [class.is-invalid]="productForm.get('name')?.invalid && productForm.get('name')?.touched" />
           <div class="invalid-feedback">Name is required</div>
         </div>
         <div class="col-12">
           <label class="form-label">Description</label>
-          <textarea class="form-control" formControlName="description" rows="2"
-                    placeholder="Optional description..."></textarea>
+          <textarea class="form-control" formControlName="description" rows="2" placeholder="Optional description..."></textarea>
         </div>
         <div class="col-md-4">
           <label class="form-label">Type <span class="text-danger">*</span></label>
@@ -178,11 +163,10 @@
           </select>
         </div>
         <div class="col-md-4">
-          <label class="form-label">Unit Price (excl. VAT) <span class="text-danger">*</span></label>
+          <label class="form-label">Unit Price <span class="text-danger">*</span></label>
           <div class="input-group">
             <span class="input-group-text">R</span>
-            <input type="number" class="form-control" formControlName="unitPrice"
-                   min="0" step="0.01" placeholder="0.00"
+            <input type="number" class="form-control" formControlName="unitPrice" min="0" step="0.01"
                    [class.is-invalid]="productForm.get('unitPrice')?.invalid && productForm.get('unitPrice')?.touched" />
           </div>
         </div>
@@ -193,21 +177,20 @@
             <span class="input-group-text">%</span>
           </div>
         </div>
-        <div class="col-md-6 d-flex align-items-center">
-          <div class="form-check form-switch mt-2">
-            <input class="form-check-input" type="checkbox" formControlName="isActive" id="isActive" />
-            <label class="form-check-label" for="isActive">Active</label>
+        <div class="col-12">
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" formControlName="isActive" id="isActiveCheck" />
+            <label class="form-check-label" for="isActiveCheck">Active (visible in forms and invoices)</label>
           </div>
         </div>
       </div>
-
-      <div class="modal-panel-actions mt-4">
-        <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="productForm.invalid || submitting">
-          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
-          {{ isEditMode ? 'Update' : 'Create' }}
-        </button>
-      </div>
     </form>
+  </div>
+  <div class="falcon-modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="closeModal()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="productForm.invalid || submitting" (click)="onSubmit()">
+      <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+      {{ isEditMode ? 'Update Product' : 'Create Product' }}
+    </button>
   </div>
 </div>

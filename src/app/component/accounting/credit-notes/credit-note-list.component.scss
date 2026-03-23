@@ -111,11 +111,7 @@
   &:disabled { opacity: 0.45; pointer-events: none; }
 }
 
-// ─── Table card header ───────────────────────────────────────────────────────
-.table-card-header { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; padding: 14px 20px; border-bottom: 1px solid var(--border-color, #e9ecef); background: var(--bg-card, #fff); flex-wrap: wrap; }
-.table-card-title { font-size: 0.9rem; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }
-
-// ─── Empty / Load states ──────────────────────────────────────────────────────
+// ─── Empty state ──────────────────────────────────────────────────────────────
 .empty-state-cell {
   text-align: center; padding: 64px 20px; color: var(--text-muted);
   i { font-size: 2.8rem; display: block; margin-bottom: 12px; opacity: 0.2; }
@@ -193,33 +189,23 @@
   color: var(--text-muted, #6c757d); font-size: 0.8rem;
 }
 
-// ─── AP Tabs ──────────────────────────────────────────────────────────────────
-.table-card-header { flex-wrap: wrap; }
-
-// ─── Pending badge (count bubble inside filter tabs) ──────────────────────────
-.pending-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 18px; height: 18px; padding: 0 5px; border-radius: 50px;
-  background: $danger; color: #fff; font-size: 0.65rem; font-weight: $font-weight-bold; line-height: 1;
-  .filter-tab.active & { background: rgba(#fff, 0.28); }
-}
-
-// ─── Table card footer ────────────────────────────────────────────────────────
+// ─── CN-specific ──────────────────────────────────────────────────────────────
 .table-card-footer {
   display: flex; align-items: center; justify-content: space-between;
   padding: 12px 20px; border-top: 1px solid var(--border-color, #e9ecef);
   background: var(--bg-body, #f8f9fa);
 }
 
-// ─── AP info banner ───────────────────────────────────────────────────────────
-.ap-info-banner {
-  padding: 10px 20px; background: rgba($primary, 0.04);
-  border-bottom: 1px solid var(--border-color, #e9ecef);
-  font-size: 0.82rem; color: var(--text-muted);
-}
+// ─── Table card header ───────────────────────────────────────────────────────
+.table-card-header { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; padding: 14px 20px; border-bottom: 1px solid var(--border-color, #e9ecef); background: var(--bg-card, #fff); flex-wrap: wrap; }
+.table-card-title { font-size: 0.9rem; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }
 
-// ─── AP Claims total row ──────────────────────────────────────────────────────
-.ap-claims-total-row {
-  background: var(--bg-body, #f8f9fa);
-  td { padding: 10px 16px; }
+.total-field { font-weight: 600; background-color: var(--bg-body, #f8f9fa); }
+
+.input-with-spinner {
+  position: relative;
+  .select-spinner {
+    position: absolute; right: 36px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); pointer-events: none;
+  }
 }

@@ -1,0 +1,144 @@
+<!-- Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved. -->
+<div class="page-banner">
+  <div class="banner-left">
+    <h1 class="banner-title"><i class="bi bi-speedometer2 me-2"></i>Accounting Overview</h1>
+    <p class="banner-subtitle">Consolidated AR, AP and financial position at a glance</p>
+  </div>
+  <div class="banner-actions">
+    <select class="form-select form-select-sm period-sel" [(ngModel)]="selectedMonth" (change)="onPeriodChange()">
+      <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+    </select>
+    <select class="form-select form-select-sm period-sel" [(ngModel)]="selectedYear" (change)="onPeriodChange()">
+      <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+    </select>
+  </div>
+</div>
+
+<!-- KPI Row -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-success-subtle"><i class="bi bi-graph-up-arrow text-success"></i></div>
+      <div class="stat-info">
+        <p class="stat-value" *ngIf="!loading">{{ formatCurrency(totalRevenue) }}</p>
+        <p class="stat-value skeleton-val" *ngIf="loading"></p>
+        <p class="stat-label">Revenue (Month)</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-primary-subtle"><i class="bi bi-bar-chart-line text-primary"></i></div>
+      <div class="stat-info">
+        <p class="stat-value" *ngIf="!loading">{{ formatCurrency(grossProfit) }}</p>
+        <p class="stat-value skeleton-val" *ngIf="loading"></p>
+        <p class="stat-label">Gross Profit</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon" [ngClass]="isProfit ? 'bg-success-subtle' : 'bg-danger-subtle'">
+        <i class="bi" [class.bi-trending-up]="isProfit" [class.bi-trending-down]="!isProfit" [class.text-success]="isProfit" [class.text-danger]="!isProfit"></i>
+      </div>
+      <div class="stat-info">
+        <p class="stat-value" *ngIf="!loading">{{ formatCurrency(netProfit) }}</p>
+        <p class="stat-value skeleton-val" *ngIf="loading"></p>
+        <p class="stat-label">Net {{ isProfit ? 'Profit' : 'Loss' }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg">
+    <div class="stat-card">
+      <div class="stat-icon bg-warning-subtle"><i class="bi bi-receipt-cutoff text-warning"></i></div>
+      <div class="stat-info">
+        <p class="stat-value">{{ formatCurrency(totalAP) }}</p>
+        <p class="stat-label">AP Outstanding</p>
+        <p class="stat-sub">Bills + Claims</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg" *ngIf="overdueCount > 0">
+    <div class="stat-card">
+      <div class="stat-icon bg-danger-subtle"><i class="bi bi-exclamation-triangle-fill text-danger"></i></div>
+      <div class="stat-info">
+        <p class="stat-value text-danger">{{ overdueCount }}</p>
+        <p class="stat-label">Overdue Bills</p>
+        <p class="stat-sub">Require attention</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Links -->
+<div class="quick-links">
+  <a class="quick-link" routerLink="../products"><i class="bi bi-box-seam"></i><span>Products &amp; Services</span></a>
+  <a class="quick-link" routerLink="../bills"><i class="bi bi-receipt-cutoff"></i><span>Bills &amp; AP</span></a>
+  <a class="quick-link" routerLink="../quotes"><i class="bi bi-file-text"></i><span>Quotes</span></a>
+  <a class="quick-link" routerLink="../credit-notes"><i class="bi bi-credit-card"></i><span>Credit Notes</span></a>
+  <a class="quick-link" routerLink="../vat-returns"><i class="bi bi-percent"></i><span>VAT Returns</span></a>
+  <a class="quick-link accent" routerLink="../reports"><i class="bi bi-file-earmark-bar-graph"></i><span>Reports</span></a>
+</div>
+
+<!-- Recent Activity Grid -->
+<div class="ov-grid">
+  <!-- Recent Bills -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h5 class="table-card-title"><i class="bi bi-receipt-cutoff me-2 text-warning"></i>Recent Bills</h5>
+      <a routerLink="../bills" class="btn btn-sm btn-outline-secondary">View All</a>
+    </div>
+    <div *ngIf="loadingBills" class="text-center py-4">
+      <div class="spinner-border spinner-border-sm text-primary"></div>
+    </div>
+    <div *ngIf="!loadingBills" class="table-responsive">
+      <table class="table table-hover align-middle mb-0 small">
+        <thead>
+          <tr><th>Bill #</th><th>Vendor</th><th>Due Date</th><th>Total</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="recentBills.length === 0">
+            <td colspan="5" class="text-center text-muted py-3">No bills recorded yet</td>
+          </tr>
+          <tr *ngFor="let b of recentBills">
+            <td><code class="text-primary">{{ b.billNumber }}</code></td>
+            <td>{{ b.vendor?.vendorName ?? '—' }}</td>
+            <td [class.text-danger]="b.status === 'OVERDUE'">{{ b.dueDate | date:'dd MMM' }}</td>
+            <td class="fw-semibold">R {{ b.total | number:'1.0-0' }}</td>
+            <td><span class="badge-soft badge-soft-sm" [ngClass]="getBillStatusClass(b.status)">{{ getBillStatusLabel(b.status) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Invoices (AR) -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h5 class="table-card-title"><i class="bi bi-file-earmark-text me-2 text-success"></i>Recent Invoices (AR)</h5>
+      <a routerLink="../quotes" class="btn btn-sm btn-outline-secondary">View All</a>
+    </div>
+    <div *ngIf="loadingInvoices" class="text-center py-4">
+      <div class="spinner-border spinner-border-sm text-primary"></div>
+    </div>
+    <div *ngIf="!loadingInvoices" class="table-responsive">
+      <table class="table table-hover align-middle mb-0 small">
+        <thead>
+          <tr><th>Invoice #</th><th>Customer</th><th>Date</th><th>Total</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="recentInvoices.length === 0">
+            <td colspan="5" class="text-center text-muted py-3">No invoices yet</td>
+          </tr>
+          <tr *ngFor="let inv of recentInvoices">
+            <td><code class="text-success">{{ inv.invoiceNumber }}</code></td>
+            <td>{{ inv.customerName ?? '—' }}</td>
+            <td>{{ inv.date | date:'dd MMM' }}</td>
+            <td class="fw-semibold">R {{ inv.total | number:'1.0-0' }}</td>
+            <td><span class="badge-soft badge-soft-sm" [ngClass]="getInvoiceStatusClass(inv.status)">{{ getInvoiceStatusLabel(inv.status) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

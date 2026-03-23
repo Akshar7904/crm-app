@@ -1,0 +1,181 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ─── Stat Cards ───────────────────────────────────────────────────────────────
+.stat-card { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e9ecef); border-radius: $border-radius-xl; padding: $spacing-md $spacing-lg; display: flex; align-items: center; gap: $spacing-md; box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06)); transition: transform $transition-base, box-shadow $transition-base; &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.09); } }
+.stat-icon { width: 48px; height: 48px; border-radius: $border-radius-lg; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.stat-info { flex: 1; min-width: 0; }
+.stat-value { font-size: 1.5rem; font-weight: $font-weight-bold; color: var(--text-primary, #1a1a2e); margin: 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-label { font-size: 0.72rem; color: var(--text-muted, #6c757d); font-weight: $font-weight-medium; margin: 2px 0 0; }
+.stat-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+.bg-primary-subtle { background: rgba($primary, 0.1) !important; }
+.bg-success-subtle { background: rgba($success, 0.1) !important; }
+.bg-warning-subtle { background: rgba($warning, 0.14) !important; }
+.bg-danger-subtle  { background: rgba($danger, 0.1) !important; }
+
+// ─── Filter Tabs ──────────────────────────────────────────────────────────────
+.filter-tabs { display: flex; gap: 2px; flex-wrap: wrap; }
+
+.filter-tab {
+  position: relative; display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border: 1px solid transparent;
+  background: transparent; color: var(--text-muted, #6c757d);
+  font-size: 0.78rem; font-weight: $font-weight-medium;
+  border-radius: $border-radius; cursor: pointer; transition: all $transition-base; white-space: nowrap;
+  &:hover { background: var(--bg-body, #f8f9fa); color: var(--text-primary); border-color: var(--border-color, #dee2e6); }
+  &.active { background: $primary; color: #fff; border-color: $primary; font-weight: $font-weight-semibold; box-shadow: 0 2px 8px rgba($primary, 0.28); }
+}
+
+// ─── Table card ───────────────────────────────────────────────────────────────
+.table-card-header { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; padding: 14px 20px; border-bottom: 1px solid var(--border-color, #e9ecef); background: var(--bg-card, #fff); flex-wrap: wrap; }
+.table-card-title { font-size: 0.9rem; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }
+
+// ─── Aging bucket card accent ─────────────────────────────────────────────────
+.aging-bucket-card {
+  &.aging-card-warning  { border-left: 3px solid $warning; }
+  &.aging-card-orange   { border-left: 3px solid #f7971e; }
+  &.aging-card-danger   { border-left: 3px solid $danger; }
+  &.aging-card-dark-danger { border-left: 3px solid darken($danger, 10%); }
+}
+
+/* ─── Aging bucket sections ───────────────────────────────────────────── */
+.aging-bucket-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  margin-bottom: $spacing-md;
+  box-shadow: var(--card-shadow);
+}
+
+.aging-bucket-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.88rem;
+  font-weight: $font-weight-semibold;
+
+  &.aging-header-success    { background: rgba($success, 0.08); color: darken($success, 10%); }
+  &.aging-header-warning    { background: rgba($warning, 0.12); color: darken($warning, 20%); }
+  &.aging-header-orange     { background: rgba(#f7971e, 0.12); color: darken(#f7971e, 10%); }
+  &.aging-header-danger     { background: rgba($danger,  0.10); color: $danger; }
+  &.aging-header-dark-danger{ background: rgba($danger,  0.18); color: darken($danger, 10%); }
+}
+
+.aging-bucket-title { font-weight: $font-weight-semibold; }
+.aging-bucket-total { font-weight: $font-weight-bold; font-variant-numeric: tabular-nums; }
+
+.aging-empty {
+  padding: 0.85rem 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.aging-subtotal {
+  background: var(--bg-body, #f8f9fa);
+  td { padding: 0.5rem 0.75rem; font-size: 0.85rem; }
+}
+
+/* ─── Period bar for P&L ─────────────────────────────────────────────── */
+.pl-period-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+}
+
+.pl-period-label {
+  font-size: 0.85rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+}
+
+/* ─── P&L Report Card ──────────────────────────────────────────────── */
+.pl-report-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  max-width: 700px;
+}
+
+.pl-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  background: var(--bg-body, #f8f9fa);
+
+  h5 { margin: 0; font-size: 1rem; font-weight: $font-weight-semibold; }
+}
+
+.pl-section { padding: 0 1.5rem; }
+
+.pl-section-title {
+  font-size: 0.62rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  padding: 10px 0 4px;
+  border-top: 1px solid var(--border-light, #f0f0f0);
+  margin-top: 4px;
+
+  &:first-child { border-top: none; }
+}
+
+.pl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 1.5rem;
+  font-size: 0.87rem;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-light, #f8f9fa);
+
+  &.pl-total-row {
+    font-weight: $font-weight-semibold;
+    color: var(--text-primary);
+    background: var(--bg-body, #f8f9fa);
+  }
+}
+
+.pl-label { flex: 1; }
+.pl-amount { font-variant-numeric: tabular-nums; font-weight: $font-weight-medium; }
+
+.pl-gross-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  background: rgba($primary, 0.05);
+  font-size: 0.9rem;
+  font-weight: $font-weight-semibold;
+  color: $primary;
+  border-top: 2px solid rgba($primary, 0.2);
+  border-bottom: 2px solid rgba($primary, 0.2);
+  margin: 0;
+}
+
+.pl-net-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  font-weight: $font-weight-bold;
+  border-top: 2px solid;
+
+  &.pl-profit { color: $success; border-top-color: rgba($success, 0.3); background: rgba($success, 0.04); }
+  &.pl-loss   { color: $danger;  border-top-color: rgba($danger,  0.3); background: rgba($danger,  0.04); }
+}
+
+/* ─── Print styles ───────────────────────────────────────────────────── */
+@media print {
+  .page-banner, .report-tabs, .pl-period-bar, .banner-actions { display: none !important; }
+  .pl-report-card { box-shadow: none; border: 1px solid #ccc; max-width: 100%; }
+}

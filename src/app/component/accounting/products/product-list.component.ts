@@ -165,7 +165,7 @@ export class ProductListComponent implements OnInit {
   toggleActive(product: ProductCatalog): void {
     this.productService.toggleActive$(product.id!).subscribe({
       next: () => {
-        this.notification.onSuccess(`Product ${product.isActive ? 'activated' : 'deactivated'}`);
+        this.notification.onSuccess(`Product ${product.isActive ? 'deactivated' : 'activated'}`);
         this.loadProducts();
       },
       error: (err: any) => this.notification.onError(err)

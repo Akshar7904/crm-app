@@ -59,6 +59,14 @@ export class CustomerService {
                 catchError(this.handleError)
             );
 
+    invoicesByCustomer$ = (customerId: number) => <Observable<CustomHttpResponse<any>>>
+        this.http.get<CustomHttpResponse<any>>
+            (`${this.server}/customer/invoice/by-customer/${customerId}`)
+            .pipe(
+                tap(console.log),
+                catchError(this.handleError)
+            );
+
     newInvoice$ = () => <Observable<CustomHttpResponse<CustomerModel[] & UserModel>>>
         this.http.get<CustomHttpResponse<CustomerModel[] & UserModel>>
             (`${this.server}/customer/invoice/new`)

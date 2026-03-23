@@ -13,14 +13,24 @@ import { ProductCatalogService } from './services/product-catalog.service';
 import { BillListComponent } from './bills/bill-list.component';
 import { BillService } from './services/bill.service';
 import { QuoteListComponent } from './quotes/quote-list.component';
+import { QuoteDetailComponent } from './quotes/quote-detail/quote-detail.component';
 import { QuoteService } from './services/quote.service';
 import { CustomerService } from '../../service/customer.service';
+import { CreditNoteListComponent } from './credit-notes/credit-note-list.component';
+import { VatReturnsComponent } from './vat-returns/vat-returns.component';
+import { AccountingOverviewComponent } from './overview/accounting-overview.component';
+import { AccountingReportsComponent } from './reports/accounting-reports.component';
 
 @NgModule({
   declarations: [
     ProductListComponent,
     BillListComponent,
-    QuoteListComponent
+    QuoteListComponent,
+    QuoteDetailComponent,
+    CreditNoteListComponent,
+    VatReturnsComponent,
+    AccountingOverviewComponent,
+    AccountingReportsComponent
   ],
   imports: [
     CommonModule,

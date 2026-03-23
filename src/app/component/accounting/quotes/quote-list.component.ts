@@ -329,6 +329,19 @@ export class QuoteListComponent implements OnInit {
     return map[status] ?? 'badge-soft-secondary';
   }
 
+  getStatusLabel(status: QuoteStatus | undefined): string {
+    if (!status) return '—';
+    const map: Record<QuoteStatus, string> = {
+      DRAFT: 'Draft',
+      SENT: 'Sent',
+      ACCEPTED: 'Accepted',
+      REJECTED: 'Rejected',
+      EXPIRED: 'Expired',
+      CONVERTED: 'Converted'
+    };
+    return map[status] ?? status;
+  }
+
   get pages(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i);
   }

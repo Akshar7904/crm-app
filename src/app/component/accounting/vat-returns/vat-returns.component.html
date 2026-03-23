@@ -1,0 +1,330 @@
+<!-- Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved. -->
+<section class="vat-returns-page">
+  <div class="container-fluid">
+
+    <!-- Page Banner -->
+    <div class="page-banner mb-4">
+      <div class="banner-left">
+        <h1 class="banner-title"><i class="bi bi-percent me-2"></i>VAT Returns</h1>
+        <p class="banner-subtitle">Calculate, file and track your SARS VAT201 returns</p>
+      </div>
+      <div class="banner-actions">
+        <button class="btn btn-banner" (click)="showCalculator = !showCalculator">
+          <i class="bi" [ngClass]="showCalculator ? 'bi-x-lg' : 'bi-calculator'" class="me-1"></i>
+          {{ showCalculator ? 'Hide Calculator' : 'Calculate VAT' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <div class="stat-icon bg-primary-subtle"><i class="bi bi-file-earmark-text text-primary"></i></div>
+          <div class="stat-info"><p class="stat-value">{{ stats.total }}</p><p class="stat-label">Total Returns</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <div class="stat-icon bg-warning-subtle"><i class="bi bi-pencil-square text-warning"></i></div>
+          <div class="stat-info"><p class="stat-value">{{ stats.draft }}</p><p class="stat-label">Draft</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <div class="stat-icon bg-info-subtle"><i class="bi bi-send-check text-info"></i></div>
+          <div class="stat-info"><p class="stat-value">{{ stats.filed }}</p><p class="stat-label">Filed</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <div class="stat-icon bg-success-subtle"><i class="bi bi-check-circle text-success"></i></div>
+          <div class="stat-info"><p class="stat-value">{{ stats.paid }}</p><p class="stat-label">Paid</p></div>
+        </div>
+      </div>
+      <div class="col-6 col-lg">
+        <div class="stat-card">
+          <div class="stat-icon bg-danger-subtle"><i class="bi bi-exclamation-triangle text-danger"></i></div>
+          <div class="stat-info"><p class="stat-value">{{ stats.overdue }}</p><p class="stat-label">Overdue</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VAT Calculator Panel -->
+    <div class="vat-calculator-panel mb-4" *ngIf="showCalculator">
+      <div class="calc-header">
+        <h5 class="calc-title"><i class="bi bi-calculator me-2"></i>VAT201 Calculator</h5>
+        <p class="calc-subtitle">Select a tax period to calculate output and input VAT</p>
+      </div>
+
+      <!-- Period Selector -->
+      <div class="period-selector mb-4">
+        <div class="period-selector-inner">
+          <div class="period-field">
+            <label class="period-label">Month</label>
+            <select class="form-select period-select" [(ngModel)]="selectedMonth" name="selectedMonth">
+              <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+            </select>
+          </div>
+          <div class="period-field">
+            <label class="period-label">Year</label>
+            <select class="form-select period-select" [(ngModel)]="selectedYear" name="selectedYear">
+              <option *ngFor="let y of years" [value]="y">{{ y }}</option>
+            </select>
+          </div>
+          <button class="btn btn-primary period-btn"
+                  (click)="calculate()"
+                  [disabled]="calculating">
+            <span *ngIf="calculating" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!calculating" class="bi bi-calculator me-1"></i>
+            Calculate
+          </button>
+        </div>
+      </div>
+
+      <!-- Calculation Results -->
+      <div *ngIf="calculation" class="vat201-result">
+
+        <div class="vat201-period-badge">
+          <i class="bi bi-calendar3 me-1"></i>Tax Period: <strong>{{ calculation.periodLabel }}</strong>
+        </div>
+
+        <!-- Existing return warning -->
+        <div class="alert alert-warning d-flex align-items-center gap-2 mt-3" *ngIf="calculation.returnExists">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          A VAT return for <strong>{{ calculation.periodLabel }}</strong> has already been saved.
+        </div>
+
+        <div class="vat201-table mt-3">
+
+          <!-- Section A: Output VAT -->
+          <div class="vat-section-header">
+            <span>Section A — Output Tax (VAT Charged on Sales)</span>
+          </div>
+          <div class="vat-row">
+            <span class="vat-row-label">Total Sales (excl. VAT)</span>
+            <span class="vat-row-value">{{ formatCurrency(calculation.totalSalesExclVat) }}</span>
+          </div>
+          <div class="vat-row vat-total-row">
+            <span class="vat-row-label">VAT on Sales (Output VAT)</span>
+            <span class="vat-row-value">{{ formatCurrency(calculation.outputVat) }}</span>
+          </div>
+
+          <!-- Section B: Input VAT -->
+          <div class="vat-section-header">
+            <span>Section B — Input Tax (VAT Paid on Purchases)</span>
+          </div>
+          <div class="vat-row">
+            <span class="vat-row-label">VAT on Bills / Purchases</span>
+            <span class="vat-row-value">{{ formatCurrency(calculation.inputVatBills) }}</span>
+          </div>
+          <div class="vat-row">
+            <span class="vat-row-label">VAT on Business Expenses</span>
+            <span class="vat-row-value">{{ formatCurrency(calculation.inputVatExpenses) }}</span>
+          </div>
+          <div class="vat-row vat-total-row">
+            <span class="vat-row-label">Total Input VAT</span>
+            <span class="vat-row-value">{{ formatCurrency(calculation.totalInputVat) }}</span>
+          </div>
+
+          <!-- Section C: Net VAT -->
+          <div class="vat-section-header vat-section-net">
+            <span>Section C — Net VAT Payable / (Refundable)</span>
+          </div>
+          <div class="net-payable-display"
+               [class.payable]="isPayable(calculation.netVatPayable)"
+               [class.refund]="isRefund(calculation.netVatPayable)">
+            <span class="net-amount">{{ formatCurrency(absAmount(calculation.netVatPayable)) }}</span>
+            <span class="net-label" *ngIf="isPayable(calculation.netVatPayable)">
+              <i class="bi bi-arrow-up-circle me-1"></i>Amount Payable to SARS
+            </span>
+            <span class="net-label" *ngIf="isRefund(calculation.netVatPayable)">
+              <i class="bi bi-arrow-down-circle me-1"></i>Refund Claim from SARS
+            </span>
+            <span class="net-label text-muted" *ngIf="calculation.netVatPayable === 0">
+              <i class="bi bi-dash-circle me-1"></i>Net Zero — No amount due or refundable
+            </span>
+          </div>
+        </div>
+
+        <div class="calc-actions mt-4">
+          <button class="btn btn-outline-secondary"
+                  (click)="showCalculator = false; calculation = null">
+            <i class="bi bi-x me-1"></i>Close
+          </button>
+          <button class="btn btn-primary"
+                  (click)="saveReturn()"
+                  [disabled]="submitting || calculation.returnExists">
+            <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+            <i *ngIf="!submitting" class="bi bi-floppy me-1"></i>
+            {{ calculation.returnExists ? 'Return Already Saved' : 'Save VAT Return' }}
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Returns Table -->
+    <div class="table-card">
+      <div class="table-card-header">
+        <h6 class="table-card-title">
+          <i class="bi bi-list-ul me-2"></i>VAT Returns
+          <span class="text-muted fw-normal ms-1" style="font-size:13px;">({{ totalElements }} total)</span>
+        </h6>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="loading" class="table-loading">
+        <div class="spinner-border text-primary spinner-border-sm"></div>
+        <span class="ms-2 text-muted">Loading...</span>
+      </div>
+
+      <div class="table-responsive" *ngIf="!loading">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Period</th>
+              <th class="text-end">Sales (excl. VAT)</th>
+              <th class="text-end">Output VAT</th>
+              <th class="text-end">Input VAT</th>
+              <th class="text-end">Net Payable</th>
+              <th>Due Date</th>
+              <th>Status</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vr of returns">
+              <td><span class="fw-semibold text-primary">{{ vr.returnReference }}</span></td>
+              <td>{{ getMonthLabel(vr.periodMonth) }} {{ vr.periodYear }}</td>
+              <td class="text-end">{{ formatCurrency(vr.totalSalesExclVat) }}</td>
+              <td class="text-end">{{ formatCurrency(vr.outputVat) }}</td>
+              <td class="text-end">{{ formatCurrency(vr.totalInputVat) }}</td>
+              <td class="text-end">
+                <span [class.text-danger]="isPayable(vr.netVatPayable)"
+                      [class.text-success]="isRefund(vr.netVatPayable)"
+                      class="fw-semibold">
+                  {{ isRefund(vr.netVatPayable) ? '(' : '' }}{{ formatCurrency(absAmount(vr.netVatPayable)) }}{{ isRefund(vr.netVatPayable) ? ')' : '' }}
+                </span>
+              </td>
+              <td>
+                <span [class.text-danger]="vr.status === 'OVERDUE'">
+                  {{ vr.dueDate | date:'dd MMM yyyy' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge-soft" [ngClass]="getStatusClass(vr.status)">
+                  {{ getStatusLabel(vr.status) }}
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="action-btn-group">
+                  <button class="action-btn" (click)="viewReturn(vr)" title="View Details"><i class="bi bi-eye"></i></button>
+                  <ng-container *ngIf="vr.status === 'DRAFT'">
+                    <button class="action-btn action-btn-success" (click)="fileReturn(vr)" [disabled]="submitting" title="File with SARS"><i class="bi bi-send"></i></button>
+                    <button class="action-btn action-btn-danger" (click)="deleteReturn(vr)" title="Delete"><i class="bi bi-trash"></i></button>
+                  </ng-container>
+                  <button class="action-btn action-btn-success" *ngIf="vr.status === 'FILED' || vr.status === 'OVERDUE'" (click)="markPaid(vr)" [disabled]="submitting" title="Mark as Paid"><i class="bi bi-check-circle"></i></button>
+                  <span *ngIf="vr.status === 'PAID'" class="text-muted" style="font-size:12px;"><i class="bi bi-shield-check text-success me-1"></i>Paid</span>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty state -->
+            <tr *ngIf="returns.length === 0">
+              <td colspan="9" class="empty-state-cell">
+                <i class="bi bi-percent display-6 text-muted"></i>
+                <p class="mt-2 mb-0">No VAT returns yet.</p>
+                <p class="text-muted small">Use the <strong>Calculate VAT</strong> button to create your first return.</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="table-card-footer" *ngIf="totalPages > 1">
+        <span class="text-muted small">
+          Page {{ currentPage + 1 }} of {{ totalPages }} &bull; {{ totalElements }} returns
+        </span>
+        <div class="pagination-controls">
+          <button class="btn btn-sm btn-outline-secondary"
+                  (click)="onPageChange(currentPage - 1)"
+                  [disabled]="currentPage === 0">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button *ngFor="let p of pages"
+                  class="btn btn-sm"
+                  [ngClass]="p === currentPage ? 'btn-primary' : 'btn-outline-secondary'"
+                  (click)="onPageChange(p)">
+            {{ p + 1 }}
+          </button>
+          <button class="btn btn-sm btn-outline-secondary"
+                  (click)="onPageChange(currentPage + 1)"
+                  [disabled]="currentPage >= totalPages - 1">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- View VAT Return Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showViewModal" (click)="closeViewModal()"></div>
+  <div class="falcon-modal-wrap" *ngIf="showViewModal && viewingReturn">
+    <div class="falcon-modal-header">
+      <div class="modal-icon-wrap"><i class="bi bi-file-earmark-bar-graph text-primary"></i></div>
+      <div>
+        <p class="modal-title">{{ viewingReturn.returnReference }}</p>
+        <p class="modal-subtitle">{{ getMonthLabel(viewingReturn.periodMonth) }} {{ viewingReturn.periodYear }} · <span class="badge-soft" [ngClass]="getStatusClass(viewingReturn.status)">{{ getStatusLabel(viewingReturn.status) }}</span></p>
+      </div>
+      <button class="btn-close ms-auto" (click)="closeViewModal()"></button>
+    </div>
+    <div class="falcon-modal-body">
+      <div class="detail-card mb-3">
+        <div class="detail-card-header"><i class="bi bi-info-circle me-2 text-primary"></i>Return Details</div>
+        <div class="detail-card-body">
+          <div class="detail-row"><span class="detail-label">Reference</span><span class="fw-semibold text-primary">{{ viewingReturn.returnReference }}</span></div>
+          <div class="detail-row"><span class="detail-label">Tax Period</span><span>{{ getMonthLabel(viewingReturn.periodMonth) }} {{ viewingReturn.periodYear }}</span></div>
+          <div class="detail-row"><span class="detail-label">Status</span><span class="badge-soft" [ngClass]="getStatusClass(viewingReturn.status)">{{ getStatusLabel(viewingReturn.status) }}</span></div>
+          <div class="detail-row"><span class="detail-label">Due Date</span><span [class.text-danger]="viewingReturn.status === 'OVERDUE'">{{ viewingReturn.dueDate | date:'dd MMMM yyyy' }}</span></div>
+        </div>
+      </div>
+      <div class="detail-card mb-3">
+        <div class="detail-card-header"><i class="bi bi-graph-up me-2 text-primary"></i>Sales (Output VAT)</div>
+        <div class="detail-card-body">
+          <div class="detail-row"><span class="detail-label">Total Sales (excl. VAT)</span><span>{{ formatCurrency(viewingReturn.totalSalesExclVat) }}</span></div>
+          <div class="detail-row"><span class="detail-label">Output VAT</span><span class="fw-semibold">{{ formatCurrency(viewingReturn.outputVat) }}</span></div>
+        </div>
+      </div>
+      <div class="detail-card mb-3">
+        <div class="detail-card-header"><i class="bi bi-graph-down me-2 text-primary"></i>Purchases (Input VAT)</div>
+        <div class="detail-card-body">
+          <div class="detail-row"><span class="detail-label">Total Purchases (excl. VAT)</span><span>{{ formatCurrency(viewingReturn.totalPurchasesExclVat) }}</span></div>
+          <div class="detail-row"><span class="detail-label">VAT on Bills</span><span>{{ formatCurrency(viewingReturn.inputVatBills) }}</span></div>
+          <div class="detail-row"><span class="detail-label">VAT on Expenses</span><span>{{ formatCurrency(viewingReturn.inputVatExpenses) }}</span></div>
+          <div class="detail-row"><span class="detail-label">Total Input VAT</span><span class="fw-semibold">{{ formatCurrency(viewingReturn.totalInputVat) }}</span></div>
+        </div>
+      </div>
+      <div class="detail-card" [class.border-danger]="isPayable(viewingReturn.netVatPayable)" [class.border-success]="isRefund(viewingReturn.netVatPayable)">
+        <div class="detail-card-header"><i class="bi bi-calculator me-2 text-primary"></i>Net VAT</div>
+        <div class="detail-card-body">
+          <div class="detail-row">
+            <span class="detail-label">{{ isPayable(viewingReturn.netVatPayable) ? 'Payable to SARS' : isRefund(viewingReturn.netVatPayable) ? 'Refundable from SARS' : 'Net Zero' }}</span>
+            <span class="fw-bold fs-5" [class.text-danger]="isPayable(viewingReturn.netVatPayable)" [class.text-success]="isRefund(viewingReturn.netVatPayable)">
+              {{ formatCurrency(absAmount(viewingReturn.netVatPayable)) }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary" (click)="closeViewModal()">Close</button>
+      <button *ngIf="viewingReturn.status === 'DRAFT'" class="btn btn-primary" (click)="fileReturn(viewingReturn); closeViewModal()" [disabled]="submitting"><i class="bi bi-send me-1"></i>File with SARS</button>
+      <button *ngIf="viewingReturn.status === 'FILED' || viewingReturn.status === 'OVERDUE'" class="btn btn-success" (click)="markPaid(viewingReturn); closeViewModal()" [disabled]="submitting"><i class="bi bi-check-circle me-1"></i>Mark as Paid</button>
+    </div>
+  </div>
+
+</section>
