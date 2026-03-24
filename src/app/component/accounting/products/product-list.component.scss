@@ -1,0 +1,156 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ─── Page wrapper ─────────────────────────────────────────────────────────────
+.page-wrapper {
+  padding: 20px 0;
+  animation: fadeInUp 0.3s ease forwards;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+// ─── Stat Cards ───────────────────────────────────────────────────────────────
+.stat-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  padding: $spacing-md $spacing-lg;
+  display: flex; align-items: center; gap: $spacing-md;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  transition: transform $transition-base, box-shadow $transition-base;
+  &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.09); }
+}
+
+.stat-icon {
+  width: 48px; height: 48px;
+  border-radius: $border-radius-lg;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem; flex-shrink: 0;
+}
+
+.stat-info { flex: 1; min-width: 0; }
+
+.stat-value {
+  font-size: 1.5rem; font-weight: $font-weight-bold;
+  color: var(--text-primary, #1a1a2e); margin: 0; line-height: 1.1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.stat-label {
+  font-size: 0.72rem; color: var(--text-muted, #6c757d);
+  font-weight: $font-weight-medium; margin: 2px 0 0;
+}
+
+.bg-primary-subtle { background: rgba($primary, 0.1) !important; }
+.bg-success-subtle { background: rgba($success, 0.1) !important; }
+.bg-warning-subtle { background: rgba($warning, 0.14) !important; }
+.bg-info-subtle    { background: rgba(13,202,240,0.1) !important; }
+.bg-danger-subtle  { background: rgba($danger, 0.1) !important; }
+
+// ─── Search Box ───────────────────────────────────────────────────────────────
+.search-box {
+  width: 240px; flex-shrink: 0;
+  .input-group-text {
+    background: var(--bg-body, #f8f9fa); border-color: var(--border-color, #dee2e6);
+    color: var(--text-muted); font-size: $font-size-sm; padding: 6px 10px;
+  }
+  .form-control {
+    border-color: var(--border-color, #dee2e6); font-size: $font-size-sm; padding: 6px 10px;
+    background: var(--bg-body, #f8f9fa); color: var(--text-primary);
+    &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); background: var(--bg-card, #fff); outline: none; }
+    &::placeholder { color: var(--text-light, #adb5bd); }
+  }
+}
+
+// ─── Table ────────────────────────────────────────────────────────────────────
+.table {
+  margin-bottom: 0; font-size: $font-size-sm;
+  thead th {
+    background: var(--table-header-bg, #f8f9fa);
+    border-bottom: 2px solid var(--border-color, #dee2e6);
+    font-size: $font-size-xs; font-weight: $font-weight-semibold;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    color: var(--text-muted, #6c757d); padding: 11px 16px; white-space: nowrap; border-top: none;
+  }
+  tbody td {
+    padding: 13px 16px; vertical-align: middle;
+    color: var(--text-primary, #1a1a2e); border-color: var(--border-color, #f0f0f0);
+  }
+  &.table-hover tbody tr:hover { background: var(--table-hover, rgba(0,0,0,0.02)); }
+}
+
+// ─── Action Buttons ───────────────────────────────────────────────────────────
+.action-btn-group { display: flex; align-items: center; gap: 4px; }
+
+.action-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  border: 1px solid var(--border-color, #dee2e6); border-radius: $border-radius;
+  background: var(--bg-card, #fff); color: var(--text-secondary, #495057);
+  font-size: 0.8rem; cursor: pointer; transition: all $transition-base;
+  &:hover { background: rgba($primary, 0.06); border-color: $primary; color: $primary; transform: translateY(-1px); }
+  &.action-btn-success:hover { background: rgba($success, 0.1); border-color: $success; color: $success; }
+  &.action-btn-danger:hover  { background: rgba($danger, 0.1);  border-color: $danger;  color: $danger; }
+  &.action-btn-info:hover    { background: rgba($info, 0.1);    border-color: $info;    color: $info; }
+  &.action-btn-warning:hover { background: rgba($warning, 0.1); border-color: $warning; color: darken($warning, 10%); }
+  &:disabled { opacity: 0.45; pointer-events: none; }
+}
+
+// ─── Empty state ──────────────────────────────────────────────────────────────
+.empty-state-cell {
+  text-align: center; padding: 64px 20px; color: var(--text-muted);
+  i { font-size: 2.8rem; display: block; margin-bottom: 12px; opacity: 0.2; }
+  p { margin: 0; font-size: $font-size-sm; }
+}
+
+// ─── Falcon Modal ─────────────────────────────────────────────────────────────
+.modal-backdrop-custom {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 1040; backdrop-filter: blur(2px);
+}
+
+.falcon-modal-wrap {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: var(--bg-card, #fff); border-radius: $border-radius-xl;
+  width: min(92vw, 680px); max-height: 90vh;
+  z-index: 1050; box-shadow: 0 24px 64px rgba(0,0,0,0.16); overflow: hidden;
+}
+
+.falcon-modal-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 18px 24px; background: var(--bg-card, #fff);
+  border-bottom: 1px solid var(--border-color, #e9ecef); position: relative;
+  &::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, $primary 0%, $primary-light 100%);
+  }
+  .modal-title { font-size: $font-size-base; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }
+  .modal-subtitle { font-size: 0.75rem; color: var(--text-muted); margin: 2px 0 0; }
+}
+
+.modal-icon-wrap {
+  width: 38px; height: 38px; border-radius: $border-radius-lg;
+  background: rgba($primary, 0.1); display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+
+.falcon-modal-body { padding: 20px 24px; max-height: calc(90vh - 140px); overflow-y: auto; }
+
+.falcon-modal-footer {
+  display: flex; align-items: center; justify-content: flex-end; gap: 8px;
+  padding: 14px 24px; background: var(--bg-card, #fff);
+  border-top: 1px solid var(--border-color, #e9ecef);
+}
+
+// ─── Table card footer ────────────────────────────────────────────────────────
+.table-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 20px; border-top: 1px solid var(--border-color, #e9ecef);
+  background: var(--bg-body, #f8f9fa);
+}
+
+// ─── Table card header ───────────────────────────────────────────────────────
+.table-card-header { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; padding: 14px 20px; border-bottom: 1px solid var(--border-color, #e9ecef); background: var(--bg-card, #fff); flex-wrap: wrap; }
+.table-card-title { font-size: 0.9rem; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }

@@ -50,6 +50,14 @@ export class UserService {
         catchError(this.handleError)
       );
 
+  verifyTotpLogin$ = (email: string, code: string) => <Observable<CustomHttpResponse<Profile>>>
+    this.http.post<CustomHttpResponse<Profile>>
+      (`${this.server}/user/mfa/verify`, { email, code })
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
   verify$ = (key: string, type: AccountType) => <Observable<CustomHttpResponse<Profile>>>
     this.http.get<CustomHttpResponse<Profile>>
       (`${this.server}/user/verify/${type}/${key}`)
@@ -131,6 +139,30 @@ export class UserService {
   toggleMfa$ = () => <Observable<CustomHttpResponse<Profile>>>
     this.http.patch<CustomHttpResponse<Profile>>
       (`${this.server}/user/togglemfa`, {})
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
+  setupMfa$ = () => <Observable<CustomHttpResponse<any>>>
+    this.http.get<CustomHttpResponse<any>>
+      (`${this.server}/user/mfa/setup`)
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
+  enableMfa$ = (code: string) => <Observable<CustomHttpResponse<Profile>>>
+    this.http.post<CustomHttpResponse<Profile>>
+      (`${this.server}/user/mfa/enable`, { code })
+      .pipe(
+        tap(console.log),
+        catchError(this.handleError)
+      );
+
+  disableMfa$ = (code: string) => <Observable<CustomHttpResponse<Profile>>>
+    this.http.post<CustomHttpResponse<Profile>>
+      (`${this.server}/user/mfa/disable`, { code })
       .pipe(
         tap(console.log),
         catchError(this.handleError)

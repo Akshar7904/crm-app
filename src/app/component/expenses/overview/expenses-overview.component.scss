@@ -27,12 +27,13 @@
 // ─── KPI grid layout ──────────────────────────────────────────────────────────
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: $spacing-md;
   margin-bottom: $spacing-lg;
 
-  @media (max-width: $breakpoint-lg) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: $breakpoint-sm) { grid-template-columns: 1fr; }
+  @media (max-width: $breakpoint-xl) { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: $breakpoint-lg)  { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: $breakpoint-sm)  { grid-template-columns: 1fr; }
 }
 
 // ─── KPI card (component-specific variant of global .kpi-stat) ────────────────
@@ -53,6 +54,8 @@
   &:nth-child(2) { animation-delay: 0.10s; }
   &:nth-child(3) { animation-delay: 0.15s; }
   &:nth-child(4) { animation-delay: 0.20s; }
+  &:nth-child(5) { animation-delay: 0.25s; }
+  &:nth-child(6) { animation-delay: 0.30s; }
 
   &:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(0,0,0,0.10); }
 
@@ -66,11 +69,19 @@
     animation: shimmer 1.4s infinite, fadeInUp 0.4s ease forwards;
   }
 
-  &.income   .kpi-icon { background: rgba($success, 0.12); color: $success; }
-  &.gross    .kpi-icon { background: rgba($primary, 0.12); color: $primary; }
-  &.expenses .kpi-icon { background: rgba($danger,  0.12); color: $danger;  }
-  &.profit   .kpi-icon { background: rgba($success, 0.12); color: $success; }
-  &.loss     .kpi-icon { background: rgba($danger,  0.12); color: $danger;  }
+  &.income    .kpi-icon { background: rgba($success, 0.12); color: $success; }
+  &.gross     .kpi-icon { background: rgba($primary, 0.12); color: $primary; }
+  &.expenses  .kpi-icon { background: rgba($danger,  0.12); color: $danger;  }
+  &.profit    .kpi-icon { background: rgba($success, 0.12); color: $success; }
+  &.loss      .kpi-icon { background: rgba($danger,  0.12); color: $danger;  }
+  &.ap        .kpi-icon { background: rgba(#f7971e, 0.12); color: #f7971e; }
+  &.claims-ap .kpi-icon { background: rgba(#7978E9, 0.12); color: #7978E9; }
+}
+
+.kpi-sub {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 3px;
 }
 
 .kpi-icon {

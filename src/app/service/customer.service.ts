@@ -59,6 +59,14 @@ export class CustomerService {
                 catchError(this.handleError)
             );
 
+    invoicesByCustomer$ = (customerId: number) => <Observable<CustomHttpResponse<any>>>
+        this.http.get<CustomHttpResponse<any>>
+            (`${this.server}/customer/invoice/by-customer/${customerId}`)
+            .pipe(
+                tap(console.log),
+                catchError(this.handleError)
+            );
+
     newInvoice$ = () => <Observable<CustomHttpResponse<CustomerModel[] & UserModel>>>
         this.http.get<CustomHttpResponse<CustomerModel[] & UserModel>>
             (`${this.server}/customer/invoice/new`)
@@ -99,13 +107,18 @@ export class CustomerService {
                 catchError(this.handleError)
             );
 
-    sendInvoice$ = (invoiceId: number) => <Observable<CustomHttpResponse<CustomerModel & InvoiceModel & UserModel>>>
-        this.http.post<CustomHttpResponse<CustomerModel & InvoiceModel & UserModel>>
-            (`${this.server}/customer/invoice/${invoiceId}/send`, {})
-            .pipe(
-                tap(console.log),
-                catchError(this.handleError)
-            );
+    sendInvoice$ = (invoiceId: number, pdfBlob?: Blob, message?: string) => {
+        const form = new FormData();
+        if (pdfBlob) form.append('pdf', pdfBlob, 'Invoice.pdf');
+        if (message) form.append('message', message);
+        return <Observable<CustomHttpResponse<CustomerModel & InvoiceModel & UserModel>>>
+            this.http.post<CustomHttpResponse<CustomerModel & InvoiceModel & UserModel>>
+                (`${this.server}/customer/invoice/${invoiceId}/send`, form)
+                .pipe(
+                    tap(console.log),
+                    catchError(this.handleError)
+                );
+    };
 
     downloadReport$ = () => <Observable<HttpEvent<Blob>>>
         this.http.get(`${this.server}/customer/download/report`,

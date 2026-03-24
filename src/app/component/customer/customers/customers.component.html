@@ -74,31 +74,17 @@
           </div>
         </div>
 
-        <!-- Search Bar -->
-        <div class="card search-card mb-4">
-          <div class="card-body">
-            <form #searchForm="ngForm" (ngSubmit)="searchCustomers(searchForm)" class="row g-3 align-items-center">
-              <div class="col-md-6">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-search"></i></span>
-                  <input type="text"
-                         ngModel
-                         name="name"
-                         class="form-control"
-                         placeholder="Search clients by name...">
-                </div>
-              </div>
-              <div class="col-auto">
-                <button type="submit" class="btn btn-primary">
-                  <i class="bi bi-search me-1"></i> Search
-                </button>
+        <!-- Clients Table -->
+        <div class="table-card">
+          <div class="table-card-header">
+            <h5 class="table-card-title"><i class="bi bi-people me-2 text-primary"></i>All Clients</h5>
+            <form #searchForm="ngForm" (ngSubmit)="searchCustomers(searchForm)">
+              <div class="input-group search-box">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" ngModel name="name" class="form-control" placeholder="Search clients by name..." />
               </div>
             </form>
           </div>
-        </div>
-
-        <!-- Clients Table -->
-        <div class="table-card">
           <div class="table-responsive">
             <table class="table table-hover mb-0">
               <thead>
@@ -162,12 +148,12 @@
                   </td>
                   <td>
                     <div class="action-btn-group">
-                      <button class="btn btn-sm btn-outline-primary"
+                      <button class="action-btn"
                               [routerLink]="['/customers', customer.id]"
                               title="View Client">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-secondary"
+                      <button class="action-btn action-btn-success"
                               [routerLink]="['/invoices/new']"
                               [queryParams]="{customerId: customer.id}"
                               title="Create Invoice">

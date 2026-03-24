@@ -436,7 +436,7 @@
   <div *ngIf="showSendConfirm"
        class="modal fade show d-block"
        style="background-color: rgba(0,0,0,0.5);">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content send-confirm-modal">
         <div class="modal-header">
           <h5 class="modal-title">
@@ -445,24 +445,31 @@
           <button class="btn-close" (click)="closeSendConfirm()"></button>
         </div>
         <div class="modal-body">
-          <div class="send-warning">
-            <div class="send-warning-icon">
-              <i class="bi bi-envelope-arrow-up"></i>
+          <!-- Recipient row -->
+          <div class="send-recipient mb-3">
+            <div class="send-recipient-avatar">{{ sendTargetCustomer?.name?.charAt(0) | uppercase }}</div>
+            <div>
+              <div class="fw-semibold">{{ sendTargetCustomer?.name }}</div>
+              <div class="text-muted small">{{ sendTargetCustomer?.email }}</div>
             </div>
-            <p class="send-warning-text">
-              You are about to send <strong>Invoice #{{ sendTargetInvoiceNumber }}</strong> to:
-            </p>
-            <div class="send-recipient">
-              <div class="send-recipient-avatar">{{ sendTargetCustomer?.name?.charAt(0) | uppercase }}</div>
-              <div>
-                <div class="fw-semibold">{{ sendTargetCustomer?.name }}</div>
-                <div class="text-muted small">{{ sendTargetCustomer?.email }}</div>
-              </div>
+            <div class="ms-auto">
+              <span class="badge bg-light text-secondary border">
+                <i class="bi bi-paperclip me-1"></i>Invoice #{{ sendTargetInvoiceNumber }}.pdf
+              </span>
             </div>
-            <p class="text-muted small mt-3 mb-0">
-              <i class="bi bi-info-circle me-1"></i>
-              An email will be sent to the client with the invoice details.
-            </p>
+          </div>
+
+          <!-- Message composer -->
+          <div class="send-message-wrap">
+            <label class="send-message-label">
+              <i class="bi bi-pencil-square me-1"></i>Message
+              <span class="text-muted fw-normal ms-1" style="font-size:11px;">(optional — edit before sending)</span>
+            </label>
+            <textarea
+              class="form-control send-message-textarea"
+              [(ngModel)]="customMessage"
+              rows="9"
+              placeholder="Type a message to accompany the invoice..."></textarea>
           </div>
         </div>
         <div class="modal-footer">

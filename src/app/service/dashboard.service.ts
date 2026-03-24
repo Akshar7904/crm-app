@@ -22,6 +22,12 @@ export interface DashboardStats {
   totalCustomers?: number;
   totalInvoices?: number;
   totalBilled?: number;
+  totalProducts?: number;
+  activeProducts?: number;
+  unpaidBills?: number;
+  overdueBills?: number;
+  openQuotes?: number;
+  pendingQuotes?: number;
   totalPayroll?: number;
   pendingPayroll?: number;
   processedPayroll?: number;

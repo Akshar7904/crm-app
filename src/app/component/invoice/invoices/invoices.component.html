@@ -76,6 +76,13 @@
 
         <!-- Invoice Table -->
         <div class="table-card">
+          <div class="table-card-header">
+            <h5 class="table-card-title"><i class="bi bi-file-earmark-text me-2 text-primary"></i>All Invoices</h5>
+            <div class="input-group search-box">
+              <span class="input-group-text"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control" placeholder="Search invoice or customer..." />
+            </div>
+          </div>
           <div class="table-responsive">
             <table class="table table-hover mb-0">
               <thead>
@@ -114,20 +121,20 @@
                   </td>
                   <td>
                     <div class="action-btn-group">
-                      <button class="btn btn-sm btn-outline-primary"
+                      <button class="action-btn"
                               [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
                               title="View Invoice">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-secondary"
+                      <button class="action-btn"
                               [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]"
                               [queryParams]="{edit: true}"
                               title="Edit Invoice">
                         <i class="bi bi-pencil"></i>
                       </button>
-                      <button class="btn btn-sm btn-outline-info"
+                      <button class="action-btn action-btn-info"
                               (click)="sendInvoice(invoice, $event)"
-                              title="Send Invoice to {{ invoice.customerName }}">
+                              title="Send Invoice">
                         <i class="bi bi-send"></i>
                       </button>
                     </div>

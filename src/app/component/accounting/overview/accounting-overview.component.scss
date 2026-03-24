@@ -1,0 +1,90 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ─── Stat Cards ───────────────────────────────────────────────────────────────
+.stat-card { background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e9ecef); border-radius: $border-radius-xl; padding: $spacing-md $spacing-lg; display: flex; align-items: center; gap: $spacing-md; box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06)); transition: transform $transition-base, box-shadow $transition-base; &:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.09); } }
+.stat-icon { width: 48px; height: 48px; border-radius: $border-radius-lg; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.stat-info { flex: 1; min-width: 0; }
+.stat-value { font-size: 1.5rem; font-weight: $font-weight-bold; color: var(--text-primary, #1a1a2e); margin: 0; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stat-label { font-size: 0.72rem; color: var(--text-muted, #6c757d); font-weight: $font-weight-medium; margin: 2px 0 0; }
+.stat-sub { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+.bg-primary-subtle { background: rgba($primary, 0.1) !important; }
+.bg-success-subtle { background: rgba($success, 0.1) !important; }
+.bg-warning-subtle { background: rgba($warning, 0.14) !important; }
+.bg-info-subtle    { background: rgba(13,202,240,0.1) !important; }
+.bg-danger-subtle  { background: rgba($danger, 0.1) !important; }
+
+.skeleton-val { height: 1.5rem; width: 80%; background: linear-gradient(90deg, var(--border-color, #e9ecef) 25%, var(--border-light, #f0f0f0) 50%, var(--border-color, #e9ecef) 75%); background-size: 400px 100%; animation: shimmer 1.4s infinite; border-radius: 4px; }
+
+/* ─── Quick links ─────────────────────────────────────────────────────────── */
+.quick-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: $spacing-lg;
+}
+
+.quick-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.45rem 1rem;
+  border-radius: $border-radius-full;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color, #dee2e6);
+  color: var(--text-secondary);
+  font-size: 0.83rem;
+  font-weight: $font-weight-medium;
+  text-decoration: none;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: rgba($secondary-dark, 0.08);
+    border-color: $secondary-dark;
+    color: $secondary-dark;
+    text-decoration: none;
+  }
+
+  &.accent {
+    background: rgba($secondary-dark, 0.08);
+    border-color: $secondary-dark;
+    color: $secondary-dark;
+    font-weight: $font-weight-semibold;
+  }
+
+  i { font-size: 1rem; }
+}
+
+/* ─── Two-column activity grid ────────────────────────────────────────────── */
+.ov-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+
+  @media (max-width: $breakpoint-lg) { grid-template-columns: 1fr; }
+}
+
+/* ─── Period selects in banner ────────────────────────────────────────────── */
+.period-sel {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  border-radius: $border-radius;
+  font-size: 0.82rem;
+  padding: 5px 10px;
+  min-width: 110px;
+
+  option { background: $primary-dark; color: #fff; }
+  &:focus { outline: none; border-color: rgba(255,255,255,0.6); box-shadow: none; }
+}
+
+.badge-soft-sm { font-size: 0.68rem; padding: 3px 8px; }
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position:  400px 0; }
+}
+
+// ─── Table card header ───────────────────────────────────────────────────────
+.table-card-header { display: flex; align-items: center; justify-content: space-between; gap: $spacing-md; padding: 14px 20px; border-bottom: 1px solid var(--border-color, #e9ecef); background: var(--bg-card, #fff); flex-wrap: wrap; }
+.table-card-title { font-size: 0.9rem; font-weight: $font-weight-semibold; color: var(--text-primary); margin: 0; }

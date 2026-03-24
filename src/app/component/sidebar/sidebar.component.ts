@@ -229,48 +229,6 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
-      label: 'Our Clients',
-      icon: 'bi-briefcase',
-      expanded: false,
-      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-      excludeRoles: ['ROLE_USER'],
-      children: [
-        {
-          label: 'All Clients',
-          icon: 'bi-people',
-          route: '/customers',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        },
-        {
-          label: 'Add New Client',
-          icon: 'bi-person-plus-fill',
-          route: '/customers/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        }
-      ]
-    },
-    {
-      label: 'Accounts',
-      icon: 'bi-receipt-cutoff',
-      expanded: false,
-      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-      excludeRoles: ['ROLE_USER'],
-      children: [
-        {
-          label: 'All Invoices',
-          icon: 'bi-file-earmark-text',
-          route: '/invoices',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        },
-        {
-          label: 'Create Invoice',
-          icon: 'bi-plus-square',
-          route: '/invoices/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        }
-      ]
-    },
-    {
       label: 'Claims',
       icon: 'bi-wallet2',
       expanded: false,
@@ -291,6 +249,81 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           label: 'Submit Claim',
           icon: 'bi-plus-circle',
           route: '/expense-claims/new'
+        }
+      ]
+    },
+    {
+      label: 'Accounting',
+      icon: 'bi-journal-text',
+      expanded: false,
+      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+      excludeRoles: ['ROLE_USER'],
+      children: [
+        {
+          label: 'Overview',
+          icon: 'bi-grid-1x2',
+          route: '/accounting/overview',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Invoices (AR)',
+          icon: 'bi-file-earmark-text',
+          route: '/invoices',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Create Invoice',
+          icon: 'bi-plus-square',
+          route: '/invoices/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Clients',
+          icon: 'bi-people',
+          route: '/customers',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Add Client',
+          icon: 'bi-person-plus-fill',
+          route: '/customers/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Products & Services',
+          icon: 'bi-box-seam',
+          route: '/accounting/products',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Bills & AP',
+          icon: 'bi-receipt-cutoff',
+          route: '/accounting/bills',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Quotes & Estimates',
+          icon: 'bi-file-text',
+          route: '/accounting/quotes',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Credit Notes',
+          icon: 'bi-credit-card',
+          route: '/accounting/credit-notes',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'VAT Returns',
+          icon: 'bi-percent',
+          route: '/accounting/vat-returns',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN']
+        },
+        {
+          label: 'Reports',
+          icon: 'bi-file-earmark-bar-graph',
+          route: '/accounting/reports',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
         }
       ]
     },

@@ -189,6 +189,16 @@ const routes: Routes = [
   },
 
   // =============================================
+  // ACCOUNTING MODULE (Products, Bills, Quotes, Credit Notes, VAT)
+  // =============================================
+  {
+    path: 'accounting',
+    loadChildren: () => import('./component/accounting/accounting.module').then(m => m.AccountingModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Accounting' }
+  },
+
+  // =============================================
   // ASSET MANAGEMENT
   // =============================================
   {

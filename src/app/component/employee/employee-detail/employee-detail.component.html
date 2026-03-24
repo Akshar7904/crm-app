@@ -622,8 +622,15 @@
                           <small class="doc-date">{{ formatDate(doc.createdAt) }}</small>
                         </div>
                         <div class="doc-actions">
+                          <button class="doc-action-btn doc-action-view" (click)="viewDocument(doc)" title="View">
+                            <i class="bi bi-eye"></i>
+                          </button>
                           <button class="doc-action-btn" (click)="downloadDocument(doc.id, doc.documentName)" title="Download">
                             <i class="bi bi-download"></i>
+                          </button>
+                          <button class="doc-action-btn doc-action-verify" *ngIf="isAdminView && !doc.isVerified"
+                                  (click)="verifyDocument(doc.id)" title="Mark as Verified">
+                            <i class="bi bi-check-circle"></i>
                           </button>
                           <button class="doc-action-btn doc-action-danger" (click)="deleteDocument(doc.id)" title="Delete">
                             <i class="bi bi-trash"></i>
@@ -734,3 +741,79 @@
     </div>
   </ng-container>
 </ng-container>
+
+<!-- ════════════════════════════════════════════════════════════════ -->
+<!-- Document Viewer Overlay                                         -->
+<!-- ════════════════════════════════════════════════════════════════ -->
+<div class="doc-viewer-overlay" *ngIf="viewingDoc" (click)="closeDocumentViewer()">
+  <div class="doc-viewer-panel" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="doc-viewer-header">
+      <div class="doc-viewer-title">
+        <i class="bi {{ getDocumentIcon(viewingDoc.doc.fileExtension) }} doc-viewer-icon"></i>
+        <span class="doc-viewer-name">{{ viewingDoc.doc.documentName }}</span>
+        <span class="doc-type-badge ms-2">{{ viewingDoc.doc.documentType }}</span>
+        <span *ngIf="viewingDoc.doc.isVerified" class="doc-viewer-verified-badge">
+          <i class="bi bi-check-circle-fill me-1"></i>Verified
+        </span>
+      </div>
+      <div class="doc-viewer-toolbar">
+        <button *ngIf="isAdminView && !viewingDoc.doc.isVerified"
+                class="doc-viewer-btn doc-viewer-btn-verify"
+                (click)="verifyDocument(viewingDoc.doc.id)"
+                [disabled]="isVerifyingDocument"
+                title="Mark as Verified">
+          <i class="bi bi-check-circle me-1"></i>
+          {{ isVerifyingDocument ? 'Verifying…' : 'Mark Verified' }}
+        </button>
+        <button class="doc-viewer-btn doc-viewer-btn-download"
+                (click)="downloadDocument(viewingDoc.doc.id, viewingDoc.doc.documentName)"
+                title="Download">
+          <i class="bi bi-download me-1"></i>Download
+        </button>
+        <button class="doc-viewer-close" (click)="closeDocumentViewer()" title="Close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="doc-viewer-body">
+
+      <!-- PDF -->
+      <iframe *ngIf="viewingDoc.type === 'pdf'"
+              [src]="viewingDoc.safeSrc"
+              class="doc-viewer-iframe"
+              frameborder="0"
+              allowfullscreen></iframe>
+
+      <!-- Image -->
+      <div *ngIf="viewingDoc.type === 'image'" class="doc-viewer-image-wrap">
+        <img [src]="viewingDoc.safeSrc" class="doc-viewer-image" alt="Document preview">
+      </div>
+
+      <!-- Word / unsupported -->
+      <div *ngIf="viewingDoc.type === 'other'" class="doc-viewer-unsupported">
+        <i class="bi bi-file-earmark-word"></i>
+        <p>This file type cannot be previewed in the browser.</p>
+        <small class="text-muted">Download the file to view it in your application.</small>
+        <button class="doc-viewer-btn doc-viewer-btn-download mt-3"
+                (click)="downloadDocument(viewingDoc.doc.id, viewingDoc.doc.documentName)">
+          <i class="bi bi-download me-2"></i>Download to View
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="doc-viewer-footer">
+      <span><i class="bi bi-hdd me-1"></i>{{ formatFileSize(viewingDoc.doc.fileSize) }}</span>
+      <span class="doc-viewer-footer-sep">•</span>
+      <span><i class="bi bi-calendar me-1"></i>Uploaded {{ formatDate(viewingDoc.doc.createdAt) }}</span>
+      <span *ngIf="viewingDoc.doc.description" class="doc-viewer-footer-sep">•</span>
+      <span *ngIf="viewingDoc.doc.description">{{ viewingDoc.doc.description }}</span>
+    </div>
+
+  </div>
+</div>

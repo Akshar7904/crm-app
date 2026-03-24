@@ -23,6 +23,10 @@ export interface CalendarEvent {
     checkInTime?: string;
     checkOutTime?: string;
     attendanceType?: string;
+    employeeName?: string;
+    totalWorkHours?: number | string;
+    checkInLocation?: string;
+    status?: string;
     [key: string]: any;
   };
 }
