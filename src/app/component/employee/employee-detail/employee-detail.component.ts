@@ -157,7 +157,13 @@ export class EmployeeDetailComponent implements OnInit {
     this.userService.profile$().subscribe({
       next: (response: any) => {
         this.currentUserId = response?.data?.user?.id || null;
-        console.log('👤 Current user ID loaded:', this.currentUserId);
+        const roleName: string = response?.data?.user?.roleName || '';
+        // Set isAdminView based on the CURRENT USER's role, not the viewed employee's role
+        if (!this.isMyDetailsPage) {
+          this.isAdminView = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_MANAGER'].includes(roleName);
+        }
+        console.log('👤 Current user ID loaded:', this.currentUserId, '| Admin view:', this.isAdminView);
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error loading current user:', error);
