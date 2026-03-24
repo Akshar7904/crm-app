@@ -3,7 +3,7 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
-import { Observable, Subject, takeUntil, catchError, of } from 'rxjs';
+import { Observable, Subject, takeUntil, catchError, of, debounceTime } from 'rxjs';
 import { AttendanceService } from "../../../service/attendance.service";
 import { EmployeeService } from "../../../service/employee.service";
 import { HolidayService } from "../../../service/holiday.service";
@@ -58,16 +58,39 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
+  // Debounce subject so rapid events (e.g. break start → end) only trigger one reload
+  private liveReload$ = new Subject<void>();
+
   ngOnInit(): void {
     this.attendanceState$ = this.attendanceService.state$;
     this.initWeek();
     this.loadEmployees();
     this.loadWeekAttendance();
+    this.subscribeToLiveUpdates();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  private subscribeToLiveUpdates(): void {
+    // Debounce: if multiple events arrive quickly, wait 1.5 s then reload once
+    this.liveReload$.pipe(
+      debounceTime(1500),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.loadWeekAttendance();
+    });
+
+    this.attendanceService.subscribeToLiveAttendance().pipe(
+      takeUntil(this.destroy$),
+      catchError(() => of(null))
+    ).subscribe(event => {
+      if (event) {
+        this.liveReload$.next();
+      }
+    });
   }
 
   // ─── Week Initialisation

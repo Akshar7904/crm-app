@@ -70,6 +70,12 @@ export class UserComponent implements OnInit {
   private showLogsSubject = new BehaviorSubject<boolean>(false);
   showLogs$ = this.showLogsSubject.asObservable();
 
+  // MFA setup state
+  mfaSetupMode = false;
+  mfaDisableMode = false;
+  mfaSetupData: { secret: string; qrCodeDataUri: string; issuer: string; email: string } | null = null;
+  mfaCode = '';
+
   // Profile image URL (from database or default)
   private readonly DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
   private readonly SERVER_URL = environment.apiUrl + '/api/v1/user';
@@ -449,30 +455,87 @@ export class UserComponent implements OnInit {
     });
   }
 
-  /**
-   * Toggle MFA (uses existing userService)
-   */
-  toggleMfa(): void {
-    console.log('🔐 Toggling MFA');
-
+  /** Start MFA setup — load QR code from backend */
+  setupMfa(): void {
     this.isLoadingSubject.next(true);
-
-    this.userService.toggleMfa$().subscribe({
+    this.userService.setupMfa$().subscribe({
       next: (response) => {
-        console.log('✅ MFA toggled successfully:', response);
-        this.dataSubject.next(response);
+        this.mfaSetupData = {
+          qrCodeDataUri: (response.data as any)?.['qrCodeDataUri'] || '',
+          secret: (response.data as any)?.['secret'] || '',
+          issuer: (response.data as any)?.['issuer'] || '',
+          email: ''
+        };
+        this.mfaSetupMode = true;
+        this.mfaCode = '';
         this.isLoadingSubject.next(false);
-        this.profileState$ = of({ dataState: DataState.LOADED, appData: response });
-        this.notification.onSuccess(response.message || 'MFA settings updated successfully');
         this.cdr.markForCheck();
       },
       error: (error: string) => {
-        console.error('❌ Error toggling MFA:', error);
         this.isLoadingSubject.next(false);
-        this.notification.onError(error || 'Failed to toggle MFA');
+        this.notification.onError(error || 'Failed to load MFA setup');
         this.cdr.markForCheck();
       }
     });
+  }
+
+  /** Confirm MFA setup with the user-entered TOTP code */
+  enableMfa(): void {
+    if (!this.mfaCode || this.mfaCode.length !== 6) {
+      this.notification.onError('Please enter the 6-digit code from your authenticator app');
+      return;
+    }
+    this.isLoadingSubject.next(true);
+    this.userService.enableMfa$(this.mfaCode).subscribe({
+      next: (response) => {
+        this.dataSubject.next(response);
+        this.profileState$ = of({ dataState: DataState.LOADED, appData: response });
+        this.mfaSetupMode = false;
+        this.mfaSetupData = null;
+        this.mfaCode = '';
+        this.isLoadingSubject.next(false);
+        this.notification.onSuccess(response.message || 'MFA enabled successfully');
+        this.cdr.markForCheck();
+      },
+      error: (error: string) => {
+        this.isLoadingSubject.next(false);
+        this.notification.onError(error || 'Invalid code — please try again');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  /** Disable MFA after verifying the current TOTP code */
+  disableMfa(): void {
+    if (!this.mfaCode || this.mfaCode.length !== 6) {
+      this.notification.onError('Please enter the 6-digit code from your authenticator app');
+      return;
+    }
+    this.isLoadingSubject.next(true);
+    this.userService.disableMfa$(this.mfaCode).subscribe({
+      next: (response) => {
+        this.dataSubject.next(response);
+        this.profileState$ = of({ dataState: DataState.LOADED, appData: response });
+        this.mfaDisableMode = false;
+        this.mfaCode = '';
+        this.isLoadingSubject.next(false);
+        this.notification.onSuccess(response.message || 'MFA disabled successfully');
+        this.cdr.markForCheck();
+      },
+      error: (error: string) => {
+        this.isLoadingSubject.next(false);
+        this.notification.onError(error || 'Invalid code — please try again');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  cancelMfaSetup(): void {
+    this.mfaSetupMode = false;
+    this.mfaDisableMode = false;
+    this.mfaSetupData = null;
+    this.mfaCode = '';
+    this.cdr.markForCheck();
   }
 
   /**

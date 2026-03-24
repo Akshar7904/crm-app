@@ -84,6 +84,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   isClockingIn: boolean = false;
   clockInTime: string = '';
   clockOutTime: string = '';
+  wrongDayRecord: boolean = false; // true when DB has a clocked-out record that doesn't match today
   locationName: string = '';
   private clockSubscription: Subscription;
 
@@ -152,27 +153,83 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  /** SAST date string YYYY-MM-DD — matches what the backend stores. */
+  private getTodaySASTDate(): string {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Johannesburg' });
+  }
+
+  private resetClockState(): void {
+    this.isClockedIn = false;
+    this.isClockedOut = false;
+    this.clockInTime = '';
+    this.clockOutTime = '';
+    this.currentStatus = '';
+    this.isOnBreak = false;
+    this.breakType = '';
+    this.wrongDayRecord = false;
+    this.break1Start = ''; this.break1End = '';
+    this.lunchStart  = ''; this.lunchEnd  = '';
+    this.break2Start = ''; this.break2End = '';
+    localStorage.removeItem('todayClockIn');
+  }
+
+  resetTodayAttendance(): void {
+    this.attendanceService.deleteMyTodayAttendance$().subscribe({
+      next: () => {
+        this.resetClockState();
+        this.notification.onSuccess('Attendance reset. You can now clock in.');
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.notification.onError(err?.error?.reason || err?.error?.message || 'Could not reset attendance');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   private checkClockInStatus(): void {
-    // First check localStorage for quick UI update
+    const todaySAST = this.getTodaySASTDate();
+
+    // Quick UI update from localStorage — only trust it if the stored date matches today
     const todayClockIn = localStorage.getItem('todayClockIn');
     if (todayClockIn) {
       const clockData = JSON.parse(todayClockIn);
-      const today = new Date().toDateString();
-      if (clockData.date === today) {
+      if (clockData.date === new Date().toDateString()) {
         this.isClockedIn = !clockData.clockedOut;
         this.isClockedOut = !!clockData.clockedOut;
         this.clockInTime = clockData.time;
         this.clockOutTime = clockData.checkOutTime || '';
       } else {
+        // Stale entry from a previous day — wipe it
         localStorage.removeItem('todayClockIn');
       }
     }
 
-    // Also check from backend for accurate status
+    // Backend is the source of truth
     this.attendanceService.getTodayAttendance$().subscribe({
       next: (response) => {
         if (response.data?.attendance) {
           const attendance = response.data.attendance;
+
+          // Guard: ensure the returned record is actually for today (SAST).
+          // Converts attendanceDate to string regardless of whether Jackson sent
+          // it as "2026-03-24" or [2026, 3, 24].
+          const recDate = Array.isArray(attendance.attendanceDate)
+            ? `${attendance.attendanceDate[0]}-${String(attendance.attendanceDate[1]).padStart(2,'0')}-${String(attendance.attendanceDate[2]).padStart(2,'0')}`
+            : String(attendance.attendanceDate || '');
+
+          if (recDate !== todaySAST) {
+            // Record belongs to a different day — do not apply it; reset state
+            // Show the "Reset" button so the user can clear it from the DB
+            this.resetClockState();
+            this.wrongDayRecord = true;
+            this.isClockedOut = true; // keep the status section visible with the reset button
+            this.clockInTime = attendance.checkInTime ? this.formatTimeDisplay(attendance.checkInTime) : '';
+            this.clockOutTime = attendance.checkOutTime ? this.formatTimeDisplay(attendance.checkOutTime) : '';
+            this.cdr.markForCheck();
+            return;
+          }
+
           this.isClockedIn = !!attendance.checkInTime;
           this.isClockedOut = !!attendance.checkOutTime;
           this.clockInTime = attendance.checkInTime ? this.formatTimeDisplay(attendance.checkInTime) : '';
@@ -199,13 +256,17 @@ export class HomeComponent implements OnInit, OnDestroy {
             checkOutTime: this.clockOutTime,
             attendanceId: attendance.id
           }));
-          // Add to calendar
           this.addTodayAttendanceToCalendar(attendance);
-          this.cdr.markForCheck();
+        } else {
+          // No attendance record for today — make sure the UI shows a clean state
+          this.resetClockState();
         }
+        this.cdr.markForCheck();
       },
       error: () => {
-        // No attendance for today, that's ok
+        // Backend error or 404 — reset state so the clock-in button is visible
+        this.resetClockState();
+        this.cdr.markForCheck();
       }
     });
   }
@@ -361,12 +422,27 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private startBreakTimer(): void {
-    this.breakElapsedSeconds = 0;
     this.stopBreakTimer();
+    // Calculate elapsed time from the actual break start timestamp so the
+    // timer continues correctly even after the page is closed and reopened.
+    const breakStartTime = this.getActiveBreakStartTime();
+    if (breakStartTime) {
+      this.breakElapsedSeconds = Math.floor((Date.now() - new Date(breakStartTime).getTime()) / 1000);
+      if (this.breakElapsedSeconds < 0) this.breakElapsedSeconds = 0;
+    } else {
+      this.breakElapsedSeconds = 0;
+    }
     this.breakTimerSubscription = interval(1000).subscribe(() => {
       this.breakElapsedSeconds++;
       this.cdr.markForCheck();
     });
+  }
+
+  private getActiveBreakStartTime(): string | null {
+    if (this.breakType === 'BREAK1') return this.break1Start || null;
+    if (this.breakType === 'LUNCH') return this.lunchStart || null;
+    if (this.breakType === 'BREAK2') return this.break2Start || null;
+    return null;
   }
 
   private stopBreakTimer(): void {
@@ -553,7 +629,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         );
         this.recentAnnouncements = announcements?.data?.announcements || [];
         this.financialSummary = financial?.data || null;
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Johannesburg' });
         this.recentClockEvents = (attendance.data?.attendances || [])
           .filter((a: Attendance) => a.attendanceDate === today && a.checkInTime)
           .sort((a: Attendance, b: Attendance) =>

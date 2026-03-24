@@ -72,6 +72,8 @@
 
 <!-- Quick Links -->
 <div class="quick-links">
+  <a class="quick-link" routerLink="/invoices"><i class="bi bi-file-earmark-text"></i><span>Invoices (AR)</span></a>
+  <a class="quick-link" routerLink="/customers"><i class="bi bi-people"></i><span>Clients</span></a>
   <a class="quick-link" routerLink="../products"><i class="bi bi-box-seam"></i><span>Products &amp; Services</span></a>
   <a class="quick-link" routerLink="../bills"><i class="bi bi-receipt-cutoff"></i><span>Bills &amp; AP</span></a>
   <a class="quick-link" routerLink="../quotes"><i class="bi bi-file-text"></i><span>Quotes</span></a>
@@ -116,7 +118,7 @@
   <div class="table-card">
     <div class="table-card-header">
       <h5 class="table-card-title"><i class="bi bi-file-earmark-text me-2 text-success"></i>Recent Invoices (AR)</h5>
-      <a routerLink="../quotes" class="btn btn-sm btn-outline-secondary">View All</a>
+      <a routerLink="/invoices" class="btn btn-sm btn-outline-secondary">View All</a>
     </div>
     <div *ngIf="loadingInvoices" class="text-center py-4">
       <div class="spinner-border spinner-border-sm text-primary"></div>

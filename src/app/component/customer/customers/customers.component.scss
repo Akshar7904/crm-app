@@ -60,26 +60,49 @@
   font-weight: $font-weight-medium;
 }
 
-// ─── Search Card ──────────────────────────────────────────────────────────────
-.search-card {
+// ─── Table Card Header ────────────────────────────────────────────────────────
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
   background: var(--bg-card, #fff);
-  border: 1px solid var(--border-color, #e9ecef);
-  border-radius: $border-radius-xl;
-  box-shadow: var(--card-shadow);
+  flex-wrap: wrap;
 }
 
-.search-card .card-body { padding: $spacing-md $spacing-lg; }
-
-.search-card .input-group-text {
-  background: var(--bg-body, #f8f9fa);
-  border-color: var(--border-color, #dee2e6);
-  color: $primary;
+.table-card-title {
+  font-size: 0.9rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  margin: 0;
 }
 
-.search-card .form-control {
-  border-color: var(--border-color, #dee2e6);
-  font-size: $font-size-sm;
-  &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.12); }
+// ─── Search Box ───────────────────────────────────────────────────────────────
+.search-box {
+  width: 240px; flex-shrink: 0;
+  .input-group-text { background: var(--bg-body, #f8f9fa); border-color: var(--border-color, #dee2e6); color: var(--text-muted); font-size: $font-size-sm; padding: 6px 10px; }
+  .form-control { border-color: var(--border-color, #dee2e6); font-size: $font-size-sm; padding: 6px 10px; background: var(--bg-body, #f8f9fa); color: var(--text-primary);
+    &:focus { border-color: $primary; box-shadow: 0 0 0 3px rgba($primary, 0.1); background: var(--bg-card, #fff); outline: none; }
+    &::placeholder { color: var(--text-light, #adb5bd); }
+  }
+}
+
+// ─── Action Buttons ───────────────────────────────────────────────────────────
+.action-btn-group { display: flex; align-items: center; gap: 4px; }
+
+.action-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  border: 1px solid var(--border-color, #dee2e6); border-radius: $border-radius;
+  background: var(--bg-card, #fff); color: var(--text-secondary, #495057);
+  font-size: 0.8rem; cursor: pointer; transition: all $transition-base;
+  &:hover { background: rgba($primary, 0.06); border-color: $primary; color: $primary; transform: translateY(-1px); }
+  &.action-btn-success:hover { background: rgba($success, 0.1); border-color: $success; color: $success; }
+  &.action-btn-danger:hover  { background: rgba($danger, 0.1);  border-color: $danger;  color: $danger; }
+  &.action-btn-info:hover    { background: rgba($info, 0.1);    border-color: $info;    color: $info; }
+  &:disabled { opacity: 0.45; pointer-events: none; }
 }
 
 // ─── Client avatar in table ────────────────────────────────────────────────────

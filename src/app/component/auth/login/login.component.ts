@@ -68,7 +68,7 @@ export class LoginComponent implements OnInit {
   }
 
   verifyCode(verifyCodeForm: NgForm): void {
-    this.loginState$ = this.userService.verifyCode$(this.emailSubject.value, verifyCodeForm.value.code)
+    this.loginState$ = this.userService.verifyTotpLogin$(this.emailSubject.value, verifyCodeForm.value.code)
       .pipe(
         map(response => {
           this.notification.onDefault(response.message);

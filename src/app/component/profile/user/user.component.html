@@ -750,22 +750,79 @@
           <div class="profile-info-card-body">
 
             <!-- MFA -->
-            <div class="up-security-row">
-              <div class="up-security-icon">
-                <i class="bi bi-phone-fill"></i>
+            <div class="up-security-row flex-column align-items-start gap-3">
+              <!-- Row header -->
+              <div class="d-flex align-items-center w-100 gap-3">
+                <div class="up-security-icon">
+                  <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <div class="up-security-info flex-grow-1">
+                  <strong>Multi-Factor Authentication (TOTP)</strong>
+                  <span *ngIf="state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-on ms-2">Enabled</span>
+                  <span *ngIf="!state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-off ms-2">Disabled</span>
+                  <p class="text-muted small mb-0 mt-1">Use an authenticator app (Google Authenticator, Authy) for sign-in verification</p>
+                </div>
+
+                <!-- Enable button (not set up yet) -->
+                <button *ngIf="!state?.appData?.data?.user?.usingMfa && !mfaSetupMode"
+                        (click)="setupMfa()" [disabled]="(isLoading$ | async)"
+                        class="btn btn-sm btn-primary">
+                  <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                  <i class="bi bi-qr-code me-1"></i> Set Up MFA
+                </button>
+
+                <!-- Disable button (MFA active) -->
+                <button *ngIf="state?.appData?.data?.user?.usingMfa && !mfaDisableMode"
+                        (click)="mfaDisableMode = true; mfaCode = ''"
+                        class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-shield-x me-1"></i> Disable MFA
+                </button>
               </div>
-              <div class="up-security-info">
-                <strong>Multi-Factor Authentication</strong>
-                <span *ngIf="state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-on ms-2">Enabled</span>
-                <span *ngIf="!state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-off ms-2">Disabled</span>
-                <p class="text-muted small mb-0 mt-1">Add an extra layer of security to your account</p>
+
+              <!-- QR Code Setup Panel -->
+              <div *ngIf="mfaSetupMode && mfaSetupData" class="mfa-setup-panel w-100">
+                <div class="mfa-setup-body">
+                  <div class="mfa-qr-wrap">
+                    <p class="mfa-setup-step"><strong>Step 1:</strong> Scan this QR code with your authenticator app</p>
+                    <img [src]="mfaSetupData.qrCodeDataUri" alt="MFA QR Code" class="mfa-qr-img" />
+                    <p class="mfa-setup-step mt-3"><strong>Can't scan?</strong> Enter this code manually:</p>
+                    <code class="mfa-secret-code">{{ mfaSetupData.secret }}</code>
+                  </div>
+                  <div class="mfa-verify-wrap">
+                    <p class="mfa-setup-step"><strong>Step 2:</strong> Enter the 6-digit code from your app to confirm setup</p>
+                    <div class="d-flex gap-2 align-items-center">
+                      <input type="text" class="form-control mfa-code-input"
+                             [(ngModel)]="mfaCode"
+                             maxlength="6" placeholder="000000"
+                             autocomplete="one-time-code" />
+                      <button class="btn btn-primary" (click)="enableMfa()" [disabled]="(isLoading$ | async) || mfaCode.length !== 6">
+                        <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                        Confirm
+                      </button>
+                      <button class="btn btn-outline-secondary" (click)="cancelMfaSetup()" [disabled]="(isLoading$ | async)">Cancel</button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <button (click)="toggleMfa()" [disabled]="(isLoading$ | async)"
-                      class="btn btn-sm" [class.btn-danger]="state?.appData?.data?.user?.usingMfa"
-                      [class.btn-primary]="!state?.appData?.data?.user?.usingMfa">
-                <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
-                {{ state?.appData?.data?.user?.usingMfa ? 'Disable' : 'Enable' }}
-              </button>
+
+              <!-- Disable MFA Confirmation Panel -->
+              <div *ngIf="mfaDisableMode" class="mfa-setup-panel w-100">
+                <div class="mfa-setup-body">
+                  <p class="mfa-setup-step"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Enter the current code from your authenticator app to disable MFA</p>
+                  <div class="d-flex gap-2 align-items-center">
+                    <input type="text" class="form-control mfa-code-input"
+                           [(ngModel)]="mfaCode"
+                           maxlength="6" placeholder="000000"
+                           autocomplete="one-time-code" />
+                    <button class="btn btn-danger" (click)="disableMfa()" [disabled]="(isLoading$ | async) || mfaCode.length !== 6">
+                      <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                      Disable
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="cancelMfaSetup()" [disabled]="(isLoading$ | async)">Cancel</button>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             <!-- Activity Logs -->

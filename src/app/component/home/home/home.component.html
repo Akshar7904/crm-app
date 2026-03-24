@@ -337,6 +337,12 @@
                 <i class="bi bi-check-circle-fill me-1"></i>
                 Clocked in: {{ clockInTime }} | Clocked out: {{ clockOutTime }}
               </span>
+              <button class="btn btn-link btn-sm text-danger mt-1 p-0"
+                      *ngIf="wrongDayRecord"
+                      (click)="resetTodayAttendance()"
+                      title="This record appears to be from the wrong date. Click to reset and clock in fresh.">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>Wrong date? Reset &amp; clock in
+              </button>
             </div>
 
             <!-- Break/Lunch Buttons -->

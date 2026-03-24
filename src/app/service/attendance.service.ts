@@ -3,9 +3,10 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { environment } from '@env/environment';
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Key } from '../enum/key.enum';
 import {
   Attendance,
   EmployeeAttendance,
@@ -36,7 +37,53 @@ export class AttendanceService {
 
   public readonly state$ = this.attendanceState$.asObservable();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private ngZone: NgZone) {}
+
+  /**
+   * Opens a Server-Sent Events connection to the live attendance stream.
+   * Returns an Observable that emits { eventType, data } on each attendance event.
+   * The connection stays open and auto-reconnects while subscribed.
+   * Token is passed as a query param because native EventSource cannot set headers.
+   */
+  subscribeToLiveAttendance(): Observable<{ eventType: string; data: any }> {
+    return new Observable(observer => {
+      const token = localStorage.getItem(Key.TOKEN);
+      if (!token) {
+        observer.error('No auth token found');
+        return;
+      }
+      const url = `${this.API_URL}/live?token=${encodeURIComponent(token)}`;
+      const eventSource = new EventSource(url);
+
+      const events = ['CLOCK_IN', 'CLOCK_OUT', 'BREAK_START', 'BREAK_END', 'UPDATED'];
+      const handlers: Array<[string, EventListener]> = [];
+
+      events.forEach(eventType => {
+        const handler = (event: MessageEvent) => {
+          this.ngZone.run(() => {
+            try {
+              const parsed = JSON.parse(event.data);
+              observer.next({ eventType, data: parsed });
+            } catch {
+              observer.next({ eventType, data: event.data });
+            }
+          });
+        };
+        eventSource.addEventListener(eventType, handler as EventListener);
+        handlers.push([eventType, handler as EventListener]);
+      });
+
+      eventSource.onerror = () => {
+        // EventSource auto-reconnects; only complete on deliberate teardown
+      };
+
+      // Teardown: close the SSE connection when unsubscribed
+      return () => {
+        handlers.forEach(([type, handler]) => eventSource.removeEventListener(type, handler));
+        eventSource.close();
+      };
+    });
+  }
 
   // Create attendance
   createAttendance(form: AttendanceForm): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
@@ -353,13 +400,18 @@ export class AttendanceService {
    * Clock in for today (self-service)
    * Uses the existing createMyAttendance endpoint
    */
+  /** Returns today's date as YYYY-MM-DD in South African time (Africa/Johannesburg). */
+  private getSASTDate(): string {
+    return new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Johannesburg' });
+  }
+
   clockIn$(
     checkInTime: string,
     location?: string,
     latitude?: number,
     longitude?: number
   ): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = this.getSASTDate();
     const form: SelfAttendanceForm = {
       attendanceDate: today,
       attendanceType: AttendanceType.FULL_DAY_PRESENT,
@@ -381,7 +433,7 @@ export class AttendanceService {
     latitude?: number,
     longitude?: number
   ): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = this.getSASTDate();
     const form: SelfAttendanceForm = {
       attendanceDate: today,
       attendanceType: AttendanceType.FULL_DAY_PRESENT,
@@ -413,11 +465,16 @@ export class AttendanceService {
     );
   }
 
+  /** Delete the current user's attendance record for today (date-confusion recovery). */
+  deleteMyTodayAttendance$(): Observable<any> {
+    return this.http.delete(`${this.API_URL}/my/today`);
+  }
+
   /**
    * Get today's attendance record
    */
   getTodayAttendance$(): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
-    const today = new Date().toISOString().split('T')[0];
+    const today = this.getSASTDate();
     return this.getMyAttendanceByDate(today);
   }
 
