@@ -1044,6 +1044,112 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   to   { opacity: 1; }
 }
 
+// ─── Document List Table ──────────────────────────────────────────────────────
+.docs-table-wrap {
+  border: 1px solid var(--border-light);
+  border-radius: $border-radius-xl;
+  overflow-x: auto;
+  margin-top: $spacing-md;
+}
+
+.docs-table {
+  width: 100%;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.83rem;
+  table-layout: fixed;
+
+  // Column widths
+  col.col-file    { width: auto; }
+  col.col-type    { width: 120px; }
+  col.col-size    { width: 90px; }
+  col.col-date    { width: 130px; }
+  col.col-status  { width: 100px; }
+  col.col-actions { width: 130px; }
+
+  thead tr {
+    background: var(--table-header-bg);
+    border-bottom: 1px solid var(--border-color);
+
+    th {
+      padding: 10px 12px;
+      font-weight: $font-weight-semibold;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.7rem;
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    transition: background $transition-base;
+
+    &:last-child { border-bottom: none; }
+    &:hover { background: var(--table-hover); }
+
+    td {
+      padding: 9px 12px;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+  }
+}
+
+.doc-list-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.doc-list-icon {
+  font-size: 1.15rem;
+  color: $primary;
+  flex-shrink: 0;
+}
+
+.doc-list-name {
+  font-weight: $font-weight-medium;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-list-size,
+.doc-list-date {
+  color: var(--text-muted);
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.doc-status-verified {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: rgba($success, 0.12);
+  color: $success;
+  border-radius: $border-radius-xl;
+  font-size: 0.72rem;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.doc-status-pending {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  background: rgba($warning, 0.12);
+  color: darken($warning, 15%);
+  border-radius: $border-radius-xl;
+  font-size: 0.72rem;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
 // ─── Required Docs Info ───────────────────────────────────────────────────────
 .required-docs-info {
   background: rgba($warning, 0.08);

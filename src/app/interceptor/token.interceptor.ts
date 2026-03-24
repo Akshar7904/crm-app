@@ -25,7 +25,7 @@ export class TokenInterceptor implements HttpInterceptor {
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     // Skip adding token for authentication endpoints
-    if (request.url.includes('verify') || request.url.includes('login') || request.url.includes('register')
+    if (request.url.includes('/user/verify') || request.url.includes('login') || request.url.includes('register')
       || request.url.includes('refresh') || request.url.includes('resetpassword')) {
       return next.handle(request);
     }
