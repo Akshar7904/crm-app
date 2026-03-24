@@ -15,6 +15,7 @@ import { NgForm } from '@angular/forms';
 import { EmployeeForm } from '../employee.model';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { UserService } from 'src/app/service/user.service';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 interface EmployeeDocument {
   id?: number;
@@ -83,6 +84,11 @@ export class EmployeeDetailComponent implements OnInit {
   isUploadingDocument: boolean = false;
   uploadProgress: number = 0;
 
+  // Document viewer
+  viewingDoc: { doc: EmployeeDocument; safeSrc: SafeResourceUrl | SafeUrl | null; type: 'pdf' | 'image' | 'other' } | null = null;
+  isVerifyingDocument: boolean = false;
+  private viewerBlobUrl: string | null = null;
+
   documentTypes = [
     { value: 'CV', label: 'Curriculum Vitae (CV)' },
     { value: 'ID', label: 'Identity Document' },
@@ -119,7 +125,8 @@ export class EmployeeDetailComponent implements OnInit {
     private notification: NotificationService,
     private router: Router,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) { }
 
   ngOnInit(): void {
@@ -678,6 +685,62 @@ export class EmployeeDetailComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: () => this.notification.onError('Failed to download document. Please try again.')
+    });
+  }
+
+  viewDocument(doc: EmployeeDocument): void {
+    this.employeeService.downloadDocumentById$(doc.id!).subscribe({
+      next: (blob: Blob) => {
+        if (this.viewerBlobUrl) {
+          window.URL.revokeObjectURL(this.viewerBlobUrl);
+        }
+        this.viewerBlobUrl = window.URL.createObjectURL(blob);
+        const ext = (doc.fileExtension || '').toLowerCase();
+        let type: 'pdf' | 'image' | 'other' = 'other';
+        let safeSrc: SafeResourceUrl | SafeUrl | null = null;
+
+        if (ext === '.pdf') {
+          type = 'pdf';
+          safeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(this.viewerBlobUrl);
+        } else if (['.jpg', '.jpeg', '.png'].includes(ext)) {
+          type = 'image';
+          safeSrc = this.sanitizer.bypassSecurityTrustUrl(this.viewerBlobUrl);
+        }
+
+        this.viewingDoc = { doc, safeSrc, type };
+        this.cdr.markForCheck();
+      },
+      error: () => this.notification.onError('Failed to load document for viewing')
+    });
+  }
+
+  closeDocumentViewer(): void {
+    if (this.viewerBlobUrl) {
+      window.URL.revokeObjectURL(this.viewerBlobUrl);
+      this.viewerBlobUrl = null;
+    }
+    this.viewingDoc = null;
+    this.cdr.markForCheck();
+  }
+
+  verifyDocument(documentId: number): void {
+    this.isVerifyingDocument = true;
+    this.http.put(`${this.SERVER_URL}/employee/documents/${documentId}/verify`, {}).subscribe({
+      next: (response: any) => {
+        this.notification.onSuccess(response.message || 'Document verified successfully');
+        this.isVerifyingDocument = false;
+        if (this.viewingDoc) {
+          this.viewingDoc.doc.isVerified = true;
+        }
+        const employeeId = this.dataSubject.value?.data?.employee?.id;
+        if (employeeId) this.loadDocuments(employeeId);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.isVerifyingDocument = false;
+        this.notification.onError(err?.error?.message || err?.error?.reason || 'Failed to verify document');
+        this.cdr.markForCheck();
+      }
     });
   }
 

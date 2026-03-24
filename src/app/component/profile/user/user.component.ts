@@ -121,6 +121,7 @@ export class UserComponent implements OnInit {
     console.log('✅ UserComponent initialized - Loading profile');
     this.loadProfile();
     this.loadDropdownData();
+    this.loadMyDocuments();
   }
 
   /**

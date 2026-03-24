@@ -434,8 +434,11 @@
 
         <div class="profile-info-card">
           <div class="profile-info-card-header">
-            <i class="bi bi-folder2-open me-2"></i> Uploaded Documents
-            <span class="up-count-badge ms-2">{{ documentCount$ | async }}</span>
+            <span><i class="bi bi-folder2-open me-2"></i> Uploaded Documents
+            <span class="up-count-badge ms-2">{{ documentCount$ | async }}</span></span>
+            <button class="action-btn action-btn-view ms-auto" style="flex-shrink:0" (click)="loadMyDocuments()" title="Refresh documents">
+              <i class="bi bi-arrow-clockwise"></i>
+            </button>
           </div>
           <div class="profile-info-card-body p-0">
             <div *ngIf="(documents$ | async)?.length === 0" class="empty-state-cell">
@@ -457,12 +460,12 @@
                 <tbody>
                   <tr *ngFor="let doc of (documents$ | async)">
                     <td><span class="up-doc-type-badge">{{ getDocumentTypeLabel(doc.documentType) }}</span></td>
-                    <td>{{ doc.originalFileName }}</td>
+                    <td>{{ doc.documentName }}</td>
                     <td>{{ doc.description || '—' }}</td>
-                    <td>{{ formatDate(doc.uploadedAt) }}</td>
+                    <td>{{ formatDate(doc.createdAt) }}</td>
                     <td>
-                      <span *ngIf="doc.verified" class="badge-soft-verified"><i class="bi bi-check-circle me-1"></i>Verified</span>
-                      <span *ngIf="!doc.verified" class="badge-soft-pending-doc"><i class="bi bi-clock me-1"></i>Pending</span>
+                      <span *ngIf="doc.isVerified" class="badge-soft-verified"><i class="bi bi-check-circle me-1"></i>Verified</span>
+                      <span *ngIf="!doc.isVerified" class="badge-soft-pending-doc"><i class="bi bi-clock me-1"></i>Pending</span>
                     </td>
                     <td>
                       <div class="action-btn-group">
@@ -470,7 +473,7 @@
                           <i class="bi bi-download"></i>
                         </button>
                         <button class="action-btn action-btn-cancel" (click)="deleteDocument(doc.id)"
-                                [disabled]="doc.verified" title="Delete">
+                                [disabled]="doc.isVerified" title="Delete">
                           <i class="bi bi-trash"></i>
                         </button>
                       </div>
