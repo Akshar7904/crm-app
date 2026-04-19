@@ -590,7 +590,7 @@
                     </div>
                   </div>
 
-                  <!-- Documents Grid -->
+                  <!-- Documents List -->
                   <div class="docs-header">
                     <h6 class="docs-title">
                       <i class="bi bi-folder2-open"></i> Uploaded Documents
@@ -604,40 +604,65 @@
                     <small>Upload your first document using the form above</small>
                   </div>
 
-                  <div class="row g-3">
-                    <div *ngFor="let doc of documents" class="col-md-6 col-lg-4">
-                      <div class="doc-card">
-                        <div class="doc-icon-wrap">
-                          <i [class]="getDocumentIcon(doc.fileExtension)"></i>
-                          <span *ngIf="doc.isVerified" class="doc-verified">
-                            <i class="bi bi-check-circle-fill"></i>
-                          </span>
-                        </div>
-                        <div class="doc-details">
-                          <h6 class="doc-name" [title]="doc.documentName">{{ doc.documentName }}</h6>
-                          <div class="doc-meta">
-                            <span class="doc-type-badge">{{ doc.documentType }}</span>
-                            <span class="doc-size">{{ formatFileSize(doc.fileSize) }}</span>
-                          </div>
-                          <small class="doc-date">{{ formatDate(doc.createdAt) }}</small>
-                        </div>
-                        <div class="doc-actions">
-                          <button class="doc-action-btn doc-action-view" (click)="viewDocument(doc)" title="View">
-                            <i class="bi bi-eye"></i>
-                          </button>
-                          <button class="doc-action-btn" (click)="downloadDocument(doc.id, doc.documentName)" title="Download">
-                            <i class="bi bi-download"></i>
-                          </button>
-                          <button class="doc-action-btn doc-action-verify" *ngIf="isAdminView && !doc.isVerified"
-                                  (click)="verifyDocument(doc.id)" title="Mark as Verified">
-                            <i class="bi bi-check-circle"></i>
-                          </button>
-                          <button class="doc-action-btn doc-action-danger" (click)="deleteDocument(doc.id)" title="Delete">
-                            <i class="bi bi-trash"></i>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                  <div *ngIf="documents.length > 0" class="docs-table-wrap">
+                    <table class="docs-table">
+                      <colgroup>
+                        <col class="col-file">
+                        <col class="col-type">
+                        <col class="col-size">
+                        <col class="col-date">
+                        <col class="col-status">
+                        <col class="col-actions">
+                      </colgroup>
+                      <thead>
+                        <tr>
+                          <th>File</th>
+                          <th>Type</th>
+                          <th>Size</th>
+                          <th>Uploaded</th>
+                          <th>Status</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr *ngFor="let doc of documents">
+                          <td>
+                            <div class="doc-list-file">
+                              <i class="bi {{ getDocumentIcon(doc.fileExtension) }} doc-list-icon"></i>
+                              <span class="doc-list-name" [title]="doc.documentName">{{ doc.documentName }}</span>
+                            </div>
+                          </td>
+                          <td><span class="doc-type-badge">{{ doc.documentType }}</span></td>
+                          <td class="doc-list-size">{{ formatFileSize(doc.fileSize) }}</td>
+                          <td class="doc-list-date">{{ formatDate(doc.createdAt) }}</td>
+                          <td>
+                            <span *ngIf="doc.isVerified" class="doc-status-verified">
+                              <i class="bi bi-check-circle-fill me-1"></i>Verified
+                            </span>
+                            <span *ngIf="!doc.isVerified" class="doc-status-pending">
+                              <i class="bi bi-clock me-1"></i>Pending
+                            </span>
+                          </td>
+                          <td>
+                            <div class="action-btn-group">
+                              <button class="action-btn action-btn-view" (click)="viewDocument(doc)" title="View">
+                                <i class="bi bi-eye"></i>
+                              </button>
+                              <button class="action-btn action-btn-view" (click)="downloadDocument(doc.id, doc.documentName)" title="Download">
+                                <i class="bi bi-download"></i>
+                              </button>
+                              <button class="action-btn action-btn-save" *ngIf="isAdminView && !doc.isVerified"
+                                      (click)="verifyDocument(doc.id)" title="Mark as Verified">
+                                <i class="bi bi-check-circle"></i>
+                              </button>
+                              <button class="action-btn action-btn-cancel" (click)="deleteDocument(doc.id)" title="Delete">
+                                <i class="bi bi-trash"></i>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
 
                   <!-- Required Docs Info -->
