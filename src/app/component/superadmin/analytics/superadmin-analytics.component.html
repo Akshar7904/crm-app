@@ -1,0 +1,228 @@
+<!-- Banner -->
+<div class="page-banner sa-banner">
+  <div class="banner-content">
+    <div class="banner-icon"><i class="bi bi-bar-chart-line-fill"></i></div>
+    <div>
+      <div class="banner-title">Platform Analytics</div>
+      <div class="banner-subtitle">Per-company performance — finances, attendance, clients &amp; invoices</div>
+    </div>
+  </div>
+  <div class="banner-actions">
+    <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="year" (change)="loadData()">
+      <option *ngFor="let y of YEARS; trackBy: trackByValue" [value]="y">{{ y }}</option>
+    </select>
+    <select class="form-select form-select-sm" style="width:130px" [(ngModel)]="month" (change)="loadData()">
+      <option *ngFor="let m of MONTHS; trackBy: trackByValue" [value]="m.v">{{ m.l }}</option>
+    </select>
+    <button class="btn-banner" (click)="refresh()">
+      <i class="bi bi-arrow-repeat me-1"></i>Refresh
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- KPI Figures -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-xl-3">
+      <div class="kpi-tile kpi-blue">
+        <div class="kpi-icon"><i class="bi bi-building-fill"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-val">{{ stats?.totalCompanies ?? perCompany.length }}</div>
+          <div class="kpi-lbl">Total Companies</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="kpi-tile kpi-green">
+        <div class="kpi-icon"><i class="bi bi-people-fill"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-val">{{ totalEmployees }}</div>
+          <div class="kpi-lbl">Total Employees</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="kpi-tile kpi-purple">
+        <div class="kpi-icon"><i class="bi bi-person-check-fill"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-val">{{ totalActiveClients }}</div>
+          <div class="kpi-lbl">Active Clients</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-xl-3">
+      <div class="kpi-tile" [ngClass]="totalNetProfit >= 0 ? 'kpi-emerald' : 'kpi-red'">
+        <div class="kpi-icon"><i class="bi bi-currency-exchange"></i></div>
+        <div class="kpi-body">
+          <div class="kpi-val" style="font-size:1.3rem">{{ currency(totalNetProfit) }}</div>
+          <div class="kpi-lbl">Platform Net Profit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="p-5 text-center">
+    <div class="spinner-border text-primary"></div>
+    <div class="text-muted mt-3 small">Loading per-company analytics…</div>
+  </div>
+
+  <ng-container *ngIf="!loading">
+
+    <!-- Row 1: Employees bar + Clients grouped bar -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-lg-6">
+        <div class="falcon-card p-3">
+          <div class="chart-section-title">
+            <i class="bi bi-people-fill text-primary me-2"></i>Employees per Company
+          </div>
+          <canvas #chartCanvas height="200"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-lg-6">
+        <div class="falcon-card p-3">
+          <div class="chart-section-title">
+            <i class="bi bi-person-check-fill text-success me-2"></i>Active vs Inactive Clients
+          </div>
+          <canvas #chartCanvas height="200"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Invoice pie + Finance grouped bar -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-5">
+        <div class="falcon-card p-3">
+          <div class="chart-section-title">
+            <i class="bi bi-receipt text-warning me-2"></i>Invoice Status Distribution
+          </div>
+          <canvas #chartCanvas height="240"></canvas>
+          <!-- Invoice totals per company -->
+          <div class="co-invoice-grid mt-3">
+            <div *ngFor="let c of perCompany; let i = index; trackBy: trackByIndex" class="co-invoice-row">
+              <span class="co-dot" [style.background]="PALETTE[i % PALETTE.length].border"></span>
+              <span class="co-name">{{ c.companyCode }}</span>
+              <span class="inv-badge inv-paid">{{ c.invoices?.paid ?? 0 }} paid</span>
+              <span class="inv-badge inv-sent">{{ c.invoices?.sent ?? 0 }} sent</span>
+              <span class="inv-badge inv-overdue">{{ c.invoices?.overdue ?? 0 }} overdue</span>
+              <span class="inv-badge inv-draft">{{ c.invoices?.draft ?? 0 }} draft</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-7">
+        <div class="falcon-card p-3">
+          <div class="chart-section-title">
+            <i class="bi bi-cash-stack text-primary me-2"></i>Financial Overview — {{ year }}
+          </div>
+          <canvas #chartCanvas height="240"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3: Attendance donut + Net Profit horizontal bar -->
+    <div class="row g-3 mb-4">
+      <div class="col-12 col-md-4">
+        <div class="falcon-card p-3">
+          <div class="chart-section-title">
+            <i class="bi bi-calendar2-check-fill text-info me-2"></i>Attendance — Present Share
+          </div>
+          <canvas #chartCanvas height="240"></canvas>
+          <div class="attendance-legend mt-3">
+            <div *ngFor="let c of perCompany; let i = index; trackBy: trackByIndex" class="att-row">
+              <span class="att-dot" [style.background]="PALETTE[i % PALETTE.length].border"></span>
+              <span class="att-name">{{ c.companyName }}</span>
+              <span class="att-count">{{ c.attendance?.present ?? 0 }}/{{ c.attendance?.total ?? 0 }}</span>
+              <div class="att-bar-wrap">
+                <div class="att-bar-fill"
+                  [style.width]="(c.attendance?.total ? (c.attendance.present / c.attendance.total * 100) : 0) + '%'"
+                  [style.background]="PALETTE[i % PALETTE.length].border">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 col-md-8">
+        <div class="falcon-card p-3">
+          <div class="chart-section-title">
+            <i class="bi bi-graph-up-arrow me-2"
+               [ngClass]="totalNetProfit >= 0 ? 'text-success' : 'text-danger'"></i>
+            Net Profit / Loss per Company — {{ year }}
+          </div>
+          <canvas #chartCanvas height="240"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 4: Per-company table summary -->
+    <div class="falcon-card table-card">
+      <div class="table-card-header">
+        <div class="fw-semibold">Company Performance Summary — {{ year }}</div>
+        <span class="badge bg-secondary">{{ perCompany.length }} companies</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th class="text-center">Employees</th>
+              <th class="text-center">Clients</th>
+              <th class="text-center">Invoices</th>
+              <th class="text-end">Income</th>
+              <th class="text-end">Payroll</th>
+              <th class="text-end">Expenses</th>
+              <th class="text-end">Net Profit</th>
+              <th class="text-center">Attendance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of perCompany; let i = index; trackBy: trackByIndex">
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <div class="co-dot-lg" [style.background]="PALETTE[i % PALETTE.length].border"></div>
+                  <div>
+                    <div class="fw-semibold small">{{ c.companyName }}</div>
+                    <div class="text-muted" style="font-size:.72rem">{{ c.companyCode }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">{{ c.employeeCount ?? 0 }}</td>
+              <td class="text-center">
+                <span class="badge-soft badge-soft-success me-1">{{ c.activeClients ?? 0 }} active</span>
+                <span class="badge-soft badge-soft-danger">{{ c.inactiveClients ?? 0 }} inactive</span>
+              </td>
+              <td class="text-center">
+                <span title="Paid" class="inv-badge inv-paid me-1">{{ c.invoices?.paid ?? 0 }}</span>
+                <span title="Sent" class="inv-badge inv-sent me-1">{{ c.invoices?.sent ?? 0 }}</span>
+                <span title="Overdue" class="inv-badge inv-overdue">{{ c.invoices?.overdue ?? 0 }}</span>
+              </td>
+              <td class="text-end small text-primary fw-semibold">{{ currency(c.finance?.invoiceIncome ?? 0) }}</td>
+              <td class="text-end small text-warning fw-semibold">{{ currency(c.finance?.payrollCost ?? 0) }}</td>
+              <td class="text-end small text-danger fw-semibold">{{ currency(c.finance?.expenses ?? 0) }}</td>
+              <td class="text-end small fw-bold"
+                  [ngClass]="(c.finance?.netProfit ?? 0) >= 0 ? 'text-success' : 'text-danger'">
+                {{ currency(c.finance?.netProfit ?? 0) }}
+              </td>
+              <td class="text-center">
+                <span *ngIf="c.attendance?.total">
+                  {{ c.attendance.present }}/{{ c.attendance.total }}
+                  <div class="small text-muted">
+                    {{ c.attendance.total ? (c.attendance.present / c.attendance.total * 100 | number:'1.0-0') : 0 }}%
+                  </div>
+                </span>
+                <span *ngIf="!c.attendance?.total" class="text-muted">—</span>
+              </td>
+            </tr>
+            <tr *ngIf="!perCompany.length">
+              <td colspan="9" class="empty-state-cell">No data available</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

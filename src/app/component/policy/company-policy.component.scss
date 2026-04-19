@@ -1,0 +1,250 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.policy-banner {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%) !important;
+  // Allow the "Add Policy" dropdown to escape the banner's clipping boundary
+  overflow: visible !important;
+
+  .banner-icon {
+    font-size: 2rem;
+    opacity: .9;
+  }
+
+  // Ensure the dropdown menu clears the banner and any page content below it
+  .dropdown-menu {
+    z-index: 1055;
+    margin-top: 6px;
+  }
+}
+
+.policy-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+
+// ── Policy Grid ──────────────────────────────────────────────────────────────
+
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: $spacing-lg;
+}
+
+.policy-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    transform: translateY(-2px);
+  }
+}
+
+.policy-card-body {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  padding: 18px 18px 12px;
+  flex: 1;
+}
+
+.policy-icon-wrap {
+  font-size: 2.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.policy-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.policy-name {
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.policy-type-badge {
+  display: inline-block;
+  font-size: .72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+  background: rgba($primary, .12);
+  color: $primary;
+  margin: 4px 0 6px;
+  font-weight: 500;
+}
+
+.policy-file,
+.policy-date {
+  font-size: .78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.policy-card-actions {
+  display: flex;
+  gap: 6px;
+  padding: 10px 18px 14px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+// Delete confirm overlay
+.delete-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 10px;
+}
+
+.delete-confirm-box {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 18px 20px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+}
+
+// ── PDF viewer ───────────────────────────────────────────────────────────────
+
+.policy-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px 10px 0 0;
+  border-bottom: none;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.policy-viewer-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+}
+
+.pdf-frame-wrap {
+  width: 100%;
+  height: calc(100vh - 260px);
+  min-height: 500px;
+}
+
+.pdf-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.pdf-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+// ── Upload Modal ─────────────────────────────────────────────────────────────
+
+.modal-backdrop-custom {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 1040;
+}
+
+.upload-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.upload-modal-content {
+  background: var(--bg-card);
+  border-radius: 12px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  overflow: hidden;
+}
+
+.upload-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.upload-modal-body {
+  padding: 20px;
+}
+
+.upload-modal-footer {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-subtle);
+}
+
+.file-drop-zone {
+  position: relative;
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 28px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover,
+  &.has-file {
+    border-color: $primary;
+    background: rgba($primary, .04);
+  }
+
+  input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+@include respond-to('md') {
+  .pdf-frame-wrap {
+    height: calc(100vh - 200px);
+    min-height: 400px;
+  }
+}

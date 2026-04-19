@@ -1,0 +1,135 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ── Tab bar ────────────────────────────────────────────────────────
+.log-tabs {
+  display: flex;
+  gap: $spacing-sm;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.log-tab {
+  position: relative;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-size: .9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &:hover { color: var(--text-primary); }
+
+  &.active {
+    color: $primary;
+    border-bottom-color: $primary;
+  }
+}
+
+.tab-badge {
+  background: $danger;
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 10px;
+  line-height: 1.4;
+}
+
+// ── Stat cards ─────────────────────────────────────────────────────
+.stat-value {
+  font-size: 2rem; font-weight: 700;
+  color: var(--text-primary); line-height: 1; margin-bottom: 4px;
+}
+.stat-label { font-size: $font-size-sm; color: var(--text-muted); }
+
+.stat-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+  &.si-blue    { background: rgba($primary, .12); color: $primary; }
+  &.si-green   { background: rgba($success, .12); color: $success; }
+  &.si-danger  { background: rgba($danger,  .12); color: $danger; }
+  &.si-warning { background: rgba($warning, .12); color: darken($warning, 10%); }
+}
+
+.clickable { cursor: pointer; transition: transform .12s, box-shadow .12s; }
+.clickable:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
+.filter-active { outline: 2px solid $primary; }
+
+// ── Quick filter chips ─────────────────────────────────────────────
+.chip {
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  font-size: .78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .12s, color .12s;
+
+  &:hover  { background: var(--table-hover); color: var(--text-primary); }
+  &.chip-active { background: $primary; color: #fff; border-color: $primary; }
+
+  &.chip-warn.chip-active   { background: darken($warning, 5%); border-color: darken($warning, 5%); }
+  &.chip-danger.chip-active { background: $danger; border-color: $danger; }
+}
+
+// ── Filters row ────────────────────────────────────────────────────
+.filters-row {
+  display: flex; align-items: center; gap: $spacing-sm; flex-wrap: wrap;
+  .form-control, .form-select {
+    width: auto; min-width: 140px; max-width: 210px; flex: 1 1 140px;
+  }
+}
+
+// ── Table ──────────────────────────────────────────────────────────
+.table-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: $spacing-md; padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card); flex-wrap: wrap;
+}
+
+.path-cell {
+  font-family: monospace;
+  font-size: .82rem;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-error td { background: rgba($danger, .03); }
+
+// ── Method badges ──────────────────────────────────────────────────
+.method-badge {
+  font-size: .72rem; font-weight: 700; padding: 2px 7px;
+  border-radius: 4px; display: inline-block;
+  &.method-get    { background: rgba($primary, .12); color: $primary; }
+  &.method-post   { background: rgba($success, .12); color: $success; }
+  &.method-put    { background: rgba($warning, .15); color: darken($warning, 15%); }
+  &.method-patch  { background: rgba($warning, .12); color: darken($warning, 12%); }
+  &.method-delete { background: rgba($danger,  .12); color: $danger; }
+}
+
+.badge-soft-purple {
+  background: rgba(#7b5ea7, .12); color: #7b5ea7;
+  font-weight: 600; font-size: .75rem; padding: 3px 8px; border-radius: 4px;
+}
+
+// ── Stat pills (event tab) ─────────────────────────────────────────
+.stat-pill {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px; border-radius: 20px;
+  font-size: .82rem; font-weight: 600;
+  &.stat-pill-blue   { background: rgba($primary, .1); color: $primary; }
+  &.stat-pill-danger { background: rgba($danger,  .1); color: $danger; }
+}

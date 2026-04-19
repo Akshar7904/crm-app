@@ -1,0 +1,249 @@
+<div class="page-banner">
+  <div class="banner-title">Audit Logs</div>
+  <div class="banner-subtitle">HTTP request tracking (via Actuator) and user activity events</div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- Tab bar -->
+  <div class="log-tabs mb-4">
+    <button class="log-tab" [class.active]="activeTab === 'requests'" (click)="switchTab('requests')">
+      <i class="bi bi-diagram-3 me-2"></i>Request Logs
+      <span class="tab-badge" *ngIf="totalServerErrors > 0">{{ totalServerErrors }}</span>
+    </button>
+    <button class="log-tab" [class.active]="activeTab === 'events'" (click)="switchTab('events')">
+      <i class="bi bi-journal-text me-2"></i>User Events
+    </button>
+  </div>
+
+  <!-- ═══════════════ REQUEST LOGS (Actuator httpexchanges) ═══════════════ -->
+  <ng-container *ngIf="activeTab === 'requests'">
+
+    <!-- KPI cards -->
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-3">
+        <div class="falcon-card p-3 d-flex align-items-center gap-3">
+          <div class="stat-icon si-blue"><i class="bi bi-diagram-3"></i></div>
+          <div>
+            <div class="stat-value">{{ allExchanges.length }}</div>
+            <div class="stat-label">In Memory</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="falcon-card p-3 d-flex align-items-center gap-3 clickable"
+             (click)="setStatusFilter('4xx')" [class.filter-active]="statusFilter === '4xx'">
+          <div class="stat-icon si-warning"><i class="bi bi-exclamation-triangle-fill"></i></div>
+          <div>
+            <div class="stat-value text-warning">{{ totalClientErrors }}</div>
+            <div class="stat-label">4xx Client Errors</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="falcon-card p-3 d-flex align-items-center gap-3 clickable"
+             (click)="setStatusFilter('5xx')" [class.filter-active]="statusFilter === '5xx'">
+          <div class="stat-icon si-danger"><i class="bi bi-bug-fill"></i></div>
+          <div>
+            <div class="stat-value text-danger">{{ totalServerErrors }}</div>
+            <div class="stat-label">5xx Server Errors</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="falcon-card p-3 d-flex align-items-center gap-3 clickable"
+             (click)="setStatusFilter('errors')" [class.filter-active]="statusFilter === 'errors'">
+          <div class="stat-icon si-danger"><i class="bi bi-shield-exclamation"></i></div>
+          <div>
+            <div class="stat-value text-danger">{{ totalClientErrors + totalServerErrors }}</div>
+            <div class="stat-label">All Errors</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick filter chips + export -->
+    <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+      <span class="text-muted small me-1">Filter:</span>
+      <button class="chip"             [class.chip-active]="statusFilter === 'all'"    (click)="setStatusFilter('all')">All</button>
+      <button class="chip chip-warn"   [class.chip-active]="statusFilter === '4xx'"    (click)="setStatusFilter('4xx')">4xx</button>
+      <button class="chip chip-danger" [class.chip-active]="statusFilter === '5xx'"    (click)="setStatusFilter('5xx')">5xx</button>
+      <button class="chip chip-danger" [class.chip-active]="statusFilter === 'errors'" (click)="setStatusFilter('errors')">All Errors</button>
+
+      <select class="form-select form-select-sm ms-2" style="width:130px" [(ngModel)]="reqMethodFilter">
+        <option value="">All Methods</option>
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="PATCH">PATCH</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+      <input class="form-control form-control-sm" style="width:200px"
+             placeholder="Filter URI…" [(ngModel)]="reqSearch">
+
+      <div class="ms-auto d-flex gap-2">
+        <button class="btn btn-outline-secondary btn-sm" (click)="loadExchanges()" [disabled]="reqLoading">
+          <i class="bi bi-arrow-clockwise me-1"></i>Refresh
+        </button>
+        <button class="btn btn-outline-success btn-sm" (click)="exportExchanges()" [disabled]="reqExporting">
+          <span *ngIf="reqExporting" class="spinner-border spinner-border-sm me-1"></span>
+          <i class="bi bi-download me-1" *ngIf="!reqExporting"></i>Export .xlsx
+        </button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="falcon-card table-card">
+      <div class="table-card-header">
+        <span class="fw-semibold">
+          HTTP Exchanges
+          <span class="badge ms-2" [ngClass]="statusFilter !== 'all' ? 'bg-danger' : 'bg-secondary'">
+            {{ statusFilter === 'all' ? 'ALL' : statusFilter.toUpperCase() }}
+          </span>
+        </span>
+        <span class="text-muted small">{{ filtered.length }} of {{ allExchanges.length }} shown</span>
+      </div>
+
+      <div *ngIf="reqLoading" class="p-4 text-center">
+        <div class="spinner-border text-primary spinner-border-sm"></div>
+        <div class="mt-2 text-muted small">Loading from actuator…</div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!reqLoading">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Method</th>
+              <th>URI</th>
+              <th>Status</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let ex of filtered; trackBy: trackByIndex" [class.row-error]="(ex.response?.status ?? 0) >= 400">
+              <td class="text-muted small text-nowrap">
+                {{ ex.timestamp | date:'dd MMM yyyy HH:mm:ss' }}
+              </td>
+              <td>
+                <span class="method-badge" [ngClass]="methodClass(ex.request?.method)">
+                  {{ ex.request?.method }}
+                </span>
+              </td>
+              <td class="path-cell" [title]="ex.request?.uri">{{ ex.request?.uri }}</td>
+              <td>
+                <span class="badge-soft fw-bold" [ngClass]="statusClass(ex.response?.status ?? 0)">
+                  {{ ex.response?.status ?? '—' }}
+                </span>
+              </td>
+              <td class="small text-muted">{{ durationMs(ex) }}ms</td>
+            </tr>
+            <tr *ngIf="filtered.length === 0 && !reqLoading">
+              <td colspan="5" class="empty-state-cell">No exchanges found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- ═══════════════ USER EVENT LOGS ═══════════════════════ -->
+  <ng-container *ngIf="activeTab === 'events'">
+
+    <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
+      <div class="d-flex gap-2 flex-wrap">
+        <div class="stat-pill stat-pill-blue">
+          <i class="bi bi-journal-text me-1"></i>{{ evtTotal }} events
+        </div>
+        <div class="stat-pill stat-pill-danger" *ngIf="evtLoginFailures > 0">
+          <i class="bi bi-shield-exclamation me-1"></i>{{ evtLoginFailures }} failed logins
+        </div>
+      </div>
+      <button class="btn btn-outline-success btn-sm" (click)="exportEvtLogs()" [disabled]="evtExporting">
+        <span *ngIf="evtExporting" class="spinner-border spinner-border-sm me-1"></span>
+        <i class="bi bi-download me-1" *ngIf="!evtExporting"></i>Export .xlsx
+      </button>
+    </div>
+
+    <div class="falcon-card p-3 mb-3">
+      <div class="filters-row">
+        <input class="form-control form-control-sm" placeholder="Search email or name…"
+               [(ngModel)]="evtSearch" (keyup.enter)="applyEvtFilters()">
+        <select class="form-select form-select-sm" [(ngModel)]="evtFilterEvent">
+          <option value="">All Event Types</option>
+          <option *ngFor="let t of EVENT_TYPES; trackBy: trackByValue" [value]="t">{{ eventLabel(t) }}</option>
+        </select>
+        <select class="form-select form-select-sm" [(ngModel)]="evtFilterCompany">
+          <option value="">All Companies</option>
+          <option *ngFor="let c of companies; trackBy: trackById" [value]="c.id">{{ c.name }}</option>
+        </select>
+        <input class="form-control form-control-sm" type="date" [(ngModel)]="evtFrom">
+        <input class="form-control form-control-sm" type="date" [(ngModel)]="evtTo">
+        <button class="btn btn-primary btn-sm" (click)="applyEvtFilters()">
+          <i class="bi bi-search me-1"></i>Search
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="clearEvtFilters()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="falcon-card table-card">
+      <div class="table-card-header">
+        <span class="fw-semibold">User Activity</span>
+        <div class="d-flex align-items-center gap-3">
+          <span class="text-muted small">
+            {{ evtPage * evtSize + 1 }}–{{ (evtPage+1)*evtSize > evtTotal ? evtTotal : (evtPage+1)*evtSize }} of {{ evtTotal }}
+          </span>
+          <div class="d-flex gap-1">
+            <button class="btn btn-outline-secondary btn-sm" (click)="evtPrevPage()" [disabled]="!evtHasPrev">
+              <i class="bi bi-chevron-left"></i>
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="evtNextPage()" [disabled]="!evtHasNext">
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="evtLoading" class="p-4 text-center">
+        <div class="spinner-border text-primary spinner-border-sm"></div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!evtLoading">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Timestamp</th><th>User</th><th>Company</th>
+              <th>Event</th><th>Description</th><th>Device</th><th>IP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of evtLogs; trackBy: trackByIndex">
+              <td class="text-muted small text-nowrap">{{ log.created_at | date:'dd MMM yyyy HH:mm:ss' }}</td>
+              <td>
+                <div class="fw-semibold">{{ log.first_name }} {{ log.last_name }}</div>
+                <div class="text-muted small">{{ log.email }}</div>
+              </td>
+              <td><span class="badge bg-secondary" *ngIf="log.company_name">{{ log.company_name }}</span></td>
+              <td>
+                <span class="badge-soft" [ngClass]="eventBadgeClass(log.event_type)">
+                  {{ eventLabel(log.event_type) }}
+                </span>
+              </td>
+              <td class="small">{{ log.event_description }}</td>
+              <td class="small text-muted text-truncate" style="max-width:140px" [title]="log.device">{{ log.device ?? '—' }}</td>
+              <td class="small text-muted text-nowrap">{{ log.ip_address ?? '—' }}</td>
+            </tr>
+            <tr *ngIf="evtLogs.length === 0">
+              <td colspan="7" class="empty-state-cell">No events found</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

@@ -1,0 +1,457 @@
+// Copyright (c) 2026 Zwelithini Ngomane. All rights reserved. LKCentrix — ORION
+@import '../../../styles/variables';
+
+// ─── Page Shell ───────────────────────────────────────────────────────────────
+
+.legal-page {
+  min-height: 100vh;
+  background: #f4f6f9;
+  display: flex;
+  flex-direction: column;
+  font-family: $font-family-base;
+  color: #2d3748;
+}
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+
+.legal-header {
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+
+.legal-header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.legal-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+
+  &:hover { text-decoration: none; }
+}
+
+.legal-logo {
+  height: 32px;
+  width: 32px;
+  object-fit: contain;
+}
+
+.legal-brand-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $primary;
+  letter-spacing: .3px;
+}
+
+.legal-brand-by {
+  font-size: .78rem;
+  color: #718096;
+  margin-left: 2px;
+}
+
+.btn-back-login {
+  font-size: .82rem;
+  color: $primary;
+  background: transparent;
+  border: 1px solid $primary;
+  border-radius: 6px;
+  padding: 5px 14px;
+  cursor: pointer;
+  transition: background .2s, color .2s;
+  text-decoration: none;
+
+  &:hover {
+    background: $primary;
+    color: #fff;
+  }
+}
+
+// ─── Body ─────────────────────────────────────────────────────────────────────
+
+.legal-body {
+  flex: 1;
+  max-width: 1200px;
+  width: 100%;
+  margin: 32px auto;
+  padding: 0 24px;
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+.legal-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 20px 0 16px;
+  position: sticky;
+  top: 80px;
+}
+
+.sidebar-heading {
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #a0aec0;
+  padding: 0 18px 10px;
+  border-bottom: 1px solid #f0f4f8;
+  margin-bottom: 8px;
+}
+
+.sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.sidebar-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 18px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  font-size: .85rem;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  border-left: 3px solid transparent;
+
+  i { font-size: .9rem; color: #a0aec0; }
+
+  &:hover {
+    background: #f7fafc;
+    color: $primary;
+    i { color: $primary; }
+  }
+
+  &.active {
+    background: rgba($primary, .07);
+    color: $primary;
+    font-weight: 600;
+    border-left-color: $primary;
+    i { color: $primary; }
+  }
+}
+
+.sidebar-meta {
+  margin-top: 16px;
+  padding: 14px 18px 0;
+  border-top: 1px solid #f0f4f8;
+  font-size: .75rem;
+  color: #718096;
+  line-height: 1.6;
+
+  a { color: $primary; text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+// ─── Document ─────────────────────────────────────────────────────────────────
+
+.legal-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.legal-doc {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  padding: 40px 48px;
+
+  @media (max-width: 768px) {
+    padding: 24px 20px;
+  }
+}
+
+.doc-header {
+  margin-bottom: 36px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid #f0f4f8;
+
+  h1 {
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 6px;
+  }
+}
+
+.doc-meta {
+  font-size: .8rem;
+  color: #718096;
+  margin-bottom: 10px;
+}
+
+.popia-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(#38a169, .1);
+  color: #276749;
+  border: 1px solid rgba(#38a169, .3);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-size: .78rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+// ─── Document sections ────────────────────────────────────────────────────────
+
+.legal-doc section {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f4f8;
+  }
+
+  h3 {
+    font-size: .9rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 14px 0 8px;
+  }
+
+  p {
+    font-size: .88rem;
+    line-height: 1.75;
+    color: #4a5568;
+    margin-bottom: 10px;
+  }
+
+  ul, ol {
+    padding-left: 22px;
+    margin-bottom: 10px;
+
+    li {
+      font-size: .88rem;
+      line-height: 1.75;
+      color: #4a5568;
+      margin-bottom: 4px;
+    }
+  }
+
+  a {
+    color: $primary;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+  }
+
+  code {
+    background: #f0f4f8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: .83rem;
+    color: #c53030;
+  }
+}
+
+// ─── Inline link (navigate between sections) ─────────────────────────────────
+
+.inline-link {
+  background: transparent;
+  border: none;
+  color: $primary;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0;
+  text-decoration: underline;
+  &:hover { color: darken($primary, 10%); }
+}
+
+// ─── Highlight box ────────────────────────────────────────────────────────────
+
+.highlight-box {
+  background: rgba($primary, .05);
+  border-left: 4px solid $primary;
+  border-radius: 0 6px 6px 0;
+  padding: 14px 18px;
+  font-size: .85rem;
+  color: #2d3748;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+// ─── Contact block ────────────────────────────────────────────────────────────
+
+.contact-block {
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 10px;
+
+  p {
+    margin-bottom: 4px !important;
+    font-size: .86rem !important;
+  }
+
+  a { color: $primary; text-decoration: none; &:hover { text-decoration: underline; } }
+}
+
+// ─── Legal table ──────────────────────────────────────────────────────────────
+
+.legal-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0 16px;
+  font-size: .84rem;
+
+  thead th {
+    background: #f7fafc;
+    padding: 9px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: #718096;
+    border: 1px solid #e2e8f0;
+  }
+
+  tbody td {
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+    line-height: 1.6;
+    vertical-align: top;
+  }
+
+  tbody tr:nth-child(even) td { background: #fafbfc; }
+}
+
+// ─── Security grid ────────────────────────────────────────────────────────────
+
+.security-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 12px 0;
+}
+
+.security-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+
+  > i {
+    font-size: 1.3rem;
+    color: $primary;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  strong {
+    display: block;
+    font-size: .85rem;
+    color: #1a202c;
+    margin-bottom: 4px;
+  }
+
+  p {
+    font-size: .8rem !important;
+    color: #718096 !important;
+    margin: 0 !important;
+    line-height: 1.5 !important;
+  }
+}
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+
+.legal-footer {
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
+  padding: 18px 24px;
+  text-align: center;
+  font-size: .78rem;
+  color: #718096;
+
+  p { margin-bottom: 6px; }
+}
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+  span { color: #cbd5e0; }
+}
+
+.footer-link {
+  background: transparent;
+  border: none;
+  color: #718096;
+  cursor: pointer;
+  font-size: .78rem;
+  padding: 0;
+
+  &:hover { color: $primary; text-decoration: underline; }
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .legal-body {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .legal-sidebar {
+    width: 100%;
+    position: static;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 0 12px 12px;
+  }
+
+  .sidebar-nav-item {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: .8rem;
+
+    &.active {
+      border-left-color: transparent;
+      border-bottom-color: $primary;
+    }
+  }
+
+  .sidebar-meta { display: none; }
+}

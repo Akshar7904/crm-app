@@ -1,0 +1,407 @@
+<div class="page-banner">
+  <div class="banner-title">Platform Users</div>
+  <div class="banner-subtitle">Manage all admin accounts across tenant companies</div>
+  <div class="banner-actions">
+    <button class="btn-banner" (click)="openCreateAdmin()">
+      <i class="bi bi-person-plus-fill me-1"></i>Create Admin
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- Stat cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-blue"><i class="bi bi-people-fill"></i></div>
+        <div>
+          <div class="stat-value">{{ users.length }}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-purple"><i class="bi bi-shield-fill-check"></i></div>
+        <div>
+          <div class="stat-value">{{ totalSysadmins }}</div>
+          <div class="stat-label">System Admins</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-green"><i class="bi bi-person-badge-fill"></i></div>
+        <div>
+          <div class="stat-value">{{ totalAdmins }}</div>
+          <div class="stat-label">Admins</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-warning"><i class="bi bi-building-fill"></i></div>
+        <div>
+          <div class="stat-value">{{ companies.length }}</div>
+          <div class="stat-label">Companies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users table -->
+  <div class="falcon-card table-card">
+    <div class="table-card-header">
+      <span class="fw-semibold">All Platform Admins</span>
+      <div class="d-flex gap-2 align-items-center flex-wrap">
+        <input class="form-control form-control-sm search-input"
+               placeholder="Search users…"
+               [(ngModel)]="searchTerm">
+        <select class="form-select form-select-sm filter-select" [(ngModel)]="filterRole">
+          <option value="">All Roles</option>
+          <option value="ROLE_SYSADMIN">System Admin</option>
+          <option value="ROLE_ADMIN">Admin</option>
+          <option value="ROLE_MANAGER">Manager</option>
+          <option value="ROLE_USER">Employee</option>
+        </select>
+        <select class="form-select form-select-sm filter-select" [(ngModel)]="filterCompany">
+          <option value="">All Companies</option>
+          <option *ngFor="let c of companies; trackBy: trackById" [value]="c.id">{{ c.name }}</option>
+        </select>
+        <select class="form-select form-select-sm" style="width:120px" [(ngModel)]="filterStatus">
+          <option value="">All Status</option>
+          <option value="active">Active</option>
+          <option value="inactive">Locked</option>
+        </select>
+        <span class="text-muted small ms-1">{{ filtered.length }} result{{ filtered.length !== 1 ? 's' : '' }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="p-4 text-center">
+      <div class="spinner-border text-primary spinner-border-sm"></div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Email</th>
+            <th>Company</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let u of filtered; trackBy: trackById" [class.row-locked]="!u.enabled">
+            <td>
+              <div class="fw-semibold">{{ u.first_name }} {{ u.last_name }}</div>
+              <div class="text-muted small" *ngIf="u.phone">{{ u.phone }}</div>
+            </td>
+            <td class="small">{{ u.email }}</td>
+            <td>
+              <span class="badge bg-secondary">{{ u.company_name ?? '—' }}</span>
+            </td>
+            <td>
+              <span class="badge-soft"
+                    [ngClass]="u.role_name === 'ROLE_SYSADMIN' ? 'badge-soft-purple' : 'badge-soft-success'">
+                {{ roleLabel(u.role_name) }}
+              </span>
+            </td>
+            <td>
+              <span class="user-status-badge" [ngClass]="u.enabled ? 'status-active' : 'status-locked'">
+                <i class="bi" [ngClass]="u.enabled ? 'bi-check-circle-fill' : 'bi-lock-fill'"></i>
+                {{ u.enabled ? 'Active' : 'Locked' }}
+              </span>
+            </td>
+            <td class="text-end">
+              <div class="action-btn-group">
+                <!-- Lock / Unlock -->
+                <button class="action-btn"
+                        [ngClass]="u.enabled ? 'action-btn-warning' : 'action-btn-success'"
+                        [title]="u.enabled ? 'Lock account' : 'Unlock account'"
+                        [disabled]="togglingUserId === u.id"
+                        (click)="toggleUser(u)">
+                  <span *ngIf="togglingUserId === u.id" class="spinner-border spinner-border-sm"></span>
+                  <i *ngIf="togglingUserId !== u.id" class="bi"
+                     [ngClass]="u.enabled ? 'bi-lock-fill' : 'bi-unlock-fill'"></i>
+                </button>
+                <!-- Reset Password -->
+                <button class="action-btn action-btn-secondary"
+                        title="Reset password"
+                        (click)="openResetPassword(u)">
+                  <i class="bi bi-key-fill"></i>
+                </button>
+                <!-- Change Role -->
+                <button class="action-btn action-btn-info"
+                        title="Change role"
+                        (click)="openChangeRole(u)">
+                  <i class="bi bi-person-badge-fill"></i>
+                </button>
+                <!-- Delete -->
+                <button class="action-btn action-btn-danger"
+                        title="Delete user"
+                        (click)="openDeleteConfirm(u)">
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filtered.length === 0">
+            <td colspan="6" class="empty-state-cell">No users found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Create Admin Modal ────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showAdminModal" (click)="closeAdminModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <h5>Create Company Admin</h5>
+      <button type="button" class="btn-close" (click)="closeAdminModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+
+      <!-- Credentials result -->
+      <div *ngIf="createdAdminCredentials" class="credentials-box">
+        <div class="credentials-header">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          Admin account created! Share these credentials securely.
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Company</span>
+          <span class="credential-value">{{ createdAdminCredentials.companyName }}</span>
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Email</span>
+          <span class="credential-value">{{ createdAdminCredentials.email }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(createdAdminCredentials.email)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Password</span>
+          <span class="credential-value credential-password">{{ createdAdminCredentials.tempPassword }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(createdAdminCredentials.tempPassword)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-note">
+          <i class="bi bi-info-circle me-1"></i>The admin should change this password on first login.
+        </div>
+        <button class="btn btn-primary mt-3 w-100" (click)="closeAdminModal()">Done</button>
+      </div>
+
+      <!-- Create form -->
+      <form #adminForm="ngForm" (ngSubmit)="createAdmin(adminForm)" *ngIf="!createdAdminCredentials">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Company <span class="text-danger">*</span></label>
+            <select class="form-select" name="companyId" ngModel required>
+              <option value="">— Select company —</option>
+              <option *ngFor="let c of companies; trackBy: trackById" [value]="c.id">{{ c.name }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">First Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="firstName" ngModel required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="lastName" ngModel required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input class="form-control" name="email" type="email" ngModel required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Phone</label>
+            <input class="form-control" name="phone" ngModel>
+          </div>
+        </div>
+        <div class="info-note mt-3">
+          <i class="bi bi-shield-check me-1"></i>
+          This user will receive <strong>SYSADMIN</strong> access to the selected company.
+          A temporary password will be generated automatically.
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" (click)="closeAdminModal()">Cancel</button>
+          <button type="submit" class="btn btn-success" [disabled]="adminForm.invalid || savingAdmin">
+            <span *ngIf="savingAdmin" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi bi-person-plus-fill me-1" *ngIf="!savingAdmin"></i>
+            Create Admin
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Reset Password Modal ───────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showResetModal" (click)="closeResetModal()">
+  <div class="modal-panel modal-panel-sm" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <h5><i class="bi bi-key-fill me-2 text-warning"></i>Reset Password</h5>
+      <button type="button" class="btn-close" (click)="closeResetModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+
+      <!-- Result -->
+      <div *ngIf="resetCredentials" class="credentials-box">
+        <div class="credentials-header">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          Password reset! Share the new credentials securely.
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Email</span>
+          <span class="credential-value">{{ resetCredentials.email }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(resetCredentials.email)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Password</span>
+          <span class="credential-value credential-password">{{ resetCredentials.tempPassword }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(resetCredentials.tempPassword)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-note">
+          <i class="bi bi-info-circle me-1"></i>The user should change this password on next login.
+        </div>
+        <button class="btn btn-primary mt-3 w-100" (click)="closeResetModal()">Done</button>
+      </div>
+
+      <!-- Confirm -->
+      <div *ngIf="!resetCredentials">
+        <p class="text-muted mb-1">Reset password for:</p>
+        <div class="confirm-user-card">
+          <strong>{{ resetTarget?.first_name }} {{ resetTarget?.last_name }}</strong>
+          <div class="small text-muted">{{ resetTarget?.email }}</div>
+          <div class="small mt-1">
+            <span class="badge bg-secondary">{{ resetTarget?.company_name }}</span>
+          </div>
+        </div>
+        <p class="small text-muted mt-3">
+          A new temporary password will be generated. The user's current password will be immediately invalidated.
+        </p>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button class="btn btn-secondary" (click)="closeResetModal()">Cancel</button>
+          <button class="btn btn-warning" [disabled]="resettingPassword" (click)="confirmResetPassword()">
+            <span *ngIf="resettingPassword" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi bi-key-fill me-1" *ngIf="!resettingPassword"></i>
+            Reset Password
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Change Role Modal ──────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showRoleModal" (click)="closeRoleModal()">
+  <div class="modal-panel modal-panel-sm" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <h5><i class="bi bi-person-gear me-2 text-info"></i>Change Role</h5>
+      <button type="button" class="btn-close" (click)="closeRoleModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+      <div class="confirm-user-card mb-3">
+        <strong>{{ roleTarget?.first_name }} {{ roleTarget?.last_name }}</strong>
+        <div class="small text-muted">{{ roleTarget?.email }}</div>
+        <div class="small mt-1">
+          <span class="badge bg-secondary">{{ roleTarget?.company_name }}</span>
+        </div>
+      </div>
+      <label class="form-label fw-semibold">Assign Role</label>
+      <div class="role-option" [class.role-selected]="selectedRole === 'ROLE_SYSADMIN'"
+           (click)="selectedRole = 'ROLE_SYSADMIN'">
+        <div class="role-icon si-purple"><i class="bi bi-shield-fill-check"></i></div>
+        <div>
+          <div class="fw-semibold">System Admin</div>
+          <div class="small text-muted">Full access to all company features and settings</div>
+        </div>
+        <i class="bi bi-check-circle-fill ms-auto text-success" *ngIf="selectedRole === 'ROLE_SYSADMIN'"></i>
+      </div>
+      <div class="role-option" [class.role-selected]="selectedRole === 'ROLE_ADMIN'"
+           (click)="selectedRole = 'ROLE_ADMIN'">
+        <div class="role-icon si-green"><i class="bi bi-person-badge-fill"></i></div>
+        <div>
+          <div class="fw-semibold">Admin</div>
+          <div class="small text-muted">Standard admin — HR, payroll, leave management</div>
+        </div>
+        <i class="bi bi-check-circle-fill ms-auto text-success" *ngIf="selectedRole === 'ROLE_ADMIN'"></i>
+      </div>
+      <div class="role-option" [class.role-selected]="selectedRole === 'ROLE_MANAGER'"
+           (click)="selectedRole = 'ROLE_MANAGER'">
+        <div class="role-icon si-orange"><i class="bi bi-briefcase-fill"></i></div>
+        <div>
+          <div class="fw-semibold">Manager</div>
+          <div class="small text-muted">Department / team management, approve leave & expenses</div>
+        </div>
+        <i class="bi bi-check-circle-fill ms-auto text-success" *ngIf="selectedRole === 'ROLE_MANAGER'"></i>
+      </div>
+      <div class="role-option" [class.role-selected]="selectedRole === 'ROLE_USER'"
+           (click)="selectedRole = 'ROLE_USER'">
+        <div class="role-icon si-teal"><i class="bi bi-person-fill"></i></div>
+        <div>
+          <div class="fw-semibold">Employee</div>
+          <div class="small text-muted">Standard employee — view payslips, submit leave & expenses</div>
+        </div>
+        <i class="bi bi-check-circle-fill ms-auto text-success" *ngIf="selectedRole === 'ROLE_USER'"></i>
+      </div>
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button class="btn btn-secondary" (click)="closeRoleModal()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="savingRole || selectedRole === roleTarget?.role_name"
+                (click)="confirmChangeRole()">
+          <span *ngIf="savingRole" class="spinner-border spinner-border-sm me-1"></span>
+          <i class="bi bi-check-lg me-1" *ngIf="!savingRole"></i>
+          Save Role
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Delete Confirm Modal ───────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal-panel modal-panel-sm" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <h5 class="text-danger"><i class="bi bi-trash3-fill me-2"></i>Delete User</h5>
+      <button type="button" class="btn-close" (click)="closeDeleteModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+      <div class="delete-warning-box">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        This action is <strong>permanent</strong> and cannot be undone.
+      </div>
+      <div class="confirm-user-card mt-3">
+        <strong>{{ deleteTarget?.first_name }} {{ deleteTarget?.last_name }}</strong>
+        <div class="small text-muted">{{ deleteTarget?.email }}</div>
+        <div class="small mt-1">
+          <span class="badge bg-secondary">{{ deleteTarget?.company_name }}</span>
+          <span class="badge-soft ms-1"
+                [ngClass]="deleteTarget?.role_name === 'ROLE_SYSADMIN' ? 'badge-soft-purple' : 'badge-soft-success'">
+            {{ roleLabel(deleteTarget?.role_name) }}
+          </span>
+        </div>
+      </div>
+      <p class="small text-muted mt-3">
+        All login history and events for this user will also be removed.
+      </p>
+      <div class="d-flex justify-content-end gap-2 mt-3">
+        <button class="btn btn-secondary" (click)="closeDeleteModal()">Cancel</button>
+        <button class="btn btn-danger" [disabled]="deletingUser" (click)="confirmDelete()">
+          <span *ngIf="deletingUser" class="spinner-border spinner-border-sm me-1"></span>
+          <i class="bi bi-trash3-fill me-1" *ngIf="!deletingUser"></i>
+          Delete User
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

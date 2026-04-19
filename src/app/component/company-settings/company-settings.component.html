@@ -1,0 +1,154 @@
+<div class="container-fluid py-3">
+
+  <!-- Page Banner -->
+  <div class="page-banner mb-3">
+    <div>
+      <h1 class="banner-title"><i class="bi bi-building-gear me-2"></i>Company Settings</h1>
+      <p class="banner-subtitle">Manage your company profile, branding and contact details</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <ng-container *ngIf="!loading && company">
+    <div class="row g-3">
+
+      <!-- ── Logo Card ─────────────────────────────────────────── -->
+      <div class="col-12 col-lg-4">
+        <div class="falcon-card h-100">
+          <div class="falcon-card-header">
+            <span class="falcon-card-title"><i class="bi bi-image me-2"></i>Company Logo</span>
+          </div>
+          <div class="falcon-card-body d-flex flex-column align-items-center gap-3">
+
+            <!-- Current logo -->
+            <div class="logo-preview-wrap">
+              <img *ngIf="logoPreview" [src]="logoPreview" alt="Preview" class="logo-preview-img">
+              <img *ngIf="!logoPreview && logoUrl" [src]="logoUrl!" alt="Current logo" class="logo-preview-img"
+                   (error)="$any($event.target).style.display='none'">
+              <div *ngIf="!logoPreview && !logoUrl" class="logo-placeholder">
+                <i class="bi bi-image text-muted" style="font-size:2.5rem"></i>
+                <div class="text-muted small mt-2">No logo uploaded</div>
+              </div>
+            </div>
+
+            <div class="w-100">
+              <label class="form-label fw-semibold">Select image file</label>
+              <input type="file" class="form-control" accept="image/*" (change)="onLogoFileSelected($event)">
+              <div class="form-text">PNG, JPG or SVG — max 2 MB</div>
+            </div>
+
+            <button class="btn btn-primary w-100" (click)="uploadLogo()"
+                    [disabled]="!selectedLogoFile || uploadingLogo">
+              <span *ngIf="uploadingLogo" class="spinner-border spinner-border-sm me-1"></span>
+              <i class="bi bi-upload me-1" *ngIf="!uploadingLogo"></i>
+              {{ uploadingLogo ? 'Uploading…' : 'Upload Logo' }}
+            </button>
+
+            <div class="info-note w-100">
+              <i class="bi bi-info-circle me-1"></i>
+              The logo appears in the sidebar and on generated reports.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Branding & Contact Card ───────────────────────────── -->
+      <div class="col-12 col-lg-8">
+        <div class="falcon-card">
+          <div class="falcon-card-header">
+            <span class="falcon-card-title"><i class="bi bi-palette me-2"></i>Branding &amp; Details</span>
+          </div>
+          <div class="falcon-card-body">
+            <form #settingsForm="ngForm" (ngSubmit)="save(settingsForm)">
+              <div class="row g-3">
+
+                <div class="col-md-8">
+                  <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                  <input class="form-control" name="name" [ngModel]="company?.name" required maxlength="100">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Company Code</label>
+                  <input class="form-control" [value]="company?.code" disabled title="Company code cannot be changed">
+                </div>
+
+                <div class="col-md-8">
+                  <label class="form-label">Tagline</label>
+                  <input class="form-control" name="tagline" [ngModel]="company?.tagline"
+                         placeholder="e.g. HR &amp; Payroll Made Simple" maxlength="255">
+                  <div class="form-text">Shown on the login page and sidebar.</div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Primary Colour</label>
+                  <input class="form-control" name="primaryColor" [ngModel]="company?.primaryColor || '#375fa0'"
+                         placeholder="#375fa0" maxlength="20">
+                  <div class="form-text">Hex value e.g. <code>#375fa0</code></div>
+                </div>
+
+                <div class="col-12"><hr class="my-0"></div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input class="form-control" name="email" type="email" [ngModel]="company?.email">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Phone</label>
+                  <input class="form-control" name="phone" [ngModel]="company?.phone">
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Address</label>
+                  <input class="form-control" name="address" [ngModel]="company?.address">
+                </div>
+
+              </div>
+
+              <div class="d-flex justify-content-end gap-2 mt-4">
+                <button type="button" class="btn btn-outline-secondary" (click)="load()">
+                  <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="settingsForm.invalid || saving">
+                  <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+                  <i class="bi bi-check-circle me-1" *ngIf="!saving"></i>
+                  {{ saving ? 'Saving…' : 'Save Changes' }}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Read-only info card -->
+        <div class="falcon-card mt-3">
+          <div class="falcon-card-header">
+            <span class="falcon-card-title"><i class="bi bi-info-circle me-2"></i>Registration Details</span>
+            <small class="text-muted">Contact platform admin to update</small>
+          </div>
+          <div class="falcon-card-body">
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label class="form-label text-muted small">Legal Name</label>
+                <div class="fw-medium">{{ company?.legalName || '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small">Registration Number</label>
+                <div class="fw-medium">{{ company?.regNumber || '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small">Tax Number</label>
+                <div class="fw-medium">{{ company?.taxNumber || '—' }}</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label text-muted small">Country</label>
+                <div class="fw-medium">{{ company?.country || 'South Africa' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+</div>

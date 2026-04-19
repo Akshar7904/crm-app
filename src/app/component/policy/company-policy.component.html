@@ -1,0 +1,175 @@
+<!-- Banner -->
+<div class="page-banner policy-banner">
+  <div class="banner-content">
+    <div class="banner-icon"><i class="bi bi-shield-check-fill"></i></div>
+    <div>
+      <div class="banner-title">Company Policies</div>
+      <div class="banner-subtitle">{{ companyName }} · Official policy documents</div>
+    </div>
+  </div>
+  <div class="banner-actions" *ngIf="!loading && companyId && isAdmin">
+    <!-- Add new policy — dropdown of available types -->
+    <div class="dropdown" *ngIf="availableTypes.length > 0">
+      <button class="btn-banner dropdown-toggle" data-bs-toggle="dropdown">
+        <i class="bi bi-plus-circle me-1"></i>Add Policy
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li *ngFor="let t of availableTypes">
+          <button class="dropdown-item" (click)="openUploadModal(t.value, t.label)">
+            {{ t.label }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+    <div class="mt-2 text-muted small">Loading policies…</div>
+  </div>
+
+  <!-- No company (SUPERADMIN) -->
+  <div *ngIf="!loading && !companyId" class="policy-empty">
+    <i class="bi bi-shield-lock display-3 text-muted opacity-25"></i>
+    <div class="mt-3 fw-semibold">No company context</div>
+    <div class="text-muted small mt-1">Super Admins do not have a company policy. Manage policies per company from the Companies admin page.</div>
+  </div>
+
+  <!-- PDF viewer overlay -->
+  <div *ngIf="viewingPolicy" class="policy-viewer-wrap mb-4">
+    <div class="policy-meta-bar">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-file-earmark-pdf-fill text-danger fs-5"></i>
+        <div>
+          <div class="fw-semibold small">{{ viewingPolicy.displayName }}</div>
+          <div class="text-muted" style="font-size:.75rem">{{ viewingPolicy.fileName }}</div>
+        </div>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-primary" (click)="download(viewingPolicy)">
+          <i class="bi bi-download me-1"></i>Download
+        </button>
+        <button class="btn btn-sm btn-outline-secondary" (click)="closeViewer()">
+          <i class="bi bi-x-lg me-1"></i>Close
+        </button>
+      </div>
+    </div>
+    <div class="pdf-frame-wrap">
+      <div *ngIf="viewerLoading" class="pdf-loading">
+        <div class="spinner-border text-primary"></div>
+        <div class="mt-2 text-muted small">Loading document…</div>
+      </div>
+      <iframe *ngIf="!viewerLoading && viewerUrl" [src]="viewerUrl" class="pdf-frame" title="Policy Document"></iframe>
+    </div>
+  </div>
+
+  <!-- Policy cards grid -->
+  <div *ngIf="!loading && companyId && !viewingPolicy">
+
+    <!-- No policies uploaded yet -->
+    <div *ngIf="policies.length === 0" class="policy-empty">
+      <i class="bi bi-folder2-open display-3 text-muted opacity-25"></i>
+      <div class="mt-3 fw-semibold">No policy documents uploaded</div>
+      <div class="text-muted small mt-1">
+        <span *ngIf="isAdmin">Use the <strong>Add Policy</strong> button above to upload your first document.</span>
+        <span *ngIf="!isAdmin">Your company hasn't uploaded any policy documents yet. Contact your administrator.</span>
+      </div>
+    </div>
+
+    <!-- Grid of policy cards -->
+    <div class="policy-grid" *ngIf="policies.length > 0">
+      <div class="policy-card falcon-card" *ngFor="let p of policies">
+
+        <!-- Delete confirm overlay -->
+        <div class="delete-confirm-overlay" *ngIf="deletingId === p.id">
+          <div class="delete-confirm-box">
+            <p class="mb-3 fw-semibold small">Remove <em>{{ p.displayName }}</em>?</p>
+            <div class="d-flex gap-2 justify-content-center">
+              <button class="btn btn-sm btn-danger" (click)="executeDelete(p)">Delete</button>
+              <button class="btn btn-sm btn-outline-secondary" (click)="cancelDelete()">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="policy-card-body">
+          <div class="policy-icon-wrap">
+            <i class="bi bi-file-earmark-pdf-fill text-danger"></i>
+          </div>
+          <div class="policy-info">
+            <div class="policy-name">{{ p.displayName }}</div>
+            <div class="policy-type-badge">{{ labelFor(p.policyType) }}</div>
+            <div class="policy-file text-muted">{{ p.fileName }}</div>
+            <div class="policy-date text-muted" *ngIf="p.uploadedAt">
+              Uploaded {{ p.uploadedAt | date:'d MMM yyyy' }}
+            </div>
+          </div>
+        </div>
+
+        <div class="policy-card-actions">
+          <button class="btn btn-sm btn-primary" (click)="openViewer(p)">
+            <i class="bi bi-eye me-1"></i>View
+          </button>
+          <button class="btn btn-sm btn-outline-secondary" (click)="download(p)">
+            <i class="bi bi-download"></i>
+          </button>
+          <ng-container *ngIf="isAdmin">
+            <button class="btn btn-sm btn-outline-secondary" (click)="openReplaceModal(p)" title="Replace">
+              <i class="bi bi-arrow-repeat"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(p)" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal-backdrop-custom" *ngIf="showUploadModal" (click)="closeUploadModal()"></div>
+<div class="upload-modal" *ngIf="showUploadModal">
+  <div class="upload-modal-content">
+    <div class="upload-modal-header">
+      <h6 class="mb-0 fw-semibold">Upload Policy Document</h6>
+      <button class="btn-close" (click)="closeUploadModal()"></button>
+    </div>
+    <div class="upload-modal-body">
+      <div class="mb-3">
+        <label class="form-label fw-medium">Policy Type</label>
+        <select class="form-select" [(ngModel)]="uploadType" [disabled]="uploading">
+          <option value="" disabled>Select type…</option>
+          <option *ngFor="let t of policyTypes" [value]="t.value">{{ t.label }}</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Display Name <span class="text-muted fw-normal">(optional)</span></label>
+        <input class="form-control" [(ngModel)]="uploadLabel" placeholder="e.g. Code of Conduct 2026" [disabled]="uploading">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">PDF File</label>
+        <div class="file-drop-zone" [class.has-file]="selectedFile">
+          <i class="bi bi-file-earmark-pdf fs-2 text-danger" *ngIf="selectedFile"></i>
+          <i class="bi bi-cloud-upload fs-2 text-muted" *ngIf="!selectedFile"></i>
+          <div class="mt-2 small">
+            <span *ngIf="selectedFile">{{ selectedFile.name }}</span>
+            <span *ngIf="!selectedFile">Click to select a PDF file</span>
+          </div>
+          <input type="file" accept="application/pdf" (change)="onFileSelected($event)" [disabled]="uploading">
+        </div>
+      </div>
+    </div>
+    <div class="upload-modal-footer">
+      <button class="btn btn-outline-secondary" (click)="closeUploadModal()" [disabled]="uploading">Cancel</button>
+      <button class="btn btn-primary" (click)="submitUpload()"
+              [disabled]="!selectedFile || !uploadType || uploading">
+        <span *ngIf="uploading"><span class="spinner-border spinner-border-sm me-1"></span>Uploading…</span>
+        <span *ngIf="!uploading"><i class="bi bi-upload me-1"></i>Upload</span>
+      </button>
+    </div>
+  </div>
+</div>
