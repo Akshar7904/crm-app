@@ -22,9 +22,7 @@ import {
 } from '../interface/leave-state';
 
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class LeaveService {
   private readonly apiUrl = environment.apiUrl + '/api/v1/leave';
 
@@ -454,6 +452,10 @@ export class LeaveService {
   // Get ALL employees' leave balances for a given year (no hire year filter)
   getAllBalancesForYear$ = (year: number) =>
     this.http.get<any>(`${this.apiUrl}/balance/allocation/all?year=${year}`);
+
+  // Bulk-initialize leave balances for all active employees in the current tenant
+  bulkInitializeLeaveBalances$ = (year: number) =>
+    this.http.post<any>(`${this.apiUrl}/balance/bulk-initialize?year=${year}`, {});
 
   // Download leave report as Excel blob
   downloadReport$ = (employeeId?: number, status?: string, startDate?: string, endDate?: string) =>

@@ -305,9 +305,13 @@
                         </div>
                         <div class="col-md-4">
                           <label class="form-label">Status</label>
-                          <select class="form-select" name="status" [(ngModel)]="state.appData.data.employee.status">
+                          <select class="form-select" name="status"
+                                  [(ngModel)]="state.appData.data.employee.status"
+                                  (change)="changeStatus(state.appData.data.employee.id, state.appData.data.employee.status)"
+                                  [disabled]="isChangingStatus">
                             <option *ngFor="let status of statusOptions" [value]="status.value">{{ status.label }}</option>
                           </select>
+                          <small *ngIf="isChangingStatus" class="text-muted">Updating…</small>
                         </div>
                         <div class="col-md-4">
                           <label class="form-label">Hire Date</label>
@@ -590,6 +594,41 @@
                     </div>
                   </div>
 
+                  <!-- Company Policy Acknowledgement -->
+                  <div *ngIf="policyStatus?.hasPolicy" class="policy-ack-card"
+                       [class.policy-ack-warn]="policyStatus?.needsAcknowledgement"
+                       [class.policy-ack-ok]="!policyStatus?.needsAcknowledgement">
+                    <div class="policy-ack-left">
+                      <i class="bi"
+                         [class.bi-exclamation-triangle-fill]="policyStatus?.needsAcknowledgement"
+                         [class.bi-shield-fill-check]="!policyStatus?.needsAcknowledgement"></i>
+                      <div>
+                        <div class="policy-ack-title">
+                          {{ policyStatus?.needsAcknowledgement ? 'Company Policy — Acknowledgement Required' : 'Company Policy Acknowledged' }}
+                        </div>
+                        <div class="policy-ack-sub" *ngIf="policyStatus?.needsAcknowledgement">
+                          Please read the company policy and confirm you have understood it.
+                        </div>
+                        <div class="policy-ack-sub" *ngIf="!policyStatus?.needsAcknowledgement">
+                          Acknowledged on {{ policyStatus?.acknowledgedAt | date:'d MMM yyyy' }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="policy-ack-right">
+                      <button class="btn btn-sm btn-outline-secondary me-2" (click)="viewCompanyPolicy()">
+                        <i class="bi bi-eye me-1"></i>View Policy
+                      </button>
+                      <button *ngIf="policyStatus?.needsAcknowledgement"
+                              class="btn btn-sm btn-warning"
+                              (click)="acknowledgePolicy()"
+                              [disabled]="isAcknowledgingPolicy">
+                        <span *ngIf="isAcknowledgingPolicy" class="spinner-border spinner-border-sm me-1"></span>
+                        <i *ngIf="!isAcknowledgingPolicy" class="bi bi-check2-circle me-1"></i>
+                        {{ isAcknowledgingPolicy ? 'Acknowledging…' : 'Acknowledge' }}
+                      </button>
+                    </div>
+                  </div>
+
                   <!-- Documents List -->
                   <div class="docs-header">
                     <h6 class="docs-title">
@@ -695,38 +734,15 @@
                       <div class="edit-section-icon"><i class="bi bi-key-fill"></i></div>
                       <div>
                         <h6 class="edit-section-title">Reset Password</h6>
-                        <p class="edit-section-sub">Set a new password for this employee. They will be able to log in immediately.</p>
+                        <p class="edit-section-sub">Generate a secure temporary password and send it to the employee's registered email address. The employee must change it on next login.</p>
                       </div>
                     </div>
-                    <div class="row g-3 mt-1">
-                      <div class="col-md-6">
-                        <label class="form-label">New Password</label>
-                        <input type="password" class="form-control"
-                               [(ngModel)]="resetPasswordData.newPassword"
-                               name="newPassword"
-                               placeholder="Min. 8 characters"
-                               [disabled]="isResettingPassword">
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control"
-                               [(ngModel)]="resetPasswordData.confirmPassword"
-                               name="confirmPassword"
-                               placeholder="Repeat new password"
-                               [disabled]="isResettingPassword">
-                      </div>
-                      <div class="col-12" *ngIf="resetPasswordError">
-                        <div class="alert alert-danger py-2 mb-0">
-                          <i class="bi bi-exclamation-triangle me-2"></i>{{ resetPasswordError }}
-                        </div>
-                      </div>
-                      <div class="col-12">
-                        <button class="btn btn-primary px-4" (click)="submitResetPassword()" [disabled]="isResettingPassword">
-                          <span *ngIf="isResettingPassword" class="spinner-border spinner-border-sm me-2"></span>
-                          <i *ngIf="!isResettingPassword" class="bi bi-key me-2"></i>
-                          {{ isResettingPassword ? 'Resetting...' : 'Reset Password' }}
-                        </button>
-                      </div>
+                    <div class="mt-3">
+                      <button class="btn btn-warning px-4" (click)="submitResetPassword()" [disabled]="isResettingPassword">
+                        <span *ngIf="isResettingPassword" class="spinner-border spinner-border-sm me-2"></span>
+                        <i *ngIf="!isResettingPassword" class="bi bi-envelope-arrow-up me-2"></i>
+                        {{ isResettingPassword ? 'Sending...' : 'Reset &amp; Send Password via Email' }}
+                      </button>
                     </div>
                   </div>
                 </div>

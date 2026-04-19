@@ -8,6 +8,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { ExpensesRoutingModule } from './expenses-routing.module';
+import { BusinessExpenseService } from './services/business-expense.service';
+import { BudgetService } from './services/budget.service';
+import { OpeningBalanceService } from './services/opening-balance.service';
 import { ExpensesOverviewComponent } from './overview/expenses-overview.component';
 import { BusinessExpenseEntryComponent } from './entry/business-expense-entry.component';
 import { BusinessExpenseListComponent } from './entry/business-expense-list.component';
@@ -38,6 +41,11 @@ import { BudgetVsActualComponent } from './financial-setup/budget-vs-actual.comp
     ReactiveFormsModule,
     RouterModule,
     ExpensesRoutingModule,
+  ],
+  providers: [
+    BusinessExpenseService,
+    BudgetService,
+    OpeningBalanceService,
   ]
 })
 export class ExpensesModule {}

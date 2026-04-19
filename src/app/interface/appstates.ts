@@ -9,6 +9,15 @@ import { Events } from "./event";
 import { Role } from "./role";
 import { UserModel } from "../component/profile/user.model";
 
+export interface Company {
+  id: number;
+  name: string;
+  code: string;
+  logoUrl?: string;
+  tagline?: string;
+  primaryColor?: string;
+}
+
 export interface LoginState {
   dataState: DataState;
   loginSuccess?: boolean;
@@ -16,6 +25,9 @@ export interface LoginState {
   message?: string;
   isUsingMfa?: boolean;
   phone?: string;
+  step?: 'email' | 'company' | 'password' | 'mfa';
+  companies?: Company[];
+  selectedCompany?: Company;
 }
 
 export interface CustomHttpResponse<T> {

@@ -10,7 +10,7 @@ import { environment } from '@env/environment';
 
 const API = `${environment.apiUrl}/api/v1/business-expenses`;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class BusinessExpenseService {
   constructor(private http: HttpClient) {}
 
@@ -99,8 +99,11 @@ export class BusinessExpenseService {
     return this.safePut(`${API}/update/${id}`, expense);
   }
 
-  approve(id: number): Observable<any> {
-    return this.safePost(`${API}/approve/${id}`);
+  approve(id: number, bankAccountId?: number): Observable<any> {
+    const url = bankAccountId
+      ? `${API}/approve/${id}?bankAccountId=${bankAccountId}`
+      : `${API}/approve/${id}`;
+    return this.safePost(url);
   }
 
   void(id: number): Observable<any> {

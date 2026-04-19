@@ -23,9 +23,7 @@ import {
 } from '../interface/asset';
 import { CustomHttpResponse, Page } from '../interface/appstates';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AssetService {
   private readonly server = environment.apiUrl;
   private readonly apiUrl = `${this.server}/api/v1/assets`;

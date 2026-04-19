@@ -15,6 +15,7 @@ import { NgForm } from '@angular/forms';
 import { EmployeeForm } from '../employee.model';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { UserService } from 'src/app/service/user.service';
+import { CompanyService } from 'src/app/service/company.service';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 
 interface EmployeeDocument {
@@ -64,9 +65,7 @@ export class EmployeeDetailComponent implements OnInit {
   isChangingRole: boolean = false;
 
   // Password reset (admin)
-  resetPasswordData = { newPassword: '', confirmPassword: '' };
   isResettingPassword: boolean = false;
-  resetPasswordError: string = '';
 
   setTab(tab: 'overview' | 'edit' | 'documents' | 'security'): void {
     this.activeTab = tab;
@@ -118,10 +117,16 @@ export class EmployeeDetailComponent implements OnInit {
     { value: 'Terminated', label: 'Terminated' }
   ];
 
+  // Policy acknowledgement
+  policyStatus: { hasPolicy: boolean; needsAcknowledgement: boolean; acknowledgedAt?: string; policyFileName?: string } | null = null;
+  isAcknowledgingPolicy = false;
+  currentCompanyId: number | null = null;
+
   constructor(
     private activatedRoute: ActivatedRoute,
     private employeeService: EmployeeService,
     private userService: UserService,
+    private companyService: CompanyService,
     private notification: NotificationService,
     private router: Router,
     private http: HttpClient,
@@ -140,6 +145,7 @@ export class EmployeeDetailComponent implements OnInit {
     // Load departments and designations for dropdowns
     this.loadDepartments();
     this.loadDesignations();
+    this.loadPolicyStatus();
 
     if (this.isMyDetailsPage) {
       // For "My Details" page, load employee based on logged-in user
@@ -157,6 +163,7 @@ export class EmployeeDetailComponent implements OnInit {
     this.userService.profile$().subscribe({
       next: (response: any) => {
         this.currentUserId = response?.data?.user?.id || null;
+        this.currentCompanyId = response?.data?.user?.companyId || null;
         const roleName: string = response?.data?.user?.roleName || '';
         // Set isAdminView based on the CURRENT USER's role, not the viewed employee's role
         if (!this.isMyDetailsPage) {
@@ -461,42 +468,86 @@ export class EmployeeDetailComponent implements OnInit {
     }
   }
 
+  // ========== STATUS CHANGE ==========
+
+  isChangingStatus: boolean = false;
+
+  changeStatus(employeeId: number, newStatus: string): void {
+    if (!employeeId || !newStatus) return;
+    this.isChangingStatus = true;
+    this.cdr.markForCheck();
+    this.http.patch<any>(`${this.SERVER_URL}/employee/status/${employeeId}?status=${encodeURIComponent(newStatus)}`, {}).subscribe({
+      next: (res) => {
+        this.isChangingStatus = false;
+        this.notification.onSuccess(res?.message || `Status updated to ${newStatus}`);
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.isChangingStatus = false;
+        this.notification.onError(err?.error?.message || err?.error?.reason || 'Failed to update status');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   // ========== PASSWORD RESET ==========
 
   submitResetPassword(): void {
-    this.resetPasswordError = '';
-
-    if (!this.resetPasswordData.newPassword) {
-      this.resetPasswordError = 'New password is required.';
-      return;
-    }
-    if (this.resetPasswordData.newPassword.length < 8) {
-      this.resetPasswordError = 'Password must be at least 8 characters.';
-      return;
-    }
-    if (this.resetPasswordData.newPassword !== this.resetPasswordData.confirmPassword) {
-      this.resetPasswordError = 'Passwords do not match.';
-      return;
-    }
-
     const employeeId = this.dataSubject.value?.data?.employee?.id;
     if (!employeeId) return;
 
-    this.isResettingPassword = true;
+    if (!confirm('Reset this employee\'s password? A temporary password will be sent to their email address.')) return;
 
-    this.http.put(`${this.SERVER_URL}/employee/${employeeId}/reset-password`, {
-      newPassword: this.resetPasswordData.newPassword,
-      confirmPassword: this.resetPasswordData.confirmPassword
-    }).subscribe({
-      next: () => {
+    this.isResettingPassword = true;
+    this.cdr.markForCheck();
+
+    this.http.put<any>(`${this.SERVER_URL}/employee/${employeeId}/reset-password`, {}).subscribe({
+      next: (res) => {
         this.isResettingPassword = false;
-        this.resetPasswordData = { newPassword: '', confirmPassword: '' };
-        this.notification.onSuccess('Password reset successfully');
+        this.notification.onSuccess(res?.message || 'Password reset. Temporary password sent to employee\'s email.');
         this.cdr.markForCheck();
       },
       error: (err) => {
         this.isResettingPassword = false;
-        this.resetPasswordError = err?.error?.message || 'Failed to reset password.';
+        this.notification.onError(err?.error?.message || 'Failed to reset password.');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  // ========== POLICY ACKNOWLEDGEMENT ==========
+
+  loadPolicyStatus(): void {
+    this.companyService.getPolicyAcknowledgementStatus$().subscribe({
+      next: (res) => {
+        this.policyStatus = res?.data ?? null;
+        this.cdr.markForCheck();
+      },
+      error: () => { /* silently ignore — no policy configured */ }
+    });
+  }
+
+  viewCompanyPolicy(): void {
+    if (!this.currentCompanyId) { this.notification.onError('Company not found'); return; }
+    window.open(`${this.SERVER_URL}/companies/${this.currentCompanyId}/policy`, '_blank');
+  }
+
+  acknowledgePolicy(): void {
+    this.isAcknowledgingPolicy = true;
+    this.cdr.markForCheck();
+    this.companyService.acknowledgePolicy$().subscribe({
+      next: (res) => {
+        this.isAcknowledgingPolicy = false;
+        this.notification.onSuccess('Company policy acknowledged');
+        if (this.policyStatus) {
+          this.policyStatus.needsAcknowledgement = false;
+          this.policyStatus.acknowledgedAt = res?.data?.acknowledgedAt;
+        }
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.isAcknowledgingPolicy = false;
+        this.notification.onError(err?.error?.message || 'Failed to acknowledge policy');
         this.cdr.markForCheck();
       }
     });

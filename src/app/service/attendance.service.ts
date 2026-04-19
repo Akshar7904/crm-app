@@ -20,9 +20,7 @@ import {
 } from '../interface/attendance-state';
 import { CustomHttpResponse, Page } from '../interface/appstates';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AttendanceService {
   private readonly SERVER_URL = environment.apiUrl + '/api/v1';
   private readonly API_URL = `${this.SERVER_URL}/attendance`;

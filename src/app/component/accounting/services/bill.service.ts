@@ -45,8 +45,9 @@ export class BillService {
       `${this.server}/bills/update`, bill
     ).pipe(tap(console.log), catchError(this.handleError));
 
-  markPaid$ = (id: number, paymentMethod?: string) => {
-    const params = paymentMethod ? `?paymentMethod=${paymentMethod}` : '';
+  markPaid$ = (id: number, paymentMethod?: string, bankAccountId?: number) => {
+    let params = paymentMethod ? `?paymentMethod=${paymentMethod}` : '';
+    if (bankAccountId) params += (params ? '&' : '?') + `bankAccountId=${bankAccountId}`;
     return this.http.patch<CustomHttpResponse<any>>(
       `${this.server}/bills/${id}/mark-paid${params}`, {}
     ).pipe(tap(console.log), catchError(this.handleError));

@@ -16,9 +16,10 @@
 
   <!-- Company Header -->
   <div class="ps-company-header">
-    <h3 class="ps-company-name">LKCentrix Solutions (PTY) LTD</h3>
-    <p class="ps-company-info">Bedfordview Corporate Park, 4 Skeen BLVD, Bedfordview, 2001</p>
-    <p class="ps-company-info">+27 (11) 568 8322 &nbsp;|&nbsp; info@lkcentrix.co.za</p>
+    <img *ngIf="company?.id" [src]="companyService.getLogoUrl(company.id)" alt="Logo" class="ps-company-logo" onerror="this.style.display='none'">
+    <h3 class="ps-company-name">{{ company?.legalName || company?.name || '' }}</h3>
+    <p class="ps-company-info" *ngIf="company?.address">{{ company?.address }}<span *ngIf="company?.city">, {{ company?.city }}</span></p>
+    <p class="ps-company-info" *ngIf="company?.phone || company?.email">{{ company?.phone }}<span *ngIf="company?.phone && company?.email"> &nbsp;|&nbsp; </span>{{ company?.email }}</p>
     <div class="ps-period-title">Payslip — {{ getPayPeriod() }}</div>
   </div>
 

@@ -15,11 +15,16 @@ import { BillService } from './services/bill.service';
 import { QuoteListComponent } from './quotes/quote-list.component';
 import { QuoteDetailComponent } from './quotes/quote-detail/quote-detail.component';
 import { QuoteService } from './services/quote.service';
-import { CustomerService } from '../../service/customer.service';
 import { CreditNoteListComponent } from './credit-notes/credit-note-list.component';
+import { CreditNoteService } from './services/credit-note.service';
 import { VatReturnsComponent } from './vat-returns/vat-returns.component';
+import { VatReturnService } from './services/vat-return.service';
 import { AccountingOverviewComponent } from './overview/accounting-overview.component';
 import { AccountingReportsComponent } from './reports/accounting-reports.component';
+import { BankingComponent } from './banking/banking.component';
+import { BankingService } from './services/banking.service';
+import { InventoryComponent } from './inventory/inventory.component';
+import { InventoryService } from './services/inventory.service';
 
 @NgModule({
   declarations: [
@@ -30,7 +35,9 @@ import { AccountingReportsComponent } from './reports/accounting-reports.compone
     CreditNoteListComponent,
     VatReturnsComponent,
     AccountingOverviewComponent,
-    AccountingReportsComponent
+    AccountingReportsComponent,
+    BankingComponent,
+    InventoryComponent
   ],
   imports: [
     CommonModule,
@@ -43,7 +50,10 @@ import { AccountingReportsComponent } from './reports/accounting-reports.compone
     ProductCatalogService,
     BillService,
     QuoteService,
-    CustomerService
+    CreditNoteService,
+    BankingService,
+    VatReturnService,
+    InventoryService
   ]
 })
 export class AccountingModule {}

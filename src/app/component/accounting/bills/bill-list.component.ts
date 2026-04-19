@@ -11,6 +11,8 @@ import { VendorService } from '../../expenses/services/vendor.service';
 import { ChartOfAccountService } from '../../expenses/services/chart-of-account.service';
 import { ExpenseClaimService } from '../../../service/expense-claim.service';
 import { ExpenseClaim, ExpenseClaimStatus } from '../../../interface/expense-claim.model';
+import { BankingService } from '../services/banking.service';
+import { BankAccount } from '../models/banking.model';
 
 @Component({
   standalone: false,
@@ -23,6 +25,7 @@ export class BillListComponent implements OnInit {
 
   bills: Bill[] = [];
   stats: BillStats = { total: 0, draft: 0, unpaid: 0, paid: 0, overdue: 0, outstanding: 0 };
+  bankAccounts: BankAccount[] = [];
 
   currentPage = 0;
   pageSize = 10;
@@ -65,6 +68,7 @@ export class BillListComponent implements OnInit {
     private vendorService: VendorService,
     private accountService: ChartOfAccountService,
     private expenseClaimService: ExpenseClaimService,
+    private bankingService: BankingService,
     private fb: FormBuilder,
     private notification: NotificationService,
     private cdr: ChangeDetectorRef
@@ -84,7 +88,8 @@ export class BillListComponent implements OnInit {
     });
 
     this.payForm = this.fb.group({
-      paymentMethod: ['BANK_TRANSFER', Validators.required]
+      paymentMethod: ['BANK_TRANSFER', Validators.required],
+      bankAccountId: [null]
     });
 
     // Auto-calculate VAT and total
@@ -97,6 +102,14 @@ export class BillListComponent implements OnInit {
     this.loadVendors();
     this.loadAccounts();
     this.loadApClaims();
+    this.loadBankAccounts();
+  }
+
+  loadBankAccounts(): void {
+    this.bankingService.getActiveAccounts$().subscribe({
+      next: (res: any) => { this.bankAccounts = res?.data?.accounts ?? []; this.cdr.markForCheck(); },
+      error: () => {}
+    });
   }
 
   loadVendors(): void {
@@ -265,7 +278,8 @@ export class BillListComponent implements OnInit {
     if (!this.payingBill || this.submitting) return;
     this.submitting = true;
     const method = this.payForm.get('paymentMethod')?.value;
-    this.billService.markPaid$(this.payingBill.id!, method).subscribe({
+    const bankAccountId = this.payForm.get('bankAccountId')?.value || undefined;
+    this.billService.markPaid$(this.payingBill.id!, method, bankAccountId).subscribe({
       next: () => {
         this.notification.onSuccess(`Bill ${this.payingBill!.billNumber} marked as paid`);
         this.submitting = false;

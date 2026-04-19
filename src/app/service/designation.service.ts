@@ -13,9 +13,7 @@ import { DesignationState } from '../interface/designation-state';
 /**
  * Service for managing designation operations
  */
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class DesignationService {
   private readonly apiUrl = environment.apiUrl + '/api/v1/designations';
 

@@ -168,11 +168,32 @@
             </div>
             <div class="col-md-4 mb-3">
               <label class="form-label ann-label">Target Audience</label>
-              <select class="form-select" name="targetAudience" [ngModel]="editingAnnouncement?.targetAudience || 'ALL'">
+              <select class="form-select" name="targetAudience"
+                      [ngModel]="editingAnnouncement?.targetAudience || 'ALL'"
+                      (ngModelChange)="onAudienceChange($event)">
                 <option *ngFor="let a of audiences" [value]="a.value">{{ a.label }}</option>
               </select>
             </div>
           </div>
+
+          <!-- Department dropdown — shown when audience is DEPARTMENT -->
+          <div class="row" *ngIf="selectedAudience === 'DEPARTMENT'">
+            <div class="col-12 mb-3">
+              <label class="form-label ann-label">Target Department <span class="text-danger">*</span></label>
+              <div *ngIf="loadingDepts" class="d-flex align-items-center gap-2 text-muted small py-2">
+                <span class="spinner-border spinner-border-sm"></span> Loading departments…
+              </div>
+              <select *ngIf="!loadingDepts" class="form-select" name="targetDepartmentId"
+                      [ngModel]="editingAnnouncement?.targetDepartmentId">
+                <option value="">— Select department —</option>
+                <option *ngFor="let d of departments" [value]="d.id">{{ d.name }}</option>
+              </select>
+              <div class="form-text" *ngIf="departments.length === 0 && !loadingDepts">
+                No departments found. Please add departments first.
+              </div>
+            </div>
+          </div>
+
           <div class="row">
             <div class="col-md-6 mb-3">
               <label class="form-label ann-label">Expires At (Optional)</label>

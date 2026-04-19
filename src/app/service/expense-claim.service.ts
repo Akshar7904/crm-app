@@ -14,9 +14,7 @@ import { CustomHttpResponse, Page } from '../interface/appstates';
 import { ExpenseClaim, ExpenseClaimApprovalForm, ExpenseClaimStatus } from '../interface/expense-claim.model';
 import { UserModel } from '../component/profile/user.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ExpenseClaimService {
   private readonly server: string = environment.apiUrl + '/api/v1';
 

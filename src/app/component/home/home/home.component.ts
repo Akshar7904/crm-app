@@ -579,9 +579,19 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.currentUser = JSON.parse(userString);
         this.determineUserRole();
 
+        // SUPERADMIN is a platform-level role — redirect to the super admin area
+        if (this.currentUser?.roleName === 'ROLE_SUPERADMIN') {
+          this.router.navigate(['/superadmin/companies']);
+          return of({ dataState: DataState.LOADED, user: this.currentUser });
+        }
+
         return of({ dataState: DataState.LOADING, user: this.currentUser });
       }),
       switchMap(state => {
+        // LOADED means we already redirected (SUPERADMIN) — skip further API calls
+        if (state.dataState === DataState.LOADED) {
+          return of(state as DashboardState);
+        }
         if (this.isAdmin || this.isManager) {
           return this.loadAdminDashboard(state.user);
         } else {

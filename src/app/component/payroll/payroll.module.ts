@@ -6,6 +6,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PayrollRoutingModule } from './payroll-routing.module';
+import { PayrollService } from '../../service/payroll.service';
 
 // Components
 import { PayrollListComponent } from './payroll-list/payroll-list.component';
@@ -33,6 +34,7 @@ import { PayrollStatsComponent } from './payroll-stats/payroll-stats.component';
     FormsModule,
     ReactiveFormsModule,
     PayrollRoutingModule,
-  ]
+  ],
+  providers: [PayrollService]
 })
 export class PayrollModule { }

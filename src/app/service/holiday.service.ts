@@ -10,9 +10,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { Holiday, HolidayForm, ApiResponse, HolidayResponse } from '../component/holiday/holiday.model';
 import { CustomHttpResponse } from '../interface/appstates';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class HolidayService {
   private readonly apiUrl = environment.apiUrl + '/api/v1/holidays';
 

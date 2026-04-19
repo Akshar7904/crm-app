@@ -9,8 +9,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DepartmentsComponent } from './department.component';
-import { DepartmentService } from '../../service/department.service';
-
 const routes: Routes = [
   {
     path: '',
@@ -29,8 +27,6 @@ const routes: Routes = [
     NgbModule,
     RouterModule.forChild(routes),
   ],
-  providers: [
-    DepartmentService
-  ]
+  providers: []
 })
 export class DepartmentModule { }

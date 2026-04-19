@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { QuoteService } from '../../services/quote.service';
 import { Quote, QuoteStatus } from '../../models/quote.model';
 import { NotificationService } from '../../../../service/notification.service';
+import { CompanyService } from '../../../../service/company.service';
 
 @Component({
   standalone: false,
@@ -17,6 +18,7 @@ import { NotificationService } from '../../../../service/notification.service';
 })
 export class QuoteDetailComponent implements OnInit {
 
+  company: any = null;
   quote: Quote | null = null;
   loading = false;
   submitting = false;
@@ -37,11 +39,16 @@ export class QuoteDetailComponent implements OnInit {
     private notification: NotificationService,
     private activatedRoute: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public companyService: CompanyService
   ) {}
 
   ngOnInit(): void {
     this.quoteId = +this.activatedRoute.snapshot.params['id'];
+    this.companyService.getMyCompany$().subscribe({
+      next: (res) => { this.company = res?.data?.company; this.cdr.markForCheck(); },
+      error: () => {}
+    });
     this.loadQuote();
   }
 

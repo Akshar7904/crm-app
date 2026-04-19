@@ -9,7 +9,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AnnouncementListComponent } from './announcement-list/announcement-list.component';
 import { AnnouncementAdminComponent } from './announcement-admin/announcement-admin.component';
-
 const routes: Routes = [
   { path: '', component: AnnouncementListComponent },
   { path: 'admin', component: AnnouncementAdminComponent }
@@ -28,6 +27,7 @@ const routes: Routes = [
   exports: [
     AnnouncementListComponent,
     AnnouncementAdminComponent
-  ]
+  ],
+  providers: []
 })
 export class AnnouncementModule { }

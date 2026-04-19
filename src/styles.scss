@@ -8,7 +8,7 @@
 
 // Import external fonts and icons
 @import url("https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i");
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.2/font/bootstrap-icons.css");
+// Bootstrap Icons loaded locally via angular.json (no CDN dependency)
 /* angular-notifier base styles (inlined - package stub has no styles file) */
 .notifier__container { position: fixed; z-index: 10000; top: 0; right: 0; pointer-events: none; width: 100%; }
 .notifier__container-list { display: flex; flex-direction: column; align-items: flex-end; margin: 0; padding: 12px 16px; gap: 8px; list-style: none; }
@@ -26,6 +26,11 @@
 // THEME SYSTEM - CSS Custom Properties
 // ========================================
 
+// Brand primary — overridden at runtime by BrandingService via document.documentElement.style.setProperty
+:root {
+  --orion-primary: #375fa0;
+}
+
 // Light Theme (default)
 [data-theme="light"] {
   // Backgrounds
@@ -39,12 +44,12 @@
   --sidebar-border: #{$gray-200};
   --sidebar-text: #{$gray-600};
   --sidebar-text-hover: #{$gray-900};
-  --sidebar-text-active: #{$primary};
+  --sidebar-text-active: var(--orion-primary);
   --sidebar-icon: #{$gray-400};
-  --sidebar-icon-active: #{$primary};
+  --sidebar-icon-active: var(--orion-primary);
   --sidebar-hover: rgba(0, 92, 143, 0.05);
   --sidebar-active-bg: rgba(0, 92, 143, 0.08);
-  --sidebar-active-border: #{$primary};
+  --sidebar-active-border: var(--orion-primary);
   --sidebar-header-border: #{$gray-200};
   --sidebar-scrollbar: #{$gray-300};
   --sidebar-scrollbar-hover: #{$gray-400};
@@ -101,7 +106,7 @@
   --badge-muted-text: #{$gray-600};
 
   // Page section headers
-  --page-header-bg: linear-gradient(135deg, #{$primary} 0%, #{$primary-medium} 60%, #{$primary-light} 100%);
+  --page-header-bg: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary) 60%, var(--orion-primary) 100%);
   --section-title-color: #{$gray-700};
 
   // Form focus ring

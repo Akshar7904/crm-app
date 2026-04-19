@@ -10,7 +10,7 @@ import { environment } from '@env/environment';
 const FINANCIAL_API = `${environment.apiUrl}/api/v1/financial`;
 const CLAIMS_API = `${environment.apiUrl}/api/v1/expense-claims`;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ExpensesService {
   constructor(private http: HttpClient) {}
 
@@ -33,7 +33,7 @@ export class ExpensesService {
     );
   }
 
-  // Expense claims (existing)
+  // Expense claims
   getAdminClaims(page = 0, size = 20): Observable<any> {
     return this.http.get<any>(`${CLAIMS_API}/list?page=${page}&size=${size}`);
   }
@@ -44,5 +44,19 @@ export class ExpensesService {
 
   getClaimsByStatus(status: string, page = 0, size = 20): Observable<any> {
     return this.http.get<any>(`${CLAIMS_API}/status/${status}?page=${page}&size=${size}`);
+  }
+
+  approveClaim(form: { expenseClaimId: number; approvedBy: number; remarks?: string }): Observable<any> {
+    return this.http.post<any>(`${CLAIMS_API}/approve`, form);
+  }
+
+  rejectClaim(form: { expenseClaimId: number; approvedBy: number; rejectionReason?: string }): Observable<any> {
+    return this.http.post<any>(`${CLAIMS_API}/reject`, form);
+  }
+
+  markClaimPaid(id: number, approvedBy: number, paymentMethod: string, bankAccountId?: number): Observable<any> {
+    let url = `${CLAIMS_API}/mark-paid/${id}?approvedBy=${approvedBy}&paymentMethod=${paymentMethod}`;
+    if (bankAccountId) url += `&bankAccountId=${bankAccountId}`;
+    return this.http.put<any>(url, {});
   }
 }

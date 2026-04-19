@@ -14,9 +14,7 @@ import { CustomHttpResponse } from '../interface/appstates';
  * Announcement Service
  * Handles all announcement-related API calls
  */
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class AnnouncementService {
   private readonly server: string = environment.apiUrl + '/api/v1/announcements';
 

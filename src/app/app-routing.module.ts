@@ -6,7 +6,10 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './component/home/home/home.component';
 import { DocumentationComponent } from './component/documentation/documentation.component';
+import { CompanyPolicyComponent } from './component/policy/company-policy.component';
 import { AuthenticationGuard } from './guard/authentication.guard';
+import { ModuleAccessGuard } from './guard/module-access.guard';
+import { SuperadminGuard } from './guard/superadmin.guard';
 import { AttendanceListComponent } from "./component/attendance/attendance-list/attendance-list.component";
 import { MyAttendanceComponent } from "./component/attendance/my-attendance/my-attendance.component";
 import { WhatsAppAttendanceComponent } from "./component/attendance/whatsapp-attendance/whatsapp-attendance.component";
@@ -35,8 +38,8 @@ const routes: Routes = [
   {
     path: 'employee/my-details',
     loadChildren: () => import('./component/employee/employee.module').then(module => module.EmployeeModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'My Details' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'My Details', moduleKey: 'EMPLOYEE_MANAGEMENT' }
   },
 
   // =============================================
@@ -72,14 +75,14 @@ const routes: Routes = [
   {
     path: 'intern/attendance',
     loadChildren: () => import('./component/intern-attendance/intern-attendance.module').then(m => m.InternAttendanceModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'My School Attendance' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'My School Attendance', moduleKey: 'INTERN_ATTENDANCE' }
   },
   {
     path: 'admin/intern-attendance',
     loadChildren: () => import('./component/intern-attendance/intern-attendance.module').then(m => m.InternAttendanceModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Intern Attendance Management' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Intern Attendance Management', moduleKey: 'INTERN_ATTENDANCE' }
   },
 
   // =============================================
@@ -90,14 +93,14 @@ const routes: Routes = [
   {
     path: 'employee/leave',
     component: EmployeeLeaveComponent,
-    canActivate: [AuthenticationGuard],
-    data: { title: 'My Leave Requests' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'My Leave Requests', moduleKey: 'LEAVE_MANAGEMENT' }
   },
   {
     path: 'admin/leave',
     component: AdminLeaveComponent,
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Leave Management' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Leave Management', moduleKey: 'LEAVE_MANAGEMENT' }
   },
 
   // =============================================
@@ -106,8 +109,8 @@ const routes: Routes = [
   {
     path: 'employee',
     loadChildren: () => import('./component/employee/employee.module').then(module => module.EmployeeModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Employees' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Employees', moduleKey: 'EMPLOYEE_MANAGEMENT' }
   },
 
   // =============================================
@@ -116,26 +119,26 @@ const routes: Routes = [
   {
     path: 'attendance',
     component: AttendanceListComponent,
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Attendance (Admin)' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Attendance (Admin)', moduleKey: 'ATTENDANCE_TRACKING' }
   },
   {
     path: 'attendance/my',
     component: MyAttendanceComponent,
-    canActivate: [AuthenticationGuard],
-    data: { title: 'My Attendance' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'My Attendance', moduleKey: 'ATTENDANCE_TRACKING' }
   },
   {
     path: 'attendance/whatsapp',
     component: WhatsAppAttendanceComponent,
-    canActivate: [AuthenticationGuard],
-    data: { title: 'WhatsApp Attendance' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'WhatsApp Attendance', moduleKey: 'ATTENDANCE_TRACKING' }
   },
   {
     path: 'holidays',
     loadChildren: () => import('./component/holiday/holiday.module').then(m => m.HolidayModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Holidays' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Holidays', moduleKey: 'ATTENDANCE_TRACKING' }
   },
 
   // =============================================
@@ -144,8 +147,8 @@ const routes: Routes = [
   {
     path: 'payroll',
     loadChildren: () => import('./component/payroll/payroll.module').then(m => m.PayrollModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Payroll' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Payroll', moduleKey: 'PAYROLL_PAYSLIPS' }
   },
 
   // =============================================
@@ -154,8 +157,8 @@ const routes: Routes = [
   {
     path: 'customers',
     loadChildren: () => import('./component/customer/customer.module').then(m => m.CustomerModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Clients' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Clients', moduleKey: 'INVOICE_CUSTOMER' }
   },
 
   // =============================================
@@ -164,8 +167,8 @@ const routes: Routes = [
   {
     path: 'invoices',
     loadChildren: () => import('./component/invoice/invoice.module').then(m => m.InvoiceModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Invoices' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Invoices', moduleKey: 'INVOICE_CUSTOMER' }
   },
 
   // =============================================
@@ -174,8 +177,8 @@ const routes: Routes = [
   {
     path: 'expense-claims',
     loadChildren: () => import('./component/expense-claims/expense-claims.module').then(m => m.ExpenseClaimsModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Expense Claims' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Expense Claims', moduleKey: 'EXPENSE_CLAIMS' }
   },
 
   // =============================================
@@ -184,8 +187,8 @@ const routes: Routes = [
   {
     path: 'expenses',
     loadChildren: () => import('./component/expenses/expenses.module').then(m => m.ExpensesModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Expenses' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Expenses', moduleKey: 'BUSINESS_EXPENSES' }
   },
 
   // =============================================
@@ -204,8 +207,8 @@ const routes: Routes = [
   {
     path: 'assets',
     loadChildren: () => import('./component/asset-management/asset-management.module').then(m => m.AssetManagementModule),
-    canActivate: [AuthenticationGuard],
-    data: { title: 'Asset Management' }
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Asset Management', moduleKey: 'ASSET_MANAGEMENT' }
   },
 
   // =============================================
@@ -232,10 +235,45 @@ const routes: Routes = [
   // DOCUMENTATION
   // =============================================
   {
+    path: 'policy',
+    component: CompanyPolicyComponent,
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Company Policy' }
+  },
+  {
     path: 'documentation',
     component: DocumentationComponent,
     canActivate: [AuthenticationGuard],
     data: { title: 'Documentation' }
+  },
+
+  // =============================================
+  // COMPANY SETTINGS (SYSADMIN / ADMIN)
+  // =============================================
+  {
+    path: 'settings/company',
+    loadChildren: () => import('./component/company-settings/company-settings.module').then(m => m.CompanySettingsModule),
+    canActivate: [AuthenticationGuard],
+    data: { title: 'Company Settings' }
+  },
+
+  // =============================================
+  // SUPER-ADMIN (platform owner — cross-company)
+  // =============================================
+  {
+    path: 'superadmin',
+    loadChildren: () => import('./component/superadmin/superadmin.module').then(m => m.SuperadminModule),
+    canActivate: [AuthenticationGuard, SuperadminGuard],
+    data: { title: 'Platform Admin' }
+  },
+
+  // =============================================
+  // LEGAL (public — no auth guard)
+  // =============================================
+  {
+    path: 'legal',
+    loadChildren: () => import('./component/legal/legal.module').then(m => m.LegalModule),
+    data: { title: 'Legal' }
   },
 
   // =============================================

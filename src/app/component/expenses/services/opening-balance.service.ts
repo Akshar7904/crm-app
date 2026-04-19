@@ -9,7 +9,7 @@ import { environment } from '@env/environment';
 
 const BASE = `${environment.apiUrl}/api/v1/opening-balance`;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class OpeningBalanceService {
   constructor(private http: HttpClient) {}
 

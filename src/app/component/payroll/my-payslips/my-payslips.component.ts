@@ -3,7 +3,7 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { environment } from '@env/environment';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PayrollService } from 'src/app/service/payroll.service';
 import { Payroll } from 'src/app/interface/payroll';
@@ -14,7 +14,8 @@ import { UserModel } from '../../profile/user.model';
   standalone: false,
   selector: 'app-my-payslips',
   templateUrl: './my-payslips.component.html',
-  styleUrls: ['./my-payslips.component.scss']
+  styleUrls: ['./my-payslips.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MyPayslipsComponent implements OnInit {
   private readonly server = environment.apiUrl + '/api/v1';
@@ -110,4 +111,6 @@ export class MyPayslipsComponent implements OnInit {
       }
     });
   }
+
+  trackById = (index: number, item: any) => item.id;
 }

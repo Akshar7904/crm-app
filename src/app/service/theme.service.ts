@@ -8,7 +8,7 @@ import { Key } from '../enum/key.enum';
 
 export type Theme = 'light' | 'dark' | 'system';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ThemeService {
   private themeSubject = new BehaviorSubject<Theme>(this.getStoredTheme());
   theme$ = this.themeSubject.asObservable();

@@ -19,9 +19,7 @@ import { CustomHttpResponse, Page, EmployeeState } from '../interface/appstates'
 import { UserModel } from '../component/profile/user.model';
 import { EmployeeStats } from '../interface/employee-state';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class EmployeeService {
   private readonly server: string = environment.apiUrl;
 

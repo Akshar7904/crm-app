@@ -10,7 +10,7 @@ import { environment } from '@env/environment';
 
 const API = `${environment.apiUrl}/api/v1/accounts`;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class ChartOfAccountService {
   constructor(private http: HttpClient) {}
 

@@ -8,7 +8,7 @@
   padding: $spacing-lg;
 }
 
-// ─── Breadcrumb
+// ─── Breadcrumb ───────────────────────────────────────────────────────────────
 .leave-breadcrumb {
   margin-bottom: $spacing-md;
 
@@ -29,77 +29,7 @@
   .breadcrumb-item + .breadcrumb-item::before { color: var(--text-muted); }
 }
 
-// ─── Falcon Banner
-.leave-page-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: $spacing-md;
-  padding: $spacing-md $spacing-xl;
-  background: linear-gradient(135deg, $primary 0%, $primary-medium 60%, $primary-light 100%);
-  border-radius: $border-radius-xl;
-  margin-bottom: $spacing-lg;
-  box-shadow: 0 6px 24px rgba($primary, 0.28);
-  position: relative;
-  overflow: hidden;
-  animation: fadeInDown 0.4s ease forwards;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 170px; height: 170px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.06);
-    pointer-events: none;
-  }
-}
-
-.leave-banner-left { position: relative; z-index: 1; }
-
-.leave-banner-title {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
-  color: #fff;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  i { opacity: 0.85; }
-}
-
-.leave-banner-subtitle {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: $font-size-sm;
-  margin: 4px 0 0;
-}
-
-.leave-banner-actions { position: relative; z-index: 1; }
-
-.btn-banner-leave {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: $border-radius-md;
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: all $transition-base;
-  backdrop-filter: blur(4px);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: translateY(-1px);
-  }
-}
-
-// ─── Stats Grid
+// ─── Stats Grid ───────────────────────────────────────────────────────────────
 .leave-stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -143,11 +73,7 @@
   &--danger  { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
 }
 
-.leave-stat-body {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+.leave-stat-body { display: flex; flex-direction: column; gap: 3px; }
 
 .leave-stat-value {
   font-size: 1.9rem;
@@ -162,7 +88,7 @@
   font-weight: $font-weight-medium;
 }
 
-// ─── Filters Card
+// ─── Filters Card ─────────────────────────────────────────────────────────────
 .leave-filters-card {
   background: var(--bg-card);
   border: 0;
@@ -263,7 +189,7 @@
   }
 }
 
-// ─── Tabs Nav
+// ─── Tabs Nav ─────────────────────────────────────────────────────────────────
 .leave-tabs-nav {
   display: flex;
   gap: $spacing-xs;
@@ -321,7 +247,7 @@
   &--primary { background: rgba($primary, 0.12); color: $primary; }
 }
 
-// ─── Loading / Empty
+// ─── Loading / Empty ──────────────────────────────────────────────────────────
 .leave-loading {
   text-align: center;
   padding: 60px 20px;
@@ -349,49 +275,10 @@
   display: block;
 }
 
-// ─── Table Card
-.leave-table-card {
-  background: var(--bg-card);
-  border: 0;
-  border-radius: $border-radius-xl;
-  box-shadow: var(--card-shadow);
-  overflow: hidden;
-  margin-bottom: $spacing-md;
-  animation: fadeInUp 0.4s ease forwards;
-}
+// ─── Table row (cursor) ───────────────────────────────────────────────────────
+.leave-row { cursor: pointer; }
 
-.leave-table {
-  thead th {
-    background: var(--table-header-bg);
-    color: var(--text-secondary);
-    font-size: 0.72rem;
-    font-weight: $font-weight-semibold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--border-light);
-    border-top: none;
-    white-space: nowrap;
-  }
-
-  tbody td {
-    padding: 13px 16px;
-    vertical-align: middle;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-light);
-  }
-
-  tbody tr {
-    transition: background-color $transition-base;
-    cursor: pointer;
-
-    &:hover { background: var(--table-hover); }
-    &:last-child td { border-bottom: none; }
-  }
-}
-
-// Employee Cell
+// ─── Employee Cell ────────────────────────────────────────────────────────────
 .leave-employee-cell {
   display: flex;
   align-items: center;
@@ -411,15 +298,6 @@
   flex-shrink: 0;
 }
 
-.leave-avatar-img {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--border-light);
-  flex-shrink: 0;
-}
-
 .leave-emp-name {
   font-weight: $font-weight-semibold;
   font-size: 0.875rem;
@@ -431,23 +309,7 @@
   color: var(--text-muted);
 }
 
-// Leave type badges
-.leave-type-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: $border-radius-xl;
-  font-size: 0.72rem;
-  font-weight: $font-weight-semibold;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.type-annual  { background: rgba(#3b82f6, 0.12); color: #1d4ed8; }
-.type-sick    { background: rgba(#f59e0b, 0.12); color: #92400e; }
-.type-family  { background: rgba($success, 0.12); color: darken($success, 10%); }
-.type-other   { background: rgba($info, 0.12); color: darken($info, 15%); }
-
-// Date range
+// ─── Date range ───────────────────────────────────────────────────────────────
 .leave-date-range {
   display: flex;
   align-items: center;
@@ -459,7 +321,7 @@
   i { color: var(--text-muted); font-size: 0.75rem; }
 }
 
-// Days badge
+// ─── Days badge ───────────────────────────────────────────────────────────────
 .leave-days-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -471,70 +333,14 @@
   font-weight: $font-weight-semibold;
 }
 
-// Status badges
-.leave-status-badge {
-  display: inline-block;
-  padding: 4px 10px;
-  border-radius: $border-radius-xl;
-  font-size: 0.72rem;
-  font-weight: $font-weight-semibold;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-}
-
-.status-pending   { background: rgba($warning, 0.15); color: darken($warning, 20%); }
-.status-approved  { background: rgba($success, 0.12); color: darken($success, 10%); }
-.status-rejected  { background: rgba($danger, 0.12); color: darken($danger, 8%); }
-.status-cancelled { background: rgba($gray-500, 0.12); color: $gray-600; }
-
+// ─── Applied date ─────────────────────────────────────────────────────────────
 .leave-applied-date {
   font-size: 0.8rem;
   color: var(--text-muted);
   white-space: nowrap;
 }
 
-// Action buttons
-.leave-action-group {
-  display: inline-flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.leave-action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: $border-radius;
-  border: 1px solid;
-  background: transparent;
-  cursor: pointer;
-  transition: all $transition-base;
-  font-size: 0.85rem;
-
-  &:hover { transform: translateY(-1px); }
-}
-
-.leave-approve-btn {
-  border-color: rgba($success, 0.5);
-  color: $success;
-  &:hover { background: rgba($success, 0.1); border-color: $success; }
-}
-
-.leave-review-btn {
-  border-color: rgba($primary, 0.4);
-  color: $primary;
-  &:hover { background: rgba($primary, 0.1); border-color: $primary; }
-}
-
-.leave-reject-btn {
-  border-color: rgba($danger, 0.4);
-  color: $danger;
-  &:hover { background: rgba($danger, 0.1); border-color: $danger; }
-}
-
-// Falcon alert
+// ─── Falcon alert ─────────────────────────────────────────────────────────────
 .falcon-alert {
   display: flex;
   align-items: center;
@@ -553,7 +359,7 @@
   }
 }
 
-// ─── Modal
+// ─── Modal ────────────────────────────────────────────────────────────────────
 .leave-modal-content {
   background: var(--bg-card);
   border: 0;
@@ -623,7 +429,7 @@
   border-radius: 0 0 $border-radius-xl $border-radius-xl;
 }
 
-// Detail grid in modal
+// ─── Detail grid in modal ─────────────────────────────────────────────────────
 .leave-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -635,11 +441,7 @@
   border: 1px solid var(--border-light);
 }
 
-.leave-detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.leave-detail-item { display: flex; flex-direction: column; gap: 4px; }
 
 .leave-detail-label {
   font-size: 0.72rem;
@@ -649,10 +451,7 @@
   letter-spacing: 0.5px;
 }
 
-.leave-detail-value {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-}
+.leave-detail-value { font-size: 0.875rem; color: var(--text-primary); }
 
 .leave-detail-section { margin-bottom: $spacing-md; }
 
@@ -707,7 +506,7 @@
   &:hover { text-decoration: underline; }
 }
 
-// Form controls in modal
+// ─── Modal form controls ──────────────────────────────────────────────────────
 .form-label {
   font-size: 0.75rem;
   font-weight: $font-weight-semibold;
@@ -740,7 +539,7 @@
 
 textarea.form-control { resize: vertical; }
 
-// Action buttons in modal
+// ─── Modal action buttons ─────────────────────────────────────────────────────
 .btn-leave-action {
   display: inline-flex;
   align-items: center;
@@ -778,10 +577,8 @@ textarea.form-control { resize: vertical; }
   }
 }
 
-// ─── Leave Allocation Section
-.leave-allocation-section {
-  margin-top: $spacing-md;
-}
+// ─── Leave Allocation ─────────────────────────────────────────────────────────
+.leave-allocation-section { margin-top: $spacing-md; }
 
 .leave-alloc-toolbar {
   display: flex;
@@ -855,10 +652,9 @@ textarea.form-control { resize: vertical; }
   }
 }
 
-// ─── Responsive
+// ─── Responsive ───────────────────────────────────────────────────────────────
 @include respond-to('md') {
   .leave-admin-wrap { padding: $spacing-md; }
-  .leave-page-banner { flex-direction: column; align-items: flex-start; }
   .leave-stats-grid { grid-template-columns: 1fr; }
   .leave-filters-card { flex-direction: column; }
   .leave-search-wrap { width: 100%; }

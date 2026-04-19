@@ -33,11 +33,12 @@
                 <div class="col-md-6">
                   <h6 class="section-label">From</h6>
                   <div class="company-info">
-                    <h5 class="company-name">LKCentrix Solutions (PTY) LTD</h5>
+                    <h5 class="company-name">{{ company?.legalName || company?.name || '' }}</h5>
                     <p class="company-address">
-                      4 Skeen BLVD Bedfordview<br>
-                      Bedfordview Corporate Park, 2001<br>
-                      Phone: +27 (11) 568 8322
+                      <ng-container *ngIf="company?.address">{{ company.address }}<br></ng-container>
+                      <ng-container *ngIf="company?.city">{{ company.city }}<br></ng-container>
+                      <ng-container *ngIf="company?.phone">Phone: {{ company.phone }}<br></ng-container>
+                      <ng-container *ngIf="company?.email">{{ company.email }}</ng-container>
                     </p>
                   </div>
                 </div>

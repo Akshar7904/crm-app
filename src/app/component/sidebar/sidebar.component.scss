@@ -32,6 +32,18 @@
   border-radius: $border-radius-xl;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   flex-shrink: 0;
+  overflow: hidden;
+  min-width: 0;
+}
+
+.sidebar-tagline {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 2px 4px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sidebar-menu-card {
@@ -68,9 +80,10 @@
 .logo-image {
   width: auto;
   height: 88px;
-  max-width: 220px;
+  max-width: min(220px, 100%);
   object-fit: contain;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  min-width: 0;
   transition: all $transition-slow;
   filter: var(--logo-filter, none);
 }
@@ -399,6 +412,20 @@
   }
 }
 
+// ── Tablet (768 – 992 px) ────────────────────────────────────────
+// Sidebar is in desktop-collapsed mode at this range — scale logo down
+// so it never overflows the narrower column.
+@media (min-width: #{$breakpoint-md + 1}) and (max-width: $breakpoint-lg) {
+  .logo-image {
+    height: 56px;
+    max-width: 160px;
+  }
+
+  .sidebar-logo-card {
+    padding: 8px 10px;
+  }
+}
+
 @include respond-to('md') {
   .sidebar {
     width: 280px;
@@ -409,6 +436,11 @@
   // Pad the sidebar menu so last items clear the bottom nav bar
   .sidebar-menu {
     padding-bottom: 70px;
+  }
+
+  .logo-image {
+    height: 52px;
+    max-width: 160px;
   }
 }
 

@@ -99,11 +99,11 @@
           <tbody>
             <tr *ngFor="let leave of filteredLeaves; trackBy: trackById">
               <td>
-                <span class="el-type-badge">{{ leaveTypeLabels[leave.leaveType] }}</span>
+                <span class="badge-soft badge-soft-primary">{{ leaveTypeLabels[leave.leaveType] }}</span>
               </td>
               <td>{{ formatDate(leave.startDate) }}</td>
               <td>{{ formatDate(leave.endDate) }}</td>
-              <td><span class="el-days-badge">{{ leave.numberOfDays }}d</span></td>
+              <td><span class="badge-soft badge-soft-secondary">{{ leave.numberOfDays }}d</span></td>
               <td>
                 <span [ngClass]="getStatusClass(leave.status)">{{ leaveStatusLabels[leave.status] }}</span>
               </td>
@@ -124,14 +124,14 @@
                 <div class="action-btn-group">
                   <button
                     *ngIf="leave.status === LeaveStatus.PENDING"
-                    class="action-btn action-btn-edit"
+                    class="btn-action btn-action-edit"
                     (click)="editLeave(leave)"
                     title="Edit">
                     <i class="bi bi-pencil"></i>
                   </button>
                   <button
                     *ngIf="canEditOrCancel(leave)"
-                    class="action-btn action-btn-cancel"
+                    class="btn-action delete"
                     (click)="cancelLeave(leave)"
                     title="Cancel">
                     <i class="bi bi-x-circle"></i>
