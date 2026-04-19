@@ -14,9 +14,7 @@ import { CustomHttpResponse } from '../interface/appstates';
  * Notification API Service
  * Handles all notification-related API calls
  */
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class NotificationApiService {
   private readonly server: string = environment.apiUrl + '/api/v1/notifications';
 

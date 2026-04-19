@@ -9,7 +9,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { InternAttendance, InternAttendanceRequest, InternAttendanceApproval } from '../interface/intern-attendance';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class InternAttendanceService {
   private apiUrl = `${environment.apiUrl}/api/v1/intern-attendance`;
 

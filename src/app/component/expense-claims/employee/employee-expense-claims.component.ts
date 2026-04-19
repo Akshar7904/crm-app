@@ -8,6 +8,7 @@
 
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Observable, BehaviorSubject, map, startWith, catchError, of, switchMap, Subject, takeUntil } from 'rxjs';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DataState } from '../../../enum/datastate.enum';
 import { CustomHttpResponse, Page } from '../../../interface/appstates';
 import { ExpenseClaim, ExpenseItem, ExpenseClaimStatus } from '../../../interface/expense-claim.model';
@@ -63,12 +64,19 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
   showDetailModal = false;
   private shouldOpenModal = false;
 
+  // Receipt viewer
+  showReceiptViewer = false;
+  receiptObjectUrl: string | null = null;
+  receiptSafeUrl: SafeResourceUrl | null = null;
+  receiptIsImage = false;
+
   constructor(
     private expenseClaimService: ExpenseClaimService,
     private notificationService: NotificationService,
     private userService: UserService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -395,11 +403,23 @@ export class EmployeeExpenseClaimsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (blob) => {
-          const url = window.URL.createObjectURL(blob);
-          window.open(url, '_blank');
+          if (this.receiptObjectUrl) window.URL.revokeObjectURL(this.receiptObjectUrl);
+          this.receiptObjectUrl = window.URL.createObjectURL(blob);
+          this.receiptIsImage = blob.type.startsWith('image/');
+          this.receiptSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.receiptObjectUrl);
+          this.showReceiptViewer = true;
+          this.cdr.markForCheck();
         },
         error: () => this.notificationService.onError('Could not open receipt')
       });
+  }
+
+  closeReceiptViewer(): void {
+    this.showReceiptViewer = false;
+    if (this.receiptObjectUrl) {
+      window.URL.revokeObjectURL(this.receiptObjectUrl);
+      this.receiptObjectUrl = null;
+    }
   }
 
   downloadMyReport(): void {

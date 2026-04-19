@@ -2,7 +2,7 @@
 // LKCentrix HR & Payroll Management System — ORION
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -17,7 +17,8 @@ import { InternAttendance } from '../../../interface/intern-attendance';
 @Component({
   selector: 'app-admin-intern-attendance',
   templateUrl: './admin-attendance.component.html',
-  styleUrls: ['./admin-attendance.component.scss']
+  styleUrls: ['./admin-attendance.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AdminInternAttendanceComponent implements OnInit {
   attendances: InternAttendance[] = [];
@@ -48,7 +49,8 @@ export class AdminInternAttendanceComponent implements OnInit {
     private userService: UserService,
     private internAttendanceService: InternAttendanceService,
     private employeeService: EmployeeService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
     this.approvalForm = this.fb.group({
       remarks: [''],
@@ -72,6 +74,7 @@ export class AdminInternAttendanceComponent implements OnInit {
       .subscribe({
         next: (res: any) => {
           this.currentUser = res?.data?.user || res?.data || res;
+          this.cdr.markForCheck();
           this.loadAll();
         },
         error: () => this.loadAll()
@@ -90,8 +93,9 @@ export class AdminInternAttendanceComponent implements OnInit {
           (e.roleName || '').toUpperCase().includes('INTERN')
         );
         this.loadingEmployees = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.loadingEmployees = false; }
+      error: () => { this.loadingEmployees = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -131,12 +135,14 @@ export class AdminInternAttendanceComponent implements OnInit {
         this.submitting = false;
         this.showLogForm = false;
         this.logForm.reset();
+        this.cdr.markForCheck();
         this.notification.onSuccess('School attendance request logged successfully.');
         this.loadAll();
       },
       error: (err) => {
         this.submitting = false;
         this.submitError = err?.error?.message || 'Failed to log request. Please try again.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -147,8 +153,9 @@ export class AdminInternAttendanceComponent implements OnInit {
       next: res => {
         this.attendances = res.data || [];
         this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; }
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -201,10 +208,11 @@ export class AdminInternAttendanceComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.processing = false;
+        this.cdr.markForCheck();
         this.closeModals();
         this.loadAll();
       },
-      error: () => { this.processing = false; }
+      error: () => { this.processing = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -220,10 +228,11 @@ export class AdminInternAttendanceComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.processing = false;
+        this.cdr.markForCheck();
         this.closeModals();
         this.loadAll();
       },
-      error: () => { this.processing = false; }
+      error: () => { this.processing = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -244,6 +253,8 @@ export class AdminInternAttendanceComponent implements OnInit {
       default: return 'badge-soft-secondary';
     }
   }
+
+  trackById = (index: number, item: any) => item.id;
 
   downloadReport(): void {
     this.internAttendanceService.downloadReport$()

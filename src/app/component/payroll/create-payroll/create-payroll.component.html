@@ -28,7 +28,7 @@
           <label class="form-label pay-label">Employee <span class="text-danger">*</span></label>
           <select class="form-select" formControlName="employeeId" [attr.disabled]="isEditMode ? '' : null">
             <option value="">Select Employee</option>
-            <option *ngFor="let emp of employees" [value]="emp.id">
+            <option *ngFor="let emp of employees; trackBy: trackById" [value]="emp.id">
               {{ emp.firstName }} {{ emp.lastName }} ({{ emp.employeeId || 'No ID' }})
             </option>
           </select>

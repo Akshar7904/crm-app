@@ -17,9 +17,7 @@ export interface PayrollStats {
   paidPayrolls: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class PayrollService {
 
   private readonly server = environment.apiUrl + '/api/v1';

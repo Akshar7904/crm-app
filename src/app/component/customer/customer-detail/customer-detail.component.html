@@ -129,6 +129,7 @@
                 <form #customerForm="ngForm" (ngSubmit)="updateCustomer(customerForm)">
                   <input type="hidden" [ngModel]="state?.appData?.data?.customer.id" name="id">
                   <input type="hidden" [ngModel]="state?.appData?.data?.customer.createdAt" name="createdAt">
+                  <input type="hidden" [ngModel]="state?.appData?.data?.customer.companyId" name="companyId">
 
                   <div class="row g-3">
                     <div class="col-md-6">

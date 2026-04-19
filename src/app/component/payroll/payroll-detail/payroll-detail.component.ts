@@ -3,13 +3,14 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { environment } from '@env/environment';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { PayrollService } from 'src/app/service/payroll.service';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { UserService } from 'src/app/service/user.service';
+import { CompanyService } from 'src/app/service/company.service';
 import { Payroll } from 'src/app/interface/payroll';
 import { Employee } from "../../employee/employee.model";
 
@@ -17,7 +18,8 @@ import { Employee } from "../../employee/employee.model";
   standalone: false,
   selector: 'app-payroll-detail',
   templateUrl: './payroll-detail.component.html',
-  styleUrls: ['./payroll-detail.component.scss']
+  styleUrls: ['./payroll-detail.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PayrollDetailComponent implements OnInit {
 
@@ -25,6 +27,7 @@ export class PayrollDetailComponent implements OnInit {
 
   payroll: Payroll | null = null;
   employee: Employee | null = null;
+  company: any = null;
   isLoading = true;
   error: string | null = null;
   isAdmin = false;
@@ -34,6 +37,7 @@ export class PayrollDetailComponent implements OnInit {
     private payrollService: PayrollService,
     private employeeService: EmployeeService,
     private userService: UserService,
+    public companyService: CompanyService,
     private route: ActivatedRoute,
     private router: Router,
     private location: Location,
@@ -44,9 +48,12 @@ export class PayrollDetailComponent implements OnInit {
   ngOnInit(): void {
     const id = +this.route.snapshot.params['id'];
     if (id) {
-      // First check user role, then load payroll with appropriate endpoint
       this.checkUserRoleAndLoadPayroll(id);
     }
+    this.companyService.getMyCompany$().subscribe({
+      next: (res) => { this.company = res?.data?.company; this.cdr.markForCheck(); },
+      error: () => {}
+    });
   }
 
   /**

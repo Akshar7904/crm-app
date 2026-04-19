@@ -47,7 +47,7 @@
         </div>
 
         <div class="pay-employee-grid">
-          <div *ngFor="let employee of employees" class="pay-emp-check" [class.pay-emp-selected]="selectedEmployees.has(employee.id)">
+          <div *ngFor="let employee of employees; trackBy: trackById" class="pay-emp-check" [class.pay-emp-selected]="selectedEmployees.has(employee.id)">
             <div class="form-check">
               <input class="form-check-input" type="checkbox"
                      [checked]="selectedEmployees.has(employee.id)"

@@ -76,7 +76,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   groupedBalances: { employeeName: string; employeeId: number; balances: LeaveBalance[] }[] = [];
   allocationLoading: boolean = false;
   savingBalanceId: string = ''; // key: employeeId-leaveType
-  showAllEmployees: boolean = false;
+  showAllEmployees: boolean = true; // kept for template empty-state conditionals
 
   constructor(
     private formBuilder: FormBuilder,
@@ -187,7 +187,7 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
     this.selectedStatus = 'all';
     this.selectedType = 'all';
     if (tab === 'allocate') {
-      this.loadAllocationData();
+      this.loadAllBalances();
     }
   }
 
@@ -401,28 +401,28 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
   getStatusClass(status: LeaveStatus): string {
     switch (status) {
       case LeaveStatus.PENDING:
-        return 'status-pending';
+        return 'badge-soft-warning';
       case LeaveStatus.APPROVED:
-        return 'status-approved';
+        return 'badge-soft-success';
       case LeaveStatus.REJECTED:
-        return 'status-rejected';
+        return 'badge-soft-danger';
       case LeaveStatus.CANCELLED:
-        return 'status-cancelled';
+        return 'badge-soft-muted';
       default:
-        return '';
+        return 'badge-soft-muted';
     }
   }
 
   getLeaveTypeClass(type: LeaveType): string {
     switch (type) {
       case LeaveType.ANNUAL:
-        return 'type-annual';
+        return 'badge-soft-primary';
       case LeaveType.SICK:
-        return 'type-sick';
+        return 'badge-soft-warning';
       case LeaveType.FAMILY_RESPONSIBILITY:
-        return 'type-family';
+        return 'badge-soft-success';
       default:
-        return 'type-other';
+        return 'badge-soft-info';
     }
   }
 
@@ -496,6 +496,27 @@ export class AdminLeaveComponent implements OnInit, OnDestroy {
     } else {
       this.loadAllocationData();
     }
+  }
+
+  bulkInitializing: boolean = false;
+
+  bulkInitializeLeave(): void {
+    if (!confirm('This will create leave balance records for all active employees who don\'t have them yet for the current year. Continue?')) return;
+    this.bulkInitializing = true;
+    const year = new Date().getFullYear();
+    this.leaveService.bulkInitializeLeaveBalances$(year)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => {
+          this.bulkInitializing = false;
+          this.notificationService.onSuccess(res.message || 'Leave balances initialized');
+          this.loadAllBalances();
+        },
+        error: (err: any) => {
+          this.bulkInitializing = false;
+          this.notificationService.onError(err?.error?.message || 'Failed to initialize leave balances');
+        }
+      });
   }
 
   loadAllBalances(): void {

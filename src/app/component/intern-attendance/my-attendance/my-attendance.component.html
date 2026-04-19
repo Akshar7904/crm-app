@@ -167,7 +167,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of filteredAttendances">
+            <tr *ngFor="let item of filteredAttendances; trackBy: trackById">
               <td>
                 <span class="fw-medium">{{ item.institutionName || '—' }}</span>
               </td>

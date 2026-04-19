@@ -124,14 +124,12 @@ export class AppComponent implements OnInit, OnDestroy {
    * Load user profile once and cache it
    */
   private loadProfile(): void {
-    console.log('📱 AppComponent: Loading user profile (once)');
-    this.profileLoaded = true; // Set flag immediately to prevent duplicate calls
+    this.profileLoaded = true;
 
     this.userService.profile$().pipe(
-      take(1), // Only take one emission
+      take(1),
       map(response => response?.data?.user as UserModel),
       catchError(error => {
-        console.error('Error loading profile:', error);
         this.isAuthenticated = false;
         this.profileLoaded = false;
         if (!this.router.url.includes('/login') &&
@@ -142,7 +140,6 @@ export class AppComponent implements OnInit, OnDestroy {
         return of(null);
       })
     ).subscribe(user => {
-      console.log('✅ AppComponent: Profile loaded and cached');
       this.userSubject.next(user);
     });
   }

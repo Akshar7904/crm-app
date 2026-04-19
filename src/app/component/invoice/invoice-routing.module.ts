@@ -10,9 +10,9 @@ import { NewinvoiceComponent } from './newinvoice/newinvoice.component';
 import { InvoiceDetailComponent } from './invoice-detail/invoice-detail.component';
 
 const invoiceRoutes: Routes = [
-    { path: 'invoices', component: InvoicesComponent, canActivate: [AuthenticationGuard] },
-    { path: 'invoices/new', component: NewinvoiceComponent, canActivate: [AuthenticationGuard] },
-    { path: 'invoices/:id/:invoiceNumber', component: InvoiceDetailComponent, canActivate: [AuthenticationGuard] }
+    { path: '', component: InvoicesComponent, canActivate: [AuthenticationGuard] },
+    { path: 'new', component: NewinvoiceComponent, canActivate: [AuthenticationGuard] },
+    { path: ':id/:invoiceNumber', component: InvoiceDetailComponent, canActivate: [AuthenticationGuard] }
 ];
 
 @NgModule({

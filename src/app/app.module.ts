@@ -2,10 +2,12 @@
 // LKCentrix HR & Payroll Management System — ORION
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { BrandingService } from './service/branding.service';
+import { UserService } from './service/user.service';
 
 // Core & Shared
 import { CoreModule } from './core/core.module';
@@ -17,8 +19,6 @@ import { AuthModule } from './component/auth/auth.module';
 // Feature Modules (some lazy-loaded, some not)
 import { HomeModule } from './component/home/home.module';
 import { NavBarModule } from './component/navbar/navbar.module';
-import { CustomerModule } from './component/customer/customer.module';
-import { InvoiceModule } from './component/invoice/invoice.module';
 // REMOVE EmployeeModule from here - it's lazy loaded
 
 // Components declared here (not in lazy-loaded modules)
@@ -31,6 +31,7 @@ import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employe
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 
 // Documentation
+import { CompanyPolicyComponent } from './component/policy/company-policy.component';
 import { DocumentationComponent } from './component/documentation/documentation.component';
 
 // Services
@@ -44,6 +45,7 @@ import { AppRoutingModule } from './app-routing.module';
   declarations: [
     AppComponent,
     DocumentationComponent,
+    CompanyPolicyComponent,
     AttendanceListComponent,
     EditAttendanceModalComponent,
     MyAttendanceComponent,
@@ -68,14 +70,25 @@ import { AppRoutingModule } from './app-routing.module';
     // Feature Modules
     NavBarModule,
     HomeModule,
-    CustomerModule,
-    InvoiceModule,
 
     // MUST BE LAST - App Routing
     AppRoutingModule
   ],
   providers: [
-    DashboardService
+    DashboardService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (branding: BrandingService, userService: UserService) => () => {
+        // Only load company branding if the user is already authenticated (token exists).
+        // On first visit / after logout this is a no-op — branding loads after login via the sidebar.
+        if (userService.isAuthenticated()) {
+          return branding.load().toPromise();
+        }
+        return Promise.resolve();
+      },
+      deps: [BrandingService, UserService],
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

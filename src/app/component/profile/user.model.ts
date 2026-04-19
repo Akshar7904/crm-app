@@ -60,6 +60,9 @@ export interface UserModel {
   branchCode?: string;             // Bank branch code
   accountType?: string;            // CURRENT, SAVINGS, CHEQUE
 
+  // Multi-tenancy
+  companyId?: number;              // The tenant company this user belongs to
+
   // System Tracking
   updatedAt?: Date;                // Last update timestamp
 

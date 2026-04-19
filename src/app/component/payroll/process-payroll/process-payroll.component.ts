@@ -2,7 +2,7 @@
 // LKCentrix HR & Payroll Management System — ORION
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PayrollService } from 'src/app/service/payroll.service';
@@ -13,7 +13,8 @@ import { Employee } from 'src/app/component/employee/employee.model';
   standalone: false,
   selector: 'app-process-payroll',
   templateUrl: './process-payroll.component.html',
-  styleUrls: ['./process-payroll.component.scss']
+  styleUrls: ['./process-payroll.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProcessPayrollComponent implements OnInit {
   processForm: FormGroup;
@@ -117,4 +118,6 @@ export class ProcessPayrollComponent implements OnInit {
   cancel(): void {
     this.router.navigate(['/payroll/list']);
   }
+
+  trackById = (index: number, item: any) => item.id;
 }

@@ -5,8 +5,19 @@
   <!-- Logo Floating Card -->
   <div class="sidebar-logo-card">
     <a routerLink="/" class="logo-link">
-      <img src="../../../assets/logo.png" alt="LKCentrix" class="logo-image">
+      <!-- Show company logo if available, fall back to platform logo -->
+      <img *ngIf="companyLogoUrl; else platformLogo"
+           [src]="companyLogoUrl"
+           [alt]="branding.branding?.name || companyName || 'Company'"
+           class="logo-image company-logo"
+           (error)="onLogoError()">
+      <ng-template #platformLogo>
+        <img src="../../../assets/logo_icon.png" alt="ORION" class="logo-image">
+      </ng-template>
     </a>
+    <div *ngIf="!collapsed && branding.branding?.tagline" class="sidebar-tagline">
+      {{ branding.branding?.tagline }}
+    </div>
   </div>
 
   <!-- Menu Floating Card -->
@@ -62,11 +73,18 @@
   <!-- Footer Floating Card -->
   <div class="sidebar-footer-card">
     <a class="menu-item"
+       routerLink="/policy"
+       routerLinkActive="active"
+       [attr.title]="collapsed ? 'Company Policy' : null">
+      <span class="menu-icon"><i class="bi bi-file-earmark-text"></i></span>
+      <span class="menu-label">Company Policy</span>
+    </a>
+    <a class="menu-item"
        routerLink="/documentation"
        routerLinkActive="active"
-       [attr.title]="collapsed ? 'Documentation' : null">
+       [attr.title]="collapsed ? 'System User Guide' : null">
       <span class="menu-icon"><i class="bi bi-book"></i></span>
-      <span class="menu-label">Documentation</span>
+      <span class="menu-label">System User Guide</span>
     </a>
     <a class="logout-btn" (click)="onLogout()" [attr.title]="collapsed ? 'Logout' : null">
       <span class="menu-icon">

@@ -25,47 +25,7 @@
   .breadcrumb-item.active { color: var(--text-muted); }
 }
 
-// ─── Falcon Banner ────────────────────────────────────────────────────────────
-.emp-page-banner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: $spacing-md;
-  padding: $spacing-md $spacing-xl;
-  background: linear-gradient(135deg, $primary 0%, $primary-medium 60%, $primary-light 100%);
-  border-radius: $border-radius-xl;
-  margin-bottom: $spacing-lg;
-  box-shadow: 0 6px 24px rgba($primary, 0.28);
-  position: relative;
-  overflow: hidden;
-  animation: fadeInDown 0.4s ease forwards;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -40px; right: -40px;
-    width: 170px; height: 170px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.06);
-    pointer-events: none;
-  }
-}
-
-.emp-banner-left  { position: relative; z-index: 1; }
-.emp-banner-title {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
-  color: #fff;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  i { opacity: 0.85; }
-}
-.emp-banner-subtitle { color: rgba(255,255,255,0.75); font-size: $font-size-sm; margin: 4px 0 0; }
-.emp-banner-actions  { position: relative; z-index: 1; }
-
+// ─── Banner search (inside .page-banner) ─────────────────────────────────────
 .emp-search-wrap {
   position: relative;
   display: flex;
@@ -100,72 +60,8 @@
   }
 }
 
-.btn-banner-emp {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 7px 16px;
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.25);
-  border-radius: $border-radius-md;
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: all $transition-base;
-  white-space: nowrap;
-  backdrop-filter: blur(4px);
-
-  &:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
-
-  &.btn-banner-emp-solid {
-    background: rgba(255,255,255,0.22);
-    border-color: rgba(255,255,255,0.4);
-    font-weight: $font-weight-semibold;
-  }
-}
-
-// ─── Table Card ───────────────────────────────────────────────────────────────
-.emp-table-card {
-  background: var(--bg-card);
-  border: 0;
-  border-radius: $border-radius-xl;
-  box-shadow: var(--card-shadow);
-  overflow: hidden;
-  margin-bottom: $spacing-md;
-  animation: fadeInUp 0.4s ease forwards;
-}
-
-.emp-table {
-  thead th {
-    background: var(--table-header-bg);
-    color: var(--text-secondary);
-    font-size: 0.72rem;
-    font-weight: $font-weight-semibold;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 13px 16px;
-    border-bottom: 1px solid var(--border-light);
-    border-top: none;
-    white-space: nowrap;
-  }
-
-  tbody td {
-    padding: 14px 16px;
-    vertical-align: middle;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-light);
-  }
-
-  tbody tr {
-    transition: background-color $transition-base;
-    cursor: pointer;
-
-    &:hover { background: var(--table-hover); }
-    &:last-child td { border-bottom: none; }
-  }
-}
+// ─── Employee row ─────────────────────────────────────────────────────────────
+.emp-row { cursor: pointer; }
 
 // ─── Employee Identity Cell ───────────────────────────────────────────────────
 .emp-identity {
@@ -219,7 +115,7 @@
   margin-top: 1px;
 }
 
-// ─── Department ───────────────────────────────────────────────────────────────
+// ─── Department cell ──────────────────────────────────────────────────────────
 .emp-dept {
   display: inline-flex;
   align-items: center;
@@ -230,18 +126,8 @@
   i { color: var(--text-muted); font-size: 0.8rem; }
 }
 
-// ─── Employee ID Badge ────────────────────────────────────────────────────────
-.emp-id-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  background: rgba($primary, 0.08);
-  color: $primary;
-  border-radius: $border-radius-xl;
-  font-size: 0.72rem;
-  font-weight: $font-weight-semibold;
-  letter-spacing: 0.5px;
-  font-family: monospace;
-}
+// ─── Employee ID (monospace overlay on badge-soft-primary) ────────────────────
+.emp-id-mono { font-family: monospace; letter-spacing: 0.5px; }
 
 // ─── Meta Text (email, phone) ─────────────────────────────────────────────────
 .emp-meta-text {
@@ -254,7 +140,7 @@
   display: block;
 }
 
-// ─── Date ─────────────────────────────────────────────────────────────────────
+// ─── Date cell ────────────────────────────────────────────────────────────────
 .emp-date {
   display: inline-flex;
   align-items: center;
@@ -266,86 +152,16 @@
   i { color: var(--text-muted); font-size: 0.75rem; }
 }
 
-// ─── Status Badges (soft) ─────────────────────────────────────────────────────
-.emp-status-badge {
-  display: inline-block;
-  padding: 4px 11px;
-  border-radius: $border-radius-xl;
-  font-size: 0.72rem;
-  font-weight: $font-weight-semibold;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  white-space: nowrap;
-
-  &.status-active     { background: rgba($success, 0.12); color: darken($success, 10%); }
-  &.status-terminated { background: rgba($danger, 0.12);  color: darken($danger, 8%); }
-  &.status-on-leave   { background: rgba($warning, 0.15); color: darken($warning, 20%); }
-  &.status-probation  { background: rgba($info, 0.15);    color: darken($info, 12%); }
-  &.status-inactive   { background: rgba($gray-500, 0.12); color: $gray-600; }
-}
-
-// ─── Action Button ────────────────────────────────────────────────────────────
-.emp-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 12px;
-  background: transparent;
-  border: 1px solid rgba($primary, 0.4);
-  border-radius: $border-radius;
-  color: $primary;
-  font-size: 0.8rem;
-  font-weight: $font-weight-medium;
-  cursor: pointer;
-  transition: all $transition-base;
-
-  &:hover {
-    background: rgba($primary, 0.1);
-    border-color: $primary;
-    transform: translateY(-1px);
-  }
-}
-
 // ─── Empty State ──────────────────────────────────────────────────────────────
 .emp-empty {
-  background: var(--bg-card);
-  border: 0;
-  border-radius: $border-radius-xl;
-  box-shadow: var(--card-shadow);
   padding: 60px 20px;
   text-align: center;
-  animation: fadeInUp 0.4s ease forwards;
 }
 
 .emp-empty-icon {
   font-size: 3.5rem;
   color: var(--text-muted);
   opacity: 0.35;
-}
-
-.emp-empty h5 { color: var(--text-primary); font-weight: $font-weight-semibold; }
-
-// ─── Primary Button ───────────────────────────────────────────────────────────
-.emp-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 22px;
-  background: linear-gradient(135deg, $primary 0%, $primary-medium 100%);
-  border: none;
-  border-radius: $border-radius-md;
-  color: #fff;
-  font-size: 0.875rem;
-  font-weight: $font-weight-semibold;
-  cursor: pointer;
-  transition: all $transition-base;
-
-  &:hover {
-    background: linear-gradient(135deg, darken($primary, 5%) 0%, darken($primary-medium, 5%) 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba($primary, 0.35);
-    color: #fff;
-  }
 }
 
 // ─── Falcon Alert ─────────────────────────────────────────────────────────────
@@ -403,27 +219,13 @@
 
 // ─── Responsive ───────────────────────────────────────────────────────────────
 @include respond-to('md') {
-  .emp-page-banner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: $spacing-md;
-  }
-
-  .emp-banner-actions form {
-    flex-wrap: wrap;
-    width: 100%;
-
-    .emp-search-wrap { flex: 1; }
-    .emp-search { min-width: 0; width: 100%; }
-  }
-
   .emp-meta-text { max-width: 140px; }
 
   // Hide less critical columns on mobile
-  .emp-table thead th:nth-child(4),
-  .emp-table thead th:nth-child(5),
-  .emp-table tbody td:nth-child(4),
-  .emp-table tbody td:nth-child(5) {
+  table thead th:nth-child(4),
+  table thead th:nth-child(5),
+  table tbody td:nth-child(4),
+  table tbody td:nth-child(5) {
     display: none;
   }
 }

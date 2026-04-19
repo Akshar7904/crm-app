@@ -12,17 +12,25 @@ import { CreditNoteListComponent } from './credit-notes/credit-note-list.compone
 import { VatReturnsComponent } from './vat-returns/vat-returns.component';
 import { AccountingOverviewComponent } from './overview/accounting-overview.component';
 import { AccountingReportsComponent } from './reports/accounting-reports.component';
+import { BankingComponent } from './banking/banking.component';
+import { InventoryComponent } from './inventory/inventory.component';
+import { ModuleAccessGuard } from '../../guard/module-access.guard';
+
+const BUSINESS = 'BUSINESS_EXPENSES';
+const INVOICE  = 'INVOICE_CUSTOMER';
 
 const routes: Routes = [
   { path: '', redirectTo: 'overview', pathMatch: 'full' },
-  { path: 'overview', component: AccountingOverviewComponent },
-  { path: 'products', component: ProductListComponent },
-  { path: 'bills', component: BillListComponent },
-  { path: 'quotes', component: QuoteListComponent },
-  { path: 'quotes/:id', component: QuoteDetailComponent },
-  { path: 'credit-notes', component: CreditNoteListComponent },
-  { path: 'vat-returns', component: VatReturnsComponent },
-  { path: 'reports', component: AccountingReportsComponent }
+  { path: 'overview',     component: AccountingOverviewComponent, canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } },
+  { path: 'products',     component: ProductListComponent,        canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } },
+  { path: 'bills',        component: BillListComponent,           canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } },
+  { path: 'quotes',       component: QuoteListComponent,          canActivate: [ModuleAccessGuard], data: { moduleKey: INVOICE  } },
+  { path: 'quotes/:id',   component: QuoteDetailComponent,        canActivate: [ModuleAccessGuard], data: { moduleKey: INVOICE  } },
+  { path: 'credit-notes', component: CreditNoteListComponent,     canActivate: [ModuleAccessGuard], data: { moduleKey: INVOICE  } },
+  { path: 'vat-returns',  component: VatReturnsComponent,         canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } },
+  { path: 'banking',      component: BankingComponent,            canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } },
+  { path: 'inventory',    component: InventoryComponent,         canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } },
+  { path: 'reports',     component: AccountingReportsComponent,  canActivate: [ModuleAccessGuard], data: { moduleKey: BUSINESS } }
 ];
 
 @NgModule({

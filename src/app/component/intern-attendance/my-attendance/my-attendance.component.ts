@@ -2,7 +2,7 @@
 // LKCentrix HR & Payroll Management System — ORION
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { Subject } from 'rxjs';
@@ -16,7 +16,8 @@ import { InternAttendance } from '../../../interface/intern-attendance';
 @Component({
   selector: 'app-my-intern-attendance',
   templateUrl: './my-attendance.component.html',
-  styleUrls: ['./my-attendance.component.scss']
+  styleUrls: ['./my-attendance.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MyInternAttendanceComponent implements OnInit {
   private destroy$ = new Subject<void>();
@@ -36,7 +37,8 @@ export class MyInternAttendanceComponent implements OnInit {
     private http: HttpClient,
     private userService: UserService,
     private internAttendanceService: InternAttendanceService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {
     // Initialize form in constructor so template never sees undefined
     this.attendanceForm = this.fb.group({
@@ -57,11 +59,12 @@ export class MyInternAttendanceComponent implements OnInit {
           // Profile response structure: { data: { user: {...} } }
           this.currentUser = res?.data?.user || res?.data || res;
           this.loadingUser = false;
+          this.cdr.markForCheck();
           if (this.currentUser?.id) {
             this.loadMyAttendances(this.currentUser.id);
           }
         },
-        error: () => { this.loadingUser = false; }
+        error: () => { this.loadingUser = false; this.cdr.markForCheck(); }
       });
   }
 
@@ -71,8 +74,9 @@ export class MyInternAttendanceComponent implements OnInit {
       next: res => {
         this.attendances = res.data || [];
         this.loading = false;
+        this.cdr.markForCheck();
       },
-      error: () => { this.loading = false; }
+      error: () => { this.loading = false; this.cdr.markForCheck(); }
     });
   }
 
@@ -115,12 +119,14 @@ export class MyInternAttendanceComponent implements OnInit {
         this.submitting = false;
         this.showForm = false;
         this.attendanceForm.reset();
+        this.cdr.markForCheck();
         this.notification.onSuccess('School attendance request submitted. An admin will review it shortly.');
         this.loadMyAttendances(this.currentUser.id);
       },
       error: (err) => {
         this.submitting = false;
         this.submitError = err?.error?.message || 'Failed to submit request. Please try again.';
+        this.cdr.markForCheck();
       }
     });
   }
@@ -155,4 +161,6 @@ export class MyInternAttendanceComponent implements OnInit {
       default: return 'badge-soft-secondary';
     }
   }
+
+  trackById = (index: number, item: any) => item.id;
 }

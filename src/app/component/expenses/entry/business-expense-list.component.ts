@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { BusinessExpenseService } from '../services/business-expense.service';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
+import { BankingService } from '../../accounting/services/banking.service';
 
 @Component({
   standalone: false,
@@ -29,10 +30,17 @@ export class BusinessExpenseListComponent implements OnInit, OnDestroy {
 
   statusOptions = ['', 'DRAFT', 'APPROVED', 'VOID'];
 
+  // Approve modal
+  showApproveModal = false;
+  approveTargetId: number | null = null;
+  approveSelectedBankAccountId: number | null = null;
+  bankAccounts: any[] = [];
+
   constructor(
     private businessExpenseService: BusinessExpenseService,
     private userService: UserService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private bankingService: BankingService
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +52,12 @@ export class BusinessExpenseListComponent implements OnInit, OnDestroy {
           this.loadExpenses();
         },
         error: () => this.loadExpenses()
+      });
+    this.bankingService.getActiveAccounts$()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (res: any) => { this.bankAccounts = res?.data?.accounts ?? res ?? []; },
+        error: () => {}
       });
   }
 
@@ -93,12 +107,27 @@ export class BusinessExpenseListComponent implements OnInit, OnDestroy {
     this.loadExpenses();
   }
 
-  approve(id: number): void {
-    if (!confirm('Approve this expense?')) return;
-    this.businessExpenseService.approve(id)
+  openApproveModal(id: number): void {
+    this.approveTargetId = id;
+    this.approveSelectedBankAccountId = null;
+    this.showApproveModal = true;
+  }
+
+  closeApproveModal(): void {
+    this.showApproveModal = false;
+    this.approveTargetId = null;
+  }
+
+  confirmApprove(): void {
+    if (!this.approveTargetId) return;
+    this.businessExpenseService.approve(this.approveTargetId, this.approveSelectedBankAccountId ?? undefined)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.notification.onSuccess('Expense approved'); this.loadExpenses(); },
+        next: () => {
+          this.notification.onSuccess('Expense approved' + (this.approveSelectedBankAccountId ? ' and payment recorded in banking' : ''));
+          this.closeApproveModal();
+          this.loadExpenses();
+        },
         error: () => this.notification.onError('Failed to approve expense')
       });
   }

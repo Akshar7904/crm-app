@@ -97,6 +97,7 @@
             <th>Purpose</th>
             <th class="text-end">Amount</th>
             <th>Status</th>
+            <th *ngIf="isAdmin">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -119,12 +120,41 @@
             </td>
             <td>
               <span class="badge-soft" [ngClass]="getStatusClass(claim.status)">{{ claim.status }}</span>
+              <small *ngIf="claim.paymentMethod" class="d-block text-muted mt-1" style="font-size:0.72rem">
+                <i class="bi" [class.bi-bank]="claim.paymentMethod === 'BANK_TRANSFER'" [class.bi-cash]="claim.paymentMethod === 'CASH'"></i>
+                {{ claim.paymentMethod === 'BANK_TRANSFER' ? 'Bank' : 'Cash' }}
+              </small>
+            </td>
+            <td *ngIf="isAdmin">
+              <div class="action-btn-group">
+                <!-- Approve -->
+                <button class="btn btn-sm btn-outline-success"
+                        *ngIf="claim.status === 'PENDING'"
+                        (click)="openApproveModal(claim.id)"
+                        title="Approve">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <!-- Reject -->
+                <button class="btn btn-sm btn-outline-danger"
+                        *ngIf="claim.status === 'PENDING'"
+                        (click)="openRejectModal(claim.id)"
+                        title="Reject">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+                <!-- Mark Paid -->
+                <button class="btn btn-sm btn-outline-primary"
+                        *ngIf="claim.status === 'APPROVED'"
+                        (click)="openPayModal(claim.id)"
+                        title="Record Payment">
+                  <i class="bi bi-cash-coin"></i>
+                </button>
+              </div>
             </td>
           </tr>
 
           <!-- Empty state -->
           <tr *ngIf="filteredClaims.length === 0">
-            <td [attr.colspan]="isAdmin ? 6 : 5" class="empty-state-cell">
+            <td [attr.colspan]="isAdmin ? 7 : 5" class="empty-state-cell">
               <i class="bi bi-file-earmark-x"></i>
               <p>No claims found for <strong>{{ selectedStatus === 'ALL' ? 'any status' : selectedStatus }}</strong></p>
               <a *ngIf="selectedStatus !== 'ALL'" class="btn btn-sm btn-outline-primary mt-2" (click)="setStatus('ALL')">
@@ -154,5 +184,107 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ===== Approve Modal ===== -->
+<div class="modal-backdrop fade show" *ngIf="showApproveModal" (click)="closeApproveModal()"></div>
+<div class="modal fade show d-block" *ngIf="showApproveModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content falcon-card">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-check-circle me-2 text-success"></i>Approve Claim</h5>
+        <button class="btn-close" (click)="closeApproveModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted">Are you sure you want to approve this expense claim?</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeApproveModal()">Cancel</button>
+        <button class="btn btn-success" (click)="confirmApprove()">
+          <i class="bi bi-check-lg me-1"></i>Approve
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Reject Modal ===== -->
+<div class="modal-backdrop fade show" *ngIf="showRejectModal" (click)="closeRejectModal()"></div>
+<div class="modal fade show d-block" *ngIf="showRejectModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content falcon-card">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-x-circle me-2 text-danger"></i>Reject Claim</h5>
+        <button class="btn-close" (click)="closeRejectModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Rejection Reason</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="rejectReason"
+                    placeholder="Provide a reason for rejection..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeRejectModal()">Cancel</button>
+        <button class="btn btn-danger" (click)="confirmReject()">
+          <i class="bi bi-x-lg me-1"></i>Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Pay Modal ===== -->
+<div class="modal-backdrop fade show" *ngIf="showPayModal" (click)="closePayModal()"></div>
+<div class="modal fade show d-block" *ngIf="showPayModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content falcon-card">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-cash-coin me-2 text-primary"></i>Record Payment</h5>
+        <button class="btn-close" (click)="closePayModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Payment Method</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="pmCash"
+                     [(ngModel)]="payPaymentMethod" value="CASH">
+              <label class="form-check-label" for="pmCash">
+                <i class="bi bi-cash me-1"></i>Cash
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="pmBank"
+                     [(ngModel)]="payPaymentMethod" value="BANK_TRANSFER">
+              <label class="form-check-label" for="pmBank">
+                <i class="bi bi-bank me-1"></i>Bank Transfer
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="mb-3" *ngIf="payPaymentMethod === 'BANK_TRANSFER'">
+          <label class="form-label fw-semibold">Bank Account</label>
+          <select class="form-select" [(ngModel)]="payBankAccountId">
+            <option [ngValue]="null">— Select bank account —</option>
+            <option *ngFor="let acct of bankAccounts" [ngValue]="acct.id">
+              {{ acct.name }} ({{ acct.bankName }})
+            </option>
+          </select>
+          <div class="form-text">A DEBIT transaction will be recorded automatically.</div>
+        </div>
+        <div class="alert alert-info py-2 mb-0" *ngIf="payPaymentMethod === 'CASH'">
+          <i class="bi bi-info-circle me-1"></i>Cash payment — no banking transaction will be created.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closePayModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="confirmPay()"
+                [disabled]="payPaymentMethod === 'BANK_TRANSFER' && !payBankAccountId">
+          <i class="bi bi-check-lg me-1"></i>Confirm Payment
+        </button>
+      </div>
+    </div>
   </div>
 </div>

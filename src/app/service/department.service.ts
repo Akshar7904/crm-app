@@ -14,9 +14,7 @@ import { DepartmentState } from '../interface/department-state';
  * Service for managing department operations
  * Implements reactive state management with BehaviorSubject
  */
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class DepartmentService {
   private readonly apiUrl = environment.apiUrl + '/api/v1/departments';
 

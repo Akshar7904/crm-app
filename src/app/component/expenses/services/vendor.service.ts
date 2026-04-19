@@ -10,7 +10,7 @@ import { environment } from '@env/environment';
 
 const API = `${environment.apiUrl}/api/v1/vendors`;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class VendorService {
   constructor(private http: HttpClient) {}
 

@@ -29,7 +29,7 @@
 // ─── Balance KPI grid
 .el-balance-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 16px;
   padding: 0 24px 24px;
 }
@@ -77,26 +77,31 @@
 .el-balance-stats {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .el-stat {
   display: flex; flex-direction: column; align-items: center; flex: 1;
+  min-width: 0;
 }
 
 .el-stat-val {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary, #1a2a4a);
   line-height: 1;
 }
 
 .el-stat-lbl {
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   text-transform: uppercase;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   color: var(--text-muted, #aaa);
   margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .el-stat-div {
@@ -137,63 +142,6 @@
     color: var(--primary, #375fa0);
   }
 }
-
-// ─── Table
-.table thead th {
-  font-size: 0.74rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--text-muted, #888);
-  background: var(--table-header-bg, #f8f9fa);
-  border-bottom: 1px solid var(--border-color, #eee);
-  padding: 10px 14px;
-  white-space: nowrap;
-}
-
-.table tbody td {
-  padding: 10px 14px;
-  font-size: 0.85rem;
-  color: var(--text-primary, #333);
-  border-bottom: 1px solid var(--border-color, #f0f0f0);
-  vertical-align: middle;
-}
-
-.table tbody tr:last-child td { border-bottom: none; }
-.table tbody tr:hover td { background: var(--table-hover, #f8faff); }
-
-// ─── Leave type badge
-.el-type-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  background: rgba(55,95,160,.1);
-  color: #375fa0;
-  white-space: nowrap;
-}
-
-// ─── Days badge
-.el-days-badge {
-  display: inline-block;
-  padding: 2px 9px;
-  border-radius: 20px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  background: rgba(142,68,173,.1);
-  color: #8e44ad;
-}
-
-// ─── Status badges
-.status-pending   { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(255,193,7,.15); color: #d68910; }
-.status-approved  { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,.12); color: #27ae60; }
-.status-rejected  { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,.1);  color: #dc3545; }
-.status-cancelled { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,.1); color: #6c757d; }
-
-// ─── Action buttons (override global for edit/cancel variants)
-.action-btn-edit   { background: rgba(55,95,160,.1); color: #375fa0; &:hover { background: rgba(55,95,160,.2); } }
-.action-btn-cancel { background: rgba(220,53,69,.1);  color: #dc3545; &:hover { background: rgba(220,53,69,.2);  } }
 
 // ─── Loading state
 .el-state-cell {
@@ -267,7 +215,10 @@
 }
 
 // ─── Responsive
-@media (max-width: 768px) {
+@media (max-width: 900px) and (min-width: 601px) {
+  .el-balance-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
   .el-balance-grid { padding: 0 12px 16px; grid-template-columns: 1fr; }
   .el-table-card { margin: 0 12px; }
   .el-balance-stats { flex-wrap: wrap; gap: 6px; }

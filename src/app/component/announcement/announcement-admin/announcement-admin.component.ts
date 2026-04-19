@@ -7,6 +7,7 @@ import { NgForm } from '@angular/forms';
 import { Observable, Subject, BehaviorSubject, of } from 'rxjs';
 import { takeUntil, map, startWith, catchError, switchMap } from 'rxjs/operators';
 import { AnnouncementService } from 'src/app/service/announcement.service';
+import { DepartmentService } from 'src/app/service/department.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { Announcement, AnnouncementForm, AnnouncementCategory, Priority, TargetAudience, getCategoryBadgeClass } from 'src/app/interface/notification';
 import { DataState } from 'src/app/enum/datastate.enum';
@@ -34,6 +35,10 @@ export class AnnouncementAdminComponent implements OnInit, OnDestroy {
   showEditModal = false;
   editingAnnouncement: Announcement | null = null;
   isSubmitting = false;
+  selectedAudience: string = 'ALL';
+
+  departments: any[] = [];
+  loadingDepts = false;
 
   readonly DataState = DataState;
 
@@ -51,11 +56,23 @@ export class AnnouncementAdminComponent implements OnInit, OnDestroy {
 
   constructor(
     private announcementService: AnnouncementService,
+    private departmentService: DepartmentService,
     private notification: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.loadAnnouncements();
+    this.loadDepartments();
+  }
+
+  loadDepartments(): void {
+    this.loadingDepts = true;
+    this.departmentService.getAllDepartments()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: depts => { this.departments = depts || []; this.loadingDepts = false; },
+        error: () => { this.loadingDepts = false; }
+      });
   }
 
   ngOnDestroy(): void {
@@ -86,11 +103,17 @@ export class AnnouncementAdminComponent implements OnInit, OnDestroy {
   openCreateModal(): void {
     this.showCreateModal = true;
     this.editingAnnouncement = null;
+    this.selectedAudience = 'ALL';
   }
 
   openEditModal(announcement: Announcement): void {
     this.editingAnnouncement = { ...announcement };
+    this.selectedAudience = announcement.targetAudience || 'ALL';
     this.showEditModal = true;
+  }
+
+  onAudienceChange(value: string): void {
+    this.selectedAudience = value;
   }
 
   closeModals(): void {

@@ -1,3 +1,12 @@
+<!-- Impersonation Banner — shown when SUPERADMIN is viewing a company -->
+<div class="impersonation-banner" *ngIf="isImpersonating">
+  <i class="bi bi-eye-fill me-2"></i>
+  Viewing as <strong>{{ impersonatedCompanyName }}</strong>
+  <button class="btn btn-sm btn-light ms-3" (click)="exitImpersonation()">
+    <i class="bi bi-arrow-return-left me-1"></i>Return to Super-Admin
+  </button>
+</div>
+
 <nav class="navbar">
   <div class="navbar-container">
 
@@ -5,7 +14,7 @@
     <div class="navbar-left">
       <!-- Mobile logo — shown on phones only, replaces hamburger -->
       <a routerLink="/" class="mobile-nav-logo">
-        <img src="assets/logo.png" alt="LKCentrix" class="mobile-nav-logo-img">
+        <img src="assets/logo_icon.png" alt="LKCentrix" class="mobile-nav-logo-img">
       </a>
       <!-- Hamburger — shown on tablet only (768–992px range) -->
       <button

@@ -454,15 +454,15 @@ export class EmployeeLeaveComponent implements OnInit, OnDestroy {
   getStatusClass(status: LeaveStatus): string {
     switch (status) {
       case LeaveStatus.PENDING:
-        return 'status-pending';
+        return 'badge-soft badge-soft-warning';
       case LeaveStatus.APPROVED:
-        return 'status-approved';
+        return 'badge-soft badge-soft-success';
       case LeaveStatus.REJECTED:
-        return 'status-rejected';
+        return 'badge-soft badge-soft-danger';
       case LeaveStatus.CANCELLED:
-        return 'status-cancelled';
+        return 'badge-soft badge-soft-muted';
       default:
-        return '';
+        return 'badge-soft badge-soft-muted';
     }
   }
 

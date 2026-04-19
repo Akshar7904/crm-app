@@ -11,22 +11,24 @@ import {
   HttpResponse,
   HttpErrorResponse
 } from '@angular/common/http';
-import { BehaviorSubject, catchError, filter, Observable, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, filter, Observable, switchMap, take, throwError } from 'rxjs';
 import { Key } from '../enum/key.enum';
 import { UserService } from '../service/user.service';
 import { CustomHttpResponse, Profile } from '../interface/appstates';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class TokenInterceptor implements HttpInterceptor {
   private isTokenRefreshing: boolean = false;
   private refreshTokenSubject: BehaviorSubject<CustomHttpResponse<Profile>> = new BehaviorSubject(null);
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private router: Router) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     // Skip adding token for authentication endpoints
     if (request.url.includes('/user/verify') || request.url.includes('login') || request.url.includes('register')
-      || request.url.includes('refresh') || request.url.includes('resetpassword')) {
+      || request.url.includes('refresh') || request.url.includes('resetpassword')
+      || request.url.includes('/auth/companies')) {
       return next.handle(request);
     }
 
@@ -63,20 +65,24 @@ export class TokenInterceptor implements HttpInterceptor {
         }),
         catchError((error) => {
           this.isTokenRefreshing = false;
-          console.error('Token refresh failed:', error);
-          // Redirect to login or handle token refresh failure
+          console.error('Token refresh failed — forcing logout:', error);
+          // Unblock any requests waiting on this subject so they don't hang forever
+          this.refreshTokenSubject.next(null);
           this.userService.logOut();
-          return throwError(() => error);
+          this.router.navigate(['/login']);
+          return EMPTY;
         })
       );
     } else {
-      // Wait for the token to be refreshed
+      // Wait for the token to be refreshed; if refresh fails the subject re-emits null
+      // and we complete without retrying (EMPTY) so we don't loop.
       return this.refreshTokenSubject.pipe(
         filter(response => response !== null),
         take(1),
         switchMap((response) => {
           return next.handle(this.addAuthorizationTokenHeader(request, response.data.access_token));
-        })
+        }),
+        catchError(() => EMPTY)
       );
     }
   }

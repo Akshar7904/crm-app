@@ -3,7 +3,7 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { environment } from '@env/environment';
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PayrollService } from 'src/app/service/payroll.service';
 import { Payroll } from 'src/app/interface/payroll';
@@ -12,7 +12,8 @@ import { Payroll } from 'src/app/interface/payroll';
   standalone: false,
   selector: 'app-payslips',
   templateUrl: './payslips.component.html',
-  styleUrls: ['./payslips.component.scss']
+  styleUrls: ['./payslips.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PayslipsComponent implements OnInit {
   private readonly server = environment.apiUrl + '/api/v1';
@@ -191,4 +192,7 @@ export class PayslipsComponent implements OnInit {
     const d = new Date(year, month, 0); // day 0 of next month = last day of this month
     return `${year}-${String(month).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }
+
+  trackById = (index: number, item: any) => item.id;
+  trackByValue = (index: number, value: any) => value;
 }

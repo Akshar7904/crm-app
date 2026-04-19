@@ -2,14 +2,15 @@
 // LKCentrix HR & Payroll Management System — ORION
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { PayrollService, PayrollStats } from 'src/app/service/payroll.service';
 
 @Component({
   standalone: false,
   selector: 'app-payroll-stats',
   templateUrl: './payroll-stats.component.html',
-  styleUrls: ['./payroll-stats.component.scss']
+  styleUrls: ['./payroll-stats.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PayrollStatsComponent implements OnInit {
   stats: PayrollStats | null = null;

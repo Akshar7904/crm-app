@@ -10,6 +10,7 @@ import { Asset, AssetAssignmentForm, AssetCondition } from 'src/app/interface/as
 import { AssetService } from 'src/app/service/asset.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { EmployeeService } from 'src/app/service/employee.service';
+import { UserService } from 'src/app/service/user.service';
 
 @Component({
   standalone: false,
@@ -34,10 +35,10 @@ export class AssignAssetComponent implements OnInit {
     private route: ActivatedRoute,
     private assetService: AssetService,
     private employeeService: EmployeeService,
+    private userService: UserService,
     private notification: NotificationService,
     private cdr: ChangeDetectorRef
   ) {
-    this.currentUser = this.getCurrentUser();
     this.assignmentForm = this.fb.group({
       employeeId: [null, Validators.required],
       expectedReturnDate: [''],
@@ -48,8 +49,18 @@ export class AssignAssetComponent implements OnInit {
 
   ngOnInit(): void {
     this.assetId = +this.route.snapshot.params['assetId'];
+    this.loadCurrentUser();
     this.loadAsset();
     this.loadEmployees();
+  }
+
+  loadCurrentUser(): void {
+    this.userService.profile$().subscribe({
+      next: res => {
+        this.currentUser = (res?.data as any)?.user;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   loadAsset(): void {
@@ -103,7 +114,7 @@ export class AssignAssetComponent implements OnInit {
       assignedByName: `${this.currentUser?.firstName} ${this.currentUser?.lastName}`,
       expectedReturnDate: this.assignmentForm.value.expectedReturnDate || undefined,
       conditionOnAssignment: this.assignmentForm.value.conditionOnAssignment,
-      notes: this.assignmentForm.value.notes || undefined
+      assignmentNotes: this.assignmentForm.value.notes || undefined
     };
 
     this.isLoadingSubject.next(true);
@@ -129,15 +140,4 @@ export class AssignAssetComponent implements OnInit {
     return control ? control.invalid && control.touched : false;
   }
 
-  private getCurrentUser(): any {
-    try {
-      const userJson = localStorage.getItem('user');
-      if (userJson) {
-        return JSON.parse(userJson);
-      }
-      return null;
-    } catch {
-      return null;
-    }
-  }
 }

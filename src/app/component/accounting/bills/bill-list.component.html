@@ -309,6 +309,14 @@
           <option *ngFor="let m of paymentMethods" [value]="m.value">{{ m.label }}</option>
         </select>
       </div>
+      <div class="mb-3" *ngIf="bankAccounts.length > 0">
+        <label class="form-label">Deduct from Bank Account <span class="text-muted small">(optional)</span></label>
+        <select class="form-select" formControlName="bankAccountId">
+          <option [ngValue]="null">— Do not record in banking —</option>
+          <option *ngFor="let a of bankAccounts" [ngValue]="a.id">{{ a.name }} ({{ a.bankName }})</option>
+        </select>
+        <div class="form-text">If selected, a debit transaction will be created automatically.</div>
+      </div>
     </form>
   </div>
   <div class="falcon-modal-footer">

@@ -10,6 +10,8 @@ import { Subject } from 'rxjs';
 import { UserModel } from 'src/app/component/profile/user.model';
 import { UserService } from 'src/app/service/user.service';
 import { NotificationService } from 'src/app/service/notification.service';
+import { ModuleAccessService } from 'src/app/service/module-access.service';
+import { BrandingService } from 'src/app/service/branding.service';
 
 type BadgeType = 'primary' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -24,6 +26,8 @@ interface MenuItem {
   excludeRoles?: string[];
   /** Show only if user has one of these employment types (OR with requiredRoles) */
   allowedEmploymentTypes?: string[];
+  /** Module subscription key — hide this item if the module is disabled for the tenant */
+  moduleKey?: string;
   badge?: {
     count: number;
     type: BadgeType;
@@ -78,6 +82,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Employees',
       icon: 'bi-people-fill',
       expanded: false,
+      moduleKey: 'EMPLOYEE_MANAGEMENT',
       children: [
         // ADMIN/MANAGER OPTIONS
         {
@@ -108,6 +113,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Leave Management',
       icon: 'bi-calendar-x',
       expanded: false,
+      moduleKey: 'LEAVE_MANAGEMENT',
       children: [
         {
           label: 'All Leave Applications',
@@ -134,6 +140,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       // Visible to admins/managers OR employees whose employment type is INTERN
       requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
       allowedEmploymentTypes: ['INTERN'],
+      moduleKey: 'INTERN_ATTENDANCE',
       children: [
         {
           label: 'My School Days',
@@ -152,6 +159,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Attendance',
       icon: 'bi-clock-history',
       expanded: false,
+      moduleKey: 'ATTENDANCE_TRACKING',
       children: [
         {
           label: 'All Attendance',
@@ -190,6 +198,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Payroll',
       icon: 'bi-cash-stack',
       expanded: false,
+      moduleKey: 'PAYROLL_PAYSLIPS',
       children: [
         // ADMIN ONLY OPTIONS
         {
@@ -232,6 +241,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Claims',
       icon: 'bi-wallet2',
       expanded: false,
+      moduleKey: 'EXPENSE_CLAIMS',
       children: [
         {
           label: 'All Claims',
@@ -258,72 +268,99 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       expanded: false,
       requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
       excludeRoles: ['ROLE_USER'],
+      // Parent has no moduleKey — it shows if EITHER INVOICE_CUSTOMER or BUSINESS_EXPENSES is enabled
+      // (the sidebar hides parents with zero visible children automatically)
       children: [
         {
           label: 'Overview',
           icon: 'bi-grid-1x2',
           route: '/accounting/overview',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
         },
         {
           label: 'Invoices (AR)',
           icon: 'bi-file-earmark-text',
           route: '/invoices',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         },
         {
           label: 'Create Invoice',
           icon: 'bi-plus-square',
           route: '/invoices/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         },
         {
           label: 'Clients',
           icon: 'bi-people',
           route: '/customers',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         },
         {
           label: 'Add Client',
           icon: 'bi-person-plus-fill',
           route: '/customers/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         },
         {
           label: 'Products & Services',
           icon: 'bi-box-seam',
           route: '/accounting/products',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
         },
         {
           label: 'Bills & AP',
           icon: 'bi-receipt-cutoff',
           route: '/accounting/bills',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
         },
         {
           label: 'Quotes & Estimates',
           icon: 'bi-file-text',
           route: '/accounting/quotes',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         },
         {
           label: 'Credit Notes',
           icon: 'bi-credit-card',
           route: '/accounting/credit-notes',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         },
         {
           label: 'VAT Returns',
           icon: 'bi-percent',
           route: '/accounting/vat-returns',
-          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
+        },
+        {
+          label: 'Banking',
+          icon: 'bi-bank',
+          route: '/accounting/banking',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
+        },
+        {
+          label: 'Inventory',
+          icon: 'bi-box-seam',
+          route: '/accounting/inventory',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
         },
         {
           label: 'Reports',
           icon: 'bi-file-earmark-bar-graph',
           route: '/accounting/reports',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'BUSINESS_EXPENSES'
         }
       ]
     },
@@ -333,6 +370,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       expanded: false,
       requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
       excludeRoles: ['ROLE_USER'],
+      moduleKey: 'BUSINESS_EXPENSES',
       children: [
         {
           label: 'Overview',
@@ -402,6 +440,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       label: 'Assets',
       icon: 'bi-laptop',
       expanded: false,
+      moduleKey: 'ASSET_MANAGEMENT',
       children: [
         // ADMIN/MANAGER - Asset Management
         {
@@ -444,6 +483,13 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
+      label: 'Company Settings',
+      icon: 'bi-building-gear',
+      route: '/settings/company',
+      requiredRoles: ['ROLE_SYSADMIN', 'ROLE_ADMIN'],
+      excludeRoles: ['ROLE_USER', 'ROLE_MANAGER']
+    },
+    {
       label: 'Announcements',
       icon: 'bi-megaphone-fill',
       expanded: false,
@@ -480,6 +526,22 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
         count: 0,
         type: 'info' as BadgeType
       }
+    },
+    {
+      label: 'Super Admin',
+      icon: 'bi-shield-lock-fill',
+      expanded: false,
+      requiredRoles: ['ROLE_SUPERADMIN'],
+      children: [
+        { label: 'Overview',        icon: 'bi-grid-1x2-fill',               route: '/superadmin/dashboard',  requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'Companies',       icon: 'bi-building',                    route: '/superadmin/companies',  requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'Platform Users',  icon: 'bi-people-fill',                 route: '/superadmin/users',      requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'Company Reports', icon: 'bi-file-earmark-bar-graph-fill', route: '/superadmin/reports',    requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'Analytics',       icon: 'bi-graph-up-arrow',              route: '/superadmin/analytics',  requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'Audit Logs',      icon: 'bi-journal-text',                route: '/superadmin/logs',          requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'System Health',   icon: 'bi-heart-pulse-fill',            route: '/superadmin/health',        requiredRoles: ['ROLE_SUPERADMIN'] },
+        { label: 'Announcements',   icon: 'bi-megaphone-fill',              route: '/superadmin/announcements', requiredRoles: ['ROLE_SUPERADMIN'] }
+      ]
     }
   ];
 
@@ -487,13 +549,22 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private userService: UserService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private moduleAccess: ModuleAccessService,
+    public branding: BrandingService
   ) {}
 
   ngOnInit(): void {
-    console.log('Sidebar initialized');
     if (this.user) {
+      // Load module access first, then re-filter to apply module visibility
+      this.moduleAccess.loadIfNeeded()
+        .pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.filterMenuItems();
+          this.cdr.markForCheck();
+        });
       this.filterMenuItems();
+      this.loadCompanyInfo();
     }
 
     // Listen for route changes to update active state and close mobile sidebar
@@ -503,16 +574,23 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
-        this.closeMobileSidebar.emit(); // Close mobile sidebar on navigation
+        this.closeMobileSidebar.emit();
         this.cdr.markForCheck();
       });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['user'] && this.user) {
-      console.log('Sidebar - User received:', this.user);
-      console.log('User role:', this.user.roleName);
       this.filterMenuItems();
+      // Only reload company info if the company actually changed
+      const prev = changes['user'].previousValue;
+      const companyChanged = !prev || prev.companyId !== this.user.companyId;
+      if (companyChanged) {
+        this.companyLogoFailed = false;
+        this.staticFallbackLogo = null;
+        this.companyName = null;
+        this.loadCompanyInfo();
+      }
     }
   }
 
@@ -522,10 +600,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   private filterMenuItems(): void {
-    console.log('Filtering menu items...');
-
     if (!this.user) {
-      console.warn('No user found');
       this.filteredMenuItems = [];
       this.cdr.markForCheck();
       return;
@@ -533,8 +608,22 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
 
     const userRole = this.user.roleName;
     const employmentType = (this.user.employmentType || '').toUpperCase();
-    console.log('User:', this.user.firstName, this.user.lastName);
-    console.log('User role:', userRole, '| Employment type:', employmentType);
+
+    // SUPERADMIN gets a dedicated flat menu — no regular tenant items
+    if (userRole === 'ROLE_SUPERADMIN') {
+      this.filteredMenuItems = [
+        { label: 'Overview',        icon: 'bi-speedometer2',                route: '/superadmin/dashboard'      },
+        { label: 'Companies',       icon: 'bi-buildings-fill',              route: '/superadmin/companies'      },
+        { label: 'Platform Users',  icon: 'bi-people-fill',                 route: '/superadmin/users'          },
+        { label: 'Company Reports', icon: 'bi-bar-chart-line-fill',         route: '/superadmin/reports'        },
+        { label: 'Analytics',       icon: 'bi-graph-up-arrow',              route: '/superadmin/analytics'      },
+        { label: 'Audit Logs',      icon: 'bi-shield-check',                route: '/superadmin/logs'           },
+        { label: 'System Health',   icon: 'bi-activity',                    route: '/superadmin/health'         },
+        { label: 'Announcements',   icon: 'bi-megaphone-fill',              route: '/superadmin/announcements'  }
+      ];
+      this.cdr.markForCheck();
+      return;
+    }
 
     this.filteredMenuItems = this.fullMenuStructure
       .filter(item => this.canShowMenuItem(item, userRole, employmentType))
@@ -573,79 +662,43 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       })
       .filter(item => item !== null);
 
-    console.log('Filtered to', this.filteredMenuItems.length, 'menu items');
-    console.log('Visible menu items:', this.filteredMenuItems.map(i => ({
-      label: i.label,
-      childCount: i.children?.length || 0,
-      children: i.children?.map(c => c.label) || []
-    })));
-
     this.cdr.markForCheck();
   }
 
   private canShowMenuItem(item: MenuItem, userRole: string, employmentType: string = ''): boolean {
-    // PRIORITY 1: Check if role is explicitly excluded
-    if (item.excludeRoles && item.excludeRoles.includes(userRole)) {
-      console.log(`"${item.label}" - EXCLUDED for role ${userRole}`);
-      return false;
-    }
+    // Module subscription gate — hide if the tenant's module is disabled
+    if (item.moduleKey && !this.moduleAccess.isEnabled(item.moduleKey)) return false;
 
-    // PRIORITY 2: Check if specific roles are required.
-    // If allowedEmploymentTypes is also set, either condition grants access (OR logic).
+    if (item.excludeRoles && item.excludeRoles.includes(userRole)) return false;
+
     if (item.requiredRoles && item.requiredRoles.length > 0) {
       const hasRole = item.requiredRoles.includes(userRole);
       const hasEmploymentType = item.allowedEmploymentTypes
         ? item.allowedEmploymentTypes.includes(employmentType)
         : false;
-
-      if (!hasRole && !hasEmploymentType) {
-        console.log(`"${item.label}" - requires role [${item.requiredRoles.join(', ')}] or employmentType [${item.allowedEmploymentTypes?.join(', ')}], user has role=${userRole} type=${employmentType}`);
-        return false;
-      }
-      return true;
+      return hasRole || hasEmploymentType;
     }
 
-    // PRIORITY 3: Check if specific role is required
-    if (item.requiredRole) {
-      const hasRole = userRole === item.requiredRole;
-      if (!hasRole) {
-        console.log(`"${item.label}" - requires ${item.requiredRole}, user has ${userRole}`);
-        return false;
-      }
-      return true;
-    }
+    if (item.requiredRole) return userRole === item.requiredRole;
 
-    // PRIORITY 4: allowedEmploymentTypes alone (no requiredRoles set)
     if (item.allowedEmploymentTypes && item.allowedEmploymentTypes.length > 0) {
-      const hasEmploymentType = item.allowedEmploymentTypes.includes(employmentType);
-      if (!hasEmploymentType) {
-        console.log(`"${item.label}" - requires employmentType [${item.allowedEmploymentTypes.join(', ')}], user has ${employmentType}`);
-        return false;
-      }
-      return true;
+      return item.allowedEmploymentTypes.includes(employmentType);
     }
 
-    // No restrictions - show to everyone
-    console.log(`"${item.label}" - visible to all (no requirements)`);
     return true;
   }
 
   toggleMenu(item: MenuItem): void {
-    console.log('Toggle menu:', item.label);
-
     if (item.children) {
       item.expanded = !item.expanded;
       this.cdr.markForCheck();
     } else if (item.route) {
-      console.log('Navigating to:', item.route);
       this.router.navigate([item.route]);
     }
   }
 
   onChildClick(event: Event, child: MenuItem): void {
     event.stopPropagation();
-    console.log('Child clicked:', child.label, '->', child.route);
-
     if (child.route) {
       this.router.navigate([child.route]);
     }
@@ -683,7 +736,8 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       'ROLE_USER': 'Employee',
       'ROLE_MANAGER': 'Manager',
       'ROLE_ADMIN': 'Administrator',
-      'ROLE_SYSADMIN': 'System Admin'
+      'ROLE_SYSADMIN': 'System Admin',
+      'ROLE_SUPERADMIN': 'Super Admin'
     };
 
     return roleMap[this.user.roleName] || this.user.roleName;
@@ -691,7 +745,57 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
 
   getAvatarUrl(): string {
     if (!this.user?.id) return 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
-    return `${environment.apiUrl}/api/v1/user/${this.user.id}/profile-image`;
+    return `${environment.apiUrl}/api/v1/user/image/${this.user.id}`;
+  }
+
+  companyLogoFailed = false;
+  companyName: string | null = null;
+  staticFallbackLogo: string | null = null;
+
+  /** Map of company name keywords to static logo assets */
+  private readonly COMPANY_LOGO_MAP: { keywords: string[]; asset: string }[] = [
+    { keywords: ['recoveries', 'lkcr'],   asset: 'assets/lkcrecoveries_logo.png' },
+    { keywords: ['trust'],                asset: 'assets/trust_x_logo.png'       },
+    { keywords: ['lkcentrix', 'lkc'],     asset: 'assets/lkcentrix_logo.png'     },
+  ];
+
+  get companyLogoUrl(): string | null {
+    const companyId = this.user?.companyId;
+    if (!companyId) return null;
+    if (this.staticFallbackLogo) return this.staticFallbackLogo;
+    if (this.companyLogoFailed) return null;
+    return `${environment.apiUrl}/api/v1/companies/${companyId}/logo`;
+  }
+
+  onLogoError(): void {
+    this.companyLogoFailed = true;
+    if (this.companyName) {
+      this.staticFallbackLogo = this.resolveStaticLogo(this.companyName);
+    }
+    this.cdr.markForCheck();
+  }
+
+  private resolveStaticLogo(name: string): string | null {
+    const lower = name.toLowerCase();
+    for (const entry of this.COMPANY_LOGO_MAP) {
+      if (entry.keywords.some(k => lower.includes(k))) {
+        return entry.asset;
+      }
+    }
+    return null;
+  }
+
+  private loadCompanyInfo(): void {
+    const companyId = this.user?.companyId;
+    if (!companyId) return;
+    this.branding.load()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(b => {
+        const name = b?.name ?? '';
+        this.companyName = name || null;
+        this.staticFallbackLogo = name ? this.resolveStaticLogo(name) : null;
+        this.cdr.markForCheck();
+      });
   }
 
   onAvatarError(event: Event): void {
@@ -699,6 +803,8 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   onLogout(): void {
+    this.moduleAccess.clear();
+    this.branding.clear();
     this.userService.logOut();
     this.notification.onDefault('You\'ve been successfully logged out');
     this.router.navigate(['/login']);

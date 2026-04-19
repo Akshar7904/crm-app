@@ -1222,3 +1222,46 @@ textarea.form-control { resize: vertical; min-height: 100px; }
     .prof-btn-save { width: 100%; justify-content: center; }
   }
 }
+
+// ─── Policy Acknowledgement Card ─────────────────────────────────────────────
+.policy-ack-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  flex-wrap: wrap;
+
+  &.policy-ack-warn {
+    background: #fff8e1;
+    border-color: #f59e0b;
+    .bi-exclamation-triangle-fill { color: #f59e0b; font-size: 1.4rem; }
+    .policy-ack-title { color: #92400e; font-weight: 600; }
+    .policy-ack-sub   { color: #b45309; font-size: 0.82rem; }
+  }
+
+  &.policy-ack-ok {
+    background: #f0fdf4;
+    border-color: #22c55e;
+    .bi-shield-fill-check { color: #22c55e; font-size: 1.4rem; }
+    .policy-ack-title { color: #15803d; font-weight: 600; }
+    .policy-ack-sub   { color: #16a34a; font-size: 0.82rem; }
+  }
+}
+
+.policy-ack-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.policy-ack-right {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+}
+

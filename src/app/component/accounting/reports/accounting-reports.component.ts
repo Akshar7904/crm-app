@@ -6,6 +6,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { BillService } from '../services/bill.service';
 import { ExpensesService } from '../../expenses/services/expenses.service';
 import { NotificationService } from '../../../service/notification.service';
+import { CompanyService } from '../../../service/company.service';
 import { Bill } from '../models/bill.model';
 
 export interface AgingBucket {
@@ -35,6 +36,7 @@ export class AccountingReportsComponent implements OnInit {
   loading = false;
   loadingPL = false;
   exporting = false;
+  company: any = null;
 
   activeReport: 'aging' | 'pl' = 'aging';
 
@@ -52,10 +54,15 @@ export class AccountingReportsComponent implements OnInit {
     private billService: BillService,
     private expensesService: ExpensesService,
     private notification: NotificationService,
+    private companyService: CompanyService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.companyService.getMyCompany$().subscribe({
+      next: (res) => { this.company = res?.data?.company; this.cdr.markForCheck(); },
+      error: () => {}
+    });
     this.loadAgingData();
     this.loadPLData();
   }

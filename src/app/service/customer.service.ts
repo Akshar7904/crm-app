@@ -120,6 +120,14 @@ export class CustomerService {
                 );
     };
 
+    markInvoicePaid$ = (invoiceId: number, bankAccountId?: number) => {
+        let url = `${this.server}/customer/invoice/${invoiceId}/mark-paid`;
+        if (bankAccountId) url += `?bankAccountId=${bankAccountId}`;
+        return <Observable<CustomHttpResponse<any>>>
+            this.http.patch<CustomHttpResponse<any>>(url, {})
+                .pipe(tap(console.log), catchError(this.handleError));
+    };
+
     downloadReport$ = () => <Observable<HttpEvent<Blob>>>
         this.http.get(`${this.server}/customer/download/report`,
             { reportProgress: true, observe: 'events', responseType: 'blob' })

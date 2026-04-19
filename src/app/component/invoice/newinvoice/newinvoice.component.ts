@@ -13,6 +13,7 @@ import { State } from 'src/app/interface/state';
 import { UserModel } from 'src/app/component/profile/user.model';
 import { CustomerService } from 'src/app/service/customer.service';
 import { NotificationService } from 'src/app/service/notification.service';
+import { CompanyService } from 'src/app/service/company.service';
 import { InvoiceLineItem, InvoiceModel } from '../invoice.model';
 
 @Component({
@@ -39,6 +40,8 @@ export class NewinvoiceComponent implements OnInit {
   discount: number = 0;
   total: number = 0;
 
+  company: any = null;
+
   // Selected customer
   selectedCustomer: CustomerModel | null = null;
 
@@ -60,10 +63,16 @@ export class NewinvoiceComponent implements OnInit {
     private customerService: CustomerService,
     private notification: NotificationService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public companyService: CompanyService
   ) { }
 
   ngOnInit(): void {
+    this.companyService.getMyCompany$().subscribe({
+      next: (res) => { this.company = res?.data?.company; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     // Add initial empty line item
     this.addLineItem();
 

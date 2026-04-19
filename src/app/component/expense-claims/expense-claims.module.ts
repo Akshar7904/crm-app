@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
 import { EmployeeExpenseClaimsComponent } from './employee/employee-expense-claims.component';
 import { AdminExpenseClaimsComponent } from './admin/admin-expense-claims.component';
-
 const routes: Routes = [
   {
     path: 'my-claims',
@@ -44,6 +43,7 @@ const routes: Routes = [
     FormsModule,
     ReactiveFormsModule,
     RouterModule.forChild(routes),
-  ]
+  ],
+  providers: []
 })
 export class ExpenseClaimsModule { }

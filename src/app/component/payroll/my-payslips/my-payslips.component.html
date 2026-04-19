@@ -24,7 +24,7 @@
   <!-- Payslips -->
   <div *ngIf="!isLoading && payrolls.length > 0" class="pay-slips-list">
 
-    <div *ngFor="let payroll of payrolls" class="table-card pay-slip-card">
+    <div *ngFor="let payroll of payrolls; trackBy: trackById" class="table-card pay-slip-card">
 
       <!-- Payslip Header -->
       <div class="pay-slip-header">

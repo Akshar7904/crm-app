@@ -9,7 +9,7 @@ import { environment } from '@env/environment';
 
 const BASE = `${environment.apiUrl}/api/v1/budget`;
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class BudgetService {
   constructor(private http: HttpClient) {}
 

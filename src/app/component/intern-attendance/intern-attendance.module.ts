@@ -21,6 +21,7 @@ import { AdminInternAttendanceComponent } from './admin-attendance/admin-attenda
     FormsModule,
     RouterModule,
     InternAttendanceRoutingModule
-  ]
+  ],
+  providers: []
 })
 export class InternAttendanceModule {}

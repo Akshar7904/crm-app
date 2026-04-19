@@ -205,7 +205,7 @@ export interface AssetAssignmentForm {
   assignedByName: string;
   expectedReturnDate?: string;
   conditionOnAssignment: AssetCondition;
-  notes?: string;
+  assignmentNotes?: string;
 }
 
 export interface AssetReturnForm {

@@ -2,7 +2,7 @@
 // LKCentrix HR & Payroll Management System — ORION
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { Employee } from 'src/app/component/employee/employee.model';
 
@@ -10,7 +10,8 @@ import { Employee } from 'src/app/component/employee/employee.model';
   standalone: false,
   selector: 'app-employee-salary',
   templateUrl: './employee-salary.component.html',
-  styleUrls: ['./employee-salary.component.scss']
+  styleUrls: ['./employee-salary.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EmployeeSalaryComponent implements OnInit {
   employees: Employee[] = [];
@@ -65,4 +66,6 @@ export class EmployeeSalaryComponent implements OnInit {
     if (amount === null || amount === undefined) return 'R 0.00';
     return new Intl.NumberFormat('en-ZA', { style: 'currency', currency: 'ZAR' }).format(amount);
   }
+
+  trackById = (index: number, item: any) => item.id;
 }

@@ -38,6 +38,11 @@
               <button class="btn btn-outline-secondary btn-sm" (click)="printInvoice()">
                 <i class="bi bi-printer me-1"></i> Print
               </button>
+              <button class="btn btn-success btn-sm"
+                      *ngIf="state?.appData?.data?.invoice?.status !== 'PAID' && state?.appData?.data?.invoice?.status !== 'CANCELLED'"
+                      (click)="openMarkPaidModal()">
+                <i class="bi bi-cash-coin me-1"></i> Mark Paid
+              </button>
               <button class="btn btn-banner" (click)="exportAsPDF()">
                 <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
               </button>
@@ -55,11 +60,10 @@
                   <div class="col-md-6">
                     <h6 class="section-label">From</h6>
                     <div class="company-info">
-                      <h5 class="company-name">LKCentrix Solutions (PTY) LTD</h5>
+                      <h5 class="company-name">{{ company?.legalName || company?.name || '' }}</h5>
                       <p class="company-address">
-                        4 Skeen BLVD Bedfordview<br>
-                        Bedfordview Corporate Park, 2001<br>
-                        Phone: +27 (11) 568 8322
+                        <span *ngIf="company?.address">{{ company?.address }}<span *ngIf="company?.city">, {{ company?.city }}</span><br></span>
+                        <span *ngIf="company?.phone">Phone: {{ company?.phone }}</span>
                       </p>
                     </div>
                   </div>
@@ -291,7 +295,7 @@
             <!-- Header: Logo + Invoice Title -->
             <div class="invoice-header">
               <div class="header-left">
-                <img src="assets/logo.png" alt="LKCentrix Solutions" class="company-logo">
+                <img *ngIf="company?.id" [src]="companyService.getLogoUrl(company.id)" alt="Logo" class="company-logo" onerror="this.style.display='none'">
               </div>
               <div class="header-right">
                 <h1 class="invoice-title">INVOICE</h1>
@@ -304,9 +308,9 @@
               <div class="info-left">
                 <h6 class="info-label">FROM</h6>
                 <p class="info-text">
-                  <strong>LKCentrix Solutions (PTY) LTD</strong><br>
-                  info@lkcentrix.co.za<br>
-                  +27 (11) 568 8322
+                  <strong>{{ company?.legalName || company?.name || '' }}</strong><br>
+                  <span *ngIf="company?.email">{{ company?.email }}<br></span>
+                  <span *ngIf="company?.phone">{{ company?.phone }}</span>
                 </p>
                 <p class="info-text issuer-line">
                   <span class="issuer-label">Issued by</span>
@@ -408,7 +412,7 @@
               <div class="footer-col">
                 <span class="footer-col-title"><i class="bi bi-bank me-1"></i>Payment Information</span>
                 <span class="footer-col-line">Bank: First National Bank</span>
-                <span class="footer-col-line">Account Name: LKCentrix Solutions</span>
+                <span class="footer-col-line">Account Name: {{ company?.name || '' }}</span>
                 <span class="footer-col-line">Account Number: 123456789</span>
                 <span class="footer-col-line">Branch Code: 250655</span>
               </div>
@@ -421,9 +425,9 @@
               </div>
               <div class="footer-divider"></div>
               <div class="footer-col footer-col-brand">
-                <img src="assets/logo.png" alt="LKCentrix" class="footer-brand-logo">
-                <span class="footer-brand-name">LKCentrix Solutions</span>
-                <span class="footer-col-line">www.lkcentrix.co.za</span>
+                <img *ngIf="company?.id" [src]="companyService.getLogoUrl(company.id)" alt="Logo" class="footer-brand-logo" onerror="this.style.display='none'">
+                <span class="footer-brand-name">{{ company?.name || '' }}</span>
+                <span class="footer-col-line" *ngIf="company?.email">{{ company?.email }}</span>
               </div>
             </div>
           </div>
@@ -431,6 +435,39 @@
       </div>
     </section>
   </ng-container>
+
+  <!-- Mark Paid Modal -->
+  <div *ngIf="showMarkPaidModal"
+       class="modal fade show d-block"
+       style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content falcon-card">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-cash-coin me-2 text-success"></i>Mark Invoice as Paid</h5>
+          <button class="btn-close" (click)="closeMarkPaidModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p class="text-muted mb-3">Optionally select a bank account to record this payment received.</p>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Record in Bank Account</label>
+            <select class="form-select" [(ngModel)]="markPaidBankAccountId">
+              <option [ngValue]="null">— Do not record in banking —</option>
+              <option *ngFor="let acct of bankAccounts" [ngValue]="acct.id">
+                {{ acct.name }} ({{ acct.bankName }})
+              </option>
+            </select>
+            <div class="form-text">If selected, a CREDIT transaction will be created automatically.</div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" (click)="closeMarkPaidModal()">Cancel</button>
+          <button class="btn btn-success" (click)="confirmMarkPaid()">
+            <i class="bi bi-check-lg me-1"></i>Confirm Payment
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Send Confirmation Modal -->
   <div *ngIf="showSendConfirm"

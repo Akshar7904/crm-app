@@ -8,17 +8,17 @@
     </ol>
   </nav>
 
-  <!-- Falcon Banner -->
-  <div class="leave-page-banner">
-    <div class="leave-banner-left">
-      <h1 class="leave-banner-title"><i class="bi bi-calendar-check"></i> Leave Management</h1>
-      <p class="leave-banner-subtitle">Manage and approve employee leave requests</p>
+  <!-- Page Banner -->
+  <div class="page-banner">
+    <div>
+      <h1 class="banner-title"><i class="bi bi-calendar-check"></i> Leave Management</h1>
+      <p class="banner-subtitle">Manage and approve employee leave requests</p>
     </div>
-    <div class="leave-banner-actions">
-      <button class="btn-banner-leave" (click)="exportToExcel()">
+    <div class="banner-actions">
+      <button class="btn-banner" (click)="exportToExcel()">
         <i class="bi bi-download"></i> Export
       </button>
-      <button class="btn-banner-leave" (click)="downloadReport()">
+      <button class="btn-banner" (click)="downloadReport()">
         <i class="bi bi-file-earmark-excel"></i> Download Report
       </button>
     </div>
@@ -132,20 +132,21 @@
     <div class="leave-alloc-toolbar">
       <div class="d-flex align-items-center gap-2">
         <label class="fw-semibold text-muted small mb-0">Hired in year:</label>
-        <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="allocationYear" (change)="loadAllocationData()" [disabled]="showAllEmployees">
+        <select class="form-select form-select-sm" style="width:110px" [(ngModel)]="allocationYear" (change)="loadAllocationData()">
           <option *ngFor="let y of [2021,2022,2023,2024,2025,2026]; trackBy: trackByValue" [value]="y">{{ y }}</option>
         </select>
-        <button class="btn btn-sm"
-          [class.btn-primary]="showAllEmployees"
-          [class.btn-outline-primary]="!showAllEmployees"
-          (click)="toggleShowAll()">
-          <i class="bi bi-people me-1"></i>{{ showAllEmployees ? 'Show by Hire Year' : 'Show All Employees' }}
+        <button class="btn btn-sm btn-outline-primary" (click)="loadAllBalances()">
+          <i class="bi bi-people me-1"></i>Show All Employees
+        </button>
+        <button class="btn btn-sm btn-outline-success" (click)="bulkInitializeLeave()" [disabled]="bulkInitializing">
+          <span *ngIf="bulkInitializing" class="spinner-border spinner-border-sm me-1"></span>
+          <i *ngIf="!bulkInitializing" class="bi bi-plus-circle me-1"></i>
+          Initialize Leave for All Employees
         </button>
       </div>
       <span class="text-muted small">
         <i class="bi bi-info-circle me-1"></i>
-        <span *ngIf="!showAllEmployees">Shows employees hired in the selected year.</span>
-        <span *ngIf="showAllEmployees">Shows all employees for the current year.</span>
+        Filter by hire year, or click Show All Employees to view everyone.
         Leave accrues monthly with each pay cycle ({{ (15/12) | number:'1.2-2' }} days/month for annual leave). Adjust entitlements to correct missed accruals.
       </span>
     </div>
@@ -159,8 +160,10 @@
     <!-- No balances -->
     <div *ngIf="!allocationLoading && groupedBalances.length === 0" class="leave-empty">
       <i class="bi bi-person-x leave-empty-icon"></i>
-      <h5 class="mt-3 mb-1">No Employees Found for {{ allocationYear }}</h5>
-      <p class="text-muted">No employees were hired in {{ allocationYear }}, or their leave has not accrued yet.<br>Leave accrues on the 1st of each month for the previous month's work.</p>
+      <h5 class="mt-3 mb-1" *ngIf="!showAllEmployees">No Employees Found for Hire Year {{ allocationYear }}</h5>
+      <h5 class="mt-3 mb-1" *ngIf="showAllEmployees">No Leave Balances Found</h5>
+      <p class="text-muted" *ngIf="!showAllEmployees">No employees were hired in {{ allocationYear }}, or their leave has not been initialized yet.</p>
+      <p class="text-muted" *ngIf="showAllEmployees">No leave balance records exist yet. Click <strong>Initialize Leave for All Employees</strong> to create them for all active employees.</p>
     </div>
 
     <!-- Employee allocation table -->
@@ -255,9 +258,9 @@
   </div>
 
   <!-- Leave Table Card -->
-  <div *ngIf="activeTab !== 'allocate' && currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="leave-table-card">
+  <div *ngIf="activeTab !== 'allocate' && currentDataState === dataState.LOADED && filteredLeaves.length > 0" class="table-card">
     <div class="table-responsive">
-      <table class="table leave-table mb-0">
+      <table class="table mb-0">
         <thead>
           <tr>
             <th>Employee</th>
@@ -285,7 +288,7 @@
             </td>
 
             <td>
-              <span class="leave-type-badge" [ngClass]="getLeaveTypeClass(leave.leaveType)">
+              <span class="badge-soft" [ngClass]="getLeaveTypeClass(leave.leaveType)">
                 {{leaveTypeLabels[leave.leaveType]}}
               </span>
             </td>
@@ -303,7 +306,7 @@
             </td>
 
             <td>
-              <span class="leave-status-badge" [ngClass]="getStatusClass(leave.status)">
+              <span class="badge-soft" [ngClass]="getStatusClass(leave.status)">
                 {{leaveStatusLabels[leave.status]}}
               </span>
             </td>
@@ -311,21 +314,21 @@
             <td class="leave-applied-date">{{formatDateTime(leave.createdAt || '')}}</td>
 
             <td class="text-center" (click)="$event.stopPropagation()">
-              <div class="leave-action-group">
+              <div class="action-btn-group justify-content-center">
                 <button *ngIf="canApprove(leave)"
-                        class="leave-action-btn leave-approve-btn"
+                        class="btn-action approve"
                         (click)="quickApprove(leave)"
                         title="Quick Approve">
                   <i class="bi bi-check-lg"></i>
                 </button>
                 <button *ngIf="canApprove(leave)"
-                        class="leave-action-btn leave-review-btn"
+                        class="btn-action btn-action-edit"
                         (click)="openApprovalModal(leave, 'approve')"
                         title="Review">
                   <i class="bi bi-eye"></i>
                 </button>
                 <button *ngIf="canApprove(leave)"
-                        class="leave-action-btn leave-reject-btn"
+                        class="btn-action delete"
                         (click)="openApprovalModal(leave, 'reject')"
                         title="Reject">
                   <i class="bi bi-x-lg"></i>
@@ -379,7 +382,7 @@
           </div>
           <div class="leave-detail-item">
             <span class="leave-detail-label">Leave Type</span>
-            <span class="leave-type-badge" [ngClass]="getLeaveTypeClass(selectedLeave.leaveType)">
+            <span class="badge-soft" [ngClass]="getLeaveTypeClass(selectedLeave.leaveType)">
               {{leaveTypeLabels[selectedLeave.leaveType]}}
             </span>
           </div>

@@ -146,7 +146,7 @@
   <!-- P&L Table -->
   <div *ngIf="!loadingPL && profitLoss" class="pl-report-card">
     <div class="pl-report-header">
-      <h5>LKCentrix — Income Statement</h5>
+      <h5>{{ company?.name || 'Company' }} — Income Statement</h5>
       <span class="text-muted">{{ months[selectedMonth - 1]?.label }} {{ selectedYear }}</span>
     </div>
 

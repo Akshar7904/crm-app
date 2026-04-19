@@ -41,7 +41,7 @@ section {
   flex: 0 0 45%;
   width: 45%;
   min-width: 400px;
-  background: $gradient-primary-dark;
+  background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary) 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -105,6 +105,7 @@ section {
   object-fit: contain;
   margin-bottom: 20px;
   filter: brightness(0) invert(1);
+  &.company-brand-logo { filter: none; max-height: 120px; }
 }
 
 .brand-title {
@@ -352,7 +353,7 @@ section {
   font-size: $font-size-base;
   font-weight: $font-weight-semibold;
   color: $white;
-  background: $gradient-primary;
+  background: var(--orion-primary);
   border: none;
   border-radius: $border-radius-lg;
   cursor: pointer;
@@ -360,9 +361,10 @@ section {
   @include flex-center;
 
   &:hover:not(:disabled) {
-    background: $gradient-primary-hover;
+    background: var(--orion-primary);
+    filter: brightness(0.9);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba($primary, 0.3);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   }
 
   &:active:not(:disabled) {
@@ -410,6 +412,94 @@ section {
 .resend-text {
   margin-top: 15px;
   font-size: $font-size-sm;
+}
+
+// ── Company Picker ──────────────────────────────────────────
+.company-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.company-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+  width: 100%;
+  text-align: left;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 2px 8px rgba($primary, 0.15);
+    transform: translateY(-1px);
+  }
+
+  &:active { transform: translateY(0); }
+
+  .company-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: rgba($primary, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i { color: $primary; font-size: 18px; }
+
+    .company-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+  }
+
+  .company-card-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+    .company-name {
+      font-size: $font-size-base;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .company-code {
+      font-size: $font-size-xs;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  > .bi-chevron-right {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+}
+
+// ── Selected company badge shown above password step ────────
+.selected-company-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: rgba($primary, 0.1);
+  color: $primary;
+  border-radius: 20px;
+  font-size: $font-size-sm;
+  font-weight: 500;
+  margin-bottom: 10px;
 }
 
 // ========================================
@@ -515,6 +605,25 @@ section {
     letter-spacing: 5px;
     font-size: $font-size-xl !important;
   }
+}
+
+// Legal footer links at bottom of the right panel
+.login-legal-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+
+  a {
+    font-size: .73rem;
+    color: #a0aec0;
+    text-decoration: none;
+    &:hover { color: $primary; text-decoration: underline; }
+  }
+
+  span { color: #e2e8f0; font-size: .7rem; }
 }
 
 // Very Small Screens

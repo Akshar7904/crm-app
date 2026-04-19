@@ -11,8 +11,6 @@ import { EmployeeDetailComponent } from './employee-detail/employee-detail.compo
 import { EmployeeRoutingModule } from './employee-routing.module';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { NavBarModule } from '../navbar/navbar.module';
-import { EmployeeService } from '../../service/employee.service';
-
 @NgModule({
   declarations: [
     EmployeesComponent,
@@ -27,6 +25,6 @@ import { EmployeeService } from '../../service/employee.service';
     SharedModule,
     EmployeeRoutingModule,
   ],
-  providers: [EmployeeService]
+  providers: []
 })
 export class EmployeeModule { }

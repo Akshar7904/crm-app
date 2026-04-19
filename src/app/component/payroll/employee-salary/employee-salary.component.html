@@ -41,7 +41,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let employee of employees">
+          <tr *ngFor="let employee of employees; trackBy: trackById">
             <td><span class="es-emp-id">{{ employee.employeeId }}</span></td>
             <td>
               <div class="es-name">{{ employee.firstName }} {{ employee.lastName }}</div>

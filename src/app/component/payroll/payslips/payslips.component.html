@@ -24,7 +24,7 @@
           <select class="form-select trigger-select"
                   [(ngModel)]="triggerMonth"
                   (ngModelChange)="onPeriodChange()">
-            <option *ngFor="let m of months" [value]="m.value">{{ m.label }}</option>
+            <option *ngFor="let m of months; trackBy: trackByValue" [value]="m.value">{{ m.label }}</option>
           </select>
         </div>
         <div class="col-auto">
@@ -65,7 +65,7 @@
 
           <!-- Employee rows -->
           <div class="employee-list mb-3">
-            <div *ngFor="let p of periodPayrolls"
+            <div *ngFor="let p of periodPayrolls; trackBy: trackById"
                  class="employee-row"
                  [class.selected]="isSelected(p.id!)"
                  (click)="toggle(p.id!)">
@@ -154,7 +154,7 @@
               </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let payroll of payrolls">
+              <tr *ngFor="let payroll of payrolls; trackBy: trackById">
                 <td>{{ payroll.employeeName }}</td>
                 <td>{{ formatDate(payroll.payPeriodStart) }} - {{ formatDate(payroll.payPeriodEnd) }}</td>
                 <td>{{ formatDate(payroll.paymentDate) }}</td>

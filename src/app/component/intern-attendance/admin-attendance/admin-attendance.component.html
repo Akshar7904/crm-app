@@ -33,7 +33,7 @@
             <label class="form-label fw-medium">Intern / Employee <span class="text-danger">*</span></label>
             <select class="form-select" formControlName="employeeId">
               <option value="">— Select employee —</option>
-              <option *ngFor="let emp of employees" [value]="emp.id">
+              <option *ngFor="let emp of employees; trackBy: trackById" [value]="emp.id">
                 {{ emp.firstName }} {{ emp.lastName }}
                 <span *ngIf="emp.email"> ({{ emp.email }})</span>
               </option>
@@ -180,7 +180,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of filteredAttendances">
+            <tr *ngFor="let item of filteredAttendances; trackBy: trackById">
               <td>
                 <div class="fw-medium">{{ item.employeeName }}</div>
                 <div class="text-muted small">{{ item.employeeEmail }}</div>

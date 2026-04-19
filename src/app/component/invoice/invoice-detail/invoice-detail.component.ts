@@ -12,11 +12,13 @@ import { InvoiceModel } from 'src/app/component/invoice/invoice.model';
 import { State } from 'src/app/interface/state';
 import { UserModel } from 'src/app/component/profile/user.model';
 import { CustomerService } from 'src/app/service/customer.service';
+import { CompanyService } from 'src/app/service/company.service';
 import { jsPDF as pdf } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { NotificationService } from 'src/app/service/notification.service';
 import { NgForm } from '@angular/forms';
 import { InvoiceLineItem } from '../invoice.model';
+import { BankingService } from '../../accounting/services/banking.service';
 
 const INVOICE_ID = 'id';
 
@@ -40,11 +42,18 @@ export class InvoiceDetailComponent implements OnInit {
   isEditMode: boolean = false;
   editInvoice: any = {};
 
+  company: any = null;
+
   // Send confirmation
   showSendConfirm = false;
   sendTargetCustomer: any = null;
   sendTargetInvoiceNumber: string = '';
   customMessage: string = '';
+
+  // Mark Paid
+  showMarkPaidModal = false;
+  markPaidBankAccountId: number | null = null;
+  bankAccounts: any[] = [];
 
   // Line items for edit mode
   editLineItems: InvoiceLineItem[] = [];
@@ -58,11 +67,22 @@ export class InvoiceDetailComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private router: Router,
     private customerService: CustomerService,
+    public companyService: CompanyService,
     private notification: NotificationService,
+    private bankingService: BankingService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
+    this.companyService.getMyCompany$().subscribe({
+      next: (res) => { this.company = res?.data?.company; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+    this.bankingService.getActiveAccounts$().subscribe({
+      next: (res: any) => { this.bankAccounts = res?.data?.accounts ?? res ?? []; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+
     // Check if edit mode is requested via query param
     this.activatedRoute.queryParams.subscribe(params => {
       this.isEditMode = params['edit'] === 'true';
@@ -258,7 +278,9 @@ export class InvoiceDetailComponent implements OnInit {
     const total    = invoice?.total ? this.formatCurrency(invoice.total) : '';
     const status   = (invoice?.status || 'PENDING').toUpperCase();
 
-    const closing = `\nShould you have any questions, please do not hesitate to contact us.\n\nKind regards,\nLKCentrix Solutions (PTY) LTD\ninfo@lkcentrix.co.za | +27 (11) 568 8322`;
+    const coName    = this.company?.legalName || this.company?.name || '';
+    const coContact = [this.company?.email, this.company?.phone].filter(Boolean).join(' | ');
+    const closing = `\nShould you have any questions, please do not hesitate to contact us.\n\nKind regards,\n${coName}${coContact ? '\n' + coContact : ''}`;
 
     switch (status) {
       case 'PAID':
@@ -268,7 +290,7 @@ export class InvoiceDetailComponent implements OnInit {
       case 'CANCELED':
         return `Good day ${name},\n\nPlease find attached the cancelled Invoice #${num} for your records.\n\nIf you believe this cancellation was made in error or would like to discuss further, please contact us at your earliest convenience.${closing}`;
       default: // PENDING
-        return `Good day ${name},\n\nPlease find attached Invoice #${num} totalling ${total} for services rendered.\n\nPayment is due within 30 days of the invoice date. Kindly use the invoice number as your payment reference.\n\nBank: First National Bank | Account: LKCentrix Solutions | Account No: 123456789 | Branch: 250655${closing}`;
+        return `Good day ${name},\n\nPlease find attached Invoice #${num} totalling ${total} for services rendered.\n\nPayment is due within 30 days of the invoice date. Kindly use the invoice number as your payment reference.${closing}`;
     }
   }
 
@@ -346,6 +368,43 @@ export class InvoiceDetailComponent implements OnInit {
       this.initEditInvoice(this.dataSubject.value.data['invoice']);
     }
     this.cdr.markForCheck();
+  }
+
+  openMarkPaidModal(): void {
+    this.markPaidBankAccountId = null;
+    this.showMarkPaidModal = true;
+    this.cdr.markForCheck();
+  }
+
+  closeMarkPaidModal(): void {
+    this.showMarkPaidModal = false;
+    this.cdr.markForCheck();
+  }
+
+  confirmMarkPaid(): void {
+    const invoiceId = this.dataSubject.value?.data?.['invoice']?.id;
+    if (!invoiceId) return;
+    this.customerService.markInvoicePaid$(invoiceId, this.markPaidBankAccountId ?? undefined)
+      .subscribe({
+        next: (response: any) => {
+          this.notification.onSuccess('Invoice marked as paid' + (this.markPaidBankAccountId ? ' and payment recorded in banking' : ''));
+          // Refresh the data
+          const updated = { ...this.dataSubject.value };
+          if (updated.data) updated.data['invoice'] = { ...updated.data['invoice'], status: 'PAID' };
+          this.dataSubject.next(updated);
+          this.invoiceState$ = new Observable(subscriber => {
+            subscriber.next({ dataState: DataState.LOADED, appData: updated });
+            subscriber.complete();
+          });
+          this.closeMarkPaidModal();
+          this.cdr.markForCheck();
+        },
+        error: (error: any) => {
+          this.notification.onError(error);
+          this.closeMarkPaidModal();
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   exportAsPDF(): void {

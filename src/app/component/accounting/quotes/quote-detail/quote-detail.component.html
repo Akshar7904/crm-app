@@ -97,7 +97,7 @@
         <!-- Header: Logo + QUOTE title -->
         <div class="quote-header">
           <div class="header-left">
-            <img src="assets/logo.png" alt="LKCentrix Solutions" class="company-logo">
+            <img *ngIf="company?.id" [src]="companyService.getLogoUrl(company.id)" alt="Logo" class="company-logo" onerror="this.style.display='none'">
           </div>
           <div class="header-right">
             <h1 class="quote-title">QUOTE</h1>
@@ -110,14 +110,14 @@
           <div class="info-left">
             <h6 class="info-label">FROM</h6>
             <p class="info-text">
-              <strong>LKCentrix Solutions (PTY) LTD</strong><br>
-              info@lkcentrix.co.za<br>
-              +27 (11) 568 8322<br>
-              4 Skeen BLVD Bedfordview, 2001
+              <strong>{{ company?.legalName || company?.name || '' }}</strong><br>
+              <ng-container *ngIf="company?.email">{{ company.email }}<br></ng-container>
+              <ng-container *ngIf="company?.phone">{{ company.phone }}<br></ng-container>
+              <ng-container *ngIf="company?.address">{{ company.address }}<span *ngIf="company?.city">, {{ company.city }}</span></ng-container>
             </p>
             <p class="info-text mt-2">
               <span class="info-label" style="font-size:11px;">ISSUED BY</span><br>
-              <strong>{{ quote.issuedByName || 'LKCentrix Team' }}</strong><br>
+              <strong>{{ quote.issuedByName || (company?.name || '') }}</strong><br>
               <span *ngIf="quote.issuedByEmail" style="font-size:12px;">{{ quote.issuedByEmail }}</span>
             </p>
           </div>
@@ -202,7 +202,7 @@
           <div class="footer-col">
             <span class="footer-col-title"><i class="bi bi-person-check me-1"></i>Issued By</span>
             <span class="footer-col-line">
-              <strong>{{ quote.issuedByName || 'LKCentrix Team' }}</strong>
+              <strong>{{ quote.issuedByName || (company?.name || '') }}</strong>
             </span>
             <span class="footer-col-line" *ngIf="quote.issuedByEmail">{{ quote.issuedByEmail }}</span>
           </div>
@@ -219,9 +219,8 @@
           </div>
           <div class="footer-divider"></div>
           <div class="footer-col footer-col-brand">
-            <img src="assets/logo.png" alt="LKCentrix" class="footer-brand-logo">
-            <span class="footer-brand-name">LKCentrix Solutions</span>
-            <span class="footer-col-line">www.lkcentrix.co.za</span>
+            <img *ngIf="company?.id" [src]="companyService.getLogoUrl(company.id)" alt="Logo" class="footer-brand-logo" onerror="this.style.display='none'">
+            <span class="footer-brand-name">{{ company?.name || '' }}</span>
           </div>
         </div>
       </div>
@@ -239,11 +238,11 @@
             <div class="col-md-6">
               <h6 class="section-label">From</h6>
               <div class="customer-info-box">
-                <h5 class="customer-name-box">LKCentrix Solutions (PTY) LTD</h5>
+                <h5 class="customer-name-box">{{ company?.legalName || company?.name || '' }}</h5>
                 <p class="mb-0 text-muted" style="font-size:13px;">
-                  4 Skeen BLVD Bedfordview<br>
-                  Bedfordview Corporate Park, 2001<br>
-                  Phone: +27 (11) 568 8322
+                  <ng-container *ngIf="company?.address">{{ company.address }}<br></ng-container>
+                  <ng-container *ngIf="company?.city">{{ company.city }}<br></ng-container>
+                  <ng-container *ngIf="company?.phone">Phone: {{ company.phone }}</ng-container>
                 </p>
               </div>
             </div>

@@ -11,8 +11,6 @@ import { HolidayRoutingModule } from './holiday-routing.module';
 import { HolidaysComponent } from './holidays/holidays.component';
 import { NewHolidayComponent } from './new-holiday/new-holiday.component';
 import { HolidayDetailComponent } from './holiday-detail/holiday-detail.component';
-import { HolidayService } from '../../service/holiday.service';
-
 @NgModule({
   declarations: [
     HolidaysComponent,
@@ -26,6 +24,6 @@ import { HolidayService } from '../../service/holiday.service';
     HttpClientModule,
     HolidayRoutingModule,
   ],
-  providers: [HolidayService]
+  providers: []
 })
 export class HolidayModule { }
