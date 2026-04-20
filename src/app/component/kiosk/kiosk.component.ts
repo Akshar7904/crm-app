@@ -78,7 +78,7 @@ export class KioskComponent implements OnInit, OnDestroy {
 
   pressKey(key: string): void {
     if (this.state === 'ENTER_ID') {
-      if (this.employeeIdInput.length < 10) this.employeeIdInput += key;
+      if (this.employeeIdInput.length < 4) this.employeeIdInput += key;
     } else if (this.state === 'ENTER_PIN') {
       if (this.pinInput.length < 4) {
         this.pinInput += key;
@@ -110,7 +110,8 @@ export class KioskComponent implements OnInit, OnDestroy {
     this.state = 'CONFIRMING';
     this.cdr.markForCheck();
 
-    this.kioskService.punch(this.employeeIdInput.trim(), this.pinInput, this.companyId)
+    const fullEmployeeId = 'LKC' + this.employeeIdInput.trim().padStart(4, '0');
+    this.kioskService.punch(fullEmployeeId, this.pinInput, this.companyId)
       .subscribe({
         next: res => {
           const r = res.data.result;
