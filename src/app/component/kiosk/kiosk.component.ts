@@ -132,6 +132,7 @@ export class KioskComponent implements OnInit, OnDestroy {
         },
         error: err => {
           console.error('[KIOSK] punch error:', err?.error);
+          console.error('[KIOSK] developer message:', err?.error?.developerMessage);
           this.errorMessage = err?.error?.reason || err?.error?.message || 'Something went wrong. Please try again.';
           this.state = 'ERROR';
           this.cdr.markForCheck();
