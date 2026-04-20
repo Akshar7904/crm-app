@@ -1,0 +1,125 @@
+<div class="kiosk-shell" (click)="state === 'IDLE' && startEntry()">
+
+  <!-- ── HEADER ─────────────────────────────────────────────────── -->
+  <header class="kiosk-header">
+    <ng-container *ngIf="branding.branding as b; else defaultLogo">
+      <img *ngIf="b.logoUrl" [src]="b.logoUrl" class="kiosk-logo" alt="Logo">
+      <span class="kiosk-company-name">{{ b.companyName }}</span>
+    </ng-container>
+    <ng-template #defaultLogo>
+      <img src="assets/logo_icon.png" class="kiosk-logo" alt="LKCentrix">
+      <span class="kiosk-company-name">LKCentrix</span>
+    </ng-template>
+
+    <div class="kiosk-clock-area">
+      <div class="kiosk-time">{{ currentTime }}</div>
+      <div class="kiosk-date">{{ currentDate }}</div>
+    </div>
+  </header>
+
+  <!-- ── MAIN PANEL ─────────────────────────────────────────────── -->
+  <main class="kiosk-main">
+
+    <!-- IDLE -->
+    <ng-container *ngIf="state === 'IDLE'">
+      <div class="kiosk-idle">
+        <i class="bi bi-person-badge kiosk-idle-icon"></i>
+        <p class="kiosk-idle-title">Tap anywhere to Clock In / Out</p>
+        <p class="kiosk-idle-sub">Enter your Employee ID and PIN</p>
+      </div>
+    </ng-container>
+
+    <!-- ENTER EMPLOYEE ID -->
+    <ng-container *ngIf="state === 'ENTER_ID'">
+      <div class="kiosk-card" (click)="$event.stopPropagation()">
+        <h2 class="kiosk-card-title">Enter Employee Number</h2>
+        <div class="kiosk-display">
+          <span class="kiosk-display-value">{{ employeeIdInput || '—' }}</span>
+        </div>
+        <div class="kiosk-numpad">
+          <button *ngFor="let k of KEYS"
+                  class="kiosk-key"
+                  [class.kiosk-key--hidden]="k === '*' || k === '#'"
+                  (click)="pressKey(k)">{{ k }}</button>
+          <button class="kiosk-key kiosk-key--action" (click)="backspace()">
+            <i class="bi bi-backspace"></i>
+          </button>
+        </div>
+        <div class="kiosk-actions">
+          <button class="kiosk-btn kiosk-btn--secondary" (click)="reset()">Cancel</button>
+          <button class="kiosk-btn kiosk-btn--primary"
+                  [disabled]="!employeeIdInput.trim()"
+                  (click)="confirmId()">Next →</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ENTER PIN -->
+    <ng-container *ngIf="state === 'ENTER_PIN'">
+      <div class="kiosk-card" (click)="$event.stopPropagation()">
+        <h2 class="kiosk-card-title">Enter PIN</h2>
+        <p class="kiosk-card-sub">{{ employeeIdInput }}</p>
+        <div class="kiosk-pin-dots">
+          <span *ngFor="let filled of pinDots" class="kiosk-dot" [class.kiosk-dot--filled]="filled"></span>
+        </div>
+        <div class="kiosk-numpad">
+          <button *ngFor="let k of KEYS"
+                  class="kiosk-key"
+                  [class.kiosk-key--hidden]="k === '*' || k === '#'"
+                  (click)="pressKey(k)">{{ k }}</button>
+          <button class="kiosk-key kiosk-key--action" (click)="backspace()">
+            <i class="bi bi-backspace"></i>
+          </button>
+        </div>
+        <div class="kiosk-actions">
+          <button class="kiosk-btn kiosk-btn--secondary" (click)="reset()">Cancel</button>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- CONFIRMING -->
+    <ng-container *ngIf="state === 'CONFIRMING'">
+      <div class="kiosk-card kiosk-card--center" (click)="$event.stopPropagation()">
+        <div class="kiosk-spinner"></div>
+        <p class="kiosk-confirming-text">Verifying...</p>
+      </div>
+    </ng-container>
+
+    <!-- SUCCESS -->
+    <ng-container *ngIf="state === 'SUCCESS' && result">
+      <div class="kiosk-card kiosk-card--center"
+           [class.kiosk-card--success-in]="result.action === 'CLOCK_IN'"
+           [class.kiosk-card--success-out]="result.action === 'CLOCK_OUT'"
+           (click)="$event.stopPropagation()">
+        <i class="bi kiosk-result-icon"
+           [class.bi-box-arrow-in-right]="result.action === 'CLOCK_IN'"
+           [class.bi-box-arrow-left]="result.action === 'CLOCK_OUT'"></i>
+        <h2 class="kiosk-result-name">{{ result.employeeName }}</h2>
+        <p class="kiosk-result-action">
+          {{ result.action === 'CLOCK_IN' ? 'Clocked In' : 'Clocked Out' }}
+          at <strong>{{ result.punchTime }}</strong>
+        </p>
+        <p *ngIf="result.hoursWorked" class="kiosk-result-hours">
+          Total: {{ result.hoursWorked }}
+        </p>
+        <p class="kiosk-result-reset">Returning to home screen...</p>
+      </div>
+    </ng-container>
+
+    <!-- ERROR -->
+    <ng-container *ngIf="state === 'ERROR'">
+      <div class="kiosk-card kiosk-card--center kiosk-card--error" (click)="$event.stopPropagation()">
+        <i class="bi bi-exclamation-triangle kiosk-result-icon"></i>
+        <p class="kiosk-error-msg">{{ errorMessage }}</p>
+        <p class="kiosk-result-reset">Please try again...</p>
+      </div>
+    </ng-container>
+
+  </main>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer class="kiosk-footer">
+    Powered by <strong>ORION</strong> — LKCentrix HR &amp; Payroll
+  </footer>
+
+</div>

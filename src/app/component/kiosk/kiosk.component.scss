@@ -1,0 +1,341 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+// ── Full-screen kiosk shell ───────────────────────────────────────
+.kiosk-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #0f1923 0%, #1a2e42 50%, #0d2137 100%);
+  color: #fff;
+  font-family: $font-family-base;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+// ── Header ────────────────────────────────────────────────────────
+.kiosk-header {
+  display: flex;
+  align-items: center;
+  padding: 18px 32px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 16px;
+}
+
+.kiosk-logo {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.kiosk-company-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: rgba(255,255,255,0.9);
+}
+
+.kiosk-clock-area {
+  margin-left: auto;
+  text-align: right;
+}
+
+.kiosk-time {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: #fff;
+}
+
+.kiosk-date {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 2px;
+}
+
+// ── Main area ─────────────────────────────────────────────────────
+.kiosk-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+// ── Idle state ────────────────────────────────────────────────────
+.kiosk-idle {
+  text-align: center;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+.kiosk-idle-icon {
+  font-size: 6rem;
+  color: rgba(255,255,255,0.15);
+  display: block;
+  margin-bottom: 24px;
+}
+
+.kiosk-idle-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 8px;
+}
+
+.kiosk-idle-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(0.98); }
+}
+
+// ── Card (shared between ENTER_ID / ENTER_PIN / states) ───────────
+.kiosk-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 36px 40px;
+  width: 100%;
+  max-width: 440px;
+  cursor: default;
+  animation: slideUp 0.2s ease-out;
+
+  &--center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &--success-in {
+    border-color: rgba(#00c853, 0.4);
+    background: rgba(#00c853, 0.08);
+  }
+
+  &--success-out {
+    border-color: rgba($primary, 0.4);
+    background: rgba($primary, 0.08);
+  }
+
+  &--error {
+    border-color: rgba($danger, 0.4);
+    background: rgba($danger, 0.08);
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.kiosk-card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px;
+  text-align: center;
+}
+
+.kiosk-card-sub {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.45);
+  margin: 0 0 20px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+// ── Employee ID display ───────────────────────────────────────────
+.kiosk-display {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 14px 20px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.kiosk-display-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: #fff;
+}
+
+// ── PIN dots ──────────────────────────────────────────────────────
+.kiosk-pin-dots {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.kiosk-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: transparent;
+  transition: all 0.15s ease;
+
+  &--filled {
+    background: $primary;
+    border-color: $primary;
+    box-shadow: 0 0 10px rgba($primary, 0.5);
+  }
+}
+
+// ── Numpad ────────────────────────────────────────────────────────
+.kiosk-numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.kiosk-key {
+  @include flex-center;
+  height: 64px;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+
+  &:hover, &:active {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.25);
+    transform: scale(0.96);
+  }
+
+  &--hidden {
+    visibility: hidden;
+  }
+
+  &--action {
+    background: rgba(255,255,255,0.04);
+    font-size: 1.1rem;
+  }
+}
+
+// ── Action buttons ────────────────────────────────────────────────
+.kiosk-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.kiosk-btn {
+  padding: 12px 28px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &--primary {
+    background: $primary;
+    color: #fff;
+    &:hover:not(:disabled) { background: darken($primary, 8%); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+
+  &--secondary {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+    &:hover { background: rgba(255,255,255,0.14); }
+  }
+}
+
+// ── Confirming spinner ────────────────────────────────────────────
+.kiosk-spinner {
+  width: 56px;
+  height: 56px;
+  border: 4px solid rgba(255,255,255,0.15);
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.kiosk-confirming-text {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.6);
+  margin: 8px 0 0;
+}
+
+// ── Result screen ─────────────────────────────────────────────────
+.kiosk-result-icon {
+  font-size: 4rem;
+  display: block;
+}
+
+.kiosk-card--success-in  .kiosk-result-icon { color: #00c853; }
+.kiosk-card--success-out .kiosk-result-icon { color: $primary; }
+.kiosk-card--error       .kiosk-result-icon { color: $danger; }
+
+.kiosk-result-name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.kiosk-result-action {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.7);
+  margin: 0;
+}
+
+.kiosk-result-hours {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+.kiosk-result-reset {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.3);
+  margin: 4px 0 0;
+}
+
+.kiosk-error-msg {
+  font-size: 1.1rem;
+  color: lighten($danger, 20%);
+  margin: 0;
+}
+
+// ── Footer ────────────────────────────────────────────────────────
+.kiosk-footer {
+  padding: 12px 32px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+// ── Tablet optimizations ──────────────────────────────────────────
+@media (max-width: 768px) {
+  .kiosk-header { padding: 14px 20px; }
+  .kiosk-time   { font-size: 1.5rem; }
+  .kiosk-card   { padding: 28px 24px; }
+  .kiosk-key    { height: 56px; font-size: 1.25rem; }
+  .kiosk-idle-title { font-size: 1.5rem; }
+}
