@@ -25,7 +25,7 @@ export class KioskComponent implements OnInit, OnDestroy {
   employeeIdInput = '';
   pinInput        = '';
 
-  companyId: number;
+  companyId: number = 0;
   result: { action: string; employeeName: string; punchTime: string; hoursWorked?: string } | null = null;
   errorMessage = '';
 
@@ -73,7 +73,11 @@ export class KioskComponent implements OnInit, OnDestroy {
   }
 
   get pinDots(): boolean[] {
-    return Array(4).fill(false).map((_, i) => i < this.pinInput.length);
+    return Array(4).fill(false).map((_, i) => i < (this.pinInput?.length ?? 0));
+  }
+
+  get paddedEmployeeId(): string {
+    return (this.employeeIdInput ?? '').padStart(4, '0');
   }
 
   pressKey(key: string): void {
@@ -107,6 +111,7 @@ export class KioskComponent implements OnInit, OnDestroy {
   }
 
   submitPunch(): void {
+    if (this.pinInput.length < 4 || !this.companyId) return;
     this.state = 'CONFIRMING';
     this.cdr.markForCheck();
 
@@ -126,6 +131,7 @@ export class KioskComponent implements OnInit, OnDestroy {
           this.resetTimer = setTimeout(() => this.reset(), 6000);
         },
         error: err => {
+          console.error('[KIOSK] punch error:', err?.error);
           this.errorMessage = err?.error?.message || 'Something went wrong. Please try again.';
           this.state = 'ERROR';
           this.cdr.markForCheck();

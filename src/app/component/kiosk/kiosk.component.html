@@ -59,7 +59,7 @@
     <ng-container *ngIf="state === 'ENTER_PIN'">
       <div class="kiosk-card" (click)="$event.stopPropagation()">
         <h2 class="kiosk-card-title">Enter PIN</h2>
-        <p class="kiosk-card-sub">LKC{{ employeeIdInput.padStart(4, '0') }}</p>
+        <p class="kiosk-card-sub">LKC{{ paddedEmployeeId }}</p>
         <div class="kiosk-pin-dots">
           <span *ngFor="let filled of pinDots" class="kiosk-dot" [class.kiosk-dot--filled]="filled"></span>
         </div>
