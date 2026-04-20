@@ -3,9 +3,12 @@
 
 // ── Full-screen kiosk shell ───────────────────────────────────────
 .kiosk-shell {
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
   background: linear-gradient(160deg, #0f1923 0%, #1a2e42 50%, #0d2137 100%);
   color: #fff;
   font-family: $font-family-base;
@@ -18,21 +21,22 @@
 .kiosk-header {
   display: flex;
   align-items: center;
-  padding: 18px 32px;
+  padding: 20px 36px;
   background: rgba(255,255,255,0.04);
   border-bottom: 1px solid rgba(255,255,255,0.08);
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .kiosk-logo {
-  height: 48px;
+  height: 54px;
   width: auto;
   object-fit: contain;
   filter: brightness(0) invert(1);
 }
 
 .kiosk-company-name {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: 0.3px;
   color: rgba(255,255,255,0.9);
@@ -44,7 +48,7 @@
 }
 
 .kiosk-time {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 700;
   letter-spacing: 2px;
   line-height: 1;
@@ -52,9 +56,9 @@
 }
 
 .kiosk-date {
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: rgba(255,255,255,0.5);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 // ── Main area ─────────────────────────────────────────────────────
@@ -63,7 +67,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 20px;
+  padding: 32px 24px;
+  overflow-y: auto;
 }
 
 // ── Idle state ────────────────────────────────────────────────────
@@ -73,21 +78,21 @@
 }
 
 .kiosk-idle-icon {
-  font-size: 6rem;
+  font-size: 8rem;
   color: rgba(255,255,255,0.15);
   display: block;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .kiosk-idle-title {
-  font-size: 2rem;
+  font-size: 2.4rem;
   font-weight: 700;
   color: rgba(255,255,255,0.85);
-  margin: 0 0 8px;
+  margin: 0 0 12px;
 }
 
 .kiosk-idle-sub {
-  font-size: 1rem;
+  font-size: 1.15rem;
   color: rgba(255,255,255,0.4);
   margin: 0;
 }
@@ -97,15 +102,15 @@
   50%       { opacity: 0.75; transform: scale(0.98); }
 }
 
-// ── Card (shared between ENTER_ID / ENTER_PIN / states) ───────────
+// ── Card ──────────────────────────────────────────────────────────
 .kiosk-card {
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px;
-  padding: 36px 40px;
+  border-radius: 24px;
+  padding: 40px 48px;
   width: 100%;
-  max-width: 440px;
+  max-width: 520px;
   cursor: default;
   animation: slideUp 0.2s ease-out;
 
@@ -114,7 +119,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
   }
 
   &--success-in {
@@ -139,17 +144,17 @@
 }
 
 .kiosk-card-title {
-  font-size: 1.35rem;
+  font-size: 1.55rem;
   font-weight: 700;
   color: #fff;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   text-align: center;
 }
 
 .kiosk-card-sub {
-  font-size: 0.85rem;
+  font-size: 0.95rem;
   color: rgba(255,255,255,0.45);
-  margin: 0 0 20px;
+  margin: 0 0 24px;
   text-align: center;
   letter-spacing: 1px;
 }
@@ -158,38 +163,38 @@
 .kiosk-display {
   background: rgba(0,0,0,0.25);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
-  padding: 14px 20px;
+  border-radius: 12px;
+  padding: 18px 24px;
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .kiosk-display-prefix {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: rgba(255,255,255,0.35);
   letter-spacing: 2px;
-  margin-right: 4px;
+  margin-right: 6px;
 }
 
 .kiosk-display-value {
-  font-size: 1.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 6px;
   color: #fff;
 }
 
 // ── PIN dots ──────────────────────────────────────────────────────
 .kiosk-pin-dots {
   display: flex;
-  gap: 18px;
+  gap: 24px;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .kiosk-dot {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.3);
   background: transparent;
@@ -198,7 +203,7 @@
   &--filled {
     background: $primary;
     border-color: $primary;
-    box-shadow: 0 0 10px rgba($primary, 0.5);
+    box-shadow: 0 0 12px rgba($primary, 0.5);
   }
 }
 
@@ -206,21 +211,23 @@
 .kiosk-numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
 .kiosk-key {
   @include flex-center;
-  height: 64px;
-  font-size: 1.4rem;
+  height: 82px;
+  font-size: 1.7rem;
   font-weight: 600;
   color: #fff;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
+  border-radius: 14px;
   cursor: pointer;
   transition: all 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 
   &:hover, &:active {
     background: rgba(255,255,255,0.18);
@@ -234,7 +241,7 @@
 
   &--action {
     background: rgba(255,255,255,0.04);
-    font-size: 1.1rem;
+    font-size: 1.3rem;
   }
 }
 
@@ -246,13 +253,14 @@
 }
 
 .kiosk-btn {
-  padding: 12px 28px;
-  border-radius: 10px;
-  font-size: 1rem;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 1.05rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
   transition: all 0.15s ease;
+  touch-action: manipulation;
 
   &--primary {
     background: $primary;
@@ -271,8 +279,8 @@
 
 // ── Confirming spinner ────────────────────────────────────────────
 .kiosk-spinner {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border: 4px solid rgba(255,255,255,0.15);
   border-top-color: $primary;
   border-radius: 50%;
@@ -284,14 +292,14 @@
 }
 
 .kiosk-confirming-text {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: rgba(255,255,255,0.6);
   margin: 8px 0 0;
 }
 
 // ── Result screen ─────────────────────────────────────────────────
 .kiosk-result-icon {
-  font-size: 4rem;
+  font-size: 5rem;
   display: block;
 }
 
@@ -300,50 +308,42 @@
 .kiosk-card--error       .kiosk-result-icon { color: $danger; }
 
 .kiosk-result-name {
-  font-size: 1.6rem;
+  font-size: 1.9rem;
   font-weight: 700;
   margin: 0;
   color: #fff;
 }
 
 .kiosk-result-action {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: rgba(255,255,255,0.7);
   margin: 0;
 }
 
 .kiosk-result-hours {
-  font-size: 1rem;
+  font-size: 1.1rem;
   color: rgba(255,255,255,0.5);
   margin: 0;
 }
 
 .kiosk-result-reset {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: rgba(255,255,255,0.3);
   margin: 4px 0 0;
 }
 
 .kiosk-error-msg {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   color: lighten($danger, 20%);
   margin: 0;
 }
 
 // ── Footer ────────────────────────────────────────────────────────
 .kiosk-footer {
-  padding: 12px 32px;
+  padding: 14px 36px;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: rgba(255,255,255,0.2);
   border-top: 1px solid rgba(255,255,255,0.05);
-}
-
-// ── Tablet optimizations ──────────────────────────────────────────
-@media (max-width: 768px) {
-  .kiosk-header { padding: 14px 20px; }
-  .kiosk-time   { font-size: 1.5rem; }
-  .kiosk-card   { padding: 28px 24px; }
-  .kiosk-key    { height: 56px; font-size: 1.25rem; }
-  .kiosk-idle-title { font-size: 1.5rem; }
+  flex-shrink: 0;
 }
