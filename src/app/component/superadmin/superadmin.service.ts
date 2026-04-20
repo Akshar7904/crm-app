@@ -58,6 +58,7 @@ export class SuperadminService {
       localStorage.setItem(Key.TOKEN, superToken);
       localStorage.removeItem(Key.SUPERADMIN_TOKEN);
       localStorage.removeItem(Key.COMPANY_ID);
+      localStorage.removeItem(Key.IMPERSONATING_COMPANY_NAME);
     }
   }
 

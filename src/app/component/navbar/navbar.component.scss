@@ -385,6 +385,12 @@
     transition: color $transition-base;
   }
 
+  &.impersonate-exit-item {
+    color: #e65100;
+    font-weight: $font-weight-semibold;
+    &:hover { background: rgba(#e65100, 0.08); }
+  }
+
   &.logout-item:hover {
     background: rgba($danger, 0.06);
     color: $danger;

@@ -121,8 +121,18 @@ export class SuperadminCompaniesComponent implements OnInit {
       next: res => {
         localStorage.setItem(Key.TOKEN, res.data.access_token);
         localStorage.setItem(Key.COMPANY_ID, String(company.id));
+        localStorage.setItem(Key.IMPERSONATING_COMPANY_NAME, company.name);
+        // Update stored user so frontend knows the active company_id
+        const stored = localStorage.getItem('user');
+        if (stored) {
+          try {
+            const u = JSON.parse(stored);
+            u.companyId = company.id;
+            localStorage.setItem('user', JSON.stringify(u));
+          } catch (_) {}
+        }
         this.notification.onDefault(`Now viewing as: ${company.name}`);
-        this.router.navigate(['/']);
+        window.location.href = '/';
       },
       error: err => this.notification.onError(err)
     });

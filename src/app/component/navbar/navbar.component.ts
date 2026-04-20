@@ -3,7 +3,7 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { environment } from '@env/environment';
-import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, Output, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { UserModel } from 'src/app/component/profile/user.model';
 import { NotificationService } from 'src/app/service/notification.service';
@@ -19,13 +19,18 @@ import { Key } from 'src/app/enum/key.enum';
   styleUrls: ['./navbar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent {
   @Input() user: UserModel;
   @Input() sidebarCollapsed: boolean = false;
   @Output() toggleSidebar = new EventEmitter<void>();
 
-  isImpersonating = false;
-  impersonatedCompanyName = '';
+  get isImpersonating(): boolean {
+    return !!localStorage.getItem(Key.SUPERADMIN_TOKEN);
+  }
+
+  get impersonatedCompanyName(): string {
+    return localStorage.getItem(Key.IMPERSONATING_COMPANY_NAME) || 'a company';
+  }
 
   private readonly DEFAULT_AVATAR = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
   private readonly SERVER_URL = environment.apiUrl + '/api/v1/user';
@@ -45,20 +50,23 @@ export class NavbarComponent implements OnInit {
     this.theme$ = this.themeService.theme$;
   }
 
-  ngOnInit(): void {
-    this.isImpersonating = !!localStorage.getItem(Key.SUPERADMIN_TOKEN);
-    if (this.isImpersonating) {
-      const companyId = localStorage.getItem(Key.COMPANY_ID);
-      this.impersonatedCompanyName = companyId ? `Company ${companyId}` : 'a company';
-    }
-  }
-
   exitImpersonation(): void {
     const superToken = localStorage.getItem(Key.SUPERADMIN_TOKEN);
     if (superToken) {
+      // Restore original superadmin token
       localStorage.setItem(Key.TOKEN, superToken);
       localStorage.removeItem(Key.SUPERADMIN_TOKEN);
       localStorage.removeItem(Key.COMPANY_ID);
+      localStorage.removeItem(Key.IMPERSONATING_COMPANY_NAME);
+      // Restore user object without company_id override
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        try {
+          const u = JSON.parse(stored);
+          delete u.companyId;
+          localStorage.setItem('user', JSON.stringify(u));
+        } catch (_) {}
+      }
       this.notification.onDefault('Returned to Super-Admin view');
       window.location.href = '/superadmin/dashboard';
     }
