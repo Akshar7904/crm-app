@@ -676,6 +676,44 @@
             </form>
           </div>
         </div>
+
+        <!-- Kiosk PIN -->
+        <div class="profile-info-card mt-4">
+          <div class="profile-info-card-header">
+            <i class="bi bi-grid-3x3-gap me-2"></i> Kiosk PIN
+          </div>
+          <div class="profile-info-card-body">
+            <p class="text-muted small mb-3">
+              Set a 4-digit PIN used to clock in/out on the office kiosk tablet.
+            </p>
+            <form #kioskPinForm="ngForm" (ngSubmit)="saveKioskPin(kioskPinForm)">
+              <div class="row g-3 align-items-end">
+                <div class="col-md-4">
+                  <label class="form-label">New PIN</label>
+                  <input type="password" name="kioskPin" class="form-control"
+                         placeholder="4 digits" maxlength="4" minlength="4" pattern="[0-9]{4}"
+                         ngModel required #kioskPinField="ngModel">
+                  <div *ngIf="kioskPinField.invalid && kioskPinField.touched" class="text-danger small mt-1">
+                    PIN must be exactly 4 digits.
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Confirm PIN</label>
+                  <input type="password" name="kioskPinConfirm" class="form-control"
+                         placeholder="Repeat PIN" maxlength="4" ngModel required>
+                </div>
+                <div class="col-md-4">
+                  <button type="submit" class="btn btn-primary w-100"
+                          [disabled]="kioskPinForm.invalid || savingKioskPin">
+                    <span *ngIf="savingKioskPin" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!savingKioskPin" class="bi bi-check-circle me-2"></i>
+                    {{ savingKioskPin ? 'Saving...' : 'Set PIN' }}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
 
       <!-- ═══ Account Tab ═══ -->

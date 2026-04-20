@@ -13,6 +13,7 @@ import { State } from 'src/app/interface/state';
 import { UserService } from 'src/app/service/user.service';
 import { EmployeeService } from 'src/app/service/employee.service';
 import { NotificationService } from 'src/app/service/notification.service';
+import { KioskService } from '../../kiosk/kiosk.service';
 import { NgForm } from '@angular/forms';
 import { UserModel } from '../user.model';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
@@ -73,6 +74,7 @@ export class UserComponent implements OnInit {
   // MFA setup state
   mfaSetupMode = false;
   mfaDisableMode = false;
+  savingKioskPin = false;
   mfaSetupData: { secret: string; qrCodeDataUri: string; issuer: string; email: string } | null = null;
   mfaCode = '';
 
@@ -114,6 +116,7 @@ export class UserComponent implements OnInit {
     private userService: UserService,
     private employeeService: EmployeeService,
     private notification: NotificationService,
+    private kioskService: KioskService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -808,5 +811,27 @@ export class UserComponent implements OnInit {
     if (img && img.src !== this.DEFAULT_AVATAR) {
       img.src = this.DEFAULT_AVATAR;
     }
+  }
+
+  saveKioskPin(form: NgForm): void {
+    const { kioskPin, kioskPinConfirm } = form.value;
+    if (kioskPin !== kioskPinConfirm) {
+      this.notification.onError('PINs do not match');
+      return;
+    }
+    this.savingKioskPin = true;
+    this.kioskService.setPin(kioskPin).subscribe({
+      next: () => {
+        this.notification.onSuccess('Kiosk PIN set successfully');
+        form.resetForm();
+        this.savingKioskPin = false;
+        this.cdr.markForCheck();
+      },
+      error: err => {
+        this.notification.onError(err);
+        this.savingKioskPin = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 }
