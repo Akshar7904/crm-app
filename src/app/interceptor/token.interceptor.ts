@@ -28,7 +28,8 @@ export class TokenInterceptor implements HttpInterceptor {
     // Skip adding token for authentication endpoints
     if (request.url.includes('/user/verify') || request.url.includes('login') || request.url.includes('register')
       || request.url.includes('refresh') || request.url.includes('resetpassword')
-      || request.url.includes('/auth/companies') || request.url.includes('/kiosk/punch')) {
+      || request.url.includes('/auth/companies') || request.url.includes('/kiosk/punch')
+      || request.url.includes('/kiosk/active-breaks')) {
       return next.handle(request);
     }
 

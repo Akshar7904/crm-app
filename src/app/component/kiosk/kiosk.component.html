@@ -2,15 +2,11 @@
 
   <!-- ── HEADER ─────────────────────────────────────────────────── -->
   <header class="kiosk-header">
-    <ng-container *ngIf="branding.branding as b; else defaultLogo">
-      <img *ngIf="b.logoUrl" [src]="b.logoUrl" class="kiosk-logo" alt="Logo">
-      <span class="kiosk-company-name">{{ b.companyName }}</span>
-    </ng-container>
-    <ng-template #defaultLogo>
-      <img src="assets/logo_icon.png" class="kiosk-logo" alt="LKCentrix">
-      <span class="kiosk-company-name">LKCentrix</span>
-    </ng-template>
-
+    <img src="assets/logo_icon.png" class="kiosk-logo" alt="ORION">
+    <div class="kiosk-brand">
+      <span class="kiosk-company-name">{{ branding.branding?.name || 'ORION' }}</span>
+      <span class="kiosk-powered">Powered by ORION</span>
+    </div>
     <div class="kiosk-clock-area">
       <div class="kiosk-time">{{ currentTime }}</div>
       <div class="kiosk-date">{{ currentDate }}</div>
@@ -22,11 +18,58 @@
 
     <!-- IDLE -->
     <ng-container *ngIf="state === 'IDLE'">
-      <div class="kiosk-idle">
+
+      <!-- Alarm banner — shown when break/lunch limit exceeded -->
+      <div *ngIf="alarmActive" class="kiosk-alarm" (click)="$event.stopPropagation()">
+        <i class="bi bi-alarm-fill kiosk-alarm__icon"></i>
+        <div>
+          <p class="kiosk-alarm__title">Break time exceeded!</p>
+          <p class="kiosk-alarm__sub">You have 1 minute to return — {{ elapsedFormatted }} elapsed</p>
+        </div>
+      </div>
+
+      <!-- CLOCK MODE: tap-to-start prompt -->
+      <div *ngIf="!isBreaksMode" class="kiosk-idle">
         <i class="bi bi-person-badge kiosk-idle-icon"></i>
         <p class="kiosk-idle-title">Tap anywhere to Clock In / Out</p>
         <p class="kiosk-idle-sub">Enter your Employee ID and PIN</p>
       </div>
+
+      <!-- BREAKS MODE: live board centered -->
+      <div *ngIf="isBreaksMode" class="kiosk-breaks-center">
+        <div class="kiosk-breaks-board">
+          <div class="kiosk-breaks-board__header">
+            <i class="bi bi-people-fill"></i>
+            Currently on Break / Lunch
+            <span *ngIf="activeBreaks.length > 0" class="kiosk-breaks-board__count">
+              {{ activeBreaks.length }}
+            </span>
+          </div>
+          <div *ngIf="activeBreaks.length === 0" class="kiosk-breaks-board__empty">
+            <i class="bi bi-cup-hot kiosk-breaks-board__empty-icon"></i>
+            <p>No one is on break right now</p>
+          </div>
+          <div class="kiosk-liveboard__rows">
+            <div *ngFor="let entry of activeBreaks"
+                 class="kiosk-liveboard__row"
+                 [class.kiosk-liveboard__row--grace]="isInGrace(entry)"
+                 [class.kiosk-liveboard__row--over]="isOverLimit(entry) && !isInGrace(entry)">
+              <span class="lb-dot"
+                    [class.lb-dot--break]="entry.status === 'ON_BREAK'"
+                    [class.lb-dot--lunch]="entry.status === 'ON_LUNCH'"
+                    [class.lb-dot--alarm]="isOverLimit(entry)"></span>
+              <span class="lb-name">{{ entry.employeeName }}</span>
+              <span class="lb-type">{{ entry.status === 'ON_LUNCH' ? 'Lunch' : 'Break' }}</span>
+              <span class="lb-elapsed" [class.lb-elapsed--warn]="isOverLimit(entry)">
+                {{ formatElapsed(entry.elapsedSec) }}
+                <i *ngIf="isInGrace(entry)" class="bi bi-alarm-fill lb-alarm-icon"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+        <p class="kiosk-idle-sub">Tap anywhere to start or end a break / lunch</p>
+      </div>
+
     </ng-container>
 
     <!-- ENTER EMPLOYEE ID -->
@@ -38,8 +81,7 @@
           <span class="kiosk-display-value">{{ employeeIdInput || '——' }}</span>
         </div>
         <div class="kiosk-numpad">
-          <button *ngFor="let k of KEYS"
-                  class="kiosk-key"
+          <button *ngFor="let k of KEYS" class="kiosk-key"
                   [class.kiosk-key--hidden]="k === '*' || k === '#'"
                   (click)="pressKey(k)">{{ k }}</button>
           <button class="kiosk-key kiosk-key--action" (click)="backspace()">
@@ -49,8 +91,7 @@
         <div class="kiosk-actions">
           <button class="kiosk-btn kiosk-btn--secondary" (click)="reset()">Cancel</button>
           <button class="kiosk-btn kiosk-btn--primary"
-                  [disabled]="!employeeIdInput.trim()"
-                  (click)="confirmId()">Next →</button>
+                  [disabled]="!employeeIdInput.trim()" (click)="confirmId()">Next →</button>
         </div>
       </div>
     </ng-container>
@@ -61,11 +102,11 @@
         <h2 class="kiosk-card-title">Enter PIN</h2>
         <p class="kiosk-card-sub">LKC{{ paddedEmployeeId }}</p>
         <div class="kiosk-pin-dots">
-          <span *ngFor="let filled of pinDots" class="kiosk-dot" [class.kiosk-dot--filled]="filled"></span>
+          <span *ngFor="let filled of pinDots" class="kiosk-dot"
+                [class.kiosk-dot--filled]="filled"></span>
         </div>
         <div class="kiosk-numpad">
-          <button *ngFor="let k of KEYS"
-                  class="kiosk-key"
+          <button *ngFor="let k of KEYS" class="kiosk-key"
                   [class.kiosk-key--hidden]="k === '*' || k === '#'"
                   (click)="pressKey(k)">{{ k }}</button>
           <button class="kiosk-key kiosk-key--action" (click)="backspace()">
@@ -86,19 +127,41 @@
       </div>
     </ng-container>
 
+    <!-- ACTION SELECT ─────────────────────────────────────────── -->
+    <ng-container *ngIf="state === 'ACTION_SELECT'">
+      <div class="kiosk-action-select" (click)="$event.stopPropagation()">
+        <div class="kiosk-action-select__header">
+          <i class="bi bi-person-check kiosk-action-select__avatar"></i>
+          <h2 class="kiosk-action-select__name">{{ selectEmployeeName }}</h2>
+          <p class="kiosk-action-select__prompt">What would you like to do?</p>
+        </div>
+        <div class="kiosk-action-grid"
+             [class.kiosk-action-grid--2col]="availableActions.length <= 2">
+          <button *ngFor="let action of availableActions"
+                  class="action-btn"
+                  [ngClass]="getActionMeta(action).colorClass"
+                  (click)="selectAction(action)">
+            <i class="bi action-btn__icon" [ngClass]="getActionMeta(action).icon"></i>
+            <span class="action-btn__label">{{ getActionMeta(action).label }}</span>
+          </button>
+        </div>
+        <button class="kiosk-btn kiosk-btn--secondary kiosk-action-select__cancel"
+                (click)="reset()">Cancel</button>
+      </div>
+    </ng-container>
+
     <!-- SUCCESS -->
     <ng-container *ngIf="state === 'SUCCESS' && result">
       <div class="kiosk-card kiosk-card--center"
            [class.kiosk-card--success-in]="result.action === 'CLOCK_IN'"
            [class.kiosk-card--success-out]="result.action === 'CLOCK_OUT'"
+           [class.kiosk-card--success-break]="result.action === 'START_BREAK' || result.action === 'END_BREAK'"
+           [class.kiosk-card--success-lunch]="result.action === 'START_LUNCH' || result.action === 'END_LUNCH'"
            (click)="$event.stopPropagation()">
-        <i class="bi kiosk-result-icon"
-           [class.bi-box-arrow-in-right]="result.action === 'CLOCK_IN'"
-           [class.bi-box-arrow-left]="result.action === 'CLOCK_OUT'"></i>
+        <i class="bi kiosk-result-icon" [ngClass]="getActionMeta(result.action).icon"></i>
         <h2 class="kiosk-result-name">{{ result.employeeName }}</h2>
         <p class="kiosk-result-action">
-          {{ result.action === 'CLOCK_IN' ? 'Clocked In' : 'Clocked Out' }}
-          at <strong>{{ result.punchTime }}</strong>
+          {{ getActionMeta(result.action).label }} at <strong>{{ result.punchTime }}</strong>
         </p>
         <p *ngIf="result.hoursWorked" class="kiosk-result-hours">
           Total: {{ result.hoursWorked }}
@@ -118,9 +181,56 @@
 
   </main>
 
+  <!-- ── BOTTOM BAR — clock mode only ─────────────────────────── -->
+  <div *ngIf="!isBreaksMode" class="kiosk-bottom-bar"
+       (click)="$event.stopPropagation(); toggleBreakList()">
+    <i class="bi bi-people-fill kiosk-bottom-bar__icon"></i>
+    <span class="kiosk-bottom-bar__text" *ngIf="activeBreaks.length === 0">
+      No one is on break or lunch
+    </span>
+    <span class="kiosk-bottom-bar__text" *ngIf="activeBreaks.length > 0">
+      <strong>{{ activeBreaks.length }}</strong> currently on break / lunch
+    </span>
+    <i class="bi kiosk-bottom-bar__chevron"
+       [ngClass]="showBreakList ? 'bi-chevron-down' : 'bi-chevron-up'"></i>
+  </div>
+
   <!-- ── FOOTER ─────────────────────────────────────────────────── -->
   <footer class="kiosk-footer">
-    Powered by <strong>ORION</strong> — LKCentrix HR &amp; Payroll
+    LKCentrix HR &amp; Payroll Management System
   </footer>
+
+  <!-- ── BREAK LIST OVERLAY — clock mode ───────────────────────── -->
+  <div *ngIf="showBreakList" class="kiosk-breaklist-overlay"
+       (click)="$event.stopPropagation(); toggleBreakList()">
+    <div class="kiosk-breaklist" (click)="$event.stopPropagation()">
+      <div class="kiosk-breaklist__header">
+        <span><i class="bi bi-people-fill"></i>&nbsp; Currently on Break / Lunch</span>
+        <button class="kiosk-breaklist__close" (click)="toggleBreakList()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div *ngIf="activeBreaks.length === 0" class="kiosk-breaklist__empty">
+        No one is currently on break or lunch.
+      </div>
+      <div class="kiosk-liveboard__rows">
+        <div *ngFor="let entry of activeBreaks"
+             class="kiosk-liveboard__row"
+             [class.kiosk-liveboard__row--grace]="isInGrace(entry)"
+             [class.kiosk-liveboard__row--over]="isOverLimit(entry) && !isInGrace(entry)">
+          <span class="lb-dot"
+                [class.lb-dot--break]="entry.status === 'ON_BREAK'"
+                [class.lb-dot--lunch]="entry.status === 'ON_LUNCH'"
+                [class.lb-dot--alarm]="isOverLimit(entry)"></span>
+          <span class="lb-name">{{ entry.employeeName }}</span>
+          <span class="lb-type">{{ entry.status === 'ON_LUNCH' ? 'Lunch' : 'Break' }}</span>
+          <span class="lb-elapsed" [class.lb-elapsed--warn]="isOverLimit(entry)">
+            {{ formatElapsed(entry.elapsedSec) }}
+            <i *ngIf="isInGrace(entry)" class="bi bi-alarm-fill lb-alarm-icon"></i>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
