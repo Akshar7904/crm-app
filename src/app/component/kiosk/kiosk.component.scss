@@ -21,15 +21,15 @@
 .kiosk-header {
   display: flex;
   align-items: center;
-  padding: 20px 36px;
+  padding: 12px 28px;
   background: rgba(255,255,255,0.04);
   border-bottom: 1px solid rgba(255,255,255,0.08);
-  gap: 16px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 .kiosk-logo {
-  height: 54px;
+  height: 40px;
   width: auto;
   object-fit: contain;
 }
@@ -41,7 +41,7 @@
 }
 
 .kiosk-company-name {
-  font-size: 1.4rem;
+  font-size: 1.1rem;
   font-weight: 700;
   letter-spacing: 0.3px;
   color: rgba(255,255,255,0.9);
@@ -60,7 +60,7 @@
 }
 
 .kiosk-time {
-  font-size: 2.4rem;
+  font-size: 1.7rem;
   font-weight: 700;
   letter-spacing: 2px;
   line-height: 1;
@@ -79,7 +79,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 32px 24px;
+  padding: 16px 20px;
   overflow-y: auto;
 }
 
@@ -90,17 +90,17 @@
 }
 
 .kiosk-idle-icon {
-  font-size: 8rem;
+  font-size: 5rem;
   color: rgba(255,255,255,0.15);
   display: block;
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 }
 
 .kiosk-idle-title {
-  font-size: 2.4rem;
+  font-size: 1.8rem;
   font-weight: 700;
   color: rgba(255,255,255,0.85);
-  margin: 0 0 12px;
+  margin: 0 0 8px;
 }
 
 .kiosk-idle-sub {
@@ -119,10 +119,10 @@
   background: rgba(255,255,255,0.06);
   backdrop-filter: blur(16px);
   border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 24px;
-  padding: 40px 48px;
+  border-radius: 20px;
+  padding: 22px 32px;
   width: 100%;
-  max-width: 520px;
+  max-width: 460px;
   cursor: default;
   animation: slideUp 0.2s ease-out;
 
@@ -156,17 +156,17 @@
 }
 
 .kiosk-card-title {
-  font-size: 1.55rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: #fff;
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   text-align: center;
 }
 
 .kiosk-card-sub {
-  font-size: 0.95rem;
+  font-size: 0.88rem;
   color: rgba(255,255,255,0.45);
-  margin: 0 0 24px;
+  margin: 0 0 16px;
   text-align: center;
   letter-spacing: 1px;
 }
@@ -175,14 +175,14 @@
 .kiosk-display {
   background: rgba(0,0,0,0.25);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 12px;
-  padding: 18px 24px;
+  border-radius: 10px;
+  padding: 10px 18px;
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
 }
 
 .kiosk-display-prefix {
-  font-size: 2.2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: rgba(255,255,255,0.35);
   letter-spacing: 2px;
@@ -190,7 +190,7 @@
 }
 
 .kiosk-display-value {
-  font-size: 2.2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 6px;
   color: #fff;
@@ -199,14 +199,14 @@
 // ── PIN dots ──────────────────────────────────────────────────────
 .kiosk-pin-dots {
   display: flex;
-  gap: 24px;
+  gap: 18px;
   justify-content: center;
-  margin-bottom: 28px;
+  margin-bottom: 16px;
 }
 
 .kiosk-dot {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   border: 2px solid rgba(255,255,255,0.3);
   background: transparent;
@@ -223,19 +223,19 @@
 .kiosk-numpad {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin-bottom: 24px;
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
 .kiosk-key {
   @include flex-center;
-  height: 82px;
-  font-size: 1.7rem;
+  height: 56px;
+  font-size: 1.35rem;
   font-weight: 600;
   color: #fff;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 14px;
+  border-radius: 12px;
   cursor: pointer;
   transition: all 0.12s ease;
   -webkit-tap-highlight-color: transparent;
@@ -253,7 +253,7 @@
 
   &--action {
     background: rgba(255,255,255,0.04);
-    font-size: 1.3rem;
+    font-size: 1.1rem;
   }
 }
 
@@ -265,9 +265,9 @@
 }
 
 .kiosk-btn {
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-size: 1.05rem;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 0.95rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
@@ -480,8 +480,8 @@ $color-lunch: #10b981;
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 680px;
-  gap: 32px;
+  max-width: 560px;
+  gap: 18px;
   cursor: default;
   animation: slideUp 0.2s ease-out;
 }
@@ -489,21 +489,21 @@ $color-lunch: #10b981;
 .kiosk-action-select__header { text-align: center; }
 
 .kiosk-action-select__avatar {
-  font-size: 4.5rem;
+  font-size: 3.2rem;
   color: rgba(255,255,255,0.6);
   display: block;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .kiosk-action-select__name {
-  font-size: 2rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: #fff;
-  margin: 0 0 8px;
+  margin: 0 0 4px;
 }
 
 .kiosk-action-select__prompt {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: rgba(255,255,255,0.45);
   margin: 0;
 }
@@ -511,17 +511,17 @@ $color-lunch: #10b981;
 .kiosk-action-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 14px;
   width: 100%;
-  max-width: 520px;
+  max-width: 460px;
 }
 
 .action-btn {
   @include flex-center;
   flex-direction: column;
-  gap: 14px;
-  min-height: 160px;
-  border-radius: 20px;
+  gap: 10px;
+  min-height: 110px;
+  border-radius: 16px;
   border: 1px solid rgba(255,255,255,0.1);
   background: rgba(255,255,255,0.07);
   color: #fff;
@@ -529,7 +529,7 @@ $color-lunch: #10b981;
   transition: transform 0.12s ease, background 0.12s ease;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  padding: 24px 16px;
+  padding: 16px 12px;
   position: relative;
 
   &:hover, &:active {
@@ -585,12 +585,12 @@ $color-lunch: #10b981;
 }
 
 .action-btn__icon {
-  font-size: 3rem;
+  font-size: 2.2rem;
   display: block;
 }
 
 .action-btn__label {
-  font-size: 1.15rem;
+  font-size: 1rem;
   font-weight: 600;
   text-align: center;
   line-height: 1.2;
@@ -692,8 +692,8 @@ $color-lunch: #10b981;
 .kiosk-bottom-bar {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 36px;
+  gap: 12px;
+  padding: 12px 28px;
   background: rgba(255,255,255,0.04);
   border-top: 1px solid rgba(255,255,255,0.07);
   cursor: pointer;
@@ -794,9 +794,9 @@ $color-lunch: #10b981;
 
 // ── Footer ────────────────────────────────────────────────────────
 .kiosk-footer {
-  padding: 14px 36px;
+  padding: 8px 28px;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: rgba(255,255,255,0.2);
   border-top: 1px solid rgba(255,255,255,0.05);
   flex-shrink: 0;
