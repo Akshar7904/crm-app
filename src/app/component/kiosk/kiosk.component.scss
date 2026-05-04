@@ -510,14 +510,10 @@ $color-lunch: #10b981;
 
 .kiosk-action-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   width: 100%;
-
-  &--2col {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 460px;
-  }
+  max-width: 520px;
 }
 
 .action-btn {
@@ -534,6 +530,7 @@ $color-lunch: #10b981;
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
   padding: 24px 16px;
+  position: relative;
 
   &:hover, &:active {
     transform: scale(0.96);
@@ -569,6 +566,24 @@ $color-lunch: #10b981;
   }
 }
 
+.action-btn__key {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
 .action-btn__icon {
   font-size: 3rem;
   display: block;
@@ -580,6 +595,24 @@ $color-lunch: #10b981;
   text-align: center;
   line-height: 1.2;
   color: rgba(255,255,255,0.9);
+}
+
+.action-btn__reason {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.action-btn--disabled {
+  opacity: 0.35;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  border-color: rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.03) !important;
+
+  .action-btn__icon { color: rgba(255,255,255,0.25) !important; }
 }
 
 .kiosk-action-select__cancel { min-width: 160px; }

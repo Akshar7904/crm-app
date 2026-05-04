@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
 // LKCentrix HR & Payroll Management System — ORION
 
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { interval, Subscription } from 'rxjs';
 import { KioskService } from './kiosk.service';
@@ -9,10 +9,8 @@ import { BrandingService } from '../../service/branding.service';
 
 type KioskState = 'IDLE' | 'ENTER_ID' | 'ENTER_PIN' | 'CONFIRMING' | 'ACTION_SELECT' | 'SUCCESS' | 'ERROR';
 
-interface ActionMeta { label: string; icon: string; colorClass: string; }
-
-const CLOCK_ACTIONS  = new Set(['CLOCK_IN', 'CLOCK_OUT']);
-const BREAK_ACTIONS  = new Set(['START_BREAK', 'END_BREAK', 'START_LUNCH', 'END_LUNCH']);
+interface ActionMeta   { label: string; icon: string; colorClass: string; }
+interface ActionOption { action: string; enabled: boolean; reason?: string; }
 
 @Component({
   standalone: false,
@@ -31,16 +29,13 @@ export class KioskComponent implements OnInit, OnDestroy {
   pinInput        = '';
 
   companyId: number = 0;
-  /** 'clock' = /kiosk/:id — only CLOCK_IN/OUT.  'breaks' = /kiosk/:id/activebreaks — only breaks/lunch. */
-  mode: 'clock' | 'breaks' = 'clock';
 
   result: { action: string; employeeName: string; punchTime: string; hoursWorked?: string } | null = null;
   errorMessage = '';
 
-  availableActions: string[] = [];
+  actionOptions: ActionOption[]  = [];
   selectEmployeeName = '';
 
-  /** Bottom-bar toggle (clock mode only). */
   showBreakList = false;
 
   elapsedSeconds = 0;
@@ -66,12 +61,14 @@ export class KioskComponent implements OnInit, OnDestroy {
   private activeLimit = 0;
 
   readonly ACTION_META: Record<string, ActionMeta> = {
-    'CLOCK_IN':    { label: 'Clock In',    icon: 'bi-box-arrow-in-right', colorClass: 'action-btn--in'    },
-    'CLOCK_OUT':   { label: 'Clock Out',   icon: 'bi-box-arrow-left',     colorClass: 'action-btn--out'   },
-    'START_BREAK': { label: 'Start Break', icon: 'bi-pause-circle',       colorClass: 'action-btn--break' },
-    'END_BREAK':   { label: 'End Break',   icon: 'bi-play-circle',        colorClass: 'action-btn--break' },
-    'START_LUNCH': { label: 'Start Lunch', icon: 'bi-egg-fried',          colorClass: 'action-btn--lunch' },
-    'END_LUNCH':   { label: 'End Lunch',   icon: 'bi-arrow-return-left',  colorClass: 'action-btn--lunch' },
+    'CLOCK_IN':      { label: 'Clock In',    icon: 'bi-box-arrow-in-right',  colorClass: 'action-btn--in'    },
+    'CLOCK_OUT':     { label: 'Clock Out',   icon: 'bi-box-arrow-left',      colorClass: 'action-btn--out'   },
+    'START_BREAK_1': { label: 'Break 1',     icon: 'bi-pause-circle',        colorClass: 'action-btn--break' },
+    'END_BREAK_1':   { label: 'End Break',   icon: 'bi-play-circle',         colorClass: 'action-btn--break' },
+    'START_BREAK_2': { label: 'Break 2',     icon: 'bi-pause-circle-fill',   colorClass: 'action-btn--break' },
+    'END_BREAK_2':   { label: 'End Break 2', icon: 'bi-play-circle-fill',    colorClass: 'action-btn--break' },
+    'START_LUNCH':   { label: 'Lunch',       icon: 'bi-egg-fried',           colorClass: 'action-btn--lunch' },
+    'END_LUNCH':     { label: 'End Lunch',   icon: 'bi-arrow-return-left',   colorClass: 'action-btn--lunch' },
   };
 
   constructor(
@@ -83,7 +80,6 @@ export class KioskComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.companyId = Number(this.route.snapshot.paramMap.get('companyId'));
-    this.mode      = this.route.snapshot.data['mode'] ?? 'clock';
 
     if (this.companyId && !this.branding.loaded) {
       this.branding.loadPublic(this.companyId).subscribe(() => this.cdr.markForCheck());
@@ -115,8 +111,6 @@ export class KioskComponent implements OnInit, OnDestroy {
   }
 
   // ── State machine ──────────────────────────────────────────────
-
-  get isBreaksMode(): boolean { return this.mode === 'breaks'; }
 
   startEntry(): void {
     this.employeeIdInput = '';
@@ -167,12 +161,13 @@ export class KioskComponent implements OnInit, OnDestroy {
       .subscribe({ next: res => this.handleResponse(res), error: err => this.handleError(err) });
   }
 
-  selectAction(action: string): void {
+  selectAction(opt: ActionOption): void {
+    if (!opt.enabled) return;
     clearTimeout(this.resetTimer);
     this.state = 'CONFIRMING';
     this.cdr.markForCheck();
     const fullEmployeeId = 'LKC' + this.employeeIdInput.trim().padStart(4, '0');
-    this.kioskService.punch(fullEmployeeId, this.pinInput, this.companyId, action)
+    this.kioskService.punch(fullEmployeeId, this.pinInput, this.companyId, opt.action)
       .subscribe({ next: res => this.handleResponse(res), error: err => this.handleError(err) });
   }
 
@@ -181,32 +176,52 @@ export class KioskComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  @HostListener('window:keydown', ['$event'])
+  handleKeydown(e: KeyboardEvent): void {
+    // Don't capture keys when typing in a native input
+    if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+    switch (this.state) {
+      case 'IDLE':
+        if (e.key !== 'Tab') this.startEntry();
+        break;
+
+      case 'ENTER_ID':
+        if (e.key >= '0' && e.key <= '9') this.pressKey(e.key);
+        else if (e.key === 'Backspace')    this.backspace();
+        else if (e.key === 'Enter')        this.confirmId();
+        else if (e.key === 'Escape')       this.reset();
+        break;
+
+      case 'ENTER_PIN':
+        if (e.key >= '0' && e.key <= '9') this.pressKey(e.key);
+        else if (e.key === 'Backspace')    this.backspace();
+        else if (e.key === 'Escape')       this.reset();
+        break;
+
+      case 'ACTION_SELECT': {
+        const num = parseInt(e.key, 10);
+        if (!isNaN(num) && num >= 1 && num <= this.actionOptions.length) {
+          const opt = this.actionOptions[num - 1];
+          if (opt.enabled) this.selectAction(opt);
+        } else if (e.key === 'Escape') {
+          this.reset();
+        }
+        break;
+      }
+
+      case 'SUCCESS':
+      case 'ERROR':
+        if (e.key === 'Enter' || e.key === 'Escape') this.reset();
+        break;
+    }
+  }
+
   private handleResponse(res: any): void {
     const r = res.data.result;
 
-    if (r.availableActions && r.availableActions.length > 0) {
-      // Filter actions based on which kiosk mode we're in
-      const allowed  = this.isBreaksMode ? BREAK_ACTIONS : CLOCK_ACTIONS;
-      const filtered = (r.availableActions as string[]).filter(a => allowed.has(a));
-
-      if (filtered.length === 0) {
-        // No relevant actions for this terminal
-        this.errorMessage = this.isBreaksMode
-          ? 'Please clock in at the main kiosk first.'
-          : 'Use the break kiosk to manage breaks and lunch.';
-        this.state = 'ERROR';
-        this.cdr.markForCheck();
-        this.resetTimer = setTimeout(() => this.reset(), 4000);
-        return;
-      }
-
-      if (filtered.length === 1) {
-        // Only one option — perform it directly
-        this.selectAction(filtered[0]);
-        return;
-      }
-
-      this.availableActions   = filtered;
+    if (r.actionOptions && r.actionOptions.length > 0) {
+      this.actionOptions     = r.actionOptions;
       this.selectEmployeeName = r.employeeName;
       this.state = 'ACTION_SELECT';
       this.cdr.markForCheck();
@@ -214,11 +229,11 @@ export class KioskComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Auto-performed action
     clearTimeout(this.resetTimer);
 
-    // Refresh live board immediately after any break/lunch action
-    if (BREAK_ACTIONS.has(r.action)) this.fetchActiveBreaks();
+    if (['START_BREAK_1','END_BREAK_1','START_BREAK_2','END_BREAK_2','START_LUNCH','END_LUNCH'].includes(r.action)) {
+      this.fetchActiveBreaks();
+    }
 
     this.result = {
       action:       r.action,
@@ -231,9 +246,13 @@ export class KioskComponent implements OnInit, OnDestroy {
     this.resetTimer = setTimeout(() => this.reset(), 6000);
 
     this.stopElapsedTimer();
-    if (r.action === 'START_BREAK' || r.action === 'START_LUNCH') {
+    if (r.action === 'START_BREAK_1' || r.action === 'START_BREAK_2') {
       this.breakStartTime = new Date(r.punchTime);
-      this.activeLimit    = r.action === 'START_LUNCH' ? this.LUNCH_LIMIT_SEC : this.BREAK_LIMIT_SEC;
+      this.activeLimit    = this.BREAK_LIMIT_SEC;
+      this.startElapsedTimer();
+    } else if (r.action === 'START_LUNCH') {
+      this.breakStartTime = new Date(r.punchTime);
+      this.activeLimit    = this.LUNCH_LIMIT_SEC;
       this.startElapsedTimer();
     }
   }
@@ -254,7 +273,7 @@ export class KioskComponent implements OnInit, OnDestroy {
     this.pinInput           = '';
     this.result             = null;
     this.errorMessage       = '';
-    this.availableActions   = [];
+    this.actionOptions      = [];
     this.selectEmployeeName = '';
     this.showBreakList      = false;
     this.cdr.markForCheck();
