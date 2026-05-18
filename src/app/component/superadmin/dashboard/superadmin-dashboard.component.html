@@ -1,0 +1,345 @@
+<!-- Banner -->
+<div class="page-banner sa-banner">
+  <div class="banner-content">
+    <div class="banner-icon"><i class="bi bi-layers-fill"></i></div>
+    <div>
+      <div class="banner-title">Platform Overview</div>
+      <div class="banner-subtitle">
+        {{ stats?.totalCompanies ?? 0 }} tenants &middot; {{ stats?.totalUsers ?? 0 }} users &middot; Real-time
+      </div>
+    </div>
+  </div>
+  <div class="banner-actions">
+    <button class="btn-banner" (click)="loadData()">
+      <i class="bi bi-arrow-repeat me-1"></i>Refresh
+    </button>
+    <button class="btn-banner btn-outline-light" *ngIf="impersonating" (click)="exitImpersonation()">
+      <i class="bi bi-arrow-return-left me-1"></i>Return to Super-Admin
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- ── Gradient Stat Cards ──────────────────────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-xl-3">
+      <div class="stat-card stat-blue">
+        <div class="stat-icon-wrap"><i class="bi bi-building-fill"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ loading ? '—' : (stats?.totalCompanies ?? 0) }}</div>
+          <div class="stat-label">Total Companies</div>
+        </div>
+        <div class="stat-footer">
+          <i class="bi bi-arrow-up-short text-success"></i>
+          <span>{{ stats?.newCompaniesThisMonth ?? 0 }} this month</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+      <div class="stat-card stat-green">
+        <div class="stat-icon-wrap"><i class="bi bi-check2-circle"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ loading ? '—' : (stats?.activeCompanies ?? 0) }}</div>
+          <div class="stat-label">Active Tenants</div>
+        </div>
+        <div class="stat-footer">
+          <span>{{ stats?.totalCompanies ? round((stats.activeCompanies / stats.totalCompanies) * 100) : 0 }}% of total</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+      <div class="stat-card stat-purple">
+        <div class="stat-icon-wrap"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ loading ? '—' : (stats?.totalUsers ?? 0) }}</div>
+          <div class="stat-label">Platform Users</div>
+        </div>
+        <div class="stat-footer">
+          <span>{{ stats?.totalAdmins ?? 0 }} admins</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6 col-xl-3">
+      <div class="stat-card stat-orange">
+        <div class="stat-icon-wrap"><i class="bi bi-pause-circle-fill"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ loading ? '—' : (stats?.inactiveCompanies ?? 0) }}</div>
+          <div class="stat-label">Inactive Tenants</div>
+        </div>
+        <div class="stat-footer">
+          <span>Pending activation</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Employees Chart + Platform Calendar ──────────────── -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-12 col-lg-7">
+      <div class="falcon-card p-0 overflow-hidden">
+        <div class="chart-header">
+          <div>
+            <div class="fw-semibold">Company Growth — Employees</div>
+            <div class="text-muted small">Users per tenant across the platform</div>
+          </div>
+          <span class="badge bg-primary bg-opacity-10 text-primary fw-semibold">{{ currentYear }}</span>
+        </div>
+        <div class="p-3">
+          <canvas #growthChart height="160"></canvas>
+          <div *ngIf="companies.length === 0" class="text-center text-muted py-4 small">
+            No company data loaded yet
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform Events Calendar -->
+    <div class="col-12 col-lg-5">
+      <div class="falcon-card p-0 overflow-hidden h-100 d-flex flex-column" style="position:relative">
+        <div class="cal-header">
+          <button class="btn-cal-nav" (click)="prevMonth()"><i class="bi bi-chevron-left"></i></button>
+          <div class="fw-semibold">{{ calendarMonthLabel }}</div>
+          <button class="btn-cal-nav" (click)="nextMonth()"><i class="bi bi-chevron-right"></i></button>
+        </div>
+
+        <!-- Day-of-week headers -->
+        <div class="cal-dow-row">
+          <div *ngFor="let d of ['Su','Mo','Tu','We','Th','Fr','Sa']; trackBy: trackByValue" class="cal-dow">{{ d }}</div>
+        </div>
+
+        <!-- Calendar grid -->
+        <div class="cal-grid flex-grow-1">
+          <div *ngFor="let cell of calendarDays; trackBy: trackByIndex"
+               class="cal-cell"
+               [class.cal-cell-today]="isToday(cell.date)"
+               [class.cal-cell-empty]="!cell.date"
+               [class.cal-cell-has-events]="cell.date && (cell.events.length > 0 || cell.holidays.length > 0)"
+               (click)="openPopup(cell, $event)">
+            <div class="cal-day-num" *ngIf="cell.date">{{ cell.date.getDate() }}</div>
+            <div class="cal-events">
+              <div *ngFor="let h of cell.holidays; trackBy: trackById" class="cal-event-dot cal-event-holiday"
+                   [title]="h.holidayName">
+                <i class="bi bi-circle-fill me-1" style="font-size:.45rem"></i>{{ h.holidayName | slice:0:14 }}
+              </div>
+              <div *ngFor="let e of cell.events | slice:0:2; trackBy: trackById" class="cal-event-dot"
+                   [class.cal-event-pinned]="e.is_pinned"
+                   [title]="e.title">
+                <i class="bi bi-circle-fill me-1" style="font-size:.45rem"></i>{{ e.title | slice:0:14 }}…
+              </div>
+              <div *ngIf="(cell.events.length + cell.holidays.length) > 3" class="cal-more">+{{ cell.events.length + cell.holidays.length - 3 }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="cal-footer">
+          <div class="d-flex align-items-center gap-2 flex-wrap" style="font-size:.72rem; color:var(--text-muted)">
+            <span><i class="bi bi-circle-fill me-1 text-primary" style="font-size:.45rem"></i>Event</span>
+            <span><i class="bi bi-circle-fill me-1" style="font-size:.45rem;color:#f6c343"></i>Pinned</span>
+            <span><i class="bi bi-circle-fill me-1" style="font-size:.45rem;color:#00d97e"></i>Holiday</span>
+            <span class="ms-auto">{{ calendarEvents.length }} events · {{ calendarHolidays.length }} holidays</span>
+          </div>
+        </div>
+
+        <!-- Day popup -->
+        <div class="cal-popup" *ngIf="popupCell"
+             [ngStyle]="popupStyle"
+             (click)="$event.stopPropagation()">
+          <div class="cal-popup-header">
+            <div class="d-flex align-items-center gap-2">
+              <span class="cal-popup-day-num">{{ popupCell.date?.getDate() }}</span>
+              <div>
+                <div class="cal-popup-weekday">{{ popupCell.date | date:'EEEE' }}</div>
+                <div class="cal-popup-monthyr">{{ popupCell.date | date:'MMMM yyyy' }}</div>
+              </div>
+            </div>
+            <button class="cal-popup-close" (click)="closePopup()"><i class="bi bi-x"></i></button>
+          </div>
+          <div class="cal-popup-body">
+            <div *ngIf="popupCell.holidays.length > 0" class="cal-popup-section">
+              <div class="cal-popup-section-title"><i class="bi bi-circle-fill me-1" style="color:#00d97e;font-size:.45rem"></i>Holidays</div>
+              <div *ngFor="let h of popupCell.holidays; trackBy: trackById" class="cal-popup-item cal-popup-holiday">
+                <i class="bi bi-calendar-event-fill me-2"></i>
+                <div>
+                  <div class="cal-popup-item-title">{{ h.holidayName }}</div>
+                  <div class="cal-popup-item-meta" *ngIf="h.description">{{ h.description }}</div>
+                  <div class="cal-popup-item-meta" *ngIf="h.countryCode">{{ h.countryCode }}</div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="popupCell.events.length > 0" class="cal-popup-section">
+              <div class="cal-popup-section-title">
+                <i class="bi bi-circle-fill me-1" style="font-size:.45rem" [style.color]="'#2c7be5'"></i>
+                Announcements ({{ popupCell.events.length }})
+              </div>
+              <div *ngFor="let e of popupCell.events; trackBy: trackById" class="cal-popup-item"
+                   [class.cal-popup-pinned]="e.is_pinned">
+                <i class="bi me-2" [ngClass]="e.is_pinned ? 'bi-pin-angle-fill text-warning' : 'bi-megaphone-fill text-primary'"></i>
+                <div>
+                  <div class="cal-popup-item-title">{{ e.title }}</div>
+                  <div class="cal-popup-item-meta" *ngIf="e.summary || e.content">
+                    {{ (e.summary || e.content) | slice:0:60 }}…
+                  </div>
+                  <div class="cal-popup-badges">
+                    <span class="cal-popup-badge" *ngIf="e.category">{{ e.category }}</span>
+                    <span class="cal-popup-badge cal-badge-pinned" *ngIf="e.is_pinned">Pinned</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── Companies Table ────────────────────────────────── -->
+  <div class="falcon-card table-card">
+    <div class="table-card-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-semibold">All Companies</span>
+        <span class="badge bg-secondary">{{ companies.length }}</span>
+      </div>
+      <a routerLink="/superadmin/companies" class="btn btn-sm btn-outline-primary">
+        Manage <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div *ngIf="loading" class="p-4 text-center">
+      <div class="spinner-border text-primary spinner-border-sm"></div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Code</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of companies; trackBy: trackById">
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <div class="co-avatar">{{ (c.name || '?')[0].toUpperCase() }}</div>
+                <div>
+                  <div class="fw-semibold small">{{ c.name }}</div>
+                  <div class="text-muted" style="font-size:.74rem">{{ c.email ?? c.country ?? '—' }}</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge bg-secondary">{{ c.code }}</span></td>
+            <td>
+              <span class="badge-soft" [ngClass]="c.active ? 'badge-soft-success' : 'badge-soft-danger'">
+                <i class="bi me-1" [ngClass]="c.active ? 'bi-check-circle' : 'bi-x-circle'"></i>
+                {{ c.active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btn-group">
+                <button class="btn btn-sm btn-outline-primary" (click)="impersonate(c)" title="Enter company portal">
+                  <i class="bi bi-box-arrow-in-right me-1"></i>Enter
+                </button>
+                <button class="btn btn-sm btn-outline-success" (click)="openCreateAdmin(c)" title="Create admin">
+                  <i class="bi bi-person-plus-fill me-1"></i>Admin
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="companies.length === 0">
+            <td colspan="4" class="empty-state-cell">
+              <i class="bi bi-building me-2 text-muted"></i>No companies found
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Create Admin Modal ──────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showAdminModal" (click)="closeAdminModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+
+    <div class="modal-panel-header">
+      <div>
+        <h5 class="mb-0">Create Company Admin</h5>
+        <div class="text-muted small mt-1" *ngIf="adminTargetCompany">
+          <i class="bi bi-building me-1"></i>{{ adminTargetCompany.name }}
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeAdminModal()"></button>
+    </div>
+
+    <div class="modal-panel-body">
+
+      <!-- Credentials result -->
+      <div *ngIf="createdAdminCredentials" class="credentials-box">
+        <div class="credentials-header">
+          <i class="bi bi-check-circle-fill text-success me-2"></i>Admin account created!
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Email</span>
+          <span class="credential-value">{{ createdAdminCredentials.email }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(createdAdminCredentials.email)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Password</span>
+          <span class="credential-value credential-password">{{ createdAdminCredentials.tempPassword }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(createdAdminCredentials.tempPassword)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-note"><i class="bi bi-info-circle me-1"></i>Admin must change password on first login.</div>
+        <button class="btn btn-primary mt-3 w-100" (click)="closeAdminModal()">Done</button>
+      </div>
+
+      <!-- Create form -->
+      <form #adminForm="ngForm" (ngSubmit)="createAdmin(adminForm)" *ngIf="!createdAdminCredentials">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">First Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="firstName" ngModel required placeholder="Jane">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="lastName" ngModel required placeholder="Smith">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input class="form-control" name="email" type="email" ngModel required placeholder="admin@company.co.za">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Phone (optional)</label>
+            <input class="form-control" name="phone" ngModel placeholder="+27 xx xxx xxxx">
+          </div>
+        </div>
+        <div class="info-note mt-3">
+          <i class="bi bi-shield-check me-1"></i>
+          SYSADMIN access for <strong>{{ adminTargetCompany?.name }}</strong>. Temporary password generated.
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" (click)="closeAdminModal()">Cancel</button>
+          <button type="submit" class="btn btn-success" [disabled]="adminForm.invalid || savingAdmin">
+            <span *ngIf="savingAdmin" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi bi-person-plus-fill me-1" *ngIf="!savingAdmin"></i>Create Admin
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>

@@ -276,6 +276,13 @@ const routes: Routes = [
     data: { title: 'Legal' }
   },
 
+  // ─── Kiosk ────────────────────────────────────────────────────────
+  {
+    path: 'kiosk',
+    loadChildren: () => import('./component/kiosk/kiosk.module').then(m => m.KioskModule),
+    data: { title: 'Kiosk' }
+  },
+
   // =============================================
   // FALLBACK - MUST BE LAST!
   // =============================================

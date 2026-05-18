@@ -1,0 +1,316 @@
+<!-- Banking Module — Falcon Design -->
+<div class="page-banner">
+  <div class="banner-content">
+    <div>
+      <h1 class="banner-title">Banking</h1>
+      <p class="banner-subtitle">Manage bank accounts and transactions</p>
+    </div>
+    <div class="banner-actions">
+      <button class="btn btn-banner" (click)="openCreateAccount()">
+        <i class="bi bi-plus-lg me-1"></i> Add Bank Account
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="container-fluid px-4 mt-4">
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-lg-4">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap" style="background:rgba(0,92,143,.08)">
+          <i class="bi bi-bank" style="color:#005c8f"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.total }}</div>
+          <div class="stat-label">Total Accounts</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap" style="background:rgba(25,135,84,.08)">
+          <i class="bi bi-check-circle" style="color:#198754"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.active }}</div>
+          <div class="stat-label">Active Accounts</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap" style="background:rgba(25,135,84,.08)">
+          <i class="bi bi-cash-stack" style="color:#198754"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ formatBalance(stats.totalBalance) }}</div>
+          <div class="stat-label">Total Cash Balance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main split layout: accounts left, transactions right -->
+  <div class="row g-3">
+
+    <!-- Accounts list -->
+    <div class="col-lg-4">
+      <div class="falcon-card table-card h-100">
+        <div class="table-card-header">
+          <span class="fw-semibold" style="color:var(--text-primary)">Bank Accounts</span>
+          <span class="badge-soft" style="background:rgba(0,92,143,.08);color:#005c8f">{{ totalElements }}</span>
+        </div>
+
+        <div *ngIf="loading" class="p-4 text-center">
+          <div class="spinner-border spinner-border-sm" style="color:var(--primary-500)"></div>
+        </div>
+
+        <div class="account-list" *ngIf="!loading">
+          <div *ngIf="accounts.length === 0" class="empty-state-cell">
+            <i class="bi bi-bank2"></i>
+            <span>No bank accounts yet</span>
+          </div>
+
+          <div *ngFor="let acc of accounts"
+               class="account-item"
+               [class.selected]="selectedAccount?.id === acc.id"
+               (click)="selectAccount(acc)">
+            <div class="account-item-main">
+              <div class="account-icon-wrap" [class.inactive]="!acc.active">
+                <i class="bi bi-bank"></i>
+              </div>
+              <div class="account-info">
+                <div class="account-name">{{ acc.name }}</div>
+                <div class="account-sub">{{ acc.bankName }} · {{ acc.accountNumber }}</div>
+                <span class="badge-soft mt-1 d-inline-block"
+                      [ngClass]="acc.accountType === 'CURRENT' ? 'badge-primary' :
+                                 acc.accountType === 'SAVINGS'  ? 'badge-success' : 'badge-warning'">
+                  {{ accountTypeLabels[acc.accountType] }}
+                </span>
+              </div>
+              <div class="account-balance" [class.negative]="acc.currentBalance < 0">
+                {{ formatBalance(acc.currentBalance) }}
+              </div>
+            </div>
+            <div class="account-item-actions">
+              <button class="action-btn" title="Edit" (click)="openEditAccount(acc, $event)">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="action-btn" [title]="acc.active ? 'Deactivate' : 'Activate'" (click)="toggleAccount(acc, $event)">
+                <i class="bi" [ngClass]="acc.active ? 'bi-toggle-on' : 'bi-toggle-off'"></i>
+              </button>
+              <button class="action-btn action-btn-danger" title="Delete" (click)="deleteAccount(acc, $event)">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="totalPages > 1" class="d-flex justify-content-center gap-1 p-2 border-top" style="border-color:var(--border-color)!important">
+          <button *ngFor="let p of pages" class="btn btn-sm"
+                  [class.btn-primary]="p === currentPage"
+                  [class.btn-outline-secondary]="p !== currentPage"
+                  (click)="goPage(p)">{{ p + 1 }}</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Transactions panel -->
+    <div class="col-lg-8">
+      <div class="falcon-card table-card h-100">
+        <div class="table-card-header">
+          <div>
+            <span class="fw-semibold" style="color:var(--text-primary)">
+              {{ selectedAccount ? selectedAccount.name + ' — Transactions' : 'Select an account to view transactions' }}
+            </span>
+            <span *ngIf="selectedAccount" class="ms-2 text-muted small">
+              Balance: <strong>{{ formatBalance(selectedAccount.currentBalance) }}</strong>
+            </span>
+          </div>
+          <button *ngIf="selectedAccount" class="btn btn-sm btn-primary" (click)="openAddTransaction()">
+            <i class="bi bi-plus-lg me-1"></i> Add Transaction
+          </button>
+        </div>
+
+        <div *ngIf="!selectedAccount" class="empty-state-cell py-5">
+          <i class="bi bi-arrow-left-circle"></i>
+          <span>Select a bank account to view and add transactions</span>
+        </div>
+
+        <div *ngIf="selectedAccount && loadingTx" class="p-4 text-center">
+          <div class="spinner-border spinner-border-sm" style="color:var(--primary-500)"></div>
+        </div>
+
+        <div *ngIf="selectedAccount && !loadingTx" class="table-responsive">
+          <div *ngIf="transactions.length === 0" class="empty-state-cell">
+            <i class="bi bi-list-ul"></i>
+            <span>No transactions yet</span>
+          </div>
+
+          <table *ngIf="transactions.length > 0" class="table mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Ref / Category</th>
+                <th class="text-end">Debit</th>
+                <th class="text-end">Credit</th>
+                <th class="text-center">Reconciled</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tx of transactions" [class.reconciled-row]="tx.reconciled">
+                <td class="text-nowrap">{{ tx.date | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <div class="fw-medium">{{ tx.description }}</div>
+                  <div *ngIf="tx.linkedEntityType" class="text-muted small">
+                    <i class="bi bi-link-45deg"></i> {{ tx.linkedEntityType }} #{{ tx.linkedEntityId }}
+                  </div>
+                </td>
+                <td>
+                  <div *ngIf="tx.reference" class="text-muted small">{{ tx.reference }}</div>
+                  <div *ngIf="tx.category">
+                    <span class="badge-soft" style="background:rgba(0,0,0,.05);color:var(--text-secondary);font-size:11px">{{ tx.category }}</span>
+                  </div>
+                </td>
+                <td class="text-end text-danger fw-medium">
+                  <span *ngIf="tx.type === 'DEBIT'">{{ formatBalance(tx.amount) }}</span>
+                </td>
+                <td class="text-end text-success fw-medium">
+                  <span *ngIf="tx.type === 'CREDIT'">{{ formatBalance(tx.amount) }}</span>
+                </td>
+                <td class="text-center">
+                  <span *ngIf="tx.reconciled" class="badge-soft badge-success"><i class="bi bi-check-lg"></i> Reconciled</span>
+                  <button *ngIf="!tx.reconciled" class="btn btn-xs btn-outline-secondary" (click)="reconcile(tx)" title="Mark reconciled">
+                    <i class="bi bi-circle"></i>
+                  </button>
+                </td>
+                <td class="text-end">
+                  <div class="action-btn-group justify-content-end">
+                    <button class="action-btn action-btn-danger" title="Delete" (click)="deleteTransaction(tx)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Tx pagination -->
+        <div *ngIf="txTotalPages > 1" class="d-flex justify-content-center gap-1 p-2 border-top" style="border-color:var(--border-color)!important">
+          <button *ngFor="let p of txPages" class="btn btn-sm"
+                  [class.btn-primary]="p === txPage"
+                  [class.btn-outline-secondary]="p !== txPage"
+                  (click)="goTxPage(p)">{{ p + 1 }}</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== ACCOUNT MODAL ===================== -->
+<div class="modal fade show d-block" *ngIf="showAccountModal" tabindex="-1" style="background:rgba(0,0,0,.45)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content falcon-modal">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editingAccount ? 'Edit Bank Account' : 'Add Bank Account' }}</h5>
+        <button type="button" class="btn-close" (click)="closeAccountModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label">Account Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="accountForm.name" placeholder="e.g. FNB Business Current">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Bank Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="accountForm.bankName" placeholder="e.g. FNB">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Account Number <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="accountForm.accountNumber" placeholder="e.g. 62000000000">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Account Type</label>
+            <select class="form-select" [(ngModel)]="accountForm.accountType">
+              <option *ngFor="let t of accountTypes" [value]="t">{{ accountTypeLabels[t] }}</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Opening Balance (R)</label>
+            <input type="number" class="form-control" [(ngModel)]="accountForm.openingBalance" [disabled]="!!editingAccount">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control" rows="2" [(ngModel)]="accountForm.notes" placeholder="Optional notes"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeAccountModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveAccount()" [disabled]="submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          {{ editingAccount ? 'Save Changes' : 'Add Account' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TRANSACTION MODAL ===================== -->
+<div class="modal fade show d-block" *ngIf="showTxModal" tabindex="-1" style="background:rgba(0,0,0,.45)">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content falcon-modal">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Transaction — {{ selectedAccount?.name }}</h5>
+        <button type="button" class="btn-close" (click)="closeTxModal()"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Date <span class="text-danger">*</span></label>
+            <input type="date" class="form-control" [(ngModel)]="txForm.date">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Type <span class="text-danger">*</span></label>
+            <select class="form-select" [(ngModel)]="txForm.type">
+              <option value="CREDIT">Credit (Money In)</option>
+              <option value="DEBIT">Debit (Money Out)</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Description <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" [(ngModel)]="txForm.description" placeholder="What is this transaction for?">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Amount (R) <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [(ngModel)]="txForm.amount" min="0.01" step="0.01">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Category</label>
+            <select class="form-select" [(ngModel)]="txForm.category">
+              <option value="">— Select —</option>
+              <option *ngFor="let c of txCategories" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Reference</label>
+            <input type="text" class="form-control" [(ngModel)]="txForm.reference" placeholder="e.g. INV-00001, BILL-00003">
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeTxModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveTransaction()" [disabled]="submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-1"></span>
+          Record Transaction
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,282 @@
+<!-- Page Banner -->
+<div class="page-banner">
+  <div>
+    <h1 class="banner-title">Inventory</h1>
+    <p class="banner-subtitle">Track stock levels, record movements and manage reorder points</p>
+  </div>
+  <div class="banner-actions">
+    <button class="btn btn-outline-light btn-sm" (click)="loadAll()">
+      <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+    </button>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="container-fluid px-4 pt-4">
+  <div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap bg-primary-soft"><i class="bi bi-box-seam text-primary"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.totalTracked }}</div>
+          <div class="stat-label">Tracked Products</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap" [class.bg-danger-soft]="stats.lowStock > 0" [class.bg-success-soft]="stats.lowStock === 0">
+          <i class="bi bi-exclamation-triangle" [class.text-danger]="stats.lowStock > 0" [class.text-success]="stats.lowStock === 0"></i>
+        </div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.lowStock }}</div>
+          <div class="stat-label">Low Stock Alerts</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap bg-info-soft"><i class="bi bi-arrow-left-right text-info"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ stats.totalMovements }}</div>
+          <div class="stat-label">Total Movements</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+      <div class="falcon-card stat-card">
+        <div class="stat-icon-wrap bg-warning-soft"><i class="bi bi-graph-up-arrow text-warning"></i></div>
+        <div class="stat-body">
+          <div class="stat-value">{{ trackedProducts.length }}</div>
+          <div class="stat-label">Products In View</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Alert Banner -->
+  <div *ngIf="stats.lowStock > 0" class="alert alert-danger d-flex align-items-center gap-2 mb-4 rounded-3">
+    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+    <span><strong>{{ stats.lowStock }} product(s)</strong> are at or below their reorder point.</span>
+    <button class="btn btn-sm btn-danger ms-auto" (click)="setTab('low-stock')">View Low Stock</button>
+  </div>
+
+  <!-- Main Table Card -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <div class="d-flex gap-2">
+        <button class="btn filter-tab" [class.active]="activeTab === 'tracked'" (click)="setTab('tracked')">Tracked Products</button>
+        <button class="btn filter-tab" [class.active]="activeTab === 'low-stock'" (click)="setTab('low-stock')">
+          Low Stock
+          <span *ngIf="stats.lowStock > 0" class="badge bg-danger ms-1">{{ stats.lowStock }}</span>
+        </button>
+        <button class="btn filter-tab" [class.active]="activeTab === 'movements'" (click)="setTab('movements')">Recent Movements</button>
+      </div>
+    </div>
+
+    <!-- Tracked / Low Stock Tab -->
+    <div *ngIf="activeTab !== 'movements'">
+      <div *ngIf="loading" class="p-4 text-center text-muted">
+        <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+      </div>
+      <div *ngIf="!loading && trackedProducts.length === 0" class="p-4 text-center text-muted">
+        <i class="bi bi-box2 fs-2 d-block mb-2"></i>
+        <span *ngIf="activeTab === 'tracked'">No tracked products yet. Enable inventory tracking on a product below.</span>
+        <span *ngIf="activeTab === 'low-stock'">No low-stock items.</span>
+      </div>
+      <div *ngIf="!loading && trackedProducts.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Code</th>
+              <th class="text-center">Stock Level</th>
+              <th class="text-center">Reorder Point</th>
+              <th class="text-end">Unit Cost</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let p of trackedProducts; trackBy: trackById" [class.table-danger]="isLowStock(p)">
+              <td>
+                <div class="fw-semibold">{{ p.name }}</div>
+                <small class="text-muted">{{ p.type }}</small>
+              </td>
+              <td><code class="small">{{ p.code }}</code></td>
+              <td class="text-center">
+                <span class="fw-bold fs-6" [class.text-danger]="isLowStock(p)" [class.text-success]="!isLowStock(p)">
+                  {{ p.stockLevel ?? 0 }}
+                </span>
+              </td>
+              <td class="text-center">{{ p.reorderPoint ?? 0 }}</td>
+              <td class="text-end">{{ p.unitCost != null ? ('R ' + (p.unitCost | number:'1.2-2')) : '—' }}</td>
+              <td>
+                <span class="badge-soft" [class.badge-soft-danger]="isLowStock(p)" [class.badge-soft-success]="!isLowStock(p)">
+                  {{ isLowStock(p) ? 'Low Stock' : 'OK' }}
+                </span>
+              </td>
+              <td class="text-end">
+                <div class="action-btn-group">
+                  <button class="btn btn-sm btn-outline-primary" title="Record movement" (click)="openMovementModal(p)">
+                    <i class="bi bi-arrow-left-right"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-secondary" title="View history" (click)="openMovementsDrawer(p)">
+                    <i class="bi bi-clock-history"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" title="Disable tracking" (click)="disableTracking(p)">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Enable Tracking on Untracked Products -->
+      <div *ngIf="activeTab === 'tracked'" class="p-3 border-top">
+        <h6 class="text-muted mb-2 small text-uppercase fw-semibold">Enable Tracking on a Product</h6>
+        <div class="d-flex gap-2 flex-wrap">
+          <ng-container *ngFor="let p of allProducts">
+            <button *ngIf="!p.trackInventory" class="btn btn-sm btn-outline-secondary" (click)="openEnableModal(p)">
+              <i class="bi bi-plus-circle me-1"></i>{{ p.name }}
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Movements Tab -->
+    <div *ngIf="activeTab === 'movements'">
+      <div *ngIf="movementsLoading" class="p-4 text-center text-muted">
+        <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+      </div>
+      <div *ngIf="!movementsLoading && movements.length === 0" class="p-4 text-center text-muted">
+        <i class="bi bi-arrow-left-right fs-2 d-block mb-2"></i>No movements recorded yet.
+      </div>
+      <div *ngIf="!movementsLoading && movements.length > 0" class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Product</th>
+              <th>Type</th>
+              <th class="text-center">Qty</th>
+              <th class="text-end">Unit Cost</th>
+              <th>Reference</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of movements; trackBy: trackById">
+              <td class="text-nowrap">{{ m.movementDate | date:'dd MMM yyyy' }}</td>
+              <td>{{ m.product?.name }}</td>
+              <td><span class="badge-soft" [ngClass]="movementBadgeClass(m.type)">{{ movementLabel(m.type) }}</span></td>
+              <td class="text-center fw-semibold">{{ m.quantity }}</td>
+              <td class="text-end">{{ m.unitCost != null ? ('R ' + (m.unitCost | number:'1.2-2')) : '—' }}</td>
+              <td>{{ m.reference || '—' }}</td>
+              <td class="text-muted small">{{ m.notes || '—' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Enable Tracking Modal -->
+<div *ngIf="showEnableModal" class="modal-backdrop-custom" (click)="closeEnableModal()"></div>
+<div *ngIf="showEnableModal" class="falcon-modal">
+  <div class="falcon-modal-header">
+    <h5 class="mb-0">Enable Inventory Tracking</h5>
+    <button class="btn-close" (click)="closeEnableModal()"></button>
+  </div>
+  <div class="falcon-modal-body">
+    <p class="text-muted mb-3">Setting up tracking for <strong>{{ enableProduct?.name }}</strong></p>
+    <div class="mb-3">
+      <label class="form-label">Opening Stock Quantity</label>
+      <input type="number" class="form-control" [(ngModel)]="enableInitialStock" min="0">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Unit Cost (R) <span class="text-muted small">optional</span></label>
+      <input type="number" class="form-control" [(ngModel)]="enableUnitCost" min="0" step="0.01">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Reorder Point <span class="text-muted small">(alert when stock ≤ this)</span></label>
+      <input type="number" class="form-control" [(ngModel)]="enableReorderPoint" min="0">
+    </div>
+  </div>
+  <div class="falcon-modal-footer">
+    <button class="btn btn-outline-secondary" (click)="closeEnableModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="confirmEnable()">Enable Tracking</button>
+  </div>
+</div>
+
+<!-- Stock Movement Modal -->
+<div *ngIf="showMovementModal" class="modal-backdrop-custom" (click)="closeMovementModal()"></div>
+<div *ngIf="showMovementModal" class="falcon-modal">
+  <div class="falcon-modal-header">
+    <h5 class="mb-0">Record Stock Movement</h5>
+    <button class="btn-close" (click)="closeMovementModal()"></button>
+  </div>
+  <div class="falcon-modal-body">
+    <p class="text-muted mb-3">
+      <strong>{{ movementProduct?.name }}</strong> — Current stock:
+      <span class="fw-bold" [class.text-danger]="isLowStock(movementProduct!)" [class.text-success]="!isLowStock(movementProduct!)">
+        {{ movementProduct?.stockLevel ?? 0 }}
+      </span>
+    </p>
+    <div class="mb-3">
+      <label class="form-label">Movement Type</label>
+      <select class="form-select" [(ngModel)]="movementType">
+        <option *ngFor="let t of movementTypes" [value]="t">{{ movementLabel(t) }}</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Quantity</label>
+      <input type="number" class="form-control" [(ngModel)]="movementQuantity" min="1">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Unit Cost (R) <span class="text-muted small">optional</span></label>
+      <input type="number" class="form-control" [(ngModel)]="movementUnitCost" min="0" step="0.01">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Reference <span class="text-muted small">optional</span></label>
+      <input type="text" class="form-control" [(ngModel)]="movementReference" placeholder="e.g. PO-001">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Notes <span class="text-muted small">optional</span></label>
+      <textarea class="form-control" [(ngModel)]="movementNotes" rows="2"></textarea>
+    </div>
+  </div>
+  <div class="falcon-modal-footer">
+    <button class="btn btn-outline-secondary" (click)="closeMovementModal()">Cancel</button>
+    <button class="btn btn-primary" (click)="confirmMovement()" [disabled]="movementQuantity < 1">Record Movement</button>
+  </div>
+</div>
+
+<!-- Movements History Drawer -->
+<div *ngIf="showMovementsDrawer" class="drawer-backdrop" (click)="closeMovementsDrawer()"></div>
+<div class="drawer" [class.open]="showMovementsDrawer">
+  <div class="drawer-header">
+    <h5 class="mb-0">Movement History — {{ drawerProduct?.name }}</h5>
+    <button class="btn-close" (click)="closeMovementsDrawer()"></button>
+  </div>
+  <div class="drawer-body">
+    <div *ngIf="drawerMovements.length === 0" class="text-center text-muted py-4">No movements recorded.</div>
+    <div *ngFor="let m of drawerMovements" class="movement-row">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <span class="badge-soft me-2" [ngClass]="movementBadgeClass(m.type)">{{ movementLabel(m.type) }}</span>
+          <span class="fw-semibold">{{ m.quantity }} units</span>
+        </div>
+        <small class="text-muted">{{ m.movementDate | date:'dd MMM yyyy' }}</small>
+      </div>
+      <div *ngIf="m.reference || m.notes" class="text-muted small mt-1">
+        <span *ngIf="m.reference">Ref: {{ m.reference }}</span>
+        <span *ngIf="m.notes" class="ms-2">{{ m.notes }}</span>
+      </div>
+    </div>
+  </div>
+</div>

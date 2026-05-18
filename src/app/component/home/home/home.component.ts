@@ -619,28 +619,30 @@ export class HomeComponent implements OnInit, OnDestroy {
     const endDate = this.formatDateISO(endOfMonth);
 
     return forkJoin({
-      stats: this.dashboardService.getAdminDashboardStats(),
-      holidays: this.holidayService.getUpcomingHolidays$(10),
-      attendance: this.attendanceService.getAttendanceByDateRange(startDate, endDate),
-      leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC'),
+      stats: this.dashboardService.getAdminDashboardStats().pipe(catchError(() => of(null))),
+      holidays: this.holidayService.getUpcomingHolidays$(10).pipe(catchError(() => of(null))),
+      attendance: this.attendanceService.getAttendanceByDateRange(startDate, endDate).pipe(catchError(() => of(null))),
+      leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC').pipe(catchError(() => of(null))),
       announcements: this.announcementService.getAnnouncements$(0, 5).pipe(catchError(() => of(null))),
       financial: this.expensesService.getSummary(now.getFullYear(), now.getMonth() + 1).pipe(catchError(() => of(null))),
       internSchoolDays: this.internAttendanceService.getByDateRange(startDate, endDate).pipe(catchError(() => of([])))
     }).pipe(
       map(({ stats, holidays, attendance, leaves, announcements, financial, internSchoolDays }) => {
-        const dashboardStats = stats.data.stats;
-        this.buildAdminStatsCards(dashboardStats);
-        this.buildAdminCharts(dashboardStats);
+        const dashboardStats = stats?.data?.stats;
+        if (dashboardStats) {
+          this.buildAdminStatsCards(dashboardStats);
+          this.buildAdminCharts(dashboardStats);
+        }
         this.buildAdminCalendar(
-          holidays.data.holidays,
-          attendance.data?.attendances || [],
+          holidays?.data?.holidays || [],
+          attendance?.data?.attendances || [],
           leaves || [],
           internSchoolDays || []
         );
         this.recentAnnouncements = announcements?.data?.announcements || [];
         this.financialSummary = financial?.data || null;
         const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Johannesburg' });
-        this.recentClockEvents = (attendance.data?.attendances || [])
+        this.recentClockEvents = (attendance?.data?.attendances || [])
           .filter((a: Attendance) => a.attendanceDate === today && a.checkInTime)
           .sort((a: Attendance, b: Attendance) =>
             new Date(b.checkInTime!).getTime() - new Date(a.checkInTime!).getTime()
@@ -670,14 +672,16 @@ export class HomeComponent implements OnInit, OnDestroy {
     const employeeId = user.id;
 
     return forkJoin({
-      stats: this.dashboardService.getEmployeeDashboardStats(employeeId),
-      holidays: this.holidayService.getUpcomingHolidays$(5)
+      stats: this.dashboardService.getEmployeeDashboardStats(employeeId).pipe(catchError(() => of(null))),
+      holidays: this.holidayService.getUpcomingHolidays$(5).pipe(catchError(() => of(null)))
     }).pipe(
       map(({ stats, holidays }) => {
-        const employeeStats = stats.data.stats;
-        this.buildEmployeeStatsCards(employeeStats);
-        this.buildEmployeeCharts(employeeStats);
-        this.buildEmployeeCalendar(employeeStats, holidays.data.holidays);
+        const employeeStats = stats?.data?.stats;
+        if (employeeStats) {
+          this.buildEmployeeStatsCards(employeeStats);
+          this.buildEmployeeCharts(employeeStats);
+        }
+        this.buildEmployeeCalendar(employeeStats || null, holidays?.data?.holidays || []);
         this.cdr.markForCheck();
 
         return {
@@ -1087,7 +1091,7 @@ export class HomeComponent implements OnInit, OnDestroy {
    * Build employee calendar with leaves and holidays
    * Combines upcoming leaves with SA public holidays
    */
-  private buildEmployeeCalendar(stats: EmployeeDashboardStats, holidays: Holiday[]): void {
+  private buildEmployeeCalendar(stats: EmployeeDashboardStats | null, holidays: Holiday[]): void {
     this.upcomingEvents = [];
 
     // Add holidays
@@ -1108,7 +1112,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     // Add upcoming leaves from stats (if available)
-    if (stats.upcomingLeaves) {
+    if (stats?.upcomingLeaves) {
       this.upcomingEvents.push(...stats.upcomingLeaves.map(l => ({
         id: l.id,
         title: `${l.leaveType} Leave`,

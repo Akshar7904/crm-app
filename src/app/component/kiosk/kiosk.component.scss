@@ -1,0 +1,803 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+// ── Full-screen kiosk shell ───────────────────────────────────────
+.kiosk-shell {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(160deg, #0f1923 0%, #1a2e42 50%, #0d2137 100%);
+  color: #fff;
+  font-family: $font-family-base;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+// ── Header ────────────────────────────────────────────────────────
+.kiosk-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 28px;
+  background: rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.kiosk-logo {
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.kiosk-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kiosk-company-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+}
+
+.kiosk-powered {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.3);
+  letter-spacing: 0.5px;
+}
+
+.kiosk-clock-area {
+  margin-left: auto;
+  text-align: right;
+}
+
+.kiosk-time {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1;
+  color: #fff;
+}
+
+.kiosk-date {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.5);
+  margin-top: 4px;
+}
+
+// ── Main area ─────────────────────────────────────────────────────
+.kiosk-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+// ── Idle state ────────────────────────────────────────────────────
+.kiosk-idle {
+  text-align: center;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+.kiosk-idle-icon {
+  font-size: 5rem;
+  color: rgba(255,255,255,0.15);
+  display: block;
+  margin-bottom: 18px;
+}
+
+.kiosk-idle-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.85);
+  margin: 0 0 8px;
+}
+
+.kiosk-idle-sub {
+  font-size: 1.15rem;
+  color: rgba(255,255,255,0.4);
+  margin: 0;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.75; transform: scale(0.98); }
+}
+
+// ── Card ──────────────────────────────────────────────────────────
+.kiosk-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 22px 32px;
+  width: 100%;
+  max-width: 460px;
+  cursor: default;
+  animation: slideUp 0.2s ease-out;
+
+  &--center {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  &--success-in {
+    border-color: rgba(#00c853, 0.4);
+    background: rgba(#00c853, 0.08);
+  }
+
+  &--success-out {
+    border-color: rgba($primary, 0.4);
+    background: rgba($primary, 0.08);
+  }
+
+  &--error {
+    border-color: rgba($danger, 0.4);
+    background: rgba($danger, 0.08);
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.kiosk-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 6px;
+  text-align: center;
+}
+
+.kiosk-card-sub {
+  font-size: 0.88rem;
+  color: rgba(255,255,255,0.45);
+  margin: 0 0 16px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+// ── Employee ID display ───────────────────────────────────────────
+.kiosk-display {
+  background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 10px;
+  padding: 10px 18px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.kiosk-display-prefix {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 2px;
+  margin-right: 6px;
+}
+
+.kiosk-display-value {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 6px;
+  color: #fff;
+}
+
+// ── PIN dots ──────────────────────────────────────────────────────
+.kiosk-pin-dots {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.kiosk-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+  background: transparent;
+  transition: all 0.15s ease;
+
+  &--filled {
+    background: $primary;
+    border-color: $primary;
+    box-shadow: 0 0 12px rgba($primary, 0.5);
+  }
+}
+
+// ── Numpad ────────────────────────────────────────────────────────
+.kiosk-numpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.kiosk-key {
+  @include flex-center;
+  height: 56px;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  &:hover, &:active {
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.25);
+    transform: scale(0.96);
+  }
+
+  &--hidden {
+    visibility: hidden;
+  }
+
+  &--action {
+    background: rgba(255,255,255,0.04);
+    font-size: 1.1rem;
+  }
+}
+
+// ── Action buttons ────────────────────────────────────────────────
+.kiosk-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.kiosk-btn {
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  touch-action: manipulation;
+
+  &--primary {
+    background: $primary;
+    color: #fff;
+    &:hover:not(:disabled) { background: darken($primary, 8%); }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+
+  &--secondary {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+    &:hover { background: rgba(255,255,255,0.14); }
+  }
+}
+
+// ── Confirming spinner ────────────────────────────────────────────
+.kiosk-spinner {
+  width: 64px;
+  height: 64px;
+  border: 4px solid rgba(255,255,255,0.15);
+  border-top-color: $primary;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.kiosk-confirming-text {
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.6);
+  margin: 8px 0 0;
+}
+
+// ── Result screen ─────────────────────────────────────────────────
+.kiosk-result-icon {
+  font-size: 5rem;
+  display: block;
+}
+
+.kiosk-card--success-in  .kiosk-result-icon { color: #00c853; }
+.kiosk-card--success-out .kiosk-result-icon { color: $primary; }
+.kiosk-card--error       .kiosk-result-icon { color: $danger; }
+
+.kiosk-result-name {
+  font-size: 1.9rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+}
+
+.kiosk-result-action {
+  font-size: 1.2rem;
+  color: rgba(255,255,255,0.7);
+  margin: 0;
+}
+
+.kiosk-result-hours {
+  font-size: 1.1rem;
+  color: rgba(255,255,255,0.5);
+  margin: 0;
+}
+
+.kiosk-result-reset {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.3);
+  margin: 4px 0 0;
+}
+
+.kiosk-error-msg {
+  font-size: 1.2rem;
+  color: lighten($danger, 20%);
+  margin: 0;
+}
+
+// ── Elapsed timer pill — top-right, above the live board ─────────
+.kiosk-elapsed {
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+// ── Alarm banner — top-right strip ───────────────────────────────
+.kiosk-alarm {
+  position: absolute;
+  right: 24px;
+  top: 20px;
+  background: rgba($danger, 0.15);
+  border: 2px solid rgba($danger, 0.6);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 260px;
+  animation: alarmPulse 0.8s ease-in-out infinite alternate;
+}
+
+.kiosk-alarm__icon {
+  font-size: 1.8rem;
+  color: lighten($danger, 15%);
+  flex-shrink: 0;
+}
+
+.kiosk-alarm__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: lighten($danger, 20%);
+  margin: 0 0 2px;
+}
+
+.kiosk-alarm__sub {
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.65);
+  margin: 0;
+}
+
+@keyframes alarmPulse {
+  from { border-color: rgba($danger, 0.4); background: rgba($danger, 0.08); }
+  to   { border-color: rgba($danger, 0.9); background: rgba($danger, 0.22); }
+}
+
+// ── Shared color tokens ───────────────────────────────────────────
+$color-break: #f59e0b;
+$color-lunch: #10b981;
+
+// ── Live board rows (shared by overlay and breaks-mode center) ────
+.kiosk-liveboard__rows { display: flex; flex-direction: column; }
+
+.kiosk-liveboard__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
+
+  &:last-child { border-bottom: none; }
+
+  &--grace  { background: rgba($danger, 0.08); }
+  &--over   { background: rgba($danger, 0.15); }
+}
+
+// Status dot
+.lb-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+
+  &--break { background: $color-break; }
+  &--lunch { background: $color-lunch; }
+  &--alarm { background: $danger; animation: alarmPulse 0.6s ease-in-out infinite alternate; }
+}
+
+.lb-name {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.85);
+}
+
+.lb-type {
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.4);
+  width: 48px;
+}
+
+.lb-elapsed {
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 60px;
+  justify-content: flex-end;
+
+  &--warn { color: lighten($danger, 15%); }
+}
+
+.lb-alarm-icon {
+  font-size: 0.95rem;
+  color: lighten($danger, 15%);
+}
+
+// ── ACTION_SELECT screen ──────────────────────────────────────────
+
+.kiosk-action-select {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 560px;
+  gap: 18px;
+  cursor: default;
+  animation: slideUp 0.2s ease-out;
+}
+
+.kiosk-action-select__header { text-align: center; }
+
+.kiosk-action-select__avatar {
+  font-size: 3.2rem;
+  color: rgba(255,255,255,0.6);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.kiosk-action-select__name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.kiosk-action-select__prompt {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.45);
+  margin: 0;
+}
+
+.kiosk-action-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.action-btn {
+  @include flex-center;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 110px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  padding: 16px 12px;
+  position: relative;
+
+  &:hover, &:active {
+    transform: scale(0.96);
+    background: rgba(255,255,255,0.14);
+  }
+
+  &--in {
+    border-color: rgba(#00c853, 0.3);
+    background: rgba(#00c853, 0.1);
+    .action-btn__icon { color: #00c853; }
+    &:hover, &:active { background: rgba(#00c853, 0.2); }
+  }
+
+  &--out {
+    border-color: rgba($primary, 0.3);
+    background: rgba($primary, 0.1);
+    .action-btn__icon { color: lighten($primary, 20%); }
+    &:hover, &:active { background: rgba($primary, 0.2); }
+  }
+
+  &--break {
+    border-color: rgba($color-break, 0.3);
+    background: rgba($color-break, 0.1);
+    .action-btn__icon { color: $color-break; }
+    &:hover, &:active { background: rgba($color-break, 0.2); }
+  }
+
+  &--lunch {
+    border-color: rgba($color-lunch, 0.3);
+    background: rgba($color-lunch, 0.1);
+    .action-btn__icon { color: $color-lunch; }
+    &:hover, &:active { background: rgba($color-lunch, 0.2); }
+  }
+}
+
+.action-btn__key {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.action-btn__icon {
+  font-size: 2.2rem;
+  display: block;
+}
+
+.action-btn__label {
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  color: rgba(255,255,255,0.9);
+}
+
+.action-btn__reason {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.3);
+  text-align: center;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.action-btn--disabled {
+  opacity: 0.35;
+  cursor: not-allowed !important;
+  pointer-events: none;
+  border-color: rgba(255,255,255,0.06) !important;
+  background: rgba(255,255,255,0.03) !important;
+
+  .action-btn__icon { color: rgba(255,255,255,0.25) !important; }
+}
+
+.kiosk-action-select__cancel { min-width: 160px; }
+
+// ── Extra SUCCESS card variants ───────────────────────────────────
+.kiosk-card--success-break {
+  border-color: rgba($color-break, 0.4);
+  background: rgba($color-break, 0.08);
+  .kiosk-result-icon { color: $color-break; }
+}
+
+.kiosk-card--success-lunch {
+  border-color: rgba($color-lunch, 0.4);
+  background: rgba($color-lunch, 0.08);
+  .kiosk-result-icon { color: $color-lunch; }
+}
+
+// ── Breaks-mode: centered live board ─────────────────────────────
+.kiosk-breaks-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 580px;
+  gap: 24px;
+  cursor: default;
+  animation: pulse 2.5s ease-in-out infinite;
+}
+
+.kiosk-breaks-board {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.kiosk-breaks-board__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 24px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+
+.kiosk-breaks-board__count {
+  margin-left: auto;
+  background: $primary;
+  color: #fff;
+  border-radius: 50px;
+  padding: 2px 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.kiosk-breaks-board__empty {
+  padding: 40px 24px;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 1rem;
+}
+
+.kiosk-breaks-board__empty-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+// ── Bottom bar — clock mode ───────────────────────────────────────
+.kiosk-bottom-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 28px;
+  background: rgba(255,255,255,0.04);
+  border-top: 1px solid rgba(255,255,255,0.07);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+
+  &:hover, &:active { background: rgba(255,255,255,0.08); }
+}
+
+.kiosk-bottom-bar__icon {
+  font-size: 1.15rem;
+  color: $color-break;
+}
+
+.kiosk-bottom-bar__text {
+  flex: 1;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.5);
+  font-weight: 500;
+
+  strong {
+    color: rgba(255,255,255,0.75);
+    font-weight: 700;
+  }
+}
+
+.kiosk-bottom-bar__chevron {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.3);
+}
+
+// ── Break list slide-up overlay ───────────────────────────────────
+.kiosk-breaklist-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.kiosk-breaklist {
+  width: 100%;
+  background: #162534;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  max-height: 65vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease-out;
+}
+
+.kiosk-breaklist__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 28px 18px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.8);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+
+  i { color: $color-break; }
+}
+
+.kiosk-breaklist__close {
+  background: rgba(255,255,255,0.07);
+  border: none;
+  color: rgba(255,255,255,0.5);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 0.95rem;
+
+  &:hover { background: rgba(255,255,255,0.14); color: #fff; }
+}
+
+.kiosk-breaklist__empty {
+  padding: 48px 28px;
+  text-align: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 1rem;
+}
+
+// ── Footer ────────────────────────────────────────────────────────
+.kiosk-footer {
+  padding: 8px 28px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.2);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}

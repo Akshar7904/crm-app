@@ -25,7 +25,7 @@ export class AppComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private profileLoaded: boolean = false;
 
-  private readonly PUBLIC_ROUTES = ['/login', '/register', '/resetpassword', '/user/verify'];
+  private readonly PUBLIC_ROUTES = ['/login', '/register', '/resetpassword', '/user/verify', '/kiosk'];
 
   // Sidebar state management
   sidebarCollapsed: boolean = false;

@@ -1,0 +1,403 @@
+<div class="page-banner">
+  <div class="banner-title">Company Management</div>
+  <div class="banner-subtitle">Manage all tenant companies on the ORION platform</div>
+  <div class="banner-actions">
+    <button class="btn-banner" (click)="openCreate()">
+      <i class="bi bi-plus-lg me-1"></i>New Company
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- Stat cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-blue"><i class="bi bi-building"></i></div>
+        <div>
+          <div class="stat-value">{{ totalAll }}</div>
+          <div class="stat-label">Total Companies</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-green"><i class="bi bi-building-check"></i></div>
+        <div>
+          <div class="stat-value text-success">{{ totalActive }}</div>
+          <div class="stat-label">Active</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-warning"><i class="bi bi-building-x"></i></div>
+        <div>
+          <div class="stat-value text-warning">{{ totalAll - totalActive }}</div>
+          <div class="stat-label">Inactive</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Company table -->
+  <div class="falcon-card table-card">
+    <div class="table-card-header">
+      <span class="fw-semibold">All Companies</span>
+      <div class="d-flex gap-2 align-items-center">
+        <span class="text-muted small">{{ companies.length }} companies</span>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="p-4 text-center">
+      <div class="spinner-border text-primary spinner-border-sm"></div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th>Company</th>
+            <th>Code</th>
+            <th>Email</th>
+            <th>Country</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of companies; trackBy: trackById">
+            <td>
+              <div class="company-logo-cell">
+                <img [src]="getLogoUrl(c)" [alt]="c.name"
+                     class="company-logo-thumb"
+                     (error)="onLogoThumbError($event)">
+              </div>
+            </td>
+            <td>
+              <div class="fw-semibold">{{ c.name }}</div>
+              <div class="text-muted small">{{ c.legalName }}</div>
+            </td>
+            <td><span class="badge bg-secondary">{{ c.code }}</span></td>
+            <td>{{ c.email ?? '—' }}</td>
+            <td>{{ c.country ?? '—' }}</td>
+            <td>
+              <span class="badge-soft" [ngClass]="c.active ? 'badge-soft-success' : 'badge-soft-danger'">
+                {{ c.active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <div class="action-btn-group">
+                <button class="btn btn-sm btn-outline-primary" (click)="impersonate(c)" title="Enter company portal">
+                  <i class="bi bi-box-arrow-in-right"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-info" (click)="openLogoModal(c)" title="Upload company logo">
+                  <i class="bi bi-image"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-success" (click)="openCreateAdmin(c)" title="Create admin user">
+                  <i class="bi bi-person-plus-fill"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-purple" (click)="openModulesPanel(c)" title="Manage module subscriptions">
+                  <i class="bi bi-toggles"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="openEdit(c)" title="Edit company">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <button class="btn btn-sm" (click)="toggle(c)"
+                  [ngClass]="c.active ? 'btn-outline-warning' : 'btn-outline-success'"
+                  [title]="c.active ? 'Deactivate' : 'Activate'">
+                  <i class="bi" [ngClass]="c.active ? 'bi-pause-circle' : 'bi-play-circle'"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="companies.length === 0">
+            <td colspan="7" class="empty-state-cell">No companies found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ── Create / Edit Company Modal ──────────────────────────── -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <h5>{{ editCompany ? 'Edit Company' : 'Create Company' }}</h5>
+      <button type="button" class="btn-close" (click)="closeModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+      <form #companyForm="ngForm" (ngSubmit)="save(companyForm)">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Company Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="name" [ngModel]="editCompany?.name" required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Code <span class="text-danger">*</span></label>
+            <input class="form-control text-uppercase" name="code" [ngModel]="editCompany?.code" required maxlength="20">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Legal Name</label>
+            <input class="form-control" name="legalName" [ngModel]="editCompany?.legalName">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Reg Number</label>
+            <input class="form-control" name="regNumber" [ngModel]="editCompany?.regNumber">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Tax Number</label>
+            <input class="form-control" name="taxNumber" [ngModel]="editCompany?.taxNumber">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Email</label>
+            <input class="form-control" name="email" type="email" [ngModel]="editCompany?.email">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Phone</label>
+            <input class="form-control" name="phone" [ngModel]="editCompany?.phone">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Country</label>
+            <input class="form-control" name="country" [ngModel]="editCompany?.country ?? 'South Africa'">
+          </div>
+          <div class="col-12">
+            <label class="form-label">Address</label>
+            <input class="form-control" name="address" [ngModel]="editCompany?.address">
+          </div>
+          <!-- Branding -->
+          <div class="col-12">
+            <hr class="my-1">
+            <div class="small fw-semibold text-muted mb-2" style="letter-spacing:.04em;text-transform:uppercase;">Branding</div>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label">Tagline</label>
+            <input class="form-control" name="tagline" [ngModel]="editCompany?.tagline"
+                   placeholder="e.g. HR &amp; Payroll Made Simple" maxlength="255">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Primary Colour</label>
+            <input class="form-control" name="primaryColor" [ngModel]="editCompany?.primaryColor || '#375fa0'"
+                   placeholder="#375fa0" maxlength="20">
+            <div class="form-text">Hex value e.g. <code>#375fa0</code></div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="companyForm.invalid || saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            {{ editCompany ? 'Save Changes' : 'Create Company' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Logo Upload Modal ─────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showLogoModal" (click)="closeLogoModal()">
+  <div class="modal-panel modal-panel-sm" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <div>
+        <h5 class="mb-0">Upload Company Logo</h5>
+        <div class="text-muted small mt-1" *ngIf="logoTarget">
+          <i class="bi bi-building me-1"></i>{{ logoTarget.name }}
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeLogoModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+
+      <!-- Preview -->
+      <div class="logo-preview-wrap" *ngIf="logoPreview">
+        <img [src]="logoPreview" alt="Preview" class="logo-preview-img">
+      </div>
+      <div class="logo-placeholder" *ngIf="!logoPreview">
+        <i class="bi bi-image text-muted" style="font-size: 2.5rem;"></i>
+        <div class="text-muted small mt-2">No logo selected</div>
+      </div>
+
+      <!-- File picker -->
+      <div class="logo-upload-zone mt-3">
+        <label class="form-label fw-semibold">Select image file</label>
+        <input type="file" class="form-control" accept="image/*" (change)="onLogoFileSelected($event)">
+        <div class="form-text">PNG, JPG or SVG — max 2 MB</div>
+      </div>
+
+      <div class="d-flex justify-content-end gap-2 mt-4">
+        <button type="button" class="btn btn-secondary" (click)="closeLogoModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="uploadLogo()"
+                [disabled]="!selectedLogoFile || uploadingLogo">
+          <span *ngIf="uploadingLogo" class="spinner-border spinner-border-sm me-1"></span>
+          <i class="bi bi-upload me-1" *ngIf="!uploadingLogo"></i>
+          Upload Logo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Create Admin Modal ────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showAdminModal" (click)="closeAdminModal()">
+  <div class="modal-panel" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <div>
+        <h5 class="mb-0">Create Company Admin</h5>
+        <div class="text-muted small mt-1" *ngIf="adminTargetCompany">
+          <i class="bi bi-building me-1"></i>{{ adminTargetCompany.name }}
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeAdminModal()"></button>
+    </div>
+    <div class="modal-panel-body">
+
+      <!-- Credentials result -->
+      <div *ngIf="createdAdminCredentials" class="credentials-box">
+        <div class="credentials-header">
+          <i class="bi bi-check-circle-fill text-success me-2"></i>
+          Admin account created! Share these credentials securely.
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Email</span>
+          <span class="credential-value">{{ createdAdminCredentials.email }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(createdAdminCredentials.email)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-row">
+          <span class="credential-label">Password</span>
+          <span class="credential-value credential-password">{{ createdAdminCredentials.tempPassword }}</span>
+          <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(createdAdminCredentials.tempPassword)">
+            <i class="bi bi-copy"></i>
+          </button>
+        </div>
+        <div class="credential-note">
+          <i class="bi bi-info-circle me-1"></i>The admin should change this password on first login.
+        </div>
+        <button class="btn btn-primary mt-3 w-100" (click)="closeAdminModal()">Done</button>
+      </div>
+
+      <!-- Create form -->
+      <form #adminForm="ngForm" (ngSubmit)="createAdmin(adminForm)" *ngIf="!createdAdminCredentials">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">First Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="firstName" ngModel required>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Last Name <span class="text-danger">*</span></label>
+            <input class="form-control" name="lastName" ngModel required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input class="form-control" name="email" type="email" ngModel required>
+          </div>
+          <div class="col-12">
+            <label class="form-label">Phone</label>
+            <input class="form-control" name="phone" ngModel>
+          </div>
+        </div>
+        <div class="info-note mt-3">
+          <i class="bi bi-shield-check me-1"></i>
+          This user will receive <strong>SYSADMIN</strong> access within
+          <strong>{{ adminTargetCompany?.name }}</strong>. A temporary password will be generated automatically.
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" (click)="closeAdminModal()">Cancel</button>
+          <button type="submit" class="btn btn-success" [disabled]="adminForm.invalid || savingAdmin">
+            <span *ngIf="savingAdmin" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi bi-person-plus-fill me-1" *ngIf="!savingAdmin"></i>
+            Create Admin
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ── Module Subscriptions Panel ───────────────────────────── -->
+<div class="modal-overlay" *ngIf="showModulesPanel" (click)="closeModulesPanel()">
+  <div class="modal-panel modal-panel-modules" (click)="$event.stopPropagation()">
+    <div class="modal-panel-header">
+      <div>
+        <h5 class="mb-0"><i class="bi bi-toggles me-2"></i>Module Subscriptions</h5>
+        <div class="text-muted small mt-1" *ngIf="modulesTarget">
+          <i class="bi bi-building me-1"></i>{{ modulesTarget.name }}
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeModulesPanel()"></button>
+    </div>
+
+    <div class="modal-panel-body">
+
+      <!-- Loading -->
+      <div class="text-center py-4" *ngIf="loadingModules">
+        <div class="spinner-border text-primary spinner-border-sm"></div>
+        <div class="text-muted small mt-2">Loading modules…</div>
+      </div>
+
+      <!-- Module list -->
+      <div *ngIf="!loadingModules">
+        <p class="text-muted small mb-3">
+          Toggle which modules this company can access. Changes take effect immediately.
+        </p>
+
+        <!-- Starter modules -->
+        <div class="module-section-label">
+          <i class="bi bi-box me-1"></i>Starter Package
+          <span class="module-section-hint">Included with every company</span>
+        </div>
+        <div class="module-list mb-3">
+          <div class="module-row" *ngFor="let mod of companyModules | moduleFilter: true; trackBy: trackByName">
+            <div class="module-info">
+              <span class="module-label">{{ mod.label }}</span>
+              <span class="module-key">{{ mod.name }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input
+                class="form-check-input module-toggle"
+                type="checkbox"
+                [id]="'mod-' + mod.name"
+                [checked]="mod.enabled"
+                (change)="toggleModule(mod)"
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- Premium modules -->
+        <div class="module-section-label">
+          <i class="bi bi-stars me-1"></i>Premium Modules
+          <span class="module-section-hint">Enable per subscription</span>
+        </div>
+        <div class="module-list">
+          <div class="module-row" *ngFor="let mod of companyModules | moduleFilter: false; trackBy: trackByName">
+            <div class="module-info">
+              <span class="module-label">{{ mod.label }}</span>
+              <span class="module-key">{{ mod.name }}</span>
+            </div>
+            <div class="form-check form-switch mb-0">
+              <input
+                class="form-check-input module-toggle"
+                type="checkbox"
+                [id]="'mod-' + mod.name"
+                [checked]="mod.enabled"
+                (change)="toggleModule(mod)"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+          <span class="text-muted small">
+            {{ companyModules.length }} modules total
+          </span>
+          <button class="btn btn-secondary btn-sm" (click)="closeModulesPanel()">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

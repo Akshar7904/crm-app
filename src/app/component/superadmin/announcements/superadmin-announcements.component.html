@@ -1,0 +1,311 @@
+<!-- Banner -->
+<div class="page-banner sa-banner">
+  <div class="banner-content">
+    <div class="banner-icon"><i class="bi bi-megaphone-fill"></i></div>
+    <div>
+      <div class="banner-title">Platform Announcements</div>
+      <div class="banner-subtitle">Broadcast to all companies or target a specific tenant</div>
+    </div>
+  </div>
+  <div class="banner-actions">
+    <button class="btn-banner" (click)="openForm()">
+      <i class="bi bi-plus-lg me-1"></i>New Announcement
+    </button>
+    <button class="btn-banner btn-outline-light" (click)="loadData()">
+      <i class="bi bi-arrow-repeat me-1"></i>Refresh
+    </button>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+
+  <!-- ── Create Form Panel ────────────────────────────────── -->
+  <div class="falcon-card mb-4" *ngIf="showForm">
+    <div class="form-panel-header">
+      <div class="fw-semibold"><i class="bi bi-megaphone me-2 text-primary"></i>New Announcement</div>
+      <button type="button" class="btn-close" (click)="closeForm()"></button>
+    </div>
+    <div class="form-panel-body">
+      <form #createForm="ngForm" (ngSubmit)="createAnnouncement(createForm)">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+            <input class="form-control" name="title" ngModel required placeholder="Announcement title…">
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Content <span class="text-danger">*</span></label>
+            <textarea class="form-control" name="content" ngModel required rows="4" placeholder="Full announcement content…"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Summary <span class="text-muted fw-normal">(optional short preview)</span></label>
+            <input class="form-control" name="summary" ngModel placeholder="One-line summary…">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Category</label>
+            <select class="form-select" name="category" ngModel>
+              <option *ngFor="let c of CATEGORIES; trackBy: trackByValue" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Priority</label>
+            <select class="form-select" name="priority" ngModel>
+              <option *ngFor="let p of PRIORITIES; trackBy: trackByValue" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Expires At <span class="text-muted fw-normal">(optional)</span></label>
+            <input class="form-control" type="datetime-local" name="expiresAt" ngModel>
+          </div>
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">Target Company</label>
+            <select class="form-select" name="companyId" ngModel (ngModelChange)="onCompanyChange($event)">
+              <option value="">All Companies (Platform-Wide)</option>
+              <option *ngFor="let c of companies; trackBy: trackById" [value]="c.id">{{ c.name }} ({{ c.code }})</option>
+            </select>
+            <div class="form-text">Leave blank to broadcast to every company on the platform.</div>
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="isPinned" ngModel id="isPinnedCreate">
+              <label class="form-check-label fw-semibold" for="isPinnedCreate">Pin to top</label>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="departments.length > 0">
+            <label class="form-label fw-semibold">Target Department <span class="text-muted fw-normal">(optional)</span></label>
+            <select class="form-select" name="departmentId" ngModel>
+              <option value="">All Departments in Company</option>
+              <option *ngFor="let d of departments; trackBy: trackById" [value]="d.id">{{ d.name }}</option>
+            </select>
+            <div class="form-text">Narrow the audience to a specific department.</div>
+          </div>
+          <div class="col-12" *ngIf="loadingDepts">
+            <div class="d-flex align-items-center gap-2 text-muted small">
+              <span class="spinner-border spinner-border-sm"></span> Loading departments…
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-secondary" (click)="closeForm()">Cancel</button>
+          <button type="submit" class="btn btn-primary" [disabled]="createForm.invalid || saving">
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi bi-send-fill me-1" *ngIf="!saving"></i>Publish
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Announcements Table ───────────────────────────────── -->
+  <div class="falcon-card table-card">
+    <div class="table-card-header">
+      <div class="d-flex align-items-center gap-2">
+        <span class="fw-semibold">All Announcements</span>
+        <span class="badge bg-secondary">{{ announcements.length }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="p-4 text-center">
+      <div class="spinner-border text-primary spinner-border-sm"></div>
+    </div>
+
+    <div class="table-responsive" *ngIf="!loading">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Scope</th>
+            <th>Category</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Pin</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of announcements; trackBy: trackById">
+            <td>
+              <div class="fw-semibold small">{{ a.title }}</div>
+              <div class="text-muted" style="font-size:.74rem">{{ a.summary || (a.content | slice:0:55) }}…</div>
+            </td>
+            <td>
+              <span class="scope-badge" [ngClass]="a.company_id ? 'scope-company' : 'scope-platform'">
+                <i class="bi me-1" [ngClass]="a.company_id ? 'bi-building' : 'bi-globe'"></i>
+                {{ scopeLabel(a) }}
+              </span>
+            </td>
+            <td><span class="badge-soft" [ngClass]="categoryClass(a.category)">{{ a.category }}</span></td>
+            <td><span class="badge-soft" [ngClass]="priorityClass(a.priority)">{{ a.priority }}</span></td>
+            <td>
+              <span class="badge-soft" [ngClass]="a.is_active ? 'badge-soft-success' : 'badge-soft-secondary'">
+                <i class="bi me-1" [ngClass]="a.is_active ? 'bi-check-circle' : 'bi-dash-circle'"></i>
+                {{ a.is_active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td>
+              <i class="bi" [ngClass]="a.is_pinned ? 'bi-pin-angle-fill text-warning' : 'bi-pin-angle text-muted'"
+                 style="font-size:1rem"></i>
+            </td>
+            <td class="text-muted small">{{ a.created_at | date:'dd MMM yyyy' }}</td>
+            <td>
+              <div class="action-btn-group">
+                <!-- View -->
+                <button class="btn btn-sm btn-outline-secondary" (click)="openView(a)" title="View">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <!-- Edit -->
+                <button class="btn btn-sm btn-outline-primary" (click)="openEdit(a)" title="Edit">
+                  <i class="bi bi-pencil"></i>
+                </button>
+                <!-- Pin/Unpin -->
+                <button class="btn btn-sm" (click)="togglePin(a)" [disabled]="pinningId === a.id"
+                  [ngClass]="a.is_pinned ? 'btn-warning' : 'btn-outline-warning'"
+                  [title]="a.is_pinned ? 'Unpin' : 'Pin to top'">
+                  <span *ngIf="pinningId === a.id" class="spinner-border spinner-border-sm"></span>
+                  <i *ngIf="pinningId !== a.id" class="bi" [ngClass]="a.is_pinned ? 'bi-pin-angle-fill' : 'bi-pin-angle'"></i>
+                </button>
+                <!-- Activate/Deactivate -->
+                <button class="btn btn-sm" (click)="toggle(a)" [disabled]="togglingId === a.id"
+                  [ngClass]="a.is_active ? 'btn-outline-secondary' : 'btn-outline-success'"
+                  [title]="a.is_active ? 'Deactivate' : 'Activate'">
+                  <span *ngIf="togglingId === a.id" class="spinner-border spinner-border-sm"></span>
+                  <i *ngIf="togglingId !== a.id" class="bi" [ngClass]="a.is_active ? 'bi-pause-circle' : 'bi-play-circle'"></i>
+                </button>
+                <!-- Delete -->
+                <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(a)"
+                  [disabled]="deletingId === a.id" title="Delete">
+                  <span *ngIf="deletingId === a.id" class="spinner-border spinner-border-sm"></span>
+                  <i *ngIf="deletingId !== a.id" class="bi bi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="announcements.length === 0">
+            <td colspan="8" class="empty-state-cell">
+              <i class="bi bi-megaphone me-2 text-muted"></i>No announcements yet. Create one above.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── View Modal ──────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="viewingAnnouncement" (click)="closeView()">
+  <div class="falcon-modal modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header-bar">
+      <div>
+        <div class="modal-title">{{ viewingAnnouncement.title }}</div>
+        <div class="d-flex align-items-center gap-2 mt-1">
+          <span class="badge-soft" [ngClass]="categoryClass(viewingAnnouncement.category)">{{ viewingAnnouncement.category }}</span>
+          <span class="badge-soft" [ngClass]="priorityClass(viewingAnnouncement.priority)">{{ viewingAnnouncement.priority }}</span>
+          <span class="scope-badge" [ngClass]="viewingAnnouncement.company_id ? 'scope-company' : 'scope-platform'">
+            <i class="bi me-1" [ngClass]="viewingAnnouncement.company_id ? 'bi-building' : 'bi-globe'"></i>
+            {{ scopeLabel(viewingAnnouncement) }}
+          </span>
+          <span *ngIf="viewingAnnouncement.is_pinned" class="badge-soft badge-soft-warning">
+            <i class="bi bi-pin-angle-fill me-1"></i>Pinned
+          </span>
+        </div>
+      </div>
+      <button type="button" class="btn-close" (click)="closeView()"></button>
+    </div>
+    <div class="modal-body-content">
+      <div *ngIf="viewingAnnouncement.summary" class="view-summary">
+        <i class="bi bi-card-text me-2 text-muted"></i>{{ viewingAnnouncement.summary }}
+      </div>
+      <div class="view-content">{{ viewingAnnouncement.content }}</div>
+      <div class="view-meta">
+        <span><i class="bi bi-person me-1"></i>{{ viewingAnnouncement.created_by_name || 'Super Admin' }}</span>
+        <span><i class="bi bi-calendar me-1"></i>{{ viewingAnnouncement.created_at | date:'dd MMM yyyy HH:mm' }}</span>
+        <span *ngIf="viewingAnnouncement.expires_at"><i class="bi bi-clock me-1"></i>Expires {{ viewingAnnouncement.expires_at | date:'dd MMM yyyy HH:mm' }}</span>
+        <span><i class="bi bi-eye me-1"></i>{{ viewingAnnouncement.view_count ?? 0 }} views</span>
+      </div>
+    </div>
+    <div class="modal-footer-bar">
+      <button class="btn btn-secondary" (click)="closeView()">Close</button>
+      <button class="btn btn-primary" (click)="closeView(); openEdit(viewingAnnouncement)">
+        <i class="bi bi-pencil me-1"></i>Edit
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Edit Modal ──────────────────────────────────────────── -->
+<div class="modal-overlay" *ngIf="showEditModal && editingAnnouncement" (click)="closeEdit()">
+  <div class="falcon-modal modal-lg" (click)="$event.stopPropagation()">
+    <div class="modal-header-bar">
+      <div class="modal-title"><i class="bi bi-pencil-square me-2 text-primary"></i>Edit Announcement</div>
+      <button type="button" class="btn-close" (click)="closeEdit()"></button>
+    </div>
+    <div class="modal-body-content">
+      <form #editForm="ngForm" (ngSubmit)="saveEdit(editForm)" id="editAnnouncementForm">
+        <div class="row g-3">
+          <div class="col-12">
+            <label class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+            <input class="form-control" name="title" [ngModel]="editingAnnouncement.title" required>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Content <span class="text-danger">*</span></label>
+            <textarea class="form-control" name="content" [ngModel]="editingAnnouncement.content" required rows="5"></textarea>
+          </div>
+          <div class="col-12">
+            <label class="form-label fw-semibold">Summary</label>
+            <input class="form-control" name="summary" [ngModel]="editingAnnouncement.summary" placeholder="Short preview…">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Category</label>
+            <select class="form-select" name="category" [ngModel]="editingAnnouncement.category">
+              <option *ngFor="let c of CATEGORIES; trackBy: trackByValue" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Priority</label>
+            <select class="form-select" name="priority" [ngModel]="editingAnnouncement.priority">
+              <option *ngFor="let p of PRIORITIES; trackBy: trackByValue" [value]="p">{{ p }}</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Expires At</label>
+            <input class="form-control" type="datetime-local" name="expiresAt" [ngModel]="editingAnnouncement.expires_at">
+          </div>
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">Target Company</label>
+            <select class="form-select" name="companyId" [ngModel]="editingAnnouncement.company_id"
+                    (ngModelChange)="onCompanyChange($event)">
+              <option value="">All Companies (Platform-Wide)</option>
+              <option *ngFor="let c of companies; trackBy: trackById" [value]="c.id">{{ c.name }} ({{ c.code }})</option>
+            </select>
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <div class="form-check form-switch mb-2">
+              <input class="form-check-input" type="checkbox" name="isPinned" [ngModel]="editingAnnouncement.is_pinned" id="isPinnedEdit">
+              <label class="form-check-label fw-semibold" for="isPinnedEdit">Pin to top</label>
+            </div>
+          </div>
+          <div class="col-12" *ngIf="departments.length > 0">
+            <label class="form-label fw-semibold">Target Department <span class="text-muted fw-normal">(optional)</span></label>
+            <select class="form-select" name="departmentId" [ngModel]="editingAnnouncement.target_department_id">
+              <option value="">All Departments in Company</option>
+              <option *ngFor="let d of departments; trackBy: trackById" [value]="d.id">{{ d.name }}</option>
+            </select>
+          </div>
+          <div class="col-12" *ngIf="loadingDepts">
+            <div class="d-flex align-items-center gap-2 text-muted small">
+              <span class="spinner-border spinner-border-sm"></span> Loading departments…
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer-bar">
+      <button type="button" class="btn btn-secondary" (click)="closeEdit()">Cancel</button>
+      <button type="submit" form="editAnnouncementForm" class="btn btn-primary" [disabled]="editForm.invalid || saving">
+        <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+        <i class="bi bi-check-lg me-1" *ngIf="!saving"></i>Save Changes
+      </button>
+    </div>
+  </div>
+</div>

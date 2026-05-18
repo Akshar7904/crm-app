@@ -1,0 +1,101 @@
+<!-- Banner -->
+<div class="page-banner sa-banner">
+  <div class="banner-content">
+    <div class="banner-icon"><i class="bi bi-file-earmark-bar-graph-fill"></i></div>
+    <div>
+      <div class="banner-title">Company Reports</div>
+      <div class="banner-subtitle">Download module reports for any company on the platform</div>
+    </div>
+  </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+  <div class="row g-3">
+
+    <!-- Left: Company selector -->
+    <div class="col-12 col-lg-4">
+      <div class="falcon-card h-100">
+        <div class="card-inner-header">
+          <i class="bi bi-building me-2 text-primary"></i>
+          <span class="fw-semibold">Select Company</span>
+        </div>
+        <div class="company-search-wrap">
+          <input class="form-control form-control-sm mb-2"
+                 placeholder="Search companies…"
+                 [(ngModel)]="companyFilter"
+                 #filterInput>
+        </div>
+        <div class="company-list">
+          <div *ngIf="loading" class="text-center py-3">
+            <div class="spinner-border spinner-border-sm text-primary"></div>
+          </div>
+          <button *ngFor="let c of filteredCompanies; trackBy: trackById"
+                  class="company-row"
+                  [class.selected]="selectedCompany?.id === c.id"
+                  (click)="selectCompany(c)">
+            <div class="company-row-dot" [class.active]="c.active"></div>
+            <div class="company-row-body">
+              <div class="fw-semibold small">{{ c.name }}</div>
+              <div class="text-muted" style="font-size:.75rem">{{ c.code }}</div>
+            </div>
+            <i class="bi bi-check-circle-fill text-primary ms-auto" *ngIf="selectedCompany?.id === c.id"></i>
+          </button>
+          <div *ngIf="!loading && companies.length === 0" class="empty-state-cell">
+            <i class="bi bi-building me-2 text-muted"></i>No companies
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Report options -->
+    <div class="col-12 col-lg-8">
+
+      <!-- Selected company banner -->
+      <div class="selected-company-bar mb-3" *ngIf="selectedCompany">
+        <div>
+          <div class="fw-semibold">{{ selectedCompany.name }}</div>
+          <div class="text-muted small">Code: {{ selectedCompany.code }}</div>
+        </div>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <!-- Period filters -->
+          <select class="form-select form-select-sm" [(ngModel)]="selectedYear" style="width:90px">
+            <option *ngFor="let y of years; trackBy: trackByValue" [value]="y">{{ y }}</option>
+          </select>
+          <select class="form-select form-select-sm" [(ngModel)]="selectedMonth" style="width:130px">
+            <option *ngFor="let m of months; trackBy: trackByValue" [value]="m.value">{{ m.label }}</option>
+          </select>
+          <button class="btn btn-sm btn-outline-primary" (click)="downloadAll()">
+            <i class="bi bi-cloud-download me-1"></i>All Reports
+          </button>
+        </div>
+      </div>
+
+      <!-- No company selected -->
+      <div *ngIf="!selectedCompany" class="falcon-card text-center py-5">
+        <i class="bi bi-building display-4 text-muted opacity-25"></i>
+        <div class="mt-3 text-muted">Select a company on the left to see available reports</div>
+      </div>
+
+      <!-- Report type grid -->
+      <div *ngIf="selectedCompany" class="report-grid">
+        <div *ngFor="let rt of reportTypes; trackBy: trackByValue" class="report-card">
+          <div class="report-card-icon {{ rt.iconClass }}">
+            <i class="bi {{ rt.icon }}"></i>
+          </div>
+          <div class="report-card-body">
+            <div class="fw-semibold small mb-1">{{ rt.label }}</div>
+            <div class="text-muted" style="font-size:.78rem">{{ rt.description }}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-primary mt-2 w-100"
+                  (click)="download(rt)"
+                  [disabled]="downloading === rt.key">
+            <span *ngIf="downloading === rt.key" class="spinner-border spinner-border-sm me-1"></span>
+            <i class="bi bi-download me-1" *ngIf="downloading !== rt.key"></i>
+            {{ downloading === rt.key ? 'Generating…' : 'Download' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

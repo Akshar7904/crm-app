@@ -108,6 +108,15 @@
 
           <li><hr class="dropdown-divider" /></li>
 
+          <li *ngIf="isImpersonating">
+            <a class="dropdown-item impersonate-exit-item" (click)="exitImpersonation()">
+              <i class="bi bi-arrow-return-left"></i>
+              Exit — Return to Super-Admin
+            </a>
+          </li>
+
+          <li *ngIf="isImpersonating"><hr class="dropdown-divider" /></li>
+
           <li>
             <a class="dropdown-item logout-item" (click)="logOut()">
               <i class="bi bi-box-arrow-right"></i>
