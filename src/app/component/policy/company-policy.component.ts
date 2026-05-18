@@ -252,8 +252,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
     return this.policyTypes.find(t => t.value === policyType)?.label ?? policyType;
   }
 
-  get availableTypes(): PolicyType[] {
-    const uploaded = new Set(this.policies.map(p => p.policyType));
-    return this.policyTypes.filter(t => !uploaded.has(t.value));
+  get uploadedTypes(): Set<string> {
+    return new Set(this.policies.map(p => p.policyType));
   }
 }

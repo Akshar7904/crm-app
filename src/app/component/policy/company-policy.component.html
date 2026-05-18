@@ -8,15 +8,16 @@
     </div>
   </div>
   <div class="banner-actions" *ngIf="!loading && companyId && isAdmin">
-    <!-- Add new policy — dropdown of available types -->
-    <div class="dropdown" *ngIf="availableTypes.length > 0">
+    <!-- Add new policy — dropdown of all types (backend upserts on same type) -->
+    <div class="dropdown" *ngIf="policyTypes.length > 0">
       <button class="btn-banner dropdown-toggle" data-bs-toggle="dropdown">
         <i class="bi bi-plus-circle me-1"></i>Add Policy
       </button>
       <ul class="dropdown-menu dropdown-menu-end">
-        <li *ngFor="let t of availableTypes">
+        <li *ngFor="let t of policyTypes">
           <button class="dropdown-item" (click)="openUploadModal(t.value, t.label)">
             {{ t.label }}
+            <span *ngIf="uploadedTypes.has(t.value)" class="text-muted ms-1" style="font-size:.75rem">(replace)</span>
           </button>
         </li>
       </ul>
