@@ -18,6 +18,7 @@ import { AttendanceService } from '../service/attendance.service';
 import { LeaveService } from '../service/leave.service';
 import { BrandingService } from '../service/branding.service';
 import { ThemeService } from '../service/theme.service';
+import { LoadingInterceptor } from '../interceptor/loading.interceptor';
 import { CompanyService } from '../service/company.service';
 import { NotificationApiService } from '../service/notification-api.service';
 import { ExpenseClaimService } from '../service/expense-claim.service';
@@ -36,7 +37,8 @@ import { DepartmentService } from '../service/department.service';
         AttendanceService, LeaveService, BrandingService, ThemeService,
         CompanyService, NotificationApiService,
         { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },
-        { provide: HTTP_INTERCEPTORS, useClass: CacheInterceptor, multi: true }
+        { provide: HTTP_INTERCEPTORS, useClass: CacheInterceptor, multi: true },
+        { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
     ]
 })
 export class CoreModule {}

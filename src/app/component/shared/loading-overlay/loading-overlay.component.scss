@@ -1,0 +1,94 @@
+@import '../../../../styles/variables';
+
+// ── Overlay backdrop ──────────────────────────────────────────────────────────
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: overlay-in 0.18s ease;
+
+  :host-context([data-theme='dark']) & {
+    background: rgba(15, 23, 42, 0.85);
+  }
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Center box ────────────────────────────────────────────────────────────────
+.loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+// ── Ring + logo stack ─────────────────────────────────────────────────────────
+.loading-ring-wrap {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: $primary;
+  animation: spin 0.9s linear infinite;
+
+  &--delay {
+    inset: 8px;
+    border-top-color: rgba($primary, 0.35);
+    animation-duration: 1.4s;
+    animation-direction: reverse;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// ── Logo ──────────────────────────────────────────────────────────────────────
+.loading-logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  animation: logo-pulse 1.8s ease-in-out infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes logo-pulse {
+  0%, 100% { transform: scale(1);    opacity: 1;    }
+  50%       { transform: scale(0.88); opacity: 0.75; }
+}
+
+// ── Label ─────────────────────────────────────────────────────────────────────
+.loading-text {
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $primary;
+  opacity: 0.7;
+  margin: 0;
+  animation: text-fade 1.8s ease-in-out infinite;
+}
+
+@keyframes text-fade {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1;    }
+}

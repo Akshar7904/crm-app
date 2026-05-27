@@ -6,6 +6,8 @@ import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { CommonModule } from '@angular/common';
+import { LoadingOverlayComponent } from './component/shared/loading-overlay/loading-overlay.component';
 import { BrandingService } from './service/branding.service';
 import { UserService } from './service/user.service';
 
@@ -44,6 +46,7 @@ import { AppRoutingModule } from './app-routing.module';
 @NgModule({
   declarations: [
     AppComponent,
+    LoadingOverlayComponent,
     DocumentationComponent,
     CompanyPolicyComponent,
     AttendanceListComponent,
@@ -56,6 +59,7 @@ import { AppRoutingModule } from './app-routing.module';
   imports: [
     // Angular Core
     BrowserModule,
+    CommonModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
