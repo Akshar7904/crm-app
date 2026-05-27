@@ -9,37 +9,74 @@
   <link rel="icon" type="image/png" href="assets/logo_icon.png">
   <style>
     .app-boot-wrap {
+      position: fixed;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      width: 100%;
-      background: #1a2a4a;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 99999;
     }
-    .loader {
-      display: inline-block;
-      font-size: 48px;
-      font-family: Arial, Helvetica, sans-serif;
-      font-weight: bold;
-      color: #fff;
+    .app-boot-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .app-boot-ring-wrap {
       position: relative;
+      width: 88px;
+      height: 88px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .loader::before {
-      content: '';
+    .app-boot-ring {
       position: absolute;
-      left: 34px;
-      bottom: 8px;
-      width: 30px;
-      height: 30px;
+      inset: 0;
       border-radius: 50%;
-      border: 5px solid #fff;
-      border-bottom-color: #375fa0;
+      border: 3px solid transparent;
+      border-top-color: #375fa0;
       box-sizing: border-box;
-      animation: rotation 0.6s linear infinite;
+      animation: boot-spin 0.9s linear infinite;
     }
-    @keyframes rotation {
-      0%   { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+    .app-boot-ring--delay {
+      inset: 8px;
+      border-top-color: rgba(55,95,160,0.35);
+      animation-duration: 1.4s;
+      animation-direction: reverse;
+    }
+    @keyframes boot-spin {
+      to { transform: rotate(360deg); }
+    }
+    .app-boot-logo {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+      animation: boot-pulse 1.8s ease-in-out infinite;
+    }
+    @keyframes boot-pulse {
+      0%, 100% { transform: scale(1);    opacity: 1;    }
+      50%       { transform: scale(0.88); opacity: 0.75; }
+    }
+    .app-boot-text {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #375fa0;
+      opacity: 0.7;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      animation: boot-text-fade 1.8s ease-in-out infinite;
+    }
+    @keyframes boot-text-fade {
+      0%, 100% { opacity: 0.55; }
+      50%       { opacity: 1;    }
     }
   </style>
 </head>
@@ -47,7 +84,14 @@
   <main class="flex-shrink-0">
     <app-root>
       <div class="app-boot-wrap">
-        <span class="loader">L &nbsp; ading</span>
+        <div class="app-boot-box">
+          <div class="app-boot-ring-wrap">
+            <div class="app-boot-ring"></div>
+            <div class="app-boot-ring app-boot-ring--delay"></div>
+            <img src="assets/logo_icon.png" alt="Loading…" class="app-boot-logo">
+          </div>
+          <p class="app-boot-text">Please wait…</p>
+        </div>
       </div>
     </app-root>
   </main>
