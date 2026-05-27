@@ -82,7 +82,11 @@
     <!-- CONFIRMING -->
     <ng-container *ngIf="state === 'CONFIRMING'">
       <div class="kiosk-card kiosk-card--center" (click)="$event.stopPropagation()">
-        <div class="kiosk-spinner"></div>
+        <div class="kiosk-loading-ring-wrap">
+          <div class="kiosk-loading-ring"></div>
+          <div class="kiosk-loading-ring kiosk-loading-ring--delay"></div>
+          <img src="assets/logo_icon.png" alt="Loading…" class="kiosk-loading-logo">
+        </div>
         <p class="kiosk-confirming-text">Verifying...</p>
       </div>
     </ng-container>

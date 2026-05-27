@@ -13,7 +13,7 @@ import { LoadingService } from '../service/loading.service';
 const SKIP_LOADING_PATTERNS = [
   '/notifications/count',
   '/notifications/unread',
-  '/kiosk/active-breaks',
+  '/kiosk/',
   'x-skip-cache',
 ];
 
