@@ -76,15 +76,12 @@
 
     <!-- Tracked / Low Stock Tab -->
     <div *ngIf="activeTab !== 'movements'">
-      <div *ngIf="loading" class="p-4 text-center text-muted">
-        <div class="spinner-border spinner-border-sm me-2"></div> Loading...
-      </div>
-      <div *ngIf="!loading && trackedProducts.length === 0" class="p-4 text-center text-muted">
+      <div *ngIf="trackedProducts.length === 0" class="p-4 text-center text-muted">
         <i class="bi bi-box2 fs-2 d-block mb-2"></i>
         <span *ngIf="activeTab === 'tracked'">No tracked products yet. Enable inventory tracking on a product below.</span>
         <span *ngIf="activeTab === 'low-stock'">No low-stock items.</span>
       </div>
-      <div *ngIf="!loading && trackedProducts.length > 0" class="table-responsive">
+      <div *ngIf="trackedProducts.length > 0" class="table-responsive">
         <table class="table table-hover align-middle mb-0">
           <thead>
             <tr>

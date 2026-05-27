@@ -7,7 +7,7 @@
       <div class="banner-subtitle">{{ companyName }} · Official policy documents</div>
     </div>
   </div>
-  <div class="banner-actions" *ngIf="!loading && companyId && isAdmin">
+  <div class="banner-actions" *ngIf="companyId && isAdmin">
     <!-- Add new policy — dropdown of all types (backend upserts on same type) -->
     <div class="dropdown" *ngIf="policyTypes.length > 0">
       <button class="btn-banner dropdown-toggle" data-bs-toggle="dropdown">
@@ -27,14 +27,8 @@
 
 <div class="container-fluid px-4 py-3">
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary"></div>
-    <div class="mt-2 text-muted small">Loading policies…</div>
-  </div>
-
   <!-- No company (SUPERADMIN) -->
-  <div *ngIf="!loading && !companyId" class="policy-empty">
+  <div *ngIf="!companyId" class="policy-empty">
     <i class="bi bi-shield-lock display-3 text-muted opacity-25"></i>
     <div class="mt-3 fw-semibold">No company context</div>
     <div class="text-muted small mt-1">Super Admins do not have a company policy. Manage policies per company from the Companies admin page.</div>
@@ -69,7 +63,7 @@
   </div>
 
   <!-- Policy cards grid -->
-  <div *ngIf="!loading && companyId && !viewingPolicy">
+  <div *ngIf="companyId && !viewingPolicy">
 
     <!-- No policies uploaded yet -->
     <div *ngIf="policies.length === 0" class="policy-empty">

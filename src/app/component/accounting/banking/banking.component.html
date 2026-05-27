@@ -62,11 +62,7 @@
           <span class="badge-soft" style="background:rgba(0,92,143,.08);color:#005c8f">{{ totalElements }}</span>
         </div>
 
-        <div *ngIf="loading" class="p-4 text-center">
-          <div class="spinner-border spinner-border-sm" style="color:var(--primary-500)"></div>
-        </div>
-
-        <div class="account-list" *ngIf="!loading">
+        <div class="account-list">
           <div *ngIf="accounts.length === 0" class="empty-state-cell">
             <i class="bi bi-bank2"></i>
             <span>No bank accounts yet</span>

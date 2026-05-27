@@ -67,11 +67,7 @@
   </div>
 
   <!-- Aging Detail Tables -->
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary"></div>
-  </div>
-
-  <ng-container *ngIf="!loading">
+  <ng-container>
     <div class="aging-bucket-section" *ngFor="let bucket of agingBuckets" [class.hide-empty]="bucket.bills.length === 0">
 
       <div class="aging-bucket-header" [class]="'aging-header-' + bucket.colorClass">
@@ -139,12 +135,8 @@
     </button>
   </div>
 
-  <div *ngIf="loadingPL" class="text-center py-5">
-    <div class="spinner-border text-primary"></div>
-  </div>
-
   <!-- P&L Table -->
-  <div *ngIf="!loadingPL && profitLoss" class="pl-report-card">
+  <div *ngIf="profitLoss" class="pl-report-card">
     <div class="pl-report-header">
       <h5>{{ company?.name || 'Company' }} — Income Statement</h5>
       <span class="text-muted">{{ months[selectedMonth - 1]?.label }} {{ selectedYear }}</span>
@@ -191,7 +183,7 @@
     </div>
   </div>
 
-  <div *ngIf="!loadingPL && !profitLoss" class="text-center py-5 text-muted">
+  <div *ngIf="!profitLoss" class="text-center py-5 text-muted">
     <i class="bi bi-file-earmark-bar-graph fs-1 d-block mb-2"></i>
     No data for selected period. Try a different month.
   </div>

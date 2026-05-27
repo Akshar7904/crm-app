@@ -62,13 +62,7 @@
     </div>
   </div>
 
-  <!-- Loading state -->
-  <div *ngIf="loading" class="p-5 text-center">
-    <div class="spinner-border text-primary"></div>
-    <div class="text-muted mt-3 small">Loading per-company analytics…</div>
-  </div>
-
-  <ng-container *ngIf="!loading">
+  <ng-container>
 
     <!-- Row 1: Employees bar + Clients grouped bar -->
     <div class="row g-3 mb-4">

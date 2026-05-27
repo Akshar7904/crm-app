@@ -53,14 +53,6 @@
     </div>
   </div>
 
-  <!-- Loading Spinner -->
-  <div *ngIf="designationState.loading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-3 text-muted">Loading designations...</p>
-  </div>
-
   <!-- Error Message -->
   <div *ngIf="designationState.error" class="falcon-alert falcon-alert-danger" role="alert">
     <i class="bi bi-exclamation-triangle-fill"></i>
@@ -68,7 +60,7 @@
   </div>
 
   <!-- Designations Table -->
-  <div *ngIf="!designationState.loading && !designationState.error" class="card">
+  <div class="card">
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover mb-0">

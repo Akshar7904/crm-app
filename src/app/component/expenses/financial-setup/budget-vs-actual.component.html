@@ -13,13 +13,7 @@
     </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="loading" class="bva-loading">
-    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
-    Loading financial data...
-  </div>
-
-  <ng-container *ngIf="!loading && summary">
+  <ng-container *ngIf="summary">
 
     <!-- Opening Balance Bar -->
     <div class="opening-bar" *ngIf="summary.openingBalance">
@@ -251,7 +245,7 @@
   </ng-container>
 
   <!-- Empty state -->
-  <div *ngIf="!loading && !summary" class="bva-empty">
+  <div *ngIf="!summary" class="bva-empty">
     <i class="bi bi-bar-chart"></i>
     <h5>No Financial Data Available</h5>
     <p>

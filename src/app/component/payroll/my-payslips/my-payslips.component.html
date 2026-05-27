@@ -8,21 +8,15 @@
     </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="pay-loading">
-    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
-    Loading payslips...
-  </div>
-
   <!-- Empty State -->
-  <div *ngIf="!isLoading && payrolls.length === 0" class="pay-empty">
+  <div *ngIf="payrolls.length === 0" class="pay-empty">
     <i class="bi bi-inbox"></i>
     <h5>No Payslips</h5>
     <p>Your payslips will appear here once payroll is processed.</p>
   </div>
 
   <!-- Payslips -->
-  <div *ngIf="!isLoading && payrolls.length > 0" class="pay-slips-list">
+  <div *ngIf="payrolls.length > 0" class="pay-slips-list">
 
     <div *ngFor="let payroll of payrolls; trackBy: trackById" class="table-card pay-slip-card">
 

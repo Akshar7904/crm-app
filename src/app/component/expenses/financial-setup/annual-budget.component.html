@@ -35,11 +35,7 @@
     </div>
   </div>
 
-  <div *ngIf="loading" class="budget-loading">
-    <div class="spinner-border text-primary spinner-border-sm me-2"></div> Loading accounts...
-  </div>
-
-  <div *ngIf="!loading" class="budget-content">
+  <div class="budget-content">
 
     <!-- INCOME Section -->
     <div class="budget-section" *ngIf="incomeLines.length > 0">

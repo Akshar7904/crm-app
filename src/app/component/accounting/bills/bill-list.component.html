@@ -84,11 +84,7 @@
 
   <!-- Supplier Bills Tab -->
   <ng-container *ngIf="activeTab === 'bills'">
-    <div *ngIf="loading" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status"></div>
-    </div>
-
-    <div *ngIf="!loading" class="table-responsive">
+    <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>
@@ -157,11 +153,7 @@
       Approved expense claims represent money the company owes to employees — they form part of Accounts Payable until reimbursed.
     </div>
 
-    <div *ngIf="apClaimsLoading" class="text-center py-5">
-      <div class="spinner-border text-primary" role="status"></div>
-    </div>
-
-    <div *ngIf="!apClaimsLoading" class="table-responsive">
+    <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead>
           <tr>

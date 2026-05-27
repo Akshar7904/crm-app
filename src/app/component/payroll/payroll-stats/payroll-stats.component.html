@@ -8,14 +8,8 @@
     </div>
   </div>
 
-  <!-- Loading -->
-  <div *ngIf="isLoading" class="pay-loading">
-    <div class="spinner-border text-primary spinner-border-sm me-2" role="status"></div>
-    Loading statistics...
-  </div>
-
   <!-- KPI Cards -->
-  <div *ngIf="!isLoading && stats" class="pay-kpi-row">
+  <div *ngIf="stats" class="pay-kpi-row">
     <div class="pay-kpi-card">
       <div class="pay-kpi-icon pay-kpi-total"><i class="bi bi-stack"></i></div>
       <div class="pay-kpi-body">
