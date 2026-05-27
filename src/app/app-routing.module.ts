@@ -276,6 +276,13 @@ const routes: Routes = [
     data: { title: 'Legal' }
   },
 
+  // ─── Demo / Showcase (public — no auth guard) ─────────────────────
+  {
+    path: 'demo',
+    loadChildren: () => import('./component/demo/demo.module').then(m => m.DemoModule),
+    data: { title: 'ORION Demo' }
+  },
+
   // ─── Kiosk ────────────────────────────────────────────────────────
   {
     path: 'kiosk',

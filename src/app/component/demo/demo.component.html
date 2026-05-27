@@ -1,0 +1,66 @@
+<div class="demo-shell">
+
+  <!-- ── HERO ───────────────────────────────────────────────────── -->
+  <section class="demo-hero">
+    <div class="demo-hero__bg"></div>
+    <div class="demo-hero__content">
+      <img src="assets/logo_icon.png" alt="ORION" class="demo-hero__logo">
+      <div class="demo-hero__eyebrow">LKCentrix &nbsp;·&nbsp; HR &amp; Payroll Platform</div>
+      <h1 class="demo-hero__title">ORION</h1>
+      <p class="demo-hero__sub">
+        An all-in-one HR, Payroll &amp; Accounting platform built for South African businesses —
+        from clock-in to payslip, leave to invoice.
+      </p>
+      <div class="demo-hero__stats">
+        <div class="demo-stat" *ngFor="let s of stats">
+          <span class="demo-stat__value">{{ s.value }}</span>
+          <span class="demo-stat__label">{{ s.label }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="demo-hero__scroll-hint">
+      <i class="bi bi-chevron-double-down"></i>
+    </div>
+  </section>
+
+  <!-- ── MODULE GRID ────────────────────────────────────────────── -->
+  <section class="demo-modules">
+    <div class="demo-modules__inner">
+      <h2 class="demo-section-title">What's inside</h2>
+      <p class="demo-section-sub">Every module your team needs, in one platform.</p>
+
+      <div class="demo-grid">
+        <a class="demo-card" *ngFor="let m of modules"
+           [routerLink]="m.route"
+           [style.--card-color]="m.color">
+          <div class="demo-card__header">
+            <div class="demo-card__icon-wrap">
+              <i class="bi demo-card__icon" [ngClass]="m.icon"></i>
+            </div>
+            <div class="demo-card__meta">
+              <span class="demo-card__tag">{{ m.tag }}</span>
+              <span *ngIf="m.badge" class="demo-card__badge">{{ m.badge }}</span>
+            </div>
+          </div>
+          <h3 class="demo-card__name">{{ m.name }}</h3>
+          <p class="demo-card__desc">{{ m.desc }}</p>
+          <ul class="demo-card__features">
+            <li *ngFor="let f of m.features">
+              <i class="bi bi-check2"></i>{{ f }}
+            </li>
+          </ul>
+          <div class="demo-card__cta">
+            Explore <i class="bi bi-arrow-right"></i>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer class="demo-footer">
+    <img src="assets/logo_icon.png" alt="ORION" class="demo-footer__logo">
+    <span>ORION — LKCentrix HR &amp; Payroll &nbsp;·&nbsp; Built by Zwelithini Ngomane</span>
+  </footer>
+
+</div>
