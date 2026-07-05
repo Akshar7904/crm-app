@@ -57,6 +57,7 @@ export class SuperadminCompaniesComponent implements OnInit {
     INVOICE_CUSTOMER: 'Invoicing & Customers',
     BUDGET_MANAGEMENT: 'Budget Management',
     INTERN_ATTENDANCE: 'Intern Attendance',
+    CONTRACT_MANAGEMENT: 'Contract Management',
   };
 
   constructor(
