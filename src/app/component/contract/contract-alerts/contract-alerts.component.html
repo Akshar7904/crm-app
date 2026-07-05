@@ -1,0 +1,92 @@
+<!-- Contract Alerts / Expiry Dashboard -->
+<div class="page-banner">
+  <div class="banner-title">Contract Alerts</div>
+  <p class="banner-subtitle">Contracts expiring within the next 90 days</p>
+</div>
+
+<div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+
+<div *ngIf="!loading">
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="falcon-card p-3 text-center expiry-card expiry-critical"
+           [class.active]="activeWindow === 30" (click)="activeWindow = 30">
+        <div class="expiry-count">{{ expiring30.length }}</div>
+        <div class="expiry-label">Expiring in 30 days</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="falcon-card p-3 text-center expiry-card expiry-warn"
+           [class.active]="activeWindow === 60" (click)="activeWindow = 60">
+        <div class="expiry-count">{{ expiring60.length }}</div>
+        <div class="expiry-label">Expiring in 31–60 days</div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="falcon-card p-3 text-center expiry-card expiry-info"
+           [class.active]="activeWindow === 90" (click)="activeWindow = 90">
+        <div class="expiry-count">{{ expiring90.length }}</div>
+        <div class="expiry-label">Expiring in 61–90 days</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <span class="fw-semibold">
+        <span *ngIf="activeWindow === 30">⚠️ Expiring within 30 days</span>
+        <span *ngIf="activeWindow === 60">⏰ Expiring within 31–60 days</span>
+        <span *ngIf="activeWindow === 90">📅 Expiring within 61–90 days</span>
+      </span>
+      <span class="badge badge-soft-secondary">{{ activeList.length }} contracts</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Ref #</th>
+            <th>Title</th>
+            <th>Counterparty</th>
+            <th>End Date</th>
+            <th>Days Left</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="activeList.length === 0">
+            <td colspan="7" class="empty-state-cell">
+              <i class="bi bi-check-circle fs-2 d-block mb-2 text-success"></i>
+              No contracts expiring in this window
+            </td>
+          </tr>
+          <tr *ngFor="let c of activeList" class="cursor-pointer" (click)="viewContract(c)">
+            <td><span class="fw-semibold text-primary">{{ c.contractNumber }}</span></td>
+            <td>{{ c.title }}</td>
+            <td>{{ c.counterpartyName || '—' }}</td>
+            <td [class.text-danger]="activeWindow === 30"
+                [class.text-warning]="activeWindow === 60">{{ c.endDate }}</td>
+            <td>
+              <span class="fw-bold"
+                    [class.text-danger]="(c.daysUntilExpiry || 999) <= 30"
+                    [class.text-warning]="(c.daysUntilExpiry || 999) > 30">
+                {{ c.daysUntilExpiry }}d
+              </span>
+            </td>
+            <td>
+              <span class="badge badge-soft-warning" *ngIf="c.status === 'EXPIRING_SOON'">Expiring Soon</span>
+              <span class="badge badge-soft-success" *ngIf="c.status === 'ACTIVE'">Active</span>
+            </td>
+            <td>
+              <button class="btn-action btn-action-view" (click)="$event.stopPropagation(); viewContract(c)">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

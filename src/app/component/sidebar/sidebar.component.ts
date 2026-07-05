@@ -55,7 +55,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     {
       label: 'Dashboard',
       icon: 'bi-house-door',
-      route: '/'
+      route: '/home'
     },
     {
       label: 'Organization',
@@ -437,6 +437,38 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
+      label: 'Contracts',
+      icon: 'bi-file-earmark-text',
+      expanded: false,
+      moduleKey: 'CONTRACT_MANAGEMENT',
+      children: [
+        {
+          label: 'All Contracts',
+          icon: 'bi-file-earmark-text',
+          route: '/contracts',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'New Contract',
+          icon: 'bi-plus-circle',
+          route: '/contracts/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Pending Approvals',
+          icon: 'bi-person-check',
+          route: '/contracts/approvals',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Expiry Alerts',
+          icon: 'bi-bell-fill',
+          route: '/contracts/alerts',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        }
+      ]
+    },
+    {
       label: 'Assets',
       icon: 'bi-laptop',
       expanded: false,
@@ -718,7 +750,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     if (currentUrl.startsWith(route + '/')) return true;
 
     // Handle special cases
-    if (route === '/' && currentUrl === '') return true;
+    if (route === '/home' && currentUrl === '') return true;
 
     return false;
   }

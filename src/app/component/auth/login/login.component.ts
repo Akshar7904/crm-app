@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.userService.isAuthenticated() ? this.router.navigate(['/']) : this.router.navigate(['/login']);
+    this.userService.isAuthenticated() ? this.router.navigate(['/home']) : this.router.navigate(['/login']);
     // Trigger change detection whenever branding changes (for OnPush)
     this.branding.branding$.pipe(takeUntil(this.destroy$)).subscribe(() => this.cdr.markForCheck());
   }
@@ -146,7 +146,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             localStorage.setItem(Key.COMPANY_ID, String(company.id));
           }
 
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
           return { dataState: DataState.LOADED, loginSuccess: true };
         }),
         startWith({
@@ -181,7 +181,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           const company = this.companySubject.value;
           if (company) localStorage.setItem(Key.COMPANY_ID, String(company.id));
 
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
           return { dataState: DataState.LOADED, loginSuccess: true };
         }),
         startWith({

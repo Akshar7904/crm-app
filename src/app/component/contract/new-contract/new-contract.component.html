@@ -1,0 +1,129 @@
+<!-- New / Edit Contract -->
+<div class="page-banner">
+  <button class="btn btn-sm btn-outline-light me-3" (click)="cancel()">
+    <i class="bi bi-arrow-left me-1"></i>Contracts
+  </button>
+  <div class="banner-title">{{ isEditMode ? 'Edit Contract' : 'New Contract' }}</div>
+  <p class="banner-subtitle">{{ isEditMode ? 'Update contract details' : 'Create a new contract agreement' }}</p>
+</div>
+
+<div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+
+<div class="row justify-content-center" *ngIf="!loading">
+  <div class="col-lg-9">
+    <div class="falcon-card">
+      <div class="card-header-line">
+        <i class="bi bi-file-earmark-plus me-2 text-primary"></i>Contract Details
+      </div>
+      <div class="card-body p-4">
+        <form [formGroup]="form">
+
+          <!-- Title + Type -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label">Contract Title <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="title"
+                     placeholder="e.g. IT Support Services Agreement"
+                     [class.is-invalid]="isInvalid('title')">
+              <div class="invalid-feedback">Title is required (min 3 characters)</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Contract Type <span class="text-danger">*</span></label>
+              <select class="form-select" formControlName="contractType" [class.is-invalid]="isInvalid('contractType')">
+                <option value="">Select type...</option>
+                <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
+              </select>
+              <div class="invalid-feedback">Contract type is required</div>
+            </div>
+          </div>
+
+          <!-- Counterparty -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Counterparty Name</label>
+              <input type="text" class="form-control" formControlName="counterpartyName"
+                     placeholder="Vendor, client, or party name">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Counterparty Type</label>
+              <select class="form-select" formControlName="counterpartyType">
+                <option *ngFor="let ct of counterpartyTypes" [value]="ct.value">{{ ct.label }}</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Contract Owner</label>
+              <input type="text" class="form-control" formControlName="ownerName"
+                     placeholder="Responsible person">
+            </div>
+          </div>
+
+          <!-- Value + Currency -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Contract Value</label>
+              <div class="input-group">
+                <span class="input-group-text">R</span>
+                <input type="number" class="form-control" formControlName="value"
+                       placeholder="0.00" min="0" step="0.01">
+              </div>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Currency</label>
+              <input type="text" class="form-control" formControlName="currency" placeholder="ZAR">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Notice Period (days)</label>
+              <input type="number" class="form-control" formControlName="noticePeriodDays" min="1">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <div class="form-check mb-2">
+                <input type="checkbox" class="form-check-input" formControlName="autoRenew" id="autoRenew">
+                <label class="form-check-label" for="autoRenew">Auto Renew</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dates -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" formControlName="startDate">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-control" formControlName="endDate">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Renewal Date</label>
+              <input type="date" class="form-control" formControlName="renewalDate">
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="3"
+                      placeholder="Describe the scope and purpose of this contract..."></textarea>
+          </div>
+
+          <!-- Notes -->
+          <div class="mb-4">
+            <label class="form-label">Internal Notes</label>
+            <textarea class="form-control" formControlName="notes" rows="2"
+                      placeholder="Internal notes (not visible to counterparty)..."></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2 justify-content-end">
+            <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+            <button type="button" class="btn btn-primary" (click)="save()" [disabled]="submitting">
+              <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isEditMode ? 'Update Contract' : 'Create Contract' }}
+            </button>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

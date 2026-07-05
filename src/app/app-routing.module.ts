@@ -22,13 +22,22 @@ import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employe
 
 const routes: Routes = [
   // =============================================
-  // HOME / DASHBOARD - MUST BE FIRST!
+  // LANDING PAGE (public — no auth guard)
   // =============================================
   {
     path: '',
+    loadChildren: () => import('./component/demo/demo.module').then(m => m.DemoModule),
+    pathMatch: 'full',
+    data: { title: 'ORION — HR & Payroll Platform' }
+  },
+
+  // =============================================
+  // HOME / DASHBOARD
+  // =============================================
+  {
+    path: 'home',
     component: HomeComponent,
     canActivate: [AuthenticationGuard],
-    pathMatch: 'full',
     data: { title: 'Dashboard' }
   },
 
@@ -202,6 +211,16 @@ const routes: Routes = [
   },
 
   // =============================================
+  // CONTRACT MANAGEMENT
+  // =============================================
+  {
+    path: 'contracts',
+    loadChildren: () => import('./component/contract/contract.module').then(m => m.ContractModule),
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Contract Management', moduleKey: 'CONTRACT_MANAGEMENT' }
+  },
+
+  // =============================================
   // ASSET MANAGEMENT
   // =============================================
   {
@@ -274,13 +293,6 @@ const routes: Routes = [
     path: 'legal',
     loadChildren: () => import('./component/legal/legal.module').then(m => m.LegalModule),
     data: { title: 'Legal' }
-  },
-
-  // ─── Demo / Showcase (public — no auth guard) ─────────────────────
-  {
-    path: 'demo',
-    loadChildren: () => import('./component/demo/demo.module').then(m => m.DemoModule),
-    data: { title: 'ORION Demo' }
   },
 
   // ─── Kiosk ────────────────────────────────────────────────────────

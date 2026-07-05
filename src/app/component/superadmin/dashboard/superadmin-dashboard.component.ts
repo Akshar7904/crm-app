@@ -264,7 +264,7 @@ export class SuperadminDashboardComponent implements OnInit, AfterViewInit, OnDe
         localStorage.setItem(Key.TOKEN, res.data.access_token);
         localStorage.setItem(Key.COMPANY_ID, String(company.id));
         this.notification.onDefault(`Now viewing as: ${company.name}`);
-        this.router.navigate(['/']);
+        this.router.navigate(['/home']);
       },
       error: err => this.notification.onError(err)
     });

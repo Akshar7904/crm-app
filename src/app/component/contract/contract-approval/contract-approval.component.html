@@ -1,0 +1,110 @@
+<!-- Contract Approval Queue -->
+<div class="page-banner">
+  <div class="banner-title">Pending Approvals</div>
+  <p class="banner-subtitle">Contracts awaiting your approval action</p>
+</div>
+
+<div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+
+<div *ngIf="!loading">
+  <div class="table-card">
+    <div class="table-card-header">
+      <span class="fw-semibold"><i class="bi bi-person-check me-2 text-warning"></i>Approval Queue</span>
+      <span class="badge badge-soft-warning">{{ pendingContracts.length }} pending</span>
+    </div>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th>Ref #</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Counterparty</th>
+            <th>Value</th>
+            <th>Submitted</th>
+            <th>Pending Step</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="pendingContracts.length === 0">
+            <td colspan="8" class="empty-state-cell">
+              <i class="bi bi-check-all fs-2 d-block mb-2 text-success"></i>
+              No contracts pending approval
+            </td>
+          </tr>
+          <tr *ngFor="let c of pendingContracts">
+            <td>
+              <span class="fw-semibold text-primary cp" (click)="viewContract(c)">
+                {{ c.contractNumber }}
+              </span>
+            </td>
+            <td>{{ c.title }}</td>
+            <td><span class="badge badge-soft-info">{{ c.contractTypeDisplay }}</span></td>
+            <td>{{ c.counterpartyName || '—' }}</td>
+            <td>{{ formatCurrency(c.value) }}</td>
+            <td>{{ c.updatedAt | date:'dd MMM yyyy' }}</td>
+            <td>
+              <div *ngIf="getPendingStep(c) as step">
+                <div class="fw-semibold" style="font-size:0.82rem">Step {{ step.stepOrder }}: {{ step.approverName }}</div>
+                <small class="text-muted">{{ step.approverRole }}</small>
+              </div>
+              <span *ngIf="!getPendingStep(c)" class="text-muted">—</span>
+            </td>
+            <td>
+              <div class="action-btn-group">
+                <button class="btn-action btn-action-view" (click)="viewContract(c)" title="View Contract">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-success" (click)="openApprove(c)" title="Approve"
+                        *ngIf="getPendingStep(c)">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button class="btn btn-sm btn-danger" (click)="openReject(c)" title="Reject"
+                        *ngIf="getPendingStep(c)">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal-backdrop-custom" *ngIf="approvingContract">
+  <div class="falcon-modal">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-check-circle text-success me-2"></i>Approve Contract Step</span>
+      <button class="btn-close-modal" (click)="approvingContract = null"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body">
+      <p class="text-muted mb-3">Optionally add a comment before approving this step.</p>
+      <textarea class="form-control" rows="3" placeholder="Comment (optional)" [(ngModel)]="actionComment"></textarea>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="approvingContract = null">Cancel</button>
+      <button class="btn btn-success btn-sm" (click)="confirmApprove()">Approve</button>
+    </div>
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-backdrop-custom" *ngIf="rejectingContract">
+  <div class="falcon-modal">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-x-circle text-danger me-2"></i>Reject Contract Step</span>
+      <button class="btn-close-modal" (click)="rejectingContract = null"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body">
+      <p class="text-muted mb-3">Rejecting will return the contract to <strong>Draft</strong> status.</p>
+      <textarea class="form-control" rows="3" placeholder="Reason for rejection (required)..." [(ngModel)]="actionComment"></textarea>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="rejectingContract = null">Cancel</button>
+      <button class="btn btn-danger btn-sm" [disabled]="!actionComment.trim()" (click)="confirmReject()">Reject</button>
+    </div>
+  </div>
+</div>

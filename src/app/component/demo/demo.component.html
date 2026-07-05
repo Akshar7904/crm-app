@@ -1,383 +1,516 @@
-<div class="demo-shell">
+<div class="lp-shell">
 
-  <!-- ══ NAVBAR ══════════════════════════════════════════════════════ -->
-  <nav class="demo-nav">
-    <div class="demo-nav__inner">
-      <a class="demo-nav__brand" routerLink="/demo">
-        <img src="assets/logo_icon.png" alt="ORION">
-        <span>ORION</span>
-      </a>
-      <ul class="demo-nav__links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#modules">Modules</a></li>
-        <li><a href="#features">Features</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-      <a class="demo-nav__cta" routerLink="/">Sign In</a>
-    </div>
-  </nav>
-
-  <!-- ══ HERO ════════════════════════════════════════════════════════ -->
-  <section class="demo-hero" id="home">
-    <div class="demo-hero__bg"></div>
-    <div class="demo-hero__inner">
-
-      <!-- Left: text -->
-      <div class="demo-hero__text">
-        <div class="demo-hero__eyebrow">LKCentrix Solutions &nbsp;·&nbsp; South Africa</div>
-        <h1 class="demo-hero__title">
-          The HR &amp; Payroll platform your business deserves
-        </h1>
-        <p class="demo-hero__desc">
-          ORION brings together employee management, payroll processing, attendance tracking,
-          leave workflows, accounting and more — in one cloud-hosted platform built for South African businesses.
-        </p>
-        <div class="demo-hero__actions">
-          <a class="demo-btn demo-btn--primary" routerLink="/">Get Started</a>
-          <a class="demo-btn demo-btn--ghost" href="#modules">Explore Modules</a>
-        </div>
-      </div>
-
-      <!-- Right: Dashboard mockup -->
-      <div class="demo-hero__visual">
-        <div class="mockup-browser">
-          <div class="mockup-bar">
-            <div class="mockup-dots"><span></span><span></span><span></span></div>
-            <div class="mockup-url">orion.lkcentrix.co.za</div>
-          </div>
-          <div class="mockup-screen">
-            <!-- sidebar -->
-            <div class="mockup-sidebar">
-              <div class="ms-logo"></div>
-              <div class="ms-link ms-link--active"></div>
-              <div class="ms-link"></div>
-              <div class="ms-link"></div>
-              <div class="ms-link"></div>
-              <div class="ms-link"></div>
-              <div class="ms-link"></div>
-            </div>
-            <!-- main -->
-            <div class="mockup-main">
-              <div class="mockup-topbar">
-                <div class="mt-title"></div>
-                <div class="mt-avatar"></div>
-              </div>
-              <div class="mockup-stats">
-                <div class="mst-card mst-card--blue">
-                  <span class="mst-num">142</span>
-                  <span class="mst-lbl">Employees</span>
-                </div>
-                <div class="mst-card mst-card--green">
-                  <span class="mst-num">118</span>
-                  <span class="mst-lbl">Present</span>
-                </div>
-                <div class="mst-card mst-card--amber">
-                  <span class="mst-num">12</span>
-                  <span class="mst-lbl">On Leave</span>
-                </div>
-                <div class="mst-card mst-card--red">
-                  <span class="mst-num">7</span>
-                  <span class="mst-lbl">Absent</span>
-                </div>
-              </div>
-              <div class="mockup-bottom">
-                <div class="mockup-chart">
-                  <div class="mc-bar" style="height:55%"></div>
-                  <div class="mc-bar" style="height:75%"></div>
-                  <div class="mc-bar" style="height:45%"></div>
-                  <div class="mc-bar" style="height:90%"></div>
-                  <div class="mc-bar" style="height:60%"></div>
-                  <div class="mc-bar mc-bar--accent" style="height:80%"></div>
-                  <div class="mc-bar mc-bar--accent" style="height:70%"></div>
-                </div>
-                <div class="mockup-list">
-                  <div class="ml-row"><div class="ml-dot ml-dot--green"></div><div class="ml-name"></div><div class="ml-badge ml-badge--green"></div></div>
-                  <div class="ml-row"><div class="ml-dot ml-dot--amber"></div><div class="ml-name"></div><div class="ml-badge ml-badge--amber"></div></div>
-                  <div class="ml-row"><div class="ml-dot ml-dot--blue"></div><div class="ml-name"></div><div class="ml-badge ml-badge--blue"></div></div>
-                  <div class="ml-row"><div class="ml-dot ml-dot--green"></div><div class="ml-name"></div><div class="ml-badge ml-badge--green"></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══ STATS BAR ═══════════════════════════════════════════════════ -->
-  <div class="demo-statsbar">
-    <div class="dsb-item"><strong>15+</strong><span>Modules</span></div>
-    <div class="dsb-sep"></div>
-    <div class="dsb-item"><strong>360°</strong><span>HR Coverage</span></div>
-    <div class="dsb-sep"></div>
-    <div class="dsb-item"><strong>ZAR</strong><span>South African</span></div>
-    <div class="dsb-sep"></div>
-    <div class="dsb-item"><strong>Live</strong><span>Cloud Hosted</span></div>
-  </div>
-
-  <!-- ══ ABOUT: Attendance ═══════════════════════════════════════════ -->
-  <section class="demo-feature" id="about">
-    <div class="demo-feature__inner">
-      <!-- Visual: Attendance grid mockup -->
-      <div class="demo-feature__visual">
-        <div class="mockup-browser mockup-browser--light">
-          <div class="mockup-bar mockup-bar--light">
-            <div class="mockup-dots"><span></span><span></span><span></span></div>
-            <div class="mockup-url mockup-url--light">orion / attendance</div>
-          </div>
-          <div class="mockup-screen mockup-screen--light">
-            <div class="att-header">
-              <div class="att-h-title"></div>
-              <div class="att-h-actions">
-                <div class="att-btn"></div>
-                <div class="att-btn att-btn--primary"></div>
-              </div>
-            </div>
-            <div class="att-table">
-              <div class="att-thead">
-                <div class="att-th att-th--name"></div>
-                <div class="att-th" *ngFor="let d of [1,2,3,4,5,6,7]"></div>
-              </div>
-              <div class="att-row" *ngFor="let r of [1,2,3,4,5]">
-                <div class="att-cell att-cell--name"></div>
-                <div class="att-cell"><div class="att-dot att-dot--green"></div></div>
-                <div class="att-cell"><div class="att-dot att-dot--green"></div></div>
-                <div class="att-cell"><div class="att-dot att-dot--amber"></div></div>
-                <div class="att-cell"><div class="att-dot att-dot--green"></div></div>
-                <div class="att-cell"><div class="att-dot att-dot--red"></div></div>
-                <div class="att-cell"><div class="att-dot att-dot--green"></div></div>
-                <div class="att-cell"><div class="att-dot att-dot--green"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Text -->
-      <div class="demo-feature__text">
-        <div class="demo-feature__eyebrow">Attendance &amp; Leave</div>
-        <h2 class="demo-feature__title">Know exactly who's in — every day</h2>
-        <p class="demo-feature__desc">
-          The weekly attendance grid gives managers a full view of the team at a glance.
-          Mark employees Present, Absent, Late, Half Day or On Leave — and export the full
-          report to Excel or PDF for HR records.
-        </p>
-        <ul class="demo-feature__list">
-          <li><i class="bi bi-check-circle-fill"></i> GPS clock-in from the mobile dashboard</li>
-          <li><i class="bi bi-check-circle-fill"></i> Leave requests with doctor note upload</li>
-          <li><i class="bi bi-check-circle-fill"></i> Auto SA Labour Law leave entitlements</li>
-          <li><i class="bi bi-check-circle-fill"></i> Holiday calendar integration</li>
-        </ul>
-        <a class="demo-btn demo-btn--primary" routerLink="/attendance">See Attendance</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ ABOUT: Payroll (reversed) ════════════════════════════════════ -->
-  <section class="demo-feature demo-feature--reverse demo-feature--grey">
-    <div class="demo-feature__inner">
-      <!-- Text -->
-      <div class="demo-feature__text">
-        <div class="demo-feature__eyebrow">Payroll &amp; Finance</div>
-        <h2 class="demo-feature__title">Process payroll in minutes, not days</h2>
-        <p class="demo-feature__desc">
-          Generate payslips, review salary breakdowns and process payments through the
-          integrated PayFast gateway — all from one screen. Bulk-email every employee their
-          payslip with a single click.
-        </p>
-        <ul class="demo-feature__list">
-          <li><i class="bi bi-check-circle-fill"></i> Payslip PDF generation per employee</li>
-          <li><i class="bi bi-check-circle-fill"></i> Bulk email delivery for the period</li>
-          <li><i class="bi bi-check-circle-fill"></i> Draft → Processed → Paid workflow</li>
-          <li><i class="bi bi-check-circle-fill"></i> PayFast payment gateway built-in</li>
-        </ul>
-        <a class="demo-btn demo-btn--primary" routerLink="/payroll">See Payroll</a>
-      </div>
-      <!-- Visual: Payroll table mockup -->
-      <div class="demo-feature__visual">
-        <div class="mockup-browser mockup-browser--dark">
-          <div class="mockup-bar">
-            <div class="mockup-dots"><span></span><span></span><span></span></div>
-            <div class="mockup-url">orion / payroll</div>
-          </div>
-          <div class="mockup-screen mockup-screen--dark">
-            <div class="pay-header">
-              <div class="pay-title"></div>
-              <div class="pay-actions">
-                <div class="pay-btn"></div>
-                <div class="pay-btn pay-btn--green"></div>
-              </div>
-            </div>
-            <div class="pay-table">
-              <div class="pay-row pay-row--head">
-                <div class="pay-cell pay-cell--lg"></div>
-                <div class="pay-cell"></div>
-                <div class="pay-cell"></div>
-                <div class="pay-cell"></div>
-              </div>
-              <div class="pay-row" *ngFor="let s of ['green','blue','amber','green']">
-                <div class="pay-cell pay-cell--lg"><div class="pay-name"></div></div>
-                <div class="pay-cell"><div class="pay-amt"></div></div>
-                <div class="pay-cell">
-                  <div class="pay-badge" [class]="'pay-badge--' + s"></div>
-                </div>
-                <div class="pay-cell"><div class="pay-actions-sm"><div></div><div></div></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ ABOUT: Kiosk ════════════════════════════════════════════════ -->
-  <section class="demo-feature">
-    <div class="demo-feature__inner">
-      <!-- Visual: Kiosk tablet mockup -->
-      <div class="demo-feature__visual demo-feature__visual--center">
-        <div class="mockup-tablet">
-          <div class="mockup-tablet__screen">
-            <div class="kiosk-m__header">
-              <div class="kiosk-m__logo"></div>
-              <div class="kiosk-m__time">14:32:05</div>
-            </div>
-            <div class="kiosk-m__body">
-              <div class="kiosk-m__card">
-                <div class="kiosk-m__label">Enter Employee Number</div>
-                <div class="kiosk-m__display">LKC <strong>0042</strong></div>
-                <div class="kiosk-m__keypad">
-                  <div class="kiosk-key" *ngFor="let k of [1,2,3,4,5,6,7,8,9,'*',0,'#']">{{k}}</div>
-                </div>
-                <div class="kiosk-m__actions">
-                  <div class="kiosk-m__btn kiosk-m__btn--sec">Cancel</div>
-                  <div class="kiosk-m__btn kiosk-m__btn--pri">Next →</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- Text -->
-      <div class="demo-feature__text">
-        <div class="demo-feature__eyebrow">Self-Service Kiosk</div>
-        <h2 class="demo-feature__title">A clock-in terminal for your office or factory floor</h2>
-        <p class="demo-feature__desc">
-          Mount any tablet on the wall and employees clock in/out using their Employee Number and PIN —
-          no phones, no apps, no passwords to remember. Managers see a live board of who's on break and for how long.
-        </p>
-        <ul class="demo-feature__list">
-          <li><i class="bi bi-check-circle-fill"></i> PIN-secured — no smartphone required</li>
-          <li><i class="bi bi-check-circle-fill"></i> Clock in, out, break 1/2, and lunch</li>
-          <li><i class="bi bi-check-circle-fill"></i> Live break board with overtime alerts</li>
-          <li><i class="bi bi-check-circle-fill"></i> Public URL — no login needed</li>
-        </ul>
-        <a class="demo-btn demo-btn--primary" routerLink="/kiosk/1">Try the Kiosk</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ MODULE GRID ══════════════════════════════════════════════════ -->
-  <section class="demo-modules demo-feature--grey" id="modules">
-    <div class="demo-modules__inner">
-      <div class="demo-section-head">
-        <h2>Everything in one platform</h2>
-        <p>Click any module to explore it live.</p>
-      </div>
-      <div class="demo-grid">
-        <a class="demo-card" *ngFor="let m of modules"
-           [routerLink]="m.route"
-           [style.--card-color]="m.color">
-          <div class="demo-card__header">
-            <div class="demo-card__icon-wrap">
-              <i class="bi demo-card__icon" [ngClass]="m.icon"></i>
-            </div>
-            <div class="demo-card__meta">
-              <span class="demo-card__tag">{{ m.tag }}</span>
-              <span *ngIf="m.badge" class="demo-card__badge">{{ m.badge }}</span>
-            </div>
-          </div>
-          <h3 class="demo-card__name">{{ m.name }}</h3>
-          <p class="demo-card__desc">{{ m.desc }}</p>
-          <ul class="demo-card__features">
-            <li *ngFor="let f of m.features">
-              <i class="bi bi-check2"></i>{{ f }}
-            </li>
-          </ul>
-          <div class="demo-card__cta">Explore <i class="bi bi-arrow-right"></i></div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ WHY CHOOSE ORION ════════════════════════════════════════════ -->
-  <section class="demo-why" id="features">
-    <div class="demo-why__inner">
-      <div class="demo-section-head demo-section-head--light">
-        <h2>Why choose ORION?</h2>
-        <p>Built differently — for businesses that need more than a spreadsheet.</p>
-      </div>
-      <div class="demo-why__grid">
-        <div class="demo-why-card" *ngFor="let w of whyItems">
-          <div class="demo-why-card__icon">
-            <i class="bi" [ngClass]="w.icon"></i>
-          </div>
-          <h3 class="demo-why-card__title">{{ w.title }}</h3>
-          <p class="demo-why-card__desc">{{ w.desc }}</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ HOW IT WORKS ═════════════════════════════════════════════════ -->
-  <section class="demo-how">
-    <div class="demo-how__inner">
-      <div class="demo-section-head">
-        <h2>How it works</h2>
-        <p>Up and running in three simple steps.</p>
-      </div>
-      <div class="demo-how__steps">
-        <div class="demo-step" *ngFor="let s of howSteps; let last = last">
-          <div class="demo-step__num">{{ s.num }}</div>
-          <div class="demo-step__icon"><i class="bi" [ngClass]="s.icon"></i></div>
-          <h3 class="demo-step__title">{{ s.title }}</h3>
-          <p class="demo-step__desc">{{ s.desc }}</p>
-          <div *ngIf="!last" class="demo-step__arrow"><i class="bi bi-arrow-right"></i></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ CTA / CONTACT ════════════════════════════════════════════════ -->
-  <section class="demo-cta" id="contact">
-    <div class="demo-cta__inner">
-      <img src="assets/logo_icon.png" alt="ORION" class="demo-cta__logo">
-      <h2 class="demo-cta__title">Ready to modernise your HR &amp; Payroll?</h2>
-      <p class="demo-cta__desc">Sign in to your ORION workspace or request a personalised walkthrough.</p>
-      <div class="demo-cta__actions">
-        <a class="demo-btn demo-btn--white" routerLink="/">Sign In to ORION</a>
-        <a class="demo-btn demo-btn--outline-white" href="mailto:cypriel17@gmail.com">Request a Demo</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ══ FOOTER ═══════════════════════════════════════════════════════ -->
-  <footer class="demo-footer">
-    <div class="demo-footer__inner">
-      <div class="demo-footer__brand">
+  <!-- ══ HEADER ═══════════════════════════════════════════════════ -->
+  <header class="lp-header">
+    <div class="lp-header__inner">
+      <div class="lp-logo">
         <img src="assets/logo_icon.png" alt="ORION">
         <span>ORION</span>
       </div>
-      <div class="demo-footer__links">
-        <a href="#home">Home</a>
+      <nav class="lp-nav">
         <a href="#about">About</a>
         <a href="#modules">Modules</a>
         <a href="#features">Features</a>
-        <a href="#contact">Contact</a>
-        <a routerLink="/">Sign In</a>
+        <a routerLink="/login" class="lp-btn-signin">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ══ HERO CAROUSEL ════════════════════════════════════════════ -->
+  <section class="lp-hero">
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+      <div class="carousel-inner">
+
+        <!-- Slide 1: Dashboard -->
+        <div class="carousel-item active">
+          <div class="container-fluid px-4 px-lg-5">
+            <div class="row align-items-center">
+              <div class="col-lg-5">
+                <div class="hero-text">
+                  <div class="hero-eyebrow">LKCentrix Solutions &nbsp;·&nbsp; South Africa</div>
+                  <h1 class="hero-title">Your complete<br>HR &amp; Payroll<br>command centre</h1>
+                  <p class="hero-desc">
+                    ORION gives managers a real-time view of the entire workforce —
+                    who's in, who's on leave, and where the money is going.
+                    Built for South African businesses.
+                  </p>
+                  <div class="hero-actions">
+                    <a href="#modules" class="btn-hero-primary">Explore Modules</a>
+                    <a routerLink="/login" class="btn-hero-ghost">Get Access</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-7 hero-visual mt-4 mt-lg-0">
+                <div class="mockup-browser">
+                  <div class="mockup-bar">
+                    <div class="mockup-dots"><span></span><span></span><span></span></div>
+                    <div class="mockup-url">orion.lkcentrix.co.za / dashboard</div>
+                  </div>
+                  <div class="mockup-screen">
+                    <div class="m-sidebar">
+                      <div class="ms-logo"></div>
+                      <div class="ms-link active"></div>
+                      <div class="ms-link"></div><div class="ms-link"></div>
+                      <div class="ms-link"></div><div class="ms-link"></div>
+                      <div class="ms-link"></div>
+                    </div>
+                    <div class="m-main">
+                      <div class="m-topbar">
+                        <div class="m-topbar-title"></div>
+                        <div class="m-topbar-avatar"></div>
+                      </div>
+                      <div class="m-stats">
+                        <div class="m-stat-card blue"><span class="num">142</span><span class="lbl">Employees</span></div>
+                        <div class="m-stat-card green"><span class="num">118</span><span class="lbl">Present</span></div>
+                        <div class="m-stat-card amber"><span class="num">12</span><span class="lbl">On Leave</span></div>
+                        <div class="m-stat-card red"><span class="num">7</span><span class="lbl">Absent</span></div>
+                      </div>
+                      <div class="m-bottom">
+                        <div class="m-chart">
+                          <div class="m-bar" style="height:50%"></div>
+                          <div class="m-bar" style="height:70%"></div>
+                          <div class="m-bar" style="height:40%"></div>
+                          <div class="m-bar a" style="height:88%"></div>
+                          <div class="m-bar" style="height:60%"></div>
+                          <div class="m-bar a" style="height:75%"></div>
+                          <div class="m-bar" style="height:55%"></div>
+                        </div>
+                        <div class="m-list">
+                          <div class="m-list-row"><div class="m-dot green"></div><div class="m-line"></div><div class="m-badge green"></div></div>
+                          <div class="m-list-row"><div class="m-dot amber"></div><div class="m-line"></div><div class="m-badge amber"></div></div>
+                          <div class="m-list-row"><div class="m-dot blue"></div><div class="m-line"></div><div class="m-badge blue"></div></div>
+                          <div class="m-list-row"><div class="m-dot green"></div><div class="m-line"></div><div class="m-badge green"></div></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 2: Kiosk -->
+        <div class="carousel-item">
+          <div class="container-fluid px-4 px-lg-5">
+            <div class="row align-items-center">
+              <div class="col-lg-5">
+                <div class="hero-text">
+                  <div class="hero-eyebrow">Self-Service Clock Terminal</div>
+                  <h1 class="hero-title">Clock in/out<br>from any tablet —<br>no app needed</h1>
+                  <p class="hero-desc">
+                    Mount a tablet on the wall. Employees enter their Employee Number and PIN to
+                    clock in, start breaks and log lunch. Live break board included.
+                  </p>
+                  <div class="hero-actions">
+                    <a href="#modules" class="btn-hero-primary">See Kiosk Module</a>
+                    <a routerLink="/login" class="btn-hero-ghost">Get Access</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-7 hero-visual d-flex justify-content-center mt-4 mt-lg-0">
+                <div class="kiosk-tablet">
+                  <div class="kiosk-screen">
+                    <div class="kiosk-hdr">
+                      <div class="kiosk-hdr-logo"></div>
+                      <div class="kiosk-hdr-time">14:32:05</div>
+                    </div>
+                    <div class="kiosk-body">
+                      <div class="kiosk-card-m">
+                        <div class="kiosk-label">Enter Employee Number</div>
+                        <div class="kiosk-display-m">LKC &nbsp;<strong>0042</strong></div>
+                        <div class="kiosk-keypad-m">
+                          <div class="kiosk-key-m">1</div><div class="kiosk-key-m">2</div><div class="kiosk-key-m">3</div>
+                          <div class="kiosk-key-m">4</div><div class="kiosk-key-m">5</div><div class="kiosk-key-m">6</div>
+                          <div class="kiosk-key-m">7</div><div class="kiosk-key-m">8</div><div class="kiosk-key-m">9</div>
+                          <div class="kiosk-key-m" style="visibility:hidden"></div>
+                          <div class="kiosk-key-m">0</div>
+                          <div class="kiosk-key-m" style="visibility:hidden"></div>
+                        </div>
+                        <div class="kiosk-btns">
+                          <div class="kiosk-btn-sec">Cancel</div>
+                          <div class="kiosk-btn-pri">Next →</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Slide 3: Payroll -->
+        <div class="carousel-item">
+          <div class="container-fluid px-4 px-lg-5">
+            <div class="row align-items-center">
+              <div class="col-lg-5">
+                <div class="hero-text">
+                  <div class="hero-eyebrow">Payroll &amp; Finance</div>
+                  <h1 class="hero-title">Process payroll<br>in minutes —<br>not days</h1>
+                  <p class="hero-desc">
+                    Generate payslips, approve salaries and send payments via PayFast — all from one screen.
+                    Bulk-email every employee their payslip with a single click.
+                  </p>
+                  <div class="hero-actions">
+                    <a href="#modules" class="btn-hero-primary">See Payroll Module</a>
+                    <a routerLink="/login" class="btn-hero-ghost">Get Access</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-7 hero-visual mt-4 mt-lg-0">
+                <div class="mockup-browser">
+                  <div class="mockup-bar">
+                    <div class="mockup-dots"><span></span><span></span><span></span></div>
+                    <div class="mockup-url">orion.lkcentrix.co.za / payroll</div>
+                  </div>
+                  <div class="mockup-screen pay-screen">
+                    <div class="pay-h">
+                      <div class="pay-h-title"></div>
+                      <div class="pay-h-btns">
+                        <div class="pay-h-btn"></div>
+                        <div class="pay-h-btn g">Send All</div>
+                      </div>
+                    </div>
+                    <div class="pay-tbl">
+                      <div class="pay-row-m head"><div></div><div></div><div></div><div></div></div>
+                      <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg g"></div><div class="pay-acts"><div></div><div></div></div></div>
+                      <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg b"></div><div class="pay-acts"><div></div><div></div></div></div>
+                      <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg y"></div><div class="pay-acts"><div></div><div></div></div></div>
+                      <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg g"></div><div class="pay-acts"><div></div><div></div></div></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
-      <div class="demo-footer__copy">
-        © 2026 LKCentrix Solutions · Built by Zwelithini Ngomane
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon"></span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon"></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ══ STATS BAR ════════════════════════════════════════════════ -->
+  <div class="lp-stats-bar">
+    <div class="stat-item"><strong>15+</strong><span>Modules</span></div>
+    <div class="sep"></div>
+    <div class="stat-item"><strong>360°</strong><span>HR Coverage</span></div>
+    <div class="sep"></div>
+    <div class="stat-item"><strong>ZAR</strong><span>South African</span></div>
+    <div class="sep"></div>
+    <div class="stat-item"><strong>Live</strong><span>Cloud Hosted</span></div>
+  </div>
+
+  <!-- ══ ABOUT: Attendance ════════════════════════════════════════ -->
+  <section class="lp-section" id="about">
+    <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+          <div class="mockup-browser">
+            <div class="mockup-bar" style="background:#cbd5e1">
+              <div class="mockup-dots"><span></span><span></span><span></span></div>
+              <div class="mockup-url" style="background:#f8fafc;color:rgba(0,0,0,.3)">orion / attendance</div>
+            </div>
+            <div class="mockup-screen" style="flex-direction:column;background:#f8fafc;">
+              <div class="att-header-m">
+                <div class="att-h-title-m"></div>
+                <div class="att-h-btns">
+                  <div class="att-h-btn"></div>
+                  <div class="att-h-btn pri"></div>
+                </div>
+              </div>
+              <div class="att-grid">
+                <div class="att-row-m" style="margin-bottom:6px;">
+                  <div></div>
+                  <div class="att-head"></div><div class="att-head"></div><div class="att-head"></div>
+                  <div class="att-head"></div><div class="att-head"></div><div class="att-head"></div><div class="att-head"></div>
+                </div>
+                <div class="att-row-m"><div class="att-name-m"></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m amber"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m red"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div></div>
+                <div class="att-row-m"><div class="att-name-m"></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m amber"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m red"></div></div></div>
+                <div class="att-row-m"><div class="att-name-m"></div><div class="att-cell-m"><div class="att-dot-m red"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m amber"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div></div>
+                <div class="att-row-m"><div class="att-name-m"></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m amber"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div></div>
+                <div class="att-row-m"><div class="att-name-m"></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m red"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m green"></div></div><div class="att-cell-m"><div class="att-dot-m amber"></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="lp-section-label">Attendance &amp; Leave</div>
+          <h2 class="lp-section-title">Know exactly who's in — <span>every day</span></h2>
+          <p class="lp-section-sub">The weekly attendance grid gives managers a full picture at a glance. Mark employees Present, Absent, Late, Half Day or On Leave — and export the full report to Excel or PDF.</p>
+          <ul class="lp-feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> GPS clock-in from the mobile dashboard</li>
+            <li><i class="bi bi-check-circle-fill"></i> Leave requests with doctor note upload</li>
+            <li><i class="bi bi-check-circle-fill"></i> Auto SA Labour Law leave entitlements</li>
+            <li><i class="bi bi-check-circle-fill"></i> Public holiday calendar integration</li>
+          </ul>
+          <a href="#modules" class="lp-read-more-btn"><i class="bi bi-arrow-right-circle"></i> Explore Attendance</a>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ══ ABOUT: Payroll (reversed) ════════════════════════════════ -->
+  <section class="lp-section lp-section--alt">
+    <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
+      <div class="row align-items-center g-5">
+        <div class="col-lg-6 order-lg-2">
+          <div class="mockup-browser">
+            <div class="mockup-bar">
+              <div class="mockup-dots"><span></span><span></span><span></span></div>
+              <div class="mockup-url">orion / payroll</div>
+            </div>
+            <div class="mockup-screen pay-screen">
+              <div class="pay-h">
+                <div class="pay-h-title"></div>
+                <div class="pay-h-btns">
+                  <div class="pay-h-btn"></div>
+                  <div class="pay-h-btn g"></div>
+                </div>
+              </div>
+              <div class="pay-tbl">
+                <div class="pay-row-m head"><div></div><div></div><div></div><div></div></div>
+                <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg g"></div><div class="pay-acts"><div></div><div></div></div></div>
+                <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg b"></div><div class="pay-acts"><div></div><div></div></div></div>
+                <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg y"></div><div class="pay-acts"><div></div><div></div></div></div>
+                <div class="pay-row-m"><div class="pay-emp"></div><div class="pay-amt-m"></div><div class="pay-bdg g"></div><div class="pay-acts"><div></div><div></div></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 order-lg-1">
+          <div class="lp-section-label">Payroll &amp; Finance</div>
+          <h2 class="lp-section-title">Process payroll in <span>minutes</span></h2>
+          <p class="lp-section-sub">Generate payslips, review salary breakdowns and process payments through the integrated PayFast gateway — all from one screen. Bulk-email every employee their payslip with a single click.</p>
+          <ul class="lp-feature-list">
+            <li><i class="bi bi-check-circle-fill"></i> Payslip PDF generation per employee</li>
+            <li><i class="bi bi-check-circle-fill"></i> Bulk email delivery by pay period</li>
+            <li><i class="bi bi-check-circle-fill"></i> Draft → Processed → Paid workflow</li>
+            <li><i class="bi bi-check-circle-fill"></i> PayFast payment gateway built-in</li>
+          </ul>
+          <a href="#modules" class="lp-read-more-btn"><i class="bi bi-arrow-right-circle"></i> Explore Payroll</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ WHY CHOOSE ORION ══════════════════════════════════════════ -->
+  <section class="lp-why" id="features">
+    <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
+      <div class="row mb-5">
+        <div class="col-12 text-center">
+          <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>ORION</span>?</h2>
+          <p style="color:rgba(255,255,255,.5);font-size:.95rem;">Built differently — for businesses that need more than a spreadsheet.</p>
+        </div>
+      </div>
+      <div class="row g-4 align-items-start">
+        <div class="col-lg-3">
+          <div class="why-tabs">
+            <button *ngFor="let tab of whyTabs; let i = index"
+                    class="why-tab"
+                    [class.active]="activeWhyTab === i"
+                    (click)="setWhyTab(i)">
+              {{ tab.label }}
+            </button>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <div class="why-content-box">
+            <div class="why-icon"><i class="bi" [class]="whyTabs[activeWhyTab].icon"></i></div>
+            <h3>{{ whyTabs[activeWhyTab].title }}</h3>
+            <p>{{ whyTabs[activeWhyTab].desc }}</p>
+            <ul class="lp-feature-list">
+              <li *ngFor="let f of whyTabs[activeWhyTab].features">
+                <i class="bi bi-check-circle-fill"></i> {{ f }}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ HOW IT WORKS ══════════════════════════════════════════════ -->
+  <section class="lp-how">
+    <div class="container-fluid px-4 px-lg-5" style="max-width:1100px;margin:0 auto;">
+      <div class="row mb-5">
+        <div class="col-12 text-center">
+          <h2 class="lp-section-title">How It <span>Works</span></h2>
+          <p class="lp-section-sub">Up and running in three simple steps.</p>
+        </div>
+      </div>
+      <div class="steps-row">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon"><i class="bi bi-building"></i></div>
+          <h4>Set Up Your Company</h4>
+          <p>Upload your logo, set your brand colour, add departments, designations and South African public holidays.</p>
+        </div>
+        <div class="step-arrow"><i class="bi bi-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon"><i class="bi bi-person-plus-fill"></i></div>
+          <h4>Invite Your Team</h4>
+          <p>Add employees, assign roles, configure leave entitlements and set up payroll salaries — all with role-based access.</p>
+        </div>
+        <div class="step-arrow"><i class="bi bi-arrow-right"></i></div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon"><i class="bi bi-rocket-takeoff"></i></div>
+          <h4>Run HR &amp; Payroll</h4>
+          <p>Process payroll, approve leave, track attendance, manage assets and send invoices — all in one place, every day.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MODULES GRID ══════════════════════════════════════════════ -->
+  <section class="lp-modules" id="modules">
+    <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
+      <div class="text-center mb-5">
+        <h2 class="lp-section-title">Everything in <span>One Platform</span></h2>
+        <p class="lp-section-sub">15 modules, one login — built for South African businesses.</p>
+      </div>
+      <div class="modules-grid">
+        <div class="module-card" style="--c:#3b82f6;--c-light:rgba(59,130,246,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-speedometer2"></i></div><span class="mc-tag">Overview</span></div>
+          <div class="mc-name">Dashboard</div>
+          <div class="mc-desc">Real-time HR command centre with live stats, attendance feed and financial summaries.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Live GPS clock-in/out</li><li><i class="bi bi-check2"></i>Leave &amp; approval summary</li><li><i class="bi bi-check2"></i>Income vs expense trends</li></ul>
+        </div>
+        <div class="module-card" style="--c:#8b5cf6;--c-light:rgba(139,92,246,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-people-fill"></i></div><span class="mc-tag">People</span></div>
+          <div class="mc-name">Employees</div>
+          <div class="mc-desc">Complete employee lifecycle from onboarding to offboarding.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Rich profiles &amp; documents</li><li><i class="bi bi-check2"></i>Status management</li><li><i class="bi bi-check2"></i>Department &amp; designation</li></ul>
+        </div>
+        <div class="module-card" style="--c:#10b981;--c-light:rgba(16,185,129,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-cash-stack"></i></div><span class="mc-tag">Finance</span></div>
+          <div class="mc-name">Payroll</div>
+          <div class="mc-desc">End-to-end payroll processing with built-in PayFast payment gateway.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Payslip PDF generation</li><li><i class="bi bi-check2"></i>Bulk email delivery</li><li><i class="bi bi-check2"></i>PayFast integration</li></ul>
+        </div>
+        <div class="module-card" style="--c:#f59e0b;--c-light:rgba(245,158,11,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-clock-history"></i></div><span class="mc-tag">Time</span></div>
+          <div class="mc-name">Attendance</div>
+          <div class="mc-desc">Daily attendance tracking for every employee with a full audit trail.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Weekly grid view</li><li><i class="bi bi-check2"></i>Mark Present/Absent/Late</li><li><i class="bi bi-check2"></i>Excel &amp; PDF export</li></ul>
+        </div>
+        <div class="module-card" style="--c:#6366f1;--c-light:rgba(99,102,241,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-calendar2-check"></i></div><span class="mc-tag">Time</span></div>
+          <div class="mc-name">Leave Management</div>
+          <div class="mc-desc">Leave request workflow with automatic balance tracking and SA labour law defaults.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>One-click approve/reject</li><li><i class="bi bi-check2"></i>Doctor note upload</li><li><i class="bi bi-check2"></i>Auto SA law defaults</li></ul>
+        </div>
+        <div class="module-card" style="--c:#06b6d4;--c-light:rgba(6,182,212,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-tablet"></i></div><span class="mc-tag">Time</span></div>
+          <div class="mc-name">Kiosk Terminal</div>
+          <div class="mc-desc">PIN-based self-service clock terminal — no phone or login needed.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Clock in/out &amp; breaks</li><li><i class="bi bi-check2"></i>Live break board</li><li><i class="bi bi-check2"></i>Works on any tablet</li></ul>
+        </div>
+        <div class="module-card" style="--c:#ec4899;--c-light:rgba(236,72,153,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-receipt-cutoff"></i></div><span class="mc-tag">Finance</span></div>
+          <div class="mc-name">Expenses</div>
+          <div class="mc-desc">Track every business expense with chart of accounts and vendor management.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>P&amp;L by period</li><li><i class="bi bi-check2"></i>Chart of accounts</li><li><i class="bi bi-check2"></i>Budget vs actual</li></ul>
+        </div>
+        <div class="module-card" style="--c:#14b8a6;--c-light:rgba(20,184,166,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-calculator"></i></div><span class="mc-tag">Finance</span></div>
+          <div class="mc-name">Accounting</div>
+          <div class="mc-desc">Complete accounting suite covering the full AP/AR cycle.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Bills, quotes &amp; credit notes</li><li><i class="bi bi-check2"></i>VAT201 calculator</li><li><i class="bi bi-check2"></i>Banking reconciliation</li></ul>
+        </div>
+        <div class="module-card" style="--c:#f97316;--c-light:rgba(249,115,22,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-file-earmark-text"></i></div><span class="mc-tag">Finance</span></div>
+          <div class="mc-name">Invoices</div>
+          <div class="mc-desc">Create and send professional invoices directly from the platform.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Branded PDF invoices</li><li><i class="bi bi-check2"></i>Email to clients</li><li><i class="bi bi-check2"></i>Paid/Pending/Overdue</li></ul>
+        </div>
+        <div class="module-card" style="--c:#22c55e;--c-light:rgba(34,197,94,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-person-lines-fill"></i></div><span class="mc-tag">Finance</span></div>
+          <div class="mc-name">Clients</div>
+          <div class="mc-desc">Manage your client base with contact history and invoice records.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Client profiles</li><li><i class="bi bi-check2"></i>Invoice history</li><li><i class="bi bi-check2"></i>Linked accounting</li></ul>
+        </div>
+        <div class="module-card" style="--c:#ef4444;--c-light:rgba(239,68,68,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-laptop"></i></div><span class="mc-tag">Ops</span></div>
+          <div class="mc-name">Asset Management</div>
+          <div class="mc-desc">Track every company asset from laptops to vehicles.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Assign to employees</li><li><i class="bi bi-check2"></i>Maintenance tracking</li><li><i class="bi bi-check2"></i>Category &amp; status filters</li></ul>
+        </div>
+        <div class="module-card" style="--c:#a855f7;--c-light:rgba(168,85,247,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-tag-fill"></i></div><span class="mc-tag">Ops</span></div>
+          <div class="mc-name">Expense Claims</div>
+          <div class="mc-desc">Employee claim submission and approval workflow.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Receipt upload</li><li><i class="bi bi-check2"></i>Approve or reject</li><li><i class="bi bi-check2"></i>Claim history</li></ul>
+        </div>
+        <div class="module-card" style="--c:#0ea5e9;--c-light:rgba(14,165,233,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-megaphone-fill"></i></div><span class="mc-tag">Comms</span></div>
+          <div class="mc-name">Announcements</div>
+          <div class="mc-desc">Broadcast company news to specific teams or the whole organisation.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Priority levels</li><li><i class="bi bi-check2"></i>Target by department</li><li><i class="bi bi-check2"></i>Pin &amp; schedule expiry</li></ul>
+        </div>
+        <div class="module-card" style="--c:#64748b;--c-light:rgba(100,116,139,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-bell-fill"></i></div><span class="mc-tag">Comms</span></div>
+          <div class="mc-name">Notifications</div>
+          <div class="mc-desc">In-app notification centre for leave, approvals and system alerts.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Filter by type</li><li><i class="bi bi-check2"></i>Bulk mark as read</li><li><i class="bi bi-check2"></i>Real-time unread badge</li></ul>
+        </div>
+        <div class="module-card" style="--c:#475569;--c-light:rgba(71,85,105,0.1)">
+          <div class="mc-header"><div class="mc-icon"><i class="bi bi-building-gear"></i></div><span class="mc-tag">Platform</span></div>
+          <div class="mc-name">Company Settings</div>
+          <div class="mc-desc">Brand your ORION workspace with your logo and colours.</div>
+          <ul class="mc-features"><li><i class="bi bi-check2"></i>Upload logo</li><li><i class="bi bi-check2"></i>Set brand colour</li><li><i class="bi bi-check2"></i>Live preview</li></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══════════════════════════════════════════════════════ -->
+  <section class="lp-cta">
+    <img src="assets/logo_icon.png" alt="ORION" class="cta-logo" (error)="$event.target.style.display='none'">
+    <h2>Ready to modernise your HR &amp; Payroll?</h2>
+    <p>Join businesses across South Africa that run HR, payroll, attendance, accounting and more — in one platform.</p>
+    <a routerLink="/login" class="btn-cta-white">Sign In to ORION</a>
+    <a href="#modules" class="btn-cta-outline">Explore Modules</a>
+  </section>
+
+  <!-- ══ FOOTER ════════════════════════════════════════════════════ -->
+  <footer class="lp-footer">
+    <div class="footer-inner">
+      <div class="row">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <div class="footer-brand">
+            <img src="assets/logo_icon.png" alt="ORION" (error)="$event.target.style.display='none'">
+            <span>ORION</span>
+          </div>
+          <p class="footer-tagline">HR &amp; Payroll for South Africa — by LKCentrix Solutions.</p>
+        </div>
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <div class="footer-links">
+            <h5>Platform</h5>
+            <a href="#modules">Modules</a>
+            <a href="#features">Why ORION</a>
+            <a href="#about">Features</a>
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="footer-links">
+            <h5>Account</h5>
+            <a routerLink="/login">Sign In</a>
+            <a routerLink="/register">Register</a>
+            <a routerLink="/legal">Legal &amp; Privacy</a>
+          </div>
+        </div>
+      </div>
+      <hr class="footer-divider">
+      <p class="footer-copy">&copy; 2026 LKCentrix Solutions. All rights reserved.</p>
     </div>
   </footer>
 

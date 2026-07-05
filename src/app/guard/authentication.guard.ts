@@ -23,7 +23,7 @@ export class AuthenticationGuard {
     // means a company-scoped token is active; the SUPERADMIN wants to see that company's dashboard).
     const targetUrl = state.url;
     const isImpersonating = !!localStorage.getItem(Key.SUPERADMIN_TOKEN);
-    if ((targetUrl === '/' || targetUrl === '') && !isImpersonating) {
+    if ((targetUrl === '/home' || targetUrl === '') && !isImpersonating) {
       const user = this.getStoredUser();
       if (user?.roleName === 'ROLE_SUPERADMIN') {
         this.router.navigate(['/superadmin/dashboard']);

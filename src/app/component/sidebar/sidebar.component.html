@@ -4,7 +4,7 @@
 
   <!-- Logo Floating Card -->
   <div class="sidebar-logo-card">
-    <a routerLink="/" class="logo-link">
+    <a routerLink="/home" class="logo-link">
       <!-- Show company logo if available, fall back to platform logo -->
       <img *ngIf="companyLogoUrl; else platformLogo"
            [src]="companyLogoUrl"

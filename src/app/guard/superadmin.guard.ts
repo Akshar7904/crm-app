@@ -29,14 +29,14 @@ export class SuperadminGuard {
     // Block during impersonation — the active token is company-scoped so
     // superadmin API calls would fail anyway. Route back to the company dashboard.
     if (localStorage.getItem(Key.SUPERADMIN_TOKEN)) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/home']);
       return false;
     }
     const user = this.getStoredUser();
     if (user?.roleName === 'ROLE_SUPERADMIN') {
       return true;
     }
-    this.router.navigate(['/']);
+    this.router.navigate(['/home']);
     return false;
   }
 

@@ -1,0 +1,47 @@
+@import '../../../../styles/variables';
+
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.expiry-card {
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+
+  &:hover { transform: translateY(-2px); }
+  &.active { border-color: $primary; }
+}
+
+.expiry-count {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.expiry-label {
+  font-size: 0.8rem;
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.expiry-critical .expiry-count { color: #ef4444; }
+.expiry-warn .expiry-count { color: #f59e0b; }
+.expiry-info .expiry-count { color: #3b82f6; }
+
+.cursor-pointer { cursor: pointer; }
+
+.table th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 600;
+}

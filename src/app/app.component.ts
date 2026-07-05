@@ -82,6 +82,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private checkIfPublicRoute(url: string): boolean {
+    if (url === '/' || url === '' || url === '/?') return true;
     return this.PUBLIC_ROUTES.some(route => url.startsWith(route));
   }
 
@@ -134,7 +135,8 @@ export class AppComponent implements OnInit, OnDestroy {
         this.profileLoaded = false;
         if (!this.router.url.includes('/login') &&
           !this.router.url.includes('/register') &&
-          !this.router.url.includes('/verify')) {
+          !this.router.url.includes('/verify') &&
+          this.router.url !== '/') {
           this.router.navigate(['/login']);
         }
         return of(null);

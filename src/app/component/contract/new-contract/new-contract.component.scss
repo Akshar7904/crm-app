@@ -1,0 +1,10 @@
+@import '../../../../styles/variables';
+
+.card-header-line {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  font-size: 0.875rem;
+}

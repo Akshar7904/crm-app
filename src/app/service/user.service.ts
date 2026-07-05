@@ -126,6 +126,15 @@ export class UserService {
     this.http.patch<CustomHttpResponse<Profile>>(`${this.server}/user/update/image`, formData)
       .pipe(catchError(this.handleError));
 
+  getUserFromLocalCache(): any {
+    try {
+      const json = localStorage.getItem('user');
+      return json ? JSON.parse(json) : null;
+    } catch {
+      return null;
+    }
+  }
+
   logOut() {
     localStorage.removeItem(Key.TOKEN);
     localStorage.removeItem(Key.REFRESH_TOKEN);
