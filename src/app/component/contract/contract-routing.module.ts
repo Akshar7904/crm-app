@@ -9,6 +9,7 @@ import { ContractDetailComponent } from './contract-detail/contract-detail.compo
 import { NewContractComponent } from './new-contract/new-contract.component';
 import { ContractApprovalComponent } from './contract-approval/contract-approval.component';
 import { ContractAlertsComponent } from './contract-alerts/contract-alerts.component';
+import { ContractTemplatesComponent } from './contract-templates/contract-templates.component';
 
 const routes: Routes = [
   {
@@ -19,6 +20,7 @@ const routes: Routes = [
       { path: 'new', component: NewContractComponent },
       { path: 'approvals', component: ContractApprovalComponent },
       { path: 'alerts', component: ContractAlertsComponent },
+      { path: 'templates', component: ContractTemplatesComponent },
       { path: ':id', component: ContractDetailComponent },
       { path: ':id/edit', component: NewContractComponent }
     ]

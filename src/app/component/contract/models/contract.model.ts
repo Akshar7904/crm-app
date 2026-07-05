@@ -25,6 +25,70 @@ export interface DocumentMeta {
   fileSize: number;
   uploadedByName: string;
   uploadedAt: string;
+  documentCategory?: string;
+}
+
+export interface ContractObligation {
+  id?: number;
+  title: string;
+  description?: string;
+  obligationType?: string;
+  party?: string;
+  dueDate?: string;
+  recurring?: boolean;
+  recurrenceDays?: number;
+  status?: string;
+  assignedToName?: string;
+  completedAt?: string;
+  createdAt?: string;
+}
+
+export interface ContractMessage {
+  id?: number;
+  senderId?: number;
+  senderName: string;
+  messageType?: 'INTERNAL' | 'EXTERNAL' | 'SYSTEM';
+  subject?: string;
+  body: string;
+  read?: boolean;
+  createdAt?: string;
+}
+
+export interface ContractSignature {
+  id?: number;
+  signerId?: number;
+  signerName: string;
+  signerRole?: string;
+  signedAt?: string;
+  ipAddress?: string;
+}
+
+export interface ContractVersion {
+  id?: number;
+  versionNumber: number;
+  title?: string;
+  content?: string;
+  description?: string;
+  notes?: string;
+  renewalNotes?: string;
+  changeSummary?: string;
+  changedByName?: string;
+  createdAt?: string;
+}
+
+export interface ContractTemplate {
+  id?: number;
+  name: string;
+  contractType: string;
+  description?: string;
+  content?: string;
+  lockedClauses?: string;
+  global?: boolean;
+  active?: boolean;
+  companyId?: number;
+  createdByName?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Contract {
@@ -53,6 +117,13 @@ export interface Contract {
 
   description?: string;
   notes?: string;
+  content?: string;
+  department?: string;
+  renewalNotes?: string;
+  templateId?: number;
+
+  signedByName?: string;
+  signedAt?: string;
 
   ownerId?: number;
   ownerName?: string;
@@ -66,6 +137,10 @@ export interface Contract {
 
   approvalSteps?: ApprovalStep[];
   documents?: DocumentMeta[];
+  obligations?: ContractObligation[];
+  messages?: ContractMessage[];
+  signatures?: ContractSignature[];
+  versions?: ContractVersion[];
 }
 
 export interface ContractStats {
@@ -77,6 +152,9 @@ export interface ContractStats {
   terminated: number;
   renewed: number;
   expiring30Days: number;
+  expiring90Days: number;
+  expiring180Days: number;
+  totalFinancialLiability?: number;
 }
 
 export interface ContractPage {

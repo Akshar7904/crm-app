@@ -10,24 +10,55 @@
 <div *ngIf="loading" class="text-center py-5"><div class="spinner-border text-primary"></div></div>
 
 <div class="row justify-content-center" *ngIf="!loading">
-  <div class="col-lg-9">
-    <div class="falcon-card">
-      <div class="card-header-line">
-        <i class="bi bi-file-earmark-plus me-2 text-primary"></i>Contract Details
-      </div>
-      <div class="card-body p-4">
-        <form [formGroup]="form">
+  <div class="col-lg-10">
+    <form [formGroup]="form">
 
-          <!-- Title + Type -->
+      <!-- Template picker (only when creating) -->
+      <div class="falcon-card mb-3" *ngIf="!isEditMode && templates.length > 0">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-layout-text-window-reverse text-primary"></i>
+            <strong>Start from a Template</strong>
+          </div>
+          <span class="text-muted small">Optional — pre-fill content from an existing template</span>
+        </div>
+        <div class="card-body p-3">
+          <div class="row g-2">
+            <div class="col-md-5">
+              <select class="form-select" (change)="applyTemplate($any($event.target).value)">
+                <option value="">— Select a template —</option>
+                <option *ngFor="let t of templates" [value]="t.id">
+                  {{ t.name }} ({{ t.contractType }})
+                </option>
+              </select>
+            </div>
+            <div class="col-md-7 text-muted small d-flex align-items-center">
+              Selecting a template pre-fills the contract body and description. You can edit all fields after applying.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core details -->
+      <div class="falcon-card mb-3">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-text text-primary"></i>
+            <strong>Contract Details</strong>
+          </div>
+        </div>
+        <div class="card-body p-4">
+
+          <!-- Title + Type + Department -->
           <div class="row g-3 mb-3">
-            <div class="col-md-8">
+            <div class="col-md-6">
               <label class="form-label">Contract Title <span class="text-danger">*</span></label>
               <input type="text" class="form-control" formControlName="title"
                      placeholder="e.g. IT Support Services Agreement"
                      [class.is-invalid]="isInvalid('title')">
               <div class="invalid-feedback">Title is required (min 3 characters)</div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label class="form-label">Contract Type <span class="text-danger">*</span></label>
               <select class="form-select" formControlName="contractType" [class.is-invalid]="isInvalid('contractType')">
                 <option value="">Select type...</option>
@@ -35,11 +66,18 @@
               </select>
               <div class="invalid-feedback">Contract type is required</div>
             </div>
+            <div class="col-md-3">
+              <label class="form-label">Department</label>
+              <select class="form-select" formControlName="department">
+                <option value="">Select department...</option>
+                <option *ngFor="let d of departments" [value]="d">{{ d }}</option>
+              </select>
+            </div>
           </div>
 
-          <!-- Counterparty -->
+          <!-- Counterparty + Owner -->
           <div class="row g-3 mb-3">
-            <div class="col-md-6">
+            <div class="col-md-5">
               <label class="form-label">Counterparty Name</label>
               <input type="text" class="form-control" formControlName="counterpartyName"
                      placeholder="Vendor, client, or party name">
@@ -50,14 +88,14 @@
                 <option *ngFor="let ct of counterpartyTypes" [value]="ct.value">{{ ct.label }}</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <label class="form-label">Contract Owner</label>
               <input type="text" class="form-control" formControlName="ownerName"
                      placeholder="Responsible person">
             </div>
           </div>
 
-          <!-- Value + Currency -->
+          <!-- Value + Currency + Notice + AutoRenew -->
           <div class="row g-3 mb-3">
             <div class="col-md-4">
               <label class="form-label">Contract Value</label>
@@ -101,29 +139,55 @@
 
           <!-- Description -->
           <div class="mb-3">
-            <label class="form-label">Description</label>
+            <label class="form-label">Description / Scope</label>
             <textarea class="form-control" formControlName="description" rows="3"
                       placeholder="Describe the scope and purpose of this contract..."></textarea>
           </div>
 
-          <!-- Notes -->
-          <div class="mb-4">
+          <!-- Internal Notes -->
+          <div class="mb-3">
             <label class="form-label">Internal Notes</label>
             <textarea class="form-control" formControlName="notes" rows="2"
                       placeholder="Internal notes (not visible to counterparty)..."></textarea>
           </div>
 
-          <!-- Actions -->
-          <div class="d-flex gap-2 justify-content-end">
-            <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
-            <button type="button" class="btn btn-primary" (click)="save()" [disabled]="submitting">
-              <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
-              {{ isEditMode ? 'Update Contract' : 'Create Contract' }}
-            </button>
-          </div>
-
-        </form>
+        </div>
       </div>
-    </div>
+
+      <!-- Contract Body (authoring) -->
+      <div class="falcon-card mb-3">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-file-richtext text-primary"></i>
+            <strong>Contract Body</strong>
+          </div>
+          <span class="text-muted small">Full contract text — clauses, terms & conditions</span>
+        </div>
+        <div class="card-body p-4">
+          <div class="mb-0">
+            <label class="form-label d-flex align-items-center gap-2">
+              Contract Content
+              <span class="badge bg-light text-secondary border" style="font-size:11px; font-weight:400;">
+                <i class="bi bi-lock-fill me-1"></i>Locked clauses from templates are preserved
+              </span>
+            </label>
+            <textarea class="form-control contract-content-editor" formControlName="content" rows="18"
+                      placeholder="Enter the full contract text here. Include all clauses, terms and conditions, obligations of each party, payment terms, dispute resolution, and termination clauses...
+
+You may reference locked clauses from the template above."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2 justify-content-end mb-4">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()" [disabled]="submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isEditMode ? 'Update Contract' : 'Create Contract' }}
+        </button>
+      </div>
+
+    </form>
   </div>
 </div>

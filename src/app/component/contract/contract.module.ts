@@ -11,6 +11,7 @@ import { ContractDetailComponent } from './contract-detail/contract-detail.compo
 import { NewContractComponent } from './new-contract/new-contract.component';
 import { ContractApprovalComponent } from './contract-approval/contract-approval.component';
 import { ContractAlertsComponent } from './contract-alerts/contract-alerts.component';
+import { ContractTemplatesComponent } from './contract-templates/contract-templates.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +19,8 @@ import { ContractAlertsComponent } from './contract-alerts/contract-alerts.compo
     ContractDetailComponent,
     NewContractComponent,
     ContractApprovalComponent,
-    ContractAlertsComponent
+    ContractAlertsComponent,
+    ContractTemplatesComponent
   ],
   imports: [
     CommonModule,

@@ -8,13 +8,15 @@ import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import {
   Contract, ContractStats, ContractPage, ContractEnumItem,
-  ApprovalStep, DocumentMeta
+  ApprovalStep, DocumentMeta, ContractObligation, ContractMessage,
+  ContractSignature, ContractVersion, ContractTemplate
 } from '../models/contract.model';
 
 @Injectable({ providedIn: 'root' })
 export class ContractService {
 
   private readonly base = `${environment.apiUrl}/api/v1/contracts`;
+  private readonly tmplBase = `${environment.apiUrl}/api/v1/contracts/templates`;
 
   constructor(private http: HttpClient) {}
 
@@ -60,8 +62,10 @@ export class ContractService {
     return this.http.post<any>(this.base, contract).pipe(map(r => r.data.contract));
   }
 
-  update(id: number, contract: Partial<Contract>): Observable<Contract> {
-    return this.http.put<any>(`${this.base}/${id}`, contract).pipe(map(r => r.data.contract));
+  update(id: number, contract: Partial<Contract>, changeSummary?: string): Observable<Contract> {
+    let params = new HttpParams();
+    if (changeSummary) params = params.set('changeSummary', changeSummary);
+    return this.http.put<any>(`${this.base}/${id}`, contract, { params }).pipe(map(r => r.data.contract));
   }
 
   delete(id: number): Observable<void> {
@@ -83,6 +87,11 @@ export class ContractService {
 
   renew(id: number, data: Partial<Contract>): Observable<Contract> {
     return this.http.post<any>(`${this.base}/${id}/renew`, data).pipe(map(r => r.data.contract));
+  }
+
+  sign(id: number, signerRole?: string): Observable<Contract> {
+    return this.http.post<any>(`${this.base}/${id}/sign`, { signerRole: signerRole || '' })
+      .pipe(map(r => r.data.contract));
   }
 
   // ── Approval ─────────────────────────────────────────────────────────────
@@ -113,5 +122,75 @@ export class ContractService {
 
   deleteDocument(contractId: number, docId: number): Observable<void> {
     return this.http.delete<any>(`${this.base}/${contractId}/documents/${docId}`);
+  }
+
+  // ── Versions ─────────────────────────────────────────────────────────────
+  getVersions(contractId: number): Observable<ContractVersion[]> {
+    return this.http.get<any>(`${this.base}/${contractId}/versions`).pipe(map(r => r.data.versions));
+  }
+
+  restoreVersion(contractId: number, versionId: number): Observable<Contract> {
+    return this.http.post<any>(`${this.base}/${contractId}/versions/${versionId}/restore`, {})
+      .pipe(map(r => r.data.contract));
+  }
+
+  // ── Obligations ──────────────────────────────────────────────────────────
+  getObligations(contractId: number): Observable<ContractObligation[]> {
+    return this.http.get<any>(`${this.base}/${contractId}/obligations`).pipe(map(r => r.data.obligations));
+  }
+
+  addObligation(contractId: number, obligation: Partial<ContractObligation>): Observable<ContractObligation> {
+    return this.http.post<any>(`${this.base}/${contractId}/obligations`, obligation)
+      .pipe(map(r => r.data.obligation));
+  }
+
+  completeObligation(contractId: number, obligationId: number): Observable<ContractObligation> {
+    return this.http.post<any>(`${this.base}/${contractId}/obligations/${obligationId}/complete`, {})
+      .pipe(map(r => r.data.obligation));
+  }
+
+  deleteObligation(contractId: number, obligationId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${contractId}/obligations/${obligationId}`);
+  }
+
+  // ── Messages ─────────────────────────────────────────────────────────────
+  getMessages(contractId: number): Observable<ContractMessage[]> {
+    return this.http.get<any>(`${this.base}/${contractId}/messages`).pipe(map(r => r.data.messages));
+  }
+
+  sendMessage(contractId: number, message: Partial<ContractMessage>): Observable<ContractMessage> {
+    return this.http.post<any>(`${this.base}/${contractId}/messages`, message).pipe(map(r => r.data.message));
+  }
+
+  markMessageRead(contractId: number, messageId: number): Observable<void> {
+    return this.http.put<any>(`${this.base}/${contractId}/messages/${messageId}/read`, {});
+  }
+
+  // ── Signatures ────────────────────────────────────────────────────────────
+  getSignatures(contractId: number): Observable<ContractSignature[]> {
+    return this.http.get<any>(`${this.base}/${contractId}/signatures`).pipe(map(r => r.data.signatures));
+  }
+
+  // ── Templates ────────────────────────────────────────────────────────────
+  getTemplates(contractType?: string): Observable<ContractTemplate[]> {
+    let params = new HttpParams();
+    if (contractType) params = params.set('contractType', contractType);
+    return this.http.get<any>(this.tmplBase, { params }).pipe(map(r => r.data.templates));
+  }
+
+  getTemplate(id: number): Observable<ContractTemplate> {
+    return this.http.get<any>(`${this.tmplBase}/${id}`).pipe(map(r => r.data.template));
+  }
+
+  createTemplate(template: Partial<ContractTemplate>): Observable<ContractTemplate> {
+    return this.http.post<any>(this.tmplBase, template).pipe(map(r => r.data.template));
+  }
+
+  updateTemplate(id: number, template: Partial<ContractTemplate>): Observable<ContractTemplate> {
+    return this.http.put<any>(`${this.tmplBase}/${id}`, template).pipe(map(r => r.data.template));
+  }
+
+  deleteTemplate(id: number): Observable<void> {
+    return this.http.delete<any>(`${this.tmplBase}/${id}`);
   }
 }

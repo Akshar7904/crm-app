@@ -9,27 +9,36 @@
       {{ contract?.statusDisplay }}
     </span>
   </div>
-  <p class="banner-subtitle" *ngIf="contract?.contractNumber">Ref: {{ contract?.contractNumber }}</p>
+  <p class="banner-subtitle" *ngIf="contract?.contractNumber">
+    Ref: {{ contract?.contractNumber }}
+    <span *ngIf="contract?.department" class="ms-3 text-white-50">
+      <i class="bi bi-building me-1"></i>{{ contract.department }}
+    </span>
+  </p>
 
-  <div class="banner-actions" *ngIf="isAdmin && contract">
+  <div class="banner-actions" *ngIf="contract">
     <button class="btn btn-outline-light btn-sm" (click)="goToEdit()"
-            *ngIf="contract.status === 'DRAFT' || contract.status === 'PENDING_APPROVAL'">
+            *ngIf="isAdmin && (contract.status === 'DRAFT' || contract.status === 'PENDING_APPROVAL')">
       <i class="bi bi-pencil me-1"></i>Edit
     </button>
     <button class="btn btn-outline-light btn-sm" (click)="submitForApproval()"
-            *ngIf="contract.status === 'DRAFT'">
+            *ngIf="isAdmin && contract.status === 'DRAFT'">
       <i class="bi bi-send me-1"></i>Submit for Approval
     </button>
     <button class="btn btn-success btn-sm" (click)="activateContract()"
-            *ngIf="contract.status === 'PENDING_APPROVAL' || contract.status === 'DRAFT'">
+            *ngIf="isAdmin && (contract.status === 'PENDING_APPROVAL' || contract.status === 'DRAFT')">
       <i class="bi bi-check-circle me-1"></i>Activate
     </button>
+    <button class="btn btn-outline-light btn-sm" (click)="showSignModal = true"
+            *ngIf="contract.status === 'ACTIVE' && !alreadySigned()">
+      <i class="bi bi-pen me-1"></i>Sign
+    </button>
     <button class="btn btn-outline-light btn-sm" (click)="showRenewModal = true"
-            *ngIf="contract.status === 'ACTIVE' || contract.status === 'EXPIRING_SOON' || contract.status === 'EXPIRED'">
+            *ngIf="isAdmin && (contract.status === 'ACTIVE' || contract.status === 'EXPIRING_SOON' || contract.status === 'EXPIRED')">
       <i class="bi bi-arrow-repeat me-1"></i>Renew
     </button>
     <button class="btn btn-danger btn-sm" (click)="showTerminateModal = true"
-            *ngIf="contract.status === 'ACTIVE' || contract.status === 'EXPIRING_SOON'">
+            *ngIf="isAdmin && (contract.status === 'ACTIVE' || contract.status === 'EXPIRING_SOON')">
       <i class="bi bi-x-circle me-1"></i>Terminate
     </button>
   </div>
@@ -39,104 +48,421 @@
   <div class="spinner-border text-primary"></div>
 </div>
 
-<div *ngIf="!loading && contract" class="row g-4">
+<ng-container *ngIf="!loading && contract">
 
-  <!-- LEFT: Contract Info + Approval + Docs -->
-  <div class="col-lg-8">
+  <!-- Tab Nav -->
+  <div class="detail-tab-nav mb-4">
+    <button class="detail-tab" [class.active]="activeTab === 'overview'" (click)="setTab('overview')">
+      <i class="bi bi-info-circle me-1"></i>Overview
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'content'" (click)="setTab('content')">
+      <i class="bi bi-file-richtext me-1"></i>Content
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'obligations'" (click)="setTab('obligations')">
+      <i class="bi bi-check2-square me-1"></i>Obligations
+      <span class="tab-badge" *ngIf="tabCounts.obligations">{{ tabCounts.obligations }}</span>
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'messages'" (click)="setTab('messages')">
+      <i class="bi bi-chat-dots me-1"></i>Messages
+      <span class="tab-badge tab-badge-warn" *ngIf="tabCounts.messages">{{ tabCounts.messages }}</span>
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'documents'" (click)="setTab('documents')">
+      <i class="bi bi-paperclip me-1"></i>Documents
+      <span class="tab-badge" *ngIf="tabCounts.documents">{{ tabCounts.documents }}</span>
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'approvals'" (click)="setTab('approvals')">
+      <i class="bi bi-diagram-3 me-1"></i>Approvals
+      <span class="tab-badge" *ngIf="tabCounts.approvals">{{ tabCounts.approvals }}</span>
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'signatures'" (click)="setTab('signatures')">
+      <i class="bi bi-pen me-1"></i>Signatures
+      <span class="tab-badge" *ngIf="tabCounts.signatures">{{ tabCounts.signatures }}</span>
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'versions'" (click)="setTab('versions')">
+      <i class="bi bi-clock-history me-1"></i>History
+      <span class="tab-badge" *ngIf="tabCounts.versions">{{ tabCounts.versions }}</span>
+    </button>
+  </div>
 
-    <!-- Contract Details Card -->
-    <div class="falcon-card mb-4">
-      <div class="card-header-line">
-        <i class="bi bi-file-earmark-text me-2 text-primary"></i>Contract Details
-      </div>
-      <div class="card-body p-4">
-        <div class="row g-3">
-          <div class="col-6 col-md-4">
-            <div class="info-label">Type</div>
-            <div class="info-value">{{ contract.contractTypeDisplay }}</div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">Contract Value</div>
-            <div class="info-value fw-semibold text-primary">{{ formatCurrency(contract.value) }}</div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">Currency</div>
-            <div class="info-value">{{ contract.currency || 'ZAR' }}</div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">Start Date</div>
-            <div class="info-value">{{ contract.startDate || '—' }}</div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">End Date</div>
-            <div class="info-value" [class.text-danger]="contract.daysUntilExpiry != null && contract.daysUntilExpiry <= 30">
-              {{ contract.endDate || '—' }}
-            </div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">Days Remaining</div>
-            <div class="info-value"
-                 [class.text-danger]="contract.daysUntilExpiry != null && contract.daysUntilExpiry <= 30"
-                 [class.text-warning]="contract.daysUntilExpiry != null && contract.daysUntilExpiry > 30 && contract.daysUntilExpiry <= 90"
-                 [class.text-success]="contract.daysUntilExpiry != null && contract.daysUntilExpiry > 90">
-              {{ contract.daysUntilExpiry != null ? (contract.daysUntilExpiry + ' days') : '—' }}
-            </div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">Notice Period</div>
-            <div class="info-value">{{ contract.noticePeriodDays || 30 }} days</div>
-          </div>
-          <div class="col-6 col-md-4">
-            <div class="info-label">Auto Renew</div>
-            <div class="info-value">
-              <span class="badge" [ngClass]="contract.autoRenew ? 'badge-soft-success' : 'badge-soft-secondary'">
-                {{ contract.autoRenew ? 'Yes' : 'No' }}
-              </span>
-            </div>
-          </div>
-          <div class="col-6 col-md-4" *ngIf="contract.renewalDate">
-            <div class="info-label">Renewal Date</div>
-            <div class="info-value">{{ contract.renewalDate }}</div>
+  <!-- ══ OVERVIEW TAB ══ -->
+  <div *ngIf="activeTab === 'overview'" class="row g-4">
+    <div class="col-lg-8">
+      <div class="falcon-card mb-4">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-file-earmark-text text-primary"></i><strong>Contract Details</strong>
           </div>
         </div>
-
-        <div class="divider my-3"></div>
-
-        <div class="row g-3">
-          <div class="col-12 col-md-6">
-            <div class="info-label">Counterparty</div>
-            <div class="info-value">{{ contract.counterpartyName || '—' }}</div>
-            <small class="text-muted" *ngIf="contract.counterpartyType">{{ contract.counterpartyType }}</small>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-6 col-md-3">
+              <div class="info-label">Type</div>
+              <div class="info-value">{{ contract.contractTypeDisplay }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Department</div>
+              <div class="info-value">{{ contract.department || '—' }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Contract Value</div>
+              <div class="info-value fw-semibold text-primary">{{ formatCurrency(contract.value) }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Currency</div>
+              <div class="info-value">{{ contract.currency || 'ZAR' }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Start Date</div>
+              <div class="info-value">{{ contract.startDate || '—' }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">End Date</div>
+              <div class="info-value" [class.text-danger]="contract.daysUntilExpiry != null && contract.daysUntilExpiry <= 30">
+                {{ contract.endDate || '—' }}
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Days Remaining</div>
+              <div class="info-value fw-semibold"
+                   [class.text-danger]="contract.daysUntilExpiry != null && contract.daysUntilExpiry <= 30"
+                   [class.text-warning]="contract.daysUntilExpiry != null && contract.daysUntilExpiry > 30 && contract.daysUntilExpiry <= 180"
+                   [class.text-success]="contract.daysUntilExpiry != null && contract.daysUntilExpiry > 180">
+                {{ contract.daysUntilExpiry != null ? (contract.daysUntilExpiry + ' days') : '—' }}
+              </div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Notice Period</div>
+              <div class="info-value">{{ contract.noticePeriodDays || 30 }} days</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Auto Renew</div>
+              <div class="info-value">
+                <span class="badge" [ngClass]="contract.autoRenew ? 'badge-soft-success' : 'badge-soft-secondary'">
+                  {{ contract.autoRenew ? 'Yes' : 'No' }}
+                </span>
+              </div>
+            </div>
+            <div class="col-6 col-md-3" *ngIf="contract.renewalDate">
+              <div class="info-label">Renewal Date</div>
+              <div class="info-value">{{ contract.renewalDate }}</div>
+            </div>
           </div>
-          <div class="col-12 col-md-6">
-            <div class="info-label">Contract Owner</div>
-            <div class="info-value">{{ contract.ownerName || '—' }}</div>
-          </div>
-        </div>
 
-        <div class="mt-3" *ngIf="contract.description">
-          <div class="info-label">Description</div>
-          <div class="info-value">{{ contract.description }}</div>
-        </div>
-        <div class="mt-3" *ngIf="contract.notes">
-          <div class="info-label">Notes</div>
-          <div class="info-value text-muted">{{ contract.notes }}</div>
+          <hr class="my-3">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="info-label">Counterparty</div>
+              <div class="info-value fw-semibold">{{ contract.counterpartyName || '—' }}</div>
+              <small class="text-muted" *ngIf="contract.counterpartyType">{{ contract.counterpartyType }}</small>
+            </div>
+            <div class="col-md-4">
+              <div class="info-label">Contract Owner</div>
+              <div class="info-value">{{ contract.ownerName || '—' }}</div>
+            </div>
+            <div class="col-md-4" *ngIf="contract.signedByName">
+              <div class="info-label">Signed By</div>
+              <div class="info-value">
+                <i class="bi bi-pen-fill text-success me-1"></i>{{ contract.signedByName }}
+                <div class="text-muted" style="font-size:0.75rem">{{ contract.signedAt | date:'dd MMM yyyy HH:mm' }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3" *ngIf="contract.description">
+            <div class="info-label">Description / Scope</div>
+            <div class="info-value">{{ contract.description }}</div>
+          </div>
+          <div class="mt-3" *ngIf="contract.notes">
+            <div class="info-label">Internal Notes</div>
+            <div class="info-value text-muted">{{ contract.notes }}</div>
+          </div>
+          <div class="mt-3" *ngIf="contract.renewalNotes">
+            <div class="info-label">Renewal Notes</div>
+            <div class="info-value"><i class="bi bi-arrow-repeat text-success me-1"></i>{{ contract.renewalNotes }}</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Approval Steps Card -->
-    <div class="falcon-card mb-4">
-      <div class="card-header-line d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-check2-all me-2 text-primary"></i>Approval Workflow</span>
-        <button class="btn btn-sm btn-outline-primary" *ngIf="isAdmin"
-                (click)="showAddStepModal = true">
+    <div class="col-lg-4">
+      <div class="falcon-card mb-3">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle text-primary"></i><strong>Summary</strong>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          <div class="summary-row"><span class="summary-label">Ref #</span><span class="summary-value">{{ contract.contractNumber }}</span></div>
+          <div class="summary-row"><span class="summary-label">Status</span>
+            <span class="badge" [ngClass]="getStatusClass(contract.status)">{{ contract.statusDisplay }}</span>
+          </div>
+          <div class="summary-row"><span class="summary-label">Type</span><span class="summary-value">{{ contract.contractTypeDisplay }}</span></div>
+          <div class="summary-row"><span class="summary-label">Value</span><span class="summary-value fw-semibold text-primary">{{ formatCurrency(contract.value) }}</span></div>
+          <div class="summary-row"><span class="summary-label">Created by</span><span class="summary-value">{{ contract.createdByName }}</span></div>
+          <div class="summary-row"><span class="summary-label">Created</span><span class="summary-value">{{ contract.createdAt | date:'dd MMM yyyy' }}</span></div>
+          <div class="summary-row" *ngIf="contract.updatedByName">
+            <span class="summary-label">Last updated</span><span class="summary-value">{{ contract.updatedByName }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="falcon-card">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-clock-history text-primary"></i><strong>Lifecycle</strong>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          <div class="lifecycle-item lc-done"><i class="bi bi-circle-fill"></i><span>Draft Created</span></div>
+          <div class="lifecycle-item" [class.lc-done]="['PENDING_APPROVAL','ACTIVE','EXPIRING_SOON','EXPIRED','TERMINATED','RENEWED'].includes(contract.status || '')">
+            <i class="bi bi-circle-fill"></i><span>Submitted for Approval</span>
+          </div>
+          <div class="lifecycle-item" [class.lc-done]="['ACTIVE','EXPIRING_SOON','EXPIRED','RENEWED'].includes(contract.status || '')"
+                                      [class.lc-error]="contract.status === 'TERMINATED'">
+            <i class="bi bi-circle-fill"></i><span>Active</span>
+          </div>
+          <div class="lifecycle-item" [class.lc-warn]="contract.status === 'EXPIRING_SOON'">
+            <i class="bi bi-circle-fill"></i><span>Expiring Soon</span>
+          </div>
+          <div class="lifecycle-item" [class.lc-done]="contract.status === 'RENEWED'">
+            <i class="bi bi-circle-fill"></i><span>Renewed</span>
+          </div>
+          <div class="lifecycle-item" [class.lc-error]="contract.status === 'EXPIRED' || contract.status === 'TERMINATED'">
+            <i class="bi bi-circle-fill"></i><span>Expired / Terminated</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ CONTENT TAB ══ -->
+  <div *ngIf="activeTab === 'content'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-file-richtext text-primary"></i><strong>Contract Body</strong>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <span *ngIf="contract.templateId" class="badge badge-soft-info">
+            <i class="bi bi-layout-text-window-reverse me-1"></i>Template-based
+          </span>
+          <span *ngIf="contract.signedByName" class="badge badge-soft-success">
+            <i class="bi bi-pen-fill me-1"></i>Signed
+          </span>
+        </div>
+      </div>
+      <div class="card-body p-4">
+        <div *ngIf="contract.content; else noContent" class="contract-body-view">
+          <pre class="contract-body-text">{{ contract.content }}</pre>
+        </div>
+        <ng-template #noContent>
+          <div class="empty-state-cell py-5">
+            <i class="bi bi-file-earmark-x d-block mb-2 fs-2 text-muted"></i>
+            <div class="text-muted">No contract body authored yet.</div>
+            <button class="btn btn-sm btn-outline-primary mt-3" (click)="goToEdit()"
+                    *ngIf="isAdmin && (contract.status === 'DRAFT' || contract.status === 'PENDING_APPROVAL')">
+              <i class="bi bi-pencil me-1"></i>Edit to add content
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ OBLIGATIONS TAB ══ -->
+  <div *ngIf="activeTab === 'obligations'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-check2-square text-primary"></i><strong>Obligations &amp; Milestones</strong>
+        </div>
+        <button class="btn btn-sm btn-primary" *ngIf="isAdmin" (click)="showObligationModal = true">
+          <i class="bi bi-plus me-1"></i>Add Obligation
+        </button>
+      </div>
+      <div class="card-body p-4">
+        <div *ngIf="!contract.obligations?.length" class="empty-state-cell py-5">
+          <i class="bi bi-check2-square d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No obligations tracked for this contract</div>
+        </div>
+
+        <div class="obligations-list" *ngIf="contract.obligations?.length">
+          <div *ngFor="let o of contract.obligations" class="obligation-item"
+               [class.obligation-overdue]="o.status === 'OVERDUE'">
+            <div class="obligation-status-bar"
+                 [class.bar-done]="o.status === 'COMPLETED'"
+                 [class.bar-overdue]="o.status === 'OVERDUE'"></div>
+            <div class="obligation-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-semibold">{{ o.title }}</div>
+                  <div class="text-muted small" *ngIf="o.description">{{ o.description }}</div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge" [ngClass]="getObligationClass(o.status)">{{ o.status }}</span>
+                  <span class="badge badge-soft-secondary">{{ o.party === 'OUR_COMPANY' ? 'Us' : 'Counterparty' }}</span>
+                </div>
+              </div>
+              <div class="d-flex align-items-center gap-3 mt-2 flex-wrap">
+                <small *ngIf="o.dueDate" class="text-muted">
+                  <i class="bi bi-calendar3 me-1"></i>Due: {{ o.dueDate }}
+                </small>
+                <small *ngIf="o.assignedToName" class="text-muted">
+                  <i class="bi bi-person me-1"></i>{{ o.assignedToName }}
+                </small>
+                <small *ngIf="o.recurring" class="text-muted">
+                  <i class="bi bi-arrow-repeat me-1"></i>Recurring every {{ o.recurrenceDays }}d
+                </small>
+                <small *ngIf="o.completedAt" class="text-success">
+                  <i class="bi bi-check-circle-fill me-1"></i>Completed {{ o.completedAt | date:'dd MMM yyyy' }}
+                </small>
+              </div>
+            </div>
+            <div class="obligation-actions" *ngIf="isAdmin">
+              <button class="btn-action btn-action-view" *ngIf="o.status !== 'COMPLETED'"
+                      (click)="completeObligation(o)" title="Mark complete">
+                <i class="bi bi-check-lg"></i>
+              </button>
+              <button class="btn-action btn-action-delete" (click)="deleteObligation(o)" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MESSAGES TAB ══ -->
+  <div *ngIf="activeTab === 'messages'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-chat-dots text-primary"></i><strong>Contract Messaging</strong>
+        </div>
+        <button class="btn btn-sm btn-primary" (click)="showMessageModal = true">
+          <i class="bi bi-plus me-1"></i>New Message
+        </button>
+      </div>
+      <div class="card-body p-4">
+        <div *ngIf="!contract.messages?.length" class="empty-state-cell py-5">
+          <i class="bi bi-chat-square d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No messages on this contract yet</div>
+        </div>
+
+        <div class="messages-thread" *ngIf="contract.messages?.length">
+          <div *ngFor="let m of contract.messages" class="message-item"
+               [class.message-unread]="!m.read"
+               [class.message-system]="m.messageType === 'SYSTEM'">
+            <div class="message-avatar">
+              <i class="bi fs-4" [ngClass]="m.messageType === 'SYSTEM' ? 'bi-gear-fill text-secondary' : 'bi-person-circle text-muted'"></i>
+            </div>
+            <div class="message-content">
+              <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="fw-semibold">{{ m.senderName }}</span>
+                <span class="badge" [ngClass]="getMessageTypeClass(m.messageType)">{{ m.messageType }}</span>
+                <span class="text-muted small ms-auto">{{ m.createdAt | date:'dd MMM yyyy HH:mm' }}</span>
+                <span *ngIf="!m.read" class="badge bg-warning text-dark" style="font-size:0.65rem">NEW</span>
+              </div>
+              <div *ngIf="m.subject" class="fw-semibold small mb-1">{{ m.subject }}</div>
+              <div class="message-body">{{ m.body }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline compose -->
+        <div class="compose-area mt-4">
+          <div class="compose-header text-muted small mb-2"><i class="bi bi-reply me-1"></i>Quick reply</div>
+          <form [formGroup]="messageForm">
+            <div class="d-flex gap-2 mb-2">
+              <select class="form-select form-select-sm" formControlName="messageType" style="max-width:160px">
+                <option value="INTERNAL">Internal</option>
+                <option value="EXTERNAL">External</option>
+              </select>
+              <input type="text" class="form-control form-control-sm" formControlName="subject"
+                     placeholder="Subject (optional)">
+            </div>
+            <div class="d-flex gap-2">
+              <textarea class="form-control" formControlName="body" rows="2"
+                        placeholder="Type your message..."></textarea>
+              <button class="btn btn-primary px-3" (click)="sendMessage()" [disabled]="messageForm.invalid">
+                <i class="bi bi-send"></i>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DOCUMENTS TAB ══ -->
+  <div *ngIf="activeTab === 'documents'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-paperclip text-primary"></i><strong>Documents</strong>
+        </div>
+        <span class="badge badge-soft-secondary">{{ tabCounts.documents }} file(s)</span>
+      </div>
+      <div class="card-body p-4">
+        <div class="upload-zone mb-4" *ngIf="isAdmin">
+          <input type="file" #fileInput class="d-none"
+                 (change)="onFileSelected($event)"
+                 accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg">
+          <div *ngIf="!selectedFile" class="upload-placeholder" (click)="fileInput.click()">
+            <i class="bi bi-cloud-upload fs-3 d-block mb-1"></i>
+            <span>Click to upload document</span>
+            <small class="d-block text-muted mt-1">PDF, DOC, DOCX, XLS, XLSX, images</small>
+          </div>
+          <div *ngIf="selectedFile" class="d-flex align-items-center gap-3 p-3">
+            <i class="bi bi-file-earmark fs-4 text-primary"></i>
+            <span>{{ selectedFile.name }}</span>
+            <button class="btn btn-sm btn-primary ms-auto" (click)="uploadDocument()" [disabled]="uploading">
+              <span *ngIf="uploading" class="spinner-border spinner-border-sm me-1"></span>Upload
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="selectedFile = null">Cancel</button>
+          </div>
+        </div>
+
+        <div *ngIf="!contract.documents?.length" class="empty-state-cell py-4">
+          <i class="bi bi-folder2-open d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No documents uploaded</div>
+        </div>
+
+        <div *ngFor="let doc of contract.documents" class="doc-item">
+          <i class="bi bi-file-earmark-text text-primary fs-5"></i>
+          <div class="doc-info">
+            <div class="fw-semibold">{{ doc.fileName }}</div>
+            <small class="text-muted">{{ formatBytes(doc.fileSize) }} · {{ doc.uploadedByName }} · {{ doc.uploadedAt | date:'dd MMM yyyy' }}</small>
+          </div>
+          <div class="ms-auto d-flex gap-2">
+            <button class="btn-action btn-action-view" (click)="downloadDocument(doc)" title="Download">
+              <i class="bi bi-download"></i>
+            </button>
+            <button class="btn-action btn-action-delete" *ngIf="isAdmin" (click)="deleteDocument(doc)" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ APPROVALS TAB ══ -->
+  <div *ngIf="activeTab === 'approvals'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-check2-all text-primary"></i><strong>Approval Workflow</strong>
+        </div>
+        <button class="btn btn-sm btn-primary" *ngIf="isAdmin" (click)="showAddStepModal = true">
           <i class="bi bi-plus me-1"></i>Add Step
         </button>
       </div>
       <div class="card-body p-4">
-        <div *ngIf="!contract.approvalSteps?.length" class="text-center text-muted py-3">
-          <i class="bi bi-diagram-3 d-block mb-2 fs-4"></i>No approval steps defined
+        <div *ngIf="!contract.approvalSteps?.length" class="empty-state-cell py-4">
+          <i class="bi bi-diagram-3 d-block mb-2 fs-2 text-muted"></i>No approval steps defined
         </div>
         <div class="approval-timeline" *ngIf="contract.approvalSteps?.length">
           <div *ngFor="let step of contract.approvalSteps" class="timeline-step" [ngClass]="getStepClass(step.status)">
@@ -151,7 +477,8 @@
                   <small class="text-muted" *ngIf="step.approverRole">{{ step.approverRole }}</small>
                 </div>
                 <div class="d-flex gap-2 align-items-center">
-                  <span class="badge badge-soft-{{ step.status === 'APPROVED' ? 'success' : step.status === 'REJECTED' ? 'danger' : 'warning' }}">
+                  <span class="badge"
+                    [ngClass]="step.status === 'APPROVED' ? 'badge-soft-success' : step.status === 'REJECTED' ? 'badge-soft-danger' : 'badge-soft-warning'">
                     {{ step.status }}
                   </span>
                   <div *ngIf="canApproveStep(step)" class="d-flex gap-1">
@@ -171,106 +498,105 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Documents Card -->
+  <!-- ══ SIGNATURES TAB ══ -->
+  <div *ngIf="activeTab === 'signatures'">
     <div class="falcon-card">
-      <div class="card-header-line d-flex justify-content-between align-items-center">
-        <span><i class="bi bi-paperclip me-2 text-primary"></i>Documents</span>
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-pen text-primary"></i><strong>Digital Signatures</strong>
+        </div>
+        <button class="btn btn-sm btn-primary" *ngIf="contract.status === 'ACTIVE' && !alreadySigned()"
+                (click)="showSignModal = true">
+          <i class="bi bi-pen me-1"></i>Sign Contract
+        </button>
       </div>
       <div class="card-body p-4">
-        <!-- Upload -->
-        <div class="upload-zone mb-3" *ngIf="isAdmin">
-          <input type="file" #fileInput class="d-none"
-                 (change)="onFileSelected($event)"
-                 accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg">
-          <div *ngIf="!selectedFile" class="upload-placeholder" (click)="fileInput.click()">
-            <i class="bi bi-cloud-upload fs-3 d-block mb-1"></i>
-            <span>Click to upload document</span>
-            <small class="d-block text-muted">PDF, DOC, DOCX, XLS, XLSX, images</small>
-          </div>
-          <div *ngIf="selectedFile" class="d-flex align-items-center gap-3">
-            <i class="bi bi-file-earmark fs-4 text-primary"></i>
-            <span>{{ selectedFile.name }}</span>
-            <button class="btn btn-sm btn-primary ms-auto" (click)="uploadDocument()" [disabled]="uploading">
-              <span *ngIf="uploading" class="spinner-border spinner-border-sm me-1"></span>
-              Upload
-            </button>
-            <button class="btn btn-sm btn-outline-secondary" (click)="selectedFile = null">Cancel</button>
+        <div *ngIf="!contract.signatures?.length" class="empty-state-cell py-4">
+          <i class="bi bi-pen d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No signatures recorded yet</div>
+          <button class="btn btn-sm btn-outline-primary mt-3"
+                  *ngIf="contract.status === 'ACTIVE' && !alreadySigned()"
+                  (click)="showSignModal = true">
+            <i class="bi bi-pen me-1"></i>Be the first to sign
+          </button>
+        </div>
+
+        <div class="signatures-list" *ngIf="contract.signatures?.length">
+          <div *ngFor="let sig of contract.signatures" class="signature-item">
+            <div class="sig-icon"><i class="bi bi-pen-fill text-success"></i></div>
+            <div class="sig-details">
+              <div class="fw-semibold">{{ sig.signerName }}</div>
+              <small class="text-muted" *ngIf="sig.signerRole">{{ sig.signerRole }}</small>
+            </div>
+            <div class="sig-meta ms-auto text-end">
+              <div class="text-success small"><i class="bi bi-check-circle me-1"></i>Digitally signed</div>
+              <div class="text-muted" style="font-size:0.75rem">{{ sig.signedAt | date:'dd MMM yyyy HH:mm' }}</div>
+              <div class="text-muted" style="font-size:0.7rem" *ngIf="sig.ipAddress">IP: {{ sig.ipAddress }}</div>
+            </div>
           </div>
         </div>
 
-        <div *ngIf="!contract.documents?.length" class="text-center text-muted py-3">
-          <i class="bi bi-folder2-open d-block mb-2 fs-4"></i>No documents uploaded
-        </div>
-        <div *ngFor="let doc of contract.documents" class="doc-item">
-          <i class="bi bi-file-earmark-text text-primary fs-5"></i>
-          <div class="doc-info">
-            <div class="fw-semibold">{{ doc.fileName }}</div>
-            <small class="text-muted">{{ formatBytes(doc.fileSize) }} · {{ doc.uploadedByName }} · {{ doc.uploadedAt | date:'dd MMM yyyy' }}</small>
-          </div>
-          <div class="ms-auto d-flex gap-2">
-            <button class="btn-action btn-action-view" (click)="downloadDocument(doc)" title="Download">
-              <i class="bi bi-download"></i>
-            </button>
-            <button class="btn-action btn-action-delete" *ngIf="isAdmin" (click)="deleteDocument(doc)" title="Delete">
-              <i class="bi bi-trash"></i>
-            </button>
-          </div>
+        <div class="sig-legal-note mt-4 p-3" *ngIf="contract.signatures?.length">
+          <i class="bi bi-shield-check text-success me-2"></i>
+          <small class="text-muted">
+            Digital signatures are recorded with timestamp, user identity, and IP address.
+            Each signature constitutes a legally binding electronic acceptance of this contract.
+          </small>
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- RIGHT: Summary sidebar -->
-  <div class="col-lg-4">
-    <div class="falcon-card mb-3">
-      <div class="card-header-line"><i class="bi bi-info-circle me-2 text-primary"></i>Summary</div>
-      <div class="card-body p-3">
-        <div class="summary-row"><span class="summary-label">Ref #</span><span class="summary-value">{{ contract.contractNumber }}</span></div>
-        <div class="summary-row"><span class="summary-label">Status</span>
-          <span class="badge" [ngClass]="getStatusClass(contract.status)">{{ contract.statusDisplay }}</span>
-        </div>
-        <div class="summary-row"><span class="summary-label">Type</span><span class="summary-value">{{ contract.contractTypeDisplay }}</span></div>
-        <div class="summary-row"><span class="summary-label">Value</span><span class="summary-value fw-semibold text-primary">{{ formatCurrency(contract.value) }}</span></div>
-        <div class="summary-row"><span class="summary-label">Created by</span><span class="summary-value">{{ contract.createdByName }}</span></div>
-        <div class="summary-row"><span class="summary-label">Created</span><span class="summary-value">{{ contract.createdAt | date:'dd MMM yyyy' }}</span></div>
-        <div class="summary-row" *ngIf="contract.updatedByName">
-          <span class="summary-label">Last updated by</span><span class="summary-value">{{ contract.updatedByName }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Timeline status card -->
+  <!-- ══ VERSION HISTORY TAB ══ -->
+  <div *ngIf="activeTab === 'versions'">
     <div class="falcon-card">
-      <div class="card-header-line"><i class="bi bi-clock-history me-2 text-primary"></i>Lifecycle</div>
-      <div class="card-body p-3">
-        <div class="lifecycle-item" [class.lc-done]="true">
-          <i class="bi bi-circle-fill"></i><span>Draft Created</span>
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-clock-history text-primary"></i><strong>Version History</strong>
         </div>
-        <div class="lifecycle-item" [class.lc-done]="['PENDING_APPROVAL','ACTIVE','EXPIRING_SOON','EXPIRED','TERMINATED','RENEWED'].includes(contract.status || '')">
-          <i class="bi bi-circle-fill"></i><span>Submitted for Approval</span>
+        <span class="text-muted small">{{ tabCounts.versions }} version(s) recorded</span>
+      </div>
+      <div class="card-body p-4">
+        <div *ngIf="!contract.versions?.length" class="empty-state-cell py-4">
+          <i class="bi bi-clock d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No version history available yet</div>
         </div>
-        <div class="lifecycle-item" [class.lc-done]="['ACTIVE','EXPIRING_SOON','EXPIRED','RENEWED'].includes(contract.status || '')"
-                                    [class.lc-error]="contract.status === 'TERMINATED'">
-          <i class="bi bi-circle-fill"></i><span>Active</span>
-        </div>
-        <div class="lifecycle-item" [class.lc-warn]="contract.status === 'EXPIRING_SOON'">
-          <i class="bi bi-circle-fill"></i><span>Expiring Soon</span>
-        </div>
-        <div class="lifecycle-item" [class.lc-done]="contract.status === 'RENEWED'">
-          <i class="bi bi-circle-fill"></i><span>Renewed</span>
-        </div>
-        <div class="lifecycle-item" [class.lc-error]="contract.status === 'EXPIRED' || contract.status === 'TERMINATED'">
-          <i class="bi bi-circle-fill"></i><span>Expired / Terminated</span>
+
+        <div class="versions-list" *ngIf="contract.versions?.length">
+          <div *ngFor="let v of contract.versions; let i = index" class="version-item"
+               [class.version-latest]="i === 0">
+            <div class="version-badge">
+              <span class="badge" [ngClass]="i === 0 ? 'badge-soft-success' : 'badge-soft-secondary'">
+                v{{ v.versionNumber }}
+              </span>
+            </div>
+            <div class="version-details">
+              <div class="fw-semibold">{{ v.title || ('Version ' + v.versionNumber) }}</div>
+              <div class="text-muted small" *ngIf="v.changeSummary">{{ v.changeSummary }}</div>
+              <div class="text-muted" style="font-size:0.75rem">
+                {{ v.changedByName }} · {{ v.createdAt | date:'dd MMM yyyy HH:mm' }}
+              </div>
+            </div>
+            <div class="version-actions ms-auto d-flex gap-2">
+              <button class="btn-action btn-action-view" (click)="viewVersion(v)" title="View">
+                <i class="bi bi-eye"></i>
+              </button>
+              <button class="btn-action btn-action-edit" *ngIf="isAdmin && i > 0"
+                      (click)="restoreVersion(v)" title="Restore">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-</div>
+</ng-container>
 
-<!-- ── Modals ──────────────────────────────────────────────────────────── -->
+<!-- ══════════════════════════════ MODALS ══════════════════════════════ -->
 
 <!-- Terminate Modal -->
 <div class="modal-backdrop-custom" *ngIf="showTerminateModal">
@@ -280,15 +606,14 @@
       <button class="btn-close-modal" (click)="showTerminateModal = false"><i class="bi bi-x-lg"></i></button>
     </div>
     <div class="falcon-modal-body">
-      <p class="text-muted">Please provide a reason for termination. This cannot be undone.</p>
+      <p class="text-muted mb-3">Please provide a reason for termination. This cannot be undone.
+        A performance review notification will be triggered.</p>
       <textarea class="form-control" rows="3" placeholder="Reason for termination..."
                 [(ngModel)]="terminateReason"></textarea>
     </div>
     <div class="falcon-modal-footer">
       <button class="btn btn-outline-secondary btn-sm" (click)="showTerminateModal = false">Cancel</button>
-      <button class="btn btn-danger btn-sm" (click)="terminateContract()" [disabled]="!terminateReason.trim()">
-        Terminate
-      </button>
+      <button class="btn btn-danger btn-sm" (click)="terminateContract()" [disabled]="!terminateReason.trim()">Terminate</button>
     </div>
   </div>
 </div>
@@ -313,6 +638,12 @@
         <div class="mb-3">
           <label class="form-label">New Contract Value</label>
           <input type="number" class="form-control" formControlName="value" placeholder="0.00">
+        </div>
+        <div class="mb-0">
+          <label class="form-label">Renewal Notes <span class="text-danger">*</span></label>
+          <textarea class="form-control" formControlName="renewalNotes" rows="2"
+                    placeholder="Reason for renewal, updated terms, or key changes..."></textarea>
+          <div class="form-text text-muted">Required — captured in audit trail for compliance.</div>
         </div>
       </form>
     </div>
@@ -353,7 +684,7 @@
   </div>
 </div>
 
-<!-- Approve Modal -->
+<!-- Approve / Reject Modals -->
 <div class="modal-backdrop-custom" *ngIf="showApproveModal">
   <div class="falcon-modal">
     <div class="falcon-modal-header">
@@ -370,7 +701,6 @@
   </div>
 </div>
 
-<!-- Reject Modal -->
 <div class="modal-backdrop-custom" *ngIf="showRejectModal">
   <div class="falcon-modal">
     <div class="falcon-modal-header">
@@ -383,6 +713,163 @@
     <div class="falcon-modal-footer">
       <button class="btn btn-outline-secondary btn-sm" (click)="showRejectModal = false">Cancel</button>
       <button class="btn btn-danger btn-sm" (click)="confirmReject()" [disabled]="!actionComment.trim()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Obligation Modal -->
+<div class="modal-backdrop-custom" *ngIf="showObligationModal">
+  <div class="falcon-modal" style="max-width:560px">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-check2-square text-primary me-2"></i>Add Obligation</span>
+      <button class="btn-close-modal" (click)="showObligationModal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body">
+      <form [formGroup]="obligationForm">
+        <div class="mb-3">
+          <label class="form-label">Title <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" formControlName="title" placeholder="e.g. Submit monthly report">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" formControlName="description" rows="2" placeholder="Details..."></textarea>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label">Type</label>
+            <select class="form-select" formControlName="obligationType">
+              <option value="GENERAL">General</option>
+              <option value="PAYMENT">Payment</option>
+              <option value="MILESTONE">Milestone</option>
+              <option value="REPORTING">Reporting</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label">Party</label>
+            <select class="form-select" formControlName="party">
+              <option value="OUR_COMPANY">Our Company</option>
+              <option value="COUNTERPARTY">Counterparty</option>
+            </select>
+          </div>
+        </div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="form-control" formControlName="dueDate">
+          </div>
+          <div class="col-6">
+            <label class="form-label">Assigned To</label>
+            <input type="text" class="form-control" formControlName="assignedToName" placeholder="Name">
+          </div>
+        </div>
+        <div class="row g-2 mb-0">
+          <div class="col-4 d-flex align-items-center">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" formControlName="recurring" id="recurring">
+              <label class="form-check-label" for="recurring">Recurring</label>
+            </div>
+          </div>
+          <div class="col-8" *ngIf="obligationForm.get('recurring')?.value">
+            <label class="form-label">Recurrence (days)</label>
+            <input type="number" class="form-control" formControlName="recurrenceDays" placeholder="e.g. 30">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showObligationModal = false">Cancel</button>
+      <button class="btn btn-primary btn-sm" (click)="addObligation()" [disabled]="obligationForm.invalid">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Message Modal -->
+<div class="modal-backdrop-custom" *ngIf="showMessageModal">
+  <div class="falcon-modal" style="max-width:520px">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-chat-dots text-primary me-2"></i>New Message</span>
+      <button class="btn-close-modal" (click)="showMessageModal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body">
+      <form [formGroup]="messageForm">
+        <div class="mb-3">
+          <label class="form-label">Type</label>
+          <select class="form-select" formControlName="messageType">
+            <option value="INTERNAL">Internal</option>
+            <option value="EXTERNAL">External (to counterparty)</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Subject</label>
+          <input type="text" class="form-control" formControlName="subject" placeholder="Optional subject">
+        </div>
+        <div class="mb-0">
+          <label class="form-label">Message <span class="text-danger">*</span></label>
+          <textarea class="form-control" formControlName="body" rows="4" placeholder="Your message..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showMessageModal = false">Cancel</button>
+      <button class="btn btn-primary btn-sm" (click)="sendMessage(); showMessageModal = false"
+              [disabled]="messageForm.invalid">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- Sign Modal -->
+<div class="modal-backdrop-custom" *ngIf="showSignModal">
+  <div class="falcon-modal" style="max-width:460px">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-pen text-primary me-2"></i>Digitally Sign Contract</span>
+      <button class="btn-close-modal" (click)="showSignModal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body">
+      <div class="text-center mb-3">
+        <i class="bi bi-shield-check text-success fs-2 d-block mb-2"></i>
+        <p class="mb-1">You are about to digitally sign:</p>
+        <p class="fw-semibold mb-1">{{ contract?.title }}</p>
+        <p class="text-muted small">Ref: {{ contract?.contractNumber }}</p>
+      </div>
+      <div class="alert alert-warning py-2 mb-0" style="font-size:0.82rem">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        By clicking "Sign", you confirm you have read and agree to the terms of this contract.
+        Your signature, name, timestamp, and IP address will be recorded.
+      </div>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showSignModal = false">Cancel</button>
+      <button class="btn btn-success btn-sm" (click)="signContract()">
+        <i class="bi bi-pen me-1"></i>Sign Contract
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Version View Modal -->
+<div class="modal-backdrop-custom" *ngIf="showVersionModal && selectedVersion">
+  <div class="falcon-modal" style="max-width:720px">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-clock-history text-primary me-2"></i>Version {{ selectedVersion.versionNumber }}</span>
+      <button class="btn-close-modal" (click)="showVersionModal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body" style="max-height:70vh; overflow-y:auto">
+      <div class="d-flex align-items-center gap-3 mb-3">
+        <div class="text-muted small">
+          <i class="bi bi-person me-1"></i>{{ selectedVersion.changedByName }}
+          <span class="ms-3"><i class="bi bi-calendar3 me-1"></i>{{ selectedVersion.createdAt | date:'dd MMM yyyy HH:mm' }}</span>
+        </div>
+      </div>
+      <div *ngIf="selectedVersion.changeSummary" class="alert alert-info py-2 mb-3" style="font-size:0.82rem">
+        <i class="bi bi-info-circle me-1"></i>{{ selectedVersion.changeSummary }}
+      </div>
+      <pre class="contract-body-text">{{ selectedVersion.content || 'No content in this version.' }}</pre>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showVersionModal = false">Close</button>
+      <button class="btn btn-warning btn-sm" *ngIf="isAdmin" (click)="restoreVersion(selectedVersion)">
+        <i class="bi bi-arrow-counterclockwise me-1"></i>Restore This Version
+      </button>
     </div>
   </div>
 </div>

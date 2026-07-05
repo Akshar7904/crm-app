@@ -5,7 +5,7 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContractService } from '../services/contract.service';
-import { ContractEnumItem } from '../models/contract.model';
+import { ContractEnumItem, ContractTemplate } from '../models/contract.model';
 import { NotificationService } from '../../../service/notification.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class NewContractComponent implements OnInit {
 
   form: FormGroup;
   types: ContractEnumItem[] = [];
+  templates: ContractTemplate[] = [];
   loading = false;
   submitting = false;
   isEditMode = false;
@@ -28,6 +29,11 @@ export class NewContractComponent implements OnInit {
     { value: 'VENDOR', label: 'Vendor / Supplier' },
     { value: 'CUSTOMER', label: 'Customer / Client' },
     { value: 'OTHER', label: 'Other Party' }
+  ];
+
+  departments = [
+    'Legal', 'Supply Chain Management', 'Finance', 'IT', 'HR', 'Operations',
+    'Procurement', 'Executive', 'Engineering', 'Other'
   ];
 
   constructor(
@@ -41,6 +47,7 @@ export class NewContractComponent implements OnInit {
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       contractType: ['', Validators.required],
+      department: [''],
       counterpartyName: [''],
       counterpartyType: ['OTHER'],
       value: [0, [Validators.min(0)]],
@@ -52,12 +59,15 @@ export class NewContractComponent implements OnInit {
       autoRenew: [false],
       description: [''],
       notes: [''],
-      ownerName: ['']
+      content: [''],
+      ownerName: [''],
+      templateId: [null]
     });
   }
 
   ngOnInit(): void {
     this.contractSvc.getTypes().subscribe(t => { this.types = t; this.cdr.markForCheck(); });
+    this.loadTemplates();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id && id !== 'new') {
@@ -65,6 +75,33 @@ export class NewContractComponent implements OnInit {
       this.editingId = Number(id);
       this.loadForEdit(this.editingId);
     }
+
+    // When type changes, reload templates for that type
+    this.form.get('contractType')?.valueChanges.subscribe(type => {
+      if (type) this.loadTemplates(type);
+    });
+  }
+
+  loadTemplates(type?: string): void {
+    this.contractSvc.getTemplates(type).subscribe({
+      next: t => { this.templates = t; this.cdr.markForCheck(); },
+      error: () => {}
+    });
+  }
+
+  applyTemplate(templateId: string | null): void {
+    if (!templateId) return;
+    const id = Number(templateId);
+    const template = this.templates.find(t => t.id === id);
+    if (!template) return;
+
+    this.form.patchValue({
+      templateId: id,
+      description: template.description || this.form.value.description,
+      content: template.content || ''
+    });
+    this.notification.onSuccess(`Template "${template.name}" applied`);
+    this.cdr.markForCheck();
   }
 
   loadForEdit(id: number): void {
@@ -74,6 +111,7 @@ export class NewContractComponent implements OnInit {
         this.form.patchValue({
           title: c.title,
           contractType: c.contractType,
+          department: c.department,
           counterpartyName: c.counterpartyName,
           counterpartyType: c.counterpartyType || 'OTHER',
           value: c.value,
@@ -85,7 +123,9 @@ export class NewContractComponent implements OnInit {
           autoRenew: c.autoRenew,
           description: c.description,
           notes: c.notes,
-          ownerName: c.ownerName
+          content: c.content,
+          ownerName: c.ownerName,
+          templateId: c.templateId
         });
         this.loading = false;
         this.cdr.markForCheck();
@@ -99,15 +139,12 @@ export class NewContractComponent implements OnInit {
   }
 
   save(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    if (this.form.invalid) { this.form.markAllAsTouched(); return; }
     this.submitting = true;
     const payload = this.form.value;
 
     const obs = this.isEditMode && this.editingId
-      ? this.contractSvc.update(this.editingId, payload)
+      ? this.contractSvc.update(this.editingId, payload, 'Manual update via edit form')
       : this.contractSvc.create(payload);
 
     obs.subscribe({

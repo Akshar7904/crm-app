@@ -5,9 +5,15 @@ import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ContractService } from '../services/contract.service';
-import { Contract, ApprovalStep, DocumentMeta } from '../models/contract.model';
+import {
+  Contract, ApprovalStep, DocumentMeta, ContractObligation,
+  ContractMessage, ContractSignature, ContractVersion
+} from '../models/contract.model';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
+
+type DetailTab = 'overview' | 'content' | 'obligations' | 'messages' | 'documents' | 'approvals' | 'versions' | 'signatures';
+
 @Component({
   standalone: false,
   selector: 'app-contract-detail',
@@ -21,6 +27,9 @@ export class ContractDetailComponent implements OnInit {
   loading = true;
   isAdmin = false;
   currentUserId: number | null = null;
+  currentUserName = '';
+
+  activeTab: DetailTab = 'overview';
 
   // Modals
   showTerminateModal = false;
@@ -28,6 +37,11 @@ export class ContractDetailComponent implements OnInit {
   showAddStepModal = false;
   showApproveModal = false;
   showRejectModal = false;
+  showObligationModal = false;
+  showMessageModal = false;
+  showSignModal = false;
+  showVersionModal = false;
+  selectedVersion: ContractVersion | null = null;
 
   actioningStepId: number | null = null;
   actionComment = '';
@@ -35,6 +49,8 @@ export class ContractDetailComponent implements OnInit {
 
   renewForm: FormGroup;
   stepForm: FormGroup;
+  obligationForm: FormGroup;
+  messageForm: FormGroup;
 
   uploading = false;
   selectedFile: File | null = null;
@@ -51,13 +67,32 @@ export class ContractDetailComponent implements OnInit {
     this.renewForm = this.fb.group({
       endDate: ['', Validators.required],
       renewalDate: [''],
-      value: [null]
+      value: [null],
+      renewalNotes: ['', Validators.required]
     });
+
     this.stepForm = this.fb.group({
       stepOrder: [1, [Validators.required, Validators.min(1)]],
       approverId: [null],
       approverName: ['', Validators.required],
       approverRole: ['']
+    });
+
+    this.obligationForm = this.fb.group({
+      title: ['', Validators.required],
+      description: [''],
+      obligationType: ['GENERAL'],
+      party: ['OUR_COMPANY'],
+      dueDate: [''],
+      recurring: [false],
+      recurrenceDays: [null],
+      assignedToName: ['']
+    });
+
+    this.messageForm = this.fb.group({
+      messageType: ['INTERNAL'],
+      subject: [''],
+      body: ['', Validators.required]
     });
   }
 
@@ -66,6 +101,7 @@ export class ContractDetailComponent implements OnInit {
     this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER']
       .includes(user?.role || '');
     this.currentUserId = user?.id || null;
+    this.currentUserName = user ? `${user.firstName} ${user.lastName}` : '';
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadContract(id);
   }
@@ -86,15 +122,16 @@ export class ContractDetailComponent implements OnInit {
     });
   }
 
+  setTab(tab: DetailTab): void {
+    this.activeTab = tab;
+    this.cdr.markForCheck();
+  }
+
   // ── Status Actions ──────────────────────────────────────────────────────
   submitForApproval(): void {
     if (!this.contract?.id) return;
     this.contractSvc.submit(this.contract.id).subscribe({
-      next: c => {
-        this.contract = c;
-        this.notification.onSuccess('Contract submitted for approval');
-        this.cdr.markForCheck();
-      },
+      next: c => { this.contract = c; this.notification.onSuccess('Contract submitted for approval'); this.cdr.markForCheck(); },
       error: e => this.notification.onError(e?.error?.message || 'Failed to submit')
     });
   }
@@ -102,11 +139,7 @@ export class ContractDetailComponent implements OnInit {
   activateContract(): void {
     if (!this.contract?.id) return;
     this.contractSvc.activate(this.contract.id).subscribe({
-      next: c => {
-        this.contract = c;
-        this.notification.onSuccess('Contract activated');
-        this.cdr.markForCheck();
-      },
+      next: c => { this.contract = c; this.notification.onSuccess('Contract activated'); this.cdr.markForCheck(); },
       error: e => this.notification.onError(e?.error?.message || 'Failed to activate')
     });
   }
@@ -115,10 +148,8 @@ export class ContractDetailComponent implements OnInit {
     if (!this.contract?.id || !this.terminateReason.trim()) return;
     this.contractSvc.terminate(this.contract.id, this.terminateReason).subscribe({
       next: c => {
-        this.contract = c;
-        this.showTerminateModal = false;
-        this.terminateReason = '';
-        this.notification.onSuccess('Contract terminated');
+        this.contract = c; this.showTerminateModal = false; this.terminateReason = '';
+        this.notification.onSuccess('Contract terminated — you will be notified to upload the performance review report');
         this.cdr.markForCheck();
       },
       error: e => this.notification.onError(e?.error?.message || 'Failed to terminate')
@@ -129,13 +160,24 @@ export class ContractDetailComponent implements OnInit {
     if (!this.contract?.id || this.renewForm.invalid) return;
     this.contractSvc.renew(this.contract.id, this.renewForm.value).subscribe({
       next: c => {
-        this.contract = c;
-        this.showRenewModal = false;
-        this.renewForm.reset();
+        this.contract = c; this.showRenewModal = false; this.renewForm.reset();
         this.notification.onSuccess('Contract renewed');
         this.cdr.markForCheck();
       },
       error: e => this.notification.onError(e?.error?.message || 'Failed to renew')
+    });
+  }
+
+  signContract(): void {
+    if (!this.contract?.id) return;
+    const user = this.userSvc.getUserFromLocalCache();
+    this.contractSvc.sign(this.contract.id, user?.role).subscribe({
+      next: c => {
+        this.contract = c; this.showSignModal = false;
+        this.notification.onSuccess('Contract digitally signed');
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to sign')
     });
   }
 
@@ -144,9 +186,7 @@ export class ContractDetailComponent implements OnInit {
     if (!this.contract?.id || this.stepForm.invalid) return;
     this.contractSvc.addApprovalStep(this.contract.id, this.stepForm.value).subscribe({
       next: c => {
-        this.contract = c;
-        this.showAddStepModal = false;
-        this.stepForm.reset({ stepOrder: 1 });
+        this.contract = c; this.showAddStepModal = false; this.stepForm.reset({ stepOrder: 1 });
         this.notification.onSuccess('Approval step added');
         this.cdr.markForCheck();
       },
@@ -154,27 +194,13 @@ export class ContractDetailComponent implements OnInit {
     });
   }
 
-  openApprove(step: ApprovalStep): void {
-    this.actioningStepId = step.id!;
-    this.actionComment = '';
-    this.showApproveModal = true;
-  }
-
-  openReject(step: ApprovalStep): void {
-    this.actioningStepId = step.id!;
-    this.actionComment = '';
-    this.showRejectModal = true;
-  }
+  openApprove(step: ApprovalStep): void { this.actioningStepId = step.id!; this.actionComment = ''; this.showApproveModal = true; }
+  openReject(step: ApprovalStep): void { this.actioningStepId = step.id!; this.actionComment = ''; this.showRejectModal = true; }
 
   confirmApprove(): void {
     if (!this.contract?.id || !this.actioningStepId) return;
     this.contractSvc.approveStep(this.contract.id, this.actioningStepId, this.actionComment).subscribe({
-      next: c => {
-        this.contract = c;
-        this.showApproveModal = false;
-        this.notification.onSuccess('Step approved');
-        this.cdr.markForCheck();
-      },
+      next: c => { this.contract = c; this.showApproveModal = false; this.notification.onSuccess('Step approved'); this.cdr.markForCheck(); },
       error: e => this.notification.onError(e?.error?.message || 'Failed to approve')
     });
   }
@@ -182,12 +208,7 @@ export class ContractDetailComponent implements OnInit {
   confirmReject(): void {
     if (!this.contract?.id || !this.actioningStepId) return;
     this.contractSvc.rejectStep(this.contract.id, this.actioningStepId, this.actionComment).subscribe({
-      next: c => {
-        this.contract = c;
-        this.showRejectModal = false;
-        this.notification.onError('Step rejected — contract returned to Draft');
-        this.cdr.markForCheck();
-      },
+      next: c => { this.contract = c; this.showRejectModal = false; this.notification.onError('Step rejected — contract returned to Draft'); this.cdr.markForCheck(); },
       error: e => this.notification.onError(e?.error?.message || 'Failed to reject')
     });
   }
@@ -204,23 +225,17 @@ export class ContractDetailComponent implements OnInit {
     this.contractSvc.uploadDocument(this.contract.id, this.selectedFile).subscribe({
       next: doc => {
         this.contract!.documents = [...(this.contract!.documents || []), doc];
-        this.selectedFile = null;
-        this.uploading = false;
+        this.selectedFile = null; this.uploading = false;
         this.notification.onSuccess('Document uploaded');
         this.cdr.markForCheck();
       },
-      error: e => {
-        this.uploading = false;
-        this.notification.onError(e?.error?.message || 'Upload failed');
-        this.cdr.markForCheck();
-      }
+      error: e => { this.uploading = false; this.notification.onError(e?.error?.message || 'Upload failed'); this.cdr.markForCheck(); }
     });
   }
 
   downloadDocument(doc: DocumentMeta): void {
     if (!this.contract?.id) return;
-    const url = this.contractSvc.getDocumentUrl(this.contract.id, doc.id);
-    window.open(url, '_blank');
+    window.open(this.contractSvc.getDocumentUrl(this.contract.id, doc.id), '_blank');
   }
 
   deleteDocument(doc: DocumentMeta): void {
@@ -235,12 +250,81 @@ export class ContractDetailComponent implements OnInit {
     });
   }
 
+  // ── Obligations ──────────────────────────────────────────────────────────
+  addObligation(): void {
+    if (!this.contract?.id || this.obligationForm.invalid) return;
+    this.contractSvc.addObligation(this.contract.id, this.obligationForm.value).subscribe({
+      next: o => {
+        this.contract!.obligations = [...(this.contract!.obligations || []), o];
+        this.showObligationModal = false; this.obligationForm.reset({ obligationType: 'GENERAL', party: 'OUR_COMPANY' });
+        this.notification.onSuccess('Obligation added');
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to add obligation')
+    });
+  }
+
+  completeObligation(o: ContractObligation): void {
+    if (!this.contract?.id || !o.id) return;
+    this.contractSvc.completeObligation(this.contract.id, o.id).subscribe({
+      next: updated => {
+        this.contract!.obligations = (this.contract!.obligations || []).map(ob => ob.id === updated.id ? updated : ob);
+        this.notification.onSuccess('Obligation marked complete');
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed')
+    });
+  }
+
+  deleteObligation(o: ContractObligation): void {
+    if (!this.contract?.id || !o.id) return;
+    this.contractSvc.deleteObligation(this.contract.id, o.id).subscribe({
+      next: () => {
+        this.contract!.obligations = (this.contract!.obligations || []).filter(ob => ob.id !== o.id);
+        this.notification.onSuccess('Obligation deleted');
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed')
+    });
+  }
+
+  // ── Messages ─────────────────────────────────────────────────────────────
+  sendMessage(): void {
+    if (!this.contract?.id || this.messageForm.invalid) return;
+    this.contractSvc.sendMessage(this.contract.id, {
+      ...this.messageForm.value,
+      senderName: this.currentUserName,
+      senderId: this.currentUserId || undefined
+    }).subscribe({
+      next: m => {
+        this.contract!.messages = [...(this.contract!.messages || []), m];
+        this.messageForm.reset({ messageType: 'INTERNAL' });
+        this.notification.onSuccess('Message sent');
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to send')
+    });
+  }
+
+  // ── Versions ─────────────────────────────────────────────────────────────
+  viewVersion(v: ContractVersion): void { this.selectedVersion = v; this.showVersionModal = true; this.cdr.markForCheck(); }
+
+  restoreVersion(v: ContractVersion): void {
+    if (!this.contract?.id || !v.id) return;
+    if (!confirm(`Restore version ${v.versionNumber}? Current contract will be saved as a new version.`)) return;
+    this.contractSvc.restoreVersion(this.contract.id, v.id).subscribe({
+      next: c => {
+        this.contract = c; this.showVersionModal = false;
+        this.notification.onSuccess(`Restored to version ${v.versionNumber}`);
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Restore failed')
+    });
+  }
+
   // ── Helpers ──────────────────────────────────────────────────────────────
   goBack(): void { this.router.navigate(['/contracts']); }
-
-  goToEdit(): void {
-    if (this.contract?.id) this.router.navigate(['/contracts', this.contract.id, 'edit']);
-  }
+  goToEdit(): void { if (this.contract?.id) this.router.navigate(['/contracts', this.contract.id, 'edit']); }
 
   getStatusClass(status: string | undefined): string {
     const map: Record<string, string> = {
@@ -253,6 +337,17 @@ export class ContractDetailComponent implements OnInit {
 
   getStepClass(status: string): string {
     return status === 'APPROVED' ? 'step-approved' : status === 'REJECTED' ? 'step-rejected' : 'step-pending';
+  }
+
+  getObligationClass(status: string | undefined): string {
+    const map: Record<string, string> = {
+      PENDING: 'badge-soft-warning', COMPLETED: 'badge-soft-success', OVERDUE: 'badge-soft-danger'
+    };
+    return map[status || ''] || 'badge-soft-secondary';
+  }
+
+  getMessageTypeClass(type: string | undefined): string {
+    return type === 'EXTERNAL' ? 'badge-soft-info' : type === 'SYSTEM' ? 'badge-soft-secondary' : 'badge-soft-primary';
   }
 
   formatCurrency(value: number | undefined): string {
@@ -268,7 +363,17 @@ export class ContractDetailComponent implements OnInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
-  canApproveStep(step: ApprovalStep): boolean {
-    return step.status === 'PENDING' && this.isAdmin;
+  canApproveStep(step: ApprovalStep): boolean { return step.status === 'PENDING' && this.isAdmin; }
+  alreadySigned(): boolean { return (this.contract?.signatures || []).some(s => s.signerId === this.currentUserId); }
+
+  get tabCounts() {
+    return {
+      obligations: this.contract?.obligations?.length || 0,
+      messages: this.contract?.messages?.filter(m => !m.read).length || 0,
+      documents: this.contract?.documents?.length || 0,
+      approvals: this.contract?.approvalSteps?.length || 0,
+      versions: this.contract?.versions?.length || 0,
+      signatures: this.contract?.signatures?.length || 0
+    };
   }
 }

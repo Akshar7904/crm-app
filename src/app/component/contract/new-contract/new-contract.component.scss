@@ -1,5 +1,16 @@
 @import '../../../../styles/variables';
 
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
 .card-header-line {
   display: flex;
   align-items: center;
@@ -7,4 +18,11 @@
   border-bottom: 1px solid var(--border-color);
   font-weight: 600;
   font-size: 0.875rem;
+}
+
+.contract-content-editor {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  resize: vertical;
 }

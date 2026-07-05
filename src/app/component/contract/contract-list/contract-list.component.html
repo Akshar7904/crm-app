@@ -11,38 +11,54 @@
 
 <!-- Stat Cards -->
 <div class="row g-3 mb-4">
-  <div class="col-6 col-md-3">
+  <div class="col-6 col-md-2">
     <div class="falcon-card p-3 text-center">
       <div class="stat-value text-success">{{ stats.active }}</div>
       <div class="stat-label">Active</div>
     </div>
   </div>
-  <div class="col-6 col-md-3">
+  <div class="col-6 col-md-2">
     <div class="falcon-card p-3 text-center">
       <div class="stat-value text-warning">{{ stats.expiring_soon }}</div>
       <div class="stat-label">Expiring Soon</div>
     </div>
   </div>
-  <div class="col-6 col-md-3">
+  <div class="col-6 col-md-2">
     <div class="falcon-card p-3 text-center">
       <div class="stat-value text-secondary">{{ stats.pending_approval }}</div>
       <div class="stat-label">Pending Approval</div>
     </div>
   </div>
-  <div class="col-6 col-md-3">
+  <div class="col-6 col-md-2">
     <div class="falcon-card p-3 text-center">
       <div class="stat-value text-danger">{{ stats.expired }}</div>
       <div class="stat-label">Expired</div>
     </div>
   </div>
+  <div class="col-6 col-md-2">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value" [class.text-warning]="stats.expiring180Days > 0">{{ stats.expiring180Days }}</div>
+      <div class="stat-label">Exp. in 6 months</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-2" *ngIf="stats.totalFinancialLiability != null">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-primary" style="font-size:1.1rem">{{ formatCurrency(stats.totalFinancialLiability) }}</div>
+      <div class="stat-label">Total Liability</div>
+    </div>
+  </div>
 </div>
 
-<!-- Expiry Alert Banner -->
-<div class="alert alert-warning d-flex align-items-center mb-4" *ngIf="stats.expiring30Days > 0">
+<!-- Expiry Alert Banners -->
+<div class="alert alert-danger d-flex align-items-center mb-3" *ngIf="stats.expiring30Days > 0">
   <i class="bi bi-exclamation-triangle-fill me-2"></i>
-  <span><strong>{{ stats.expiring30Days }}</strong> contract(s) expire within the next 30 days.
+  <span><strong>{{ stats.expiring30Days }}</strong> contract(s) expire within 30 days.
     <a class="alert-link ms-1" (click)="onStatusFilter('EXPIRING_SOON')" style="cursor:pointer">View now</a>
   </span>
+</div>
+<div class="alert alert-warning d-flex align-items-center mb-4" *ngIf="stats.expiring180Days > 0 && stats.expiring30Days === 0">
+  <i class="bi bi-clock me-2"></i>
+  <span><strong>{{ stats.expiring180Days }}</strong> contract(s) expire within the next 6 months — plan renewals now.</span>
 </div>
 
 <!-- Table Card -->

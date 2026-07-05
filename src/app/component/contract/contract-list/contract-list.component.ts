@@ -23,8 +23,10 @@ export class ContractListComponent implements OnInit {
 
   contracts: Contract[] = [];
   stats: ContractStats = {
-    draft: 0, pending_approval: 0, active: 0,
-    expiring_soon: 0, expired: 0, terminated: 0, renewed: 0, expiring30Days: 0
+    draft: 0, pending_approval: 0, active: 0, expiring_soon: 0,
+    expired: 0, terminated: 0, renewed: 0,
+    expiring30Days: 0, expiring90Days: 0, expiring180Days: 0,
+    totalFinancialLiability: undefined
   };
 
   loading = false;

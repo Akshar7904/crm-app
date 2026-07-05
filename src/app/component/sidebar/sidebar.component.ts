@@ -465,6 +465,12 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           icon: 'bi-bell-fill',
           route: '/contracts/alerts',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Templates',
+          icon: 'bi-layout-text-window-reverse',
+          route: '/contracts/templates',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
         }
       ]
     },
