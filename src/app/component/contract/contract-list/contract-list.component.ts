@@ -140,6 +140,20 @@ export class ContractListComponent implements OnInit {
     this.router.navigate(['/contracts/new']);
   }
 
+  deleteContract(c: Contract, event: Event): void {
+    event.stopPropagation();
+    if (!confirm(`Delete "${c.title}"? This cannot be undone.`)) return;
+    this.contractSvc.delete(c.id!).subscribe({
+      next: () => {
+        this.contracts = this.contracts.filter(x => x.id !== c.id);
+        this.totalElements = Math.max(0, this.totalElements - 1);
+        this.notification.onSuccess('Contract deleted');
+        this.cdr.markForCheck();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to delete')
+    });
+  }
+
   getStatusClass(status: ContractStatus | undefined): string {
     const map: Record<string, string> = {
       DRAFT: 'badge-soft-secondary',

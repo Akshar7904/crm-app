@@ -27,6 +27,85 @@
   resize: vertical;
 }
 
+// ── Rich Text Editor ──────────────────────────────────────────────────────
+
+.rte-wrap {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:focus-within {
+    border-color: $primary;
+    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+  }
+}
+
+.rte-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 5px 8px;
+  background: var(--bg-hover);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.rte-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 26px;
+  padding: 0 5px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.12s;
+  user-select: none;
+
+  &:hover { background: var(--border-color); }
+
+  &.rte-italic { font-style: italic; }
+  &.rte-underline { text-decoration: underline; }
+}
+
+.rte-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border-color);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+.rte-editor {
+  min-height: 340px;
+  padding: 16px 18px;
+  font-size: 0.9rem;
+  line-height: 1.85;
+  color: var(--text-primary);
+  background: var(--bg-card);
+  outline: none;
+  word-break: break-word;
+
+  &:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  h2 { font-size: 1.05rem; font-weight: 700; margin: 0.8em 0 0.3em; }
+  h3 { font-size: 0.95rem; font-weight: 600; margin: 0.7em 0 0.3em; }
+  p { margin-bottom: 0.6em; }
+  ul, ol { margin: 0.4em 0 0.6em 1.4em; }
+  li { margin-bottom: 0.2em; }
+}
+
+.rte-editor-sm { min-height: 200px; }
+
 // ── Template picker cards ──────────────────────────────────────────────────
 
 .template-picker-grid {

@@ -147,6 +147,11 @@
               <button class="btn-action btn-action-view" title="View" (click)="goToDetail(c)">
                 <i class="bi bi-eye"></i>
               </button>
+              <button class="btn-action btn-action-delete" title="Delete"
+                      *ngIf="isAdmin && (c.status === 'DRAFT' || c.status === 'TERMINATED' || c.status === 'EXPIRED')"
+                      (click)="deleteContract(c, $event)">
+                <i class="bi bi-trash"></i>
+              </button>
             </div>
           </td>
         </tr>

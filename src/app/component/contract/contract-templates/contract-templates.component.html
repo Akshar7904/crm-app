@@ -129,10 +129,30 @@
         <div class="mb-3">
           <label class="form-label d-flex align-items-center gap-2">
             Contract Body
-            <span class="text-muted" style="font-size:0.78rem; font-weight:400">— default text applied when template is selected</span>
+            <span class="text-muted" style="font-size:0.78rem;font-weight:400">— default text applied when template is selected</span>
           </label>
-          <textarea class="form-control template-content-editor" formControlName="content" rows="12"
-                    placeholder="Enter the default contract body text here. Include clause headers, standard terms, and placeholder text (e.g. [VENDOR NAME], [START DATE])..."></textarea>
+          <div class="rte-wrap">
+            <div class="rte-toolbar">
+              <button type="button" class="rte-btn" (mousedown)="$event.preventDefault(); execCmd('bold')" title="Bold"><b>B</b></button>
+              <button type="button" class="rte-btn rte-italic" (mousedown)="$event.preventDefault(); execCmd('italic')" title="Italic"><i>I</i></button>
+              <button type="button" class="rte-btn rte-underline" (mousedown)="$event.preventDefault(); execCmd('underline')" title="Underline"><u>U</u></button>
+              <div class="rte-sep"></div>
+              <button type="button" class="rte-btn" (mousedown)="$event.preventDefault(); execCmd('formatBlock', 'h2')" title="Heading">H2</button>
+              <button type="button" class="rte-btn" (mousedown)="$event.preventDefault(); execCmd('formatBlock', 'p')" title="Paragraph">¶</button>
+              <div class="rte-sep"></div>
+              <button type="button" class="rte-btn" (mousedown)="$event.preventDefault(); execCmd('insertUnorderedList')" title="Bullet list"><i class="bi bi-list-ul"></i></button>
+              <button type="button" class="rte-btn" (mousedown)="$event.preventDefault(); execCmd('insertOrderedList')" title="Numbered list"><i class="bi bi-list-ol"></i></button>
+              <div class="rte-sep"></div>
+              <button type="button" class="rte-btn" (mousedown)="$event.preventDefault(); execCmd('removeFormat')" title="Clear formatting"><i class="bi bi-eraser"></i></button>
+            </div>
+            <div class="rte-editor"
+                 #tmplRteEditor
+                 contenteditable="true"
+                 (input)="onRteInput()"
+                 (blur)="onRteBlur()"
+                 data-placeholder="Enter the default contract body text. Include clause headers, standard terms, and placeholder text (e.g. [VENDOR NAME], [START DATE])...">
+            </div>
+          </div>
         </div>
 
         <div class="mb-3">

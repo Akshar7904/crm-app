@@ -17,6 +17,13 @@
   </p>
 
   <div class="banner-actions" *ngIf="contract">
+    <button class="btn btn-outline-light btn-sm" (click)="printContract()" title="Print contract">
+      <i class="bi bi-printer me-1"></i>Print
+    </button>
+    <button class="btn btn-outline-light btn-sm" (click)="downloadPdf()" [disabled]="downloading" title="Download PDF">
+      <span *ngIf="downloading" class="spinner-border spinner-border-sm me-1"></span>
+      <i *ngIf="!downloading" class="bi bi-file-earmark-pdf me-1"></i>PDF
+    </button>
     <button class="btn btn-outline-light btn-sm" (click)="goToEdit()"
             *ngIf="isAdmin && (contract.status === 'DRAFT' || contract.status === 'PENDING_APPROVAL')">
       <i class="bi bi-pencil me-1"></i>Edit
@@ -40,6 +47,10 @@
     <button class="btn btn-danger btn-sm" (click)="showTerminateModal = true"
             *ngIf="isAdmin && (contract.status === 'ACTIVE' || contract.status === 'EXPIRING_SOON')">
       <i class="bi bi-x-circle me-1"></i>Terminate
+    </button>
+    <button class="btn btn-danger btn-sm" (click)="deleteContract()"
+            *ngIf="isAdmin && (contract.status === 'DRAFT' || contract.status === 'TERMINATED' || contract.status === 'EXPIRED')">
+      <i class="bi bi-trash me-1"></i>Delete
     </button>
   </div>
 </div>
@@ -254,7 +265,7 @@
       </div>
       <div class="card-body p-4">
         <div *ngIf="contract.content; else noContent" class="contract-body-view">
-          <pre class="contract-body-text">{{ contract.content }}</pre>
+          <div class="contract-body-html" [innerHTML]="safeContent"></div>
         </div>
         <ng-template #noContent>
           <div class="empty-state-cell py-5">

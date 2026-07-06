@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ContractRoutingModule } from './contract-routing.module';
 import { ContractService } from './services/contract.service';
+import { CompanyService } from '../../service/company.service';
 import { ContractListComponent } from './contract-list/contract-list.component';
 import { ContractDetailComponent } from './contract-detail/contract-detail.component';
 import { NewContractComponent } from './new-contract/new-contract.component';
@@ -28,6 +29,6 @@ import { ContractTemplatesComponent } from './contract-templates/contract-templa
     ReactiveFormsModule,
     ContractRoutingModule
   ],
-  providers: [ContractService]
+  providers: [ContractService, CompanyService]
 })
 export class ContractModule {}

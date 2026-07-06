@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
 // LKCentrix HR & Payroll Management System — ORION
 
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ContractService } from '../services/contract.service';
 import { ContractTemplate, ContractEnumItem } from '../models/contract.model';
@@ -16,6 +16,8 @@ import { UserService } from '../../../service/user.service';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ContractTemplatesComponent implements OnInit {
+
+  @ViewChild('tmplRteEditor') tmplRteEditorRef?: ElementRef<HTMLDivElement>;
 
   templates: ContractTemplate[] = [];
   types: ContractEnumItem[] = [];
@@ -68,6 +70,9 @@ export class ContractTemplatesComponent implements OnInit {
     this.form.reset({ global: false, active: true });
     this.showModal = true;
     this.cdr.markForCheck();
+    setTimeout(() => {
+      if (this.tmplRteEditorRef?.nativeElement) this.tmplRteEditorRef.nativeElement.innerHTML = '';
+    }, 0);
   }
 
   openEdit(t: ContractTemplate): void {
@@ -83,6 +88,11 @@ export class ContractTemplatesComponent implements OnInit {
     });
     this.showModal = true;
     this.cdr.markForCheck();
+    setTimeout(() => {
+      if (this.tmplRteEditorRef?.nativeElement) {
+        this.tmplRteEditorRef.nativeElement.innerHTML = t.content || '';
+      }
+    }, 0);
   }
 
   save(): void {
@@ -124,6 +134,23 @@ export class ContractTemplatesComponent implements OnInit {
       },
       error: e => this.notification.onError(e?.error?.message || 'Delete failed')
     });
+  }
+
+  execCmd(cmd: string, value?: string): void {
+    document.execCommand(cmd, false, value ?? undefined);
+    this.onRteInput();
+  }
+
+  onRteInput(): void {
+    if (!this.tmplRteEditorRef?.nativeElement) return;
+    this.form.get('content')?.setValue(
+      this.tmplRteEditorRef.nativeElement.innerHTML, { emitEvent: false }
+    );
+  }
+
+  onRteBlur(): void {
+    this.onRteInput();
+    this.form.get('content')?.markAsTouched();
   }
 
   isInvalid(field: string): boolean {

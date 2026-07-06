@@ -1,9 +1,13 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
 // LKCentrix HR & Payroll Management System — ORION
 
-import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component, OnInit, AfterViewInit, OnDestroy,
+  ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ContractService } from '../services/contract.service';
 import { ContractEnumItem, ContractTemplate } from '../models/contract.model';
 import { NotificationService } from '../../../service/notification.service';
@@ -16,7 +20,12 @@ import { UserService } from '../../../service/user.service';
   styleUrls: ['./new-contract.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NewContractComponent implements OnInit {
+export class NewContractComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild('rteEditor') rteEditorRef?: ElementRef<HTMLDivElement>;
+  @ViewChild('tmplRteEditor') tmplRteEditorRef?: ElementRef<HTMLDivElement>;
+
+  private rteSub?: Subscription;
 
   form: FormGroup;
   tmplForm: FormGroup;
@@ -80,6 +89,17 @@ export class NewContractComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit(): void {
+    const initial = this.form.get('content')?.value || '';
+    if (this.rteEditorRef?.nativeElement) {
+      this.rteEditorRef.nativeElement.innerHTML = initial;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.rteSub?.unsubscribe();
+  }
+
   ngOnInit(): void {
     const user = this.userSvc.getUserFromLocalCache();
     this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER'].includes(user?.role || '');
@@ -114,11 +134,15 @@ export class NewContractComponent implements OnInit {
 
   useTemplate(t: ContractTemplate): void {
     this.selectedTemplateId = t.id!;
+    const html = t.content || '';
     this.form.patchValue({
       templateId: t.id,
       description: t.description || this.form.value.description,
-      content: t.content || ''
+      content: html
     });
+    if (this.rteEditorRef?.nativeElement) {
+      this.rteEditorRef.nativeElement.innerHTML = html;
+    }
     this.notification.onSuccess(`Template "${t.name}" applied`);
     this.cdr.markForCheck();
   }
@@ -133,6 +157,11 @@ export class NewContractComponent implements OnInit {
     });
     this.showTemplateEditor = true;
     this.cdr.markForCheck();
+    setTimeout(() => {
+      if (this.tmplRteEditorRef?.nativeElement) {
+        this.tmplRteEditorRef.nativeElement.innerHTML = t.content || '';
+      }
+    }, 0);
   }
 
   saveTemplateEdit(): void {
@@ -182,6 +211,11 @@ export class NewContractComponent implements OnInit {
         });
         this.loading = false;
         this.cdr.markForCheck();
+        setTimeout(() => {
+          if (this.rteEditorRef?.nativeElement) {
+            this.rteEditorRef.nativeElement.innerHTML = c.content || '';
+          }
+        }, 0);
       },
       error: () => {
         this.loading = false;
@@ -212,6 +246,40 @@ export class NewContractComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  // ── Rich Text Editor (contract body) ─────────────────────────────────────
+  execCmd(cmd: string, value?: string): void {
+    document.execCommand(cmd, false, value ?? undefined);
+    this.onRteInput();
+  }
+
+  onRteInput(): void {
+    if (!this.rteEditorRef?.nativeElement) return;
+    const html = this.rteEditorRef.nativeElement.innerHTML;
+    this.form.get('content')?.setValue(html, { emitEvent: false });
+  }
+
+  onRteBlur(): void {
+    this.onRteInput();
+    this.form.get('content')?.markAsTouched();
+  }
+
+  // ── Rich Text Editor (template modal) ────────────────────────────────────
+  execTmplCmd(cmd: string, value?: string): void {
+    document.execCommand(cmd, false, value ?? undefined);
+    this.onTmplRteInput();
+  }
+
+  onTmplRteInput(): void {
+    if (!this.tmplRteEditorRef?.nativeElement) return;
+    const html = this.tmplRteEditorRef.nativeElement.innerHTML;
+    this.tmplForm.get('content')?.setValue(html, { emitEvent: false });
+  }
+
+  onTmplRteBlur(): void {
+    this.onTmplRteInput();
+    this.tmplForm.get('content')?.markAsTouched();
   }
 
   cancel(): void { this.router.navigate(['/contracts']); }
