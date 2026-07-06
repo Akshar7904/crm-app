@@ -326,6 +326,9 @@
 
 .hero-acc-panels {
   flex: 1; display: flex; gap: 10px; height: 460px; min-width: 0;
+  // Specificity fix: .lp-shell img (0,1,1) overrides .acc-panel-img (0,1,0).
+  // Nesting here gives .hero-acc-panels .acc-panel-img (0,2,0) which wins.
+  .acc-panel-img { height: 100%; }
 }
 
 .acc-panel {
