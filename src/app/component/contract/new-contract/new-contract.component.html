@@ -13,29 +13,59 @@
   <div class="col-lg-10">
     <form [formGroup]="form">
 
-      <!-- Template picker (only when creating) -->
-      <div class="falcon-card mb-3" *ngIf="!isEditMode && templates.length > 0">
+      <!-- Template picker (always shown when creating) -->
+      <div class="falcon-card mb-3" *ngIf="!isEditMode">
         <div class="table-card-header">
           <div class="d-flex align-items-center gap-2">
             <i class="bi bi-layout-text-window-reverse text-primary"></i>
             <strong>Start from a Template</strong>
+            <span class="badge badge-soft-success ms-1" *ngIf="selectedTemplateId">Applied</span>
           </div>
-          <span class="text-muted small">Optional — pre-fill content from an existing template</span>
+          <span class="text-muted small">
+            {{ form.value.contractType
+                ? (templates.length + ' template' + (templates.length !== 1 ? 's' : '') + ' for this type')
+                : 'Select a contract type above to see templates' }}
+          </span>
         </div>
         <div class="card-body p-3">
-          <div class="row g-2">
-            <div class="col-md-5">
-              <select class="form-select" (change)="applyTemplate($any($event.target).value)">
-                <option value="">— Select a template —</option>
-                <option *ngFor="let t of templates" [value]="t.id">
-                  {{ t.name }} ({{ t.contractType }})
-                </option>
-              </select>
-            </div>
-            <div class="col-md-7 text-muted small d-flex align-items-center">
-              Selecting a template pre-fills the contract body and description. You can edit all fields after applying.
-            </div>
+          <div *ngIf="!form.value.contractType" class="text-muted small text-center py-3">
+            <i class="bi bi-arrow-up me-1"></i>Select a contract type above to load matching templates
           </div>
+          <div *ngIf="form.value.contractType && templates.length === 0" class="text-muted small text-center py-3">
+            <i class="bi bi-info-circle me-1"></i>No templates for this type yet.
+            <a routerLink="/contracts/templates" class="ms-1">Create one</a>
+          </div>
+          <ng-container *ngIf="form.value.contractType && templates.length > 0">
+            <div class="template-picker-grid">
+              <div *ngFor="let t of (showAllTemplates ? templates : templates.slice(0, 2))"
+                   class="tpc-card"
+                   [class.selected]="selectedTemplateId === t.id">
+                <div class="tpc-top">
+                  <div class="tpc-name">{{ t.name }}</div>
+                  <button *ngIf="isAdmin" class="btn-action btn-action-edit" (click)="openEditTemplate(t)" title="Edit template">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                </div>
+                <div class="tpc-desc">{{ t.description || 'No description' }}</div>
+                <div class="tpc-preview" *ngIf="t.content">{{ t.content | slice:0:100 }}{{ (t.content?.length ?? 0) > 100 ? '...' : '' }}</div>
+                <div class="tpc-footer">
+                  <span *ngIf="t.active" class="badge badge-soft-success">Active</span>
+                  <span *ngIf="t.global" class="badge badge-soft-info">Global</span>
+                </div>
+                <button class="btn btn-sm w-100 mt-auto"
+                        [ngClass]="selectedTemplateId === t.id ? 'btn-primary' : 'btn-outline-primary'"
+                        (click)="useTemplate(t)">
+                  <i class="bi me-1" [ngClass]="selectedTemplateId === t.id ? 'bi-check-circle-fill' : 'bi-check-circle'"></i>
+                  {{ selectedTemplateId === t.id ? 'Applied' : 'Use Template' }}
+                </button>
+              </div>
+            </div>
+            <div *ngIf="templates.length > 2" class="text-center mt-2">
+              <button class="btn btn-link btn-sm text-muted" (click)="showAllTemplates = !showAllTemplates">
+                {{ showAllTemplates ? 'Show less' : 'Show all ' + templates.length + ' templates' }}
+              </button>
+            </div>
+          </ng-container>
         </div>
       </div>
 
@@ -189,5 +219,49 @@ You may reference locked clauses from the template above."></textarea>
       </div>
 
     </form>
+  </div>
+</div>
+
+<!-- Inline template editor modal -->
+<div class="modal-backdrop-custom" *ngIf="showTemplateEditor">
+  <div class="falcon-modal" style="max-width:700px">
+    <div class="falcon-modal-header">
+      <span><i class="bi bi-pencil-square text-primary me-2"></i>Edit Template</span>
+      <button class="btn-close-modal" (click)="showTemplateEditor = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body">
+      <form [formGroup]="tmplForm">
+        <div class="row g-3 mb-3">
+          <div class="col-md-8">
+            <label class="form-label">Template Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" formControlName="name"
+                   [class.is-invalid]="tmplForm.get('name')?.invalid && tmplForm.get('name')?.touched">
+            <div class="invalid-feedback">Required (min 3 characters)</div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Contract Type</label>
+            <select class="form-select" formControlName="contractType">
+              <option *ngFor="let t of types" [value]="t.value">{{ t.label }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-control" formControlName="description" placeholder="Brief description">
+        </div>
+        <div class="mb-0">
+          <label class="form-label">Contract Body</label>
+          <textarea class="form-control contract-content-editor" formControlName="content" rows="12"
+                    placeholder="Default contract body text..."></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showTemplateEditor = false">Cancel</button>
+      <button class="btn btn-primary btn-sm" (click)="saveTemplateEdit()" [disabled]="savingTemplate || tmplForm.invalid">
+        <span *ngIf="savingTemplate" class="spinner-border spinner-border-sm me-2"></span>
+        Save Template
+      </button>
+    </div>
   </div>
 </div>

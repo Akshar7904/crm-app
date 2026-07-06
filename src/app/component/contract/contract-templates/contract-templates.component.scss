@@ -91,3 +91,68 @@
   font-size: 1rem;
   &:hover { color: var(--text-primary); }
 }
+
+// ── Grouped card layout ──────────────────────────────────────────────────────
+
+.tmpl-type-group {
+  &:not(:last-child) { border-bottom: 1px solid var(--border-color); }
+}
+
+.tmpl-group-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-size: 0.85rem;
+  background: var(--bg-card);
+}
+
+.tmpl-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  padding: 16px 20px;
+}
+
+.tmpl-card {
+  background: var(--bg-page);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.15s;
+
+  &:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+
+  .tmpl-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .tmpl-card-name {
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    flex: 1;
+  }
+
+  .tmpl-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .tmpl-card-meta {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+  }
+}

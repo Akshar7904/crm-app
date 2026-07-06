@@ -131,6 +131,31 @@ export class ContractTemplatesComponent implements OnInit {
     return !!(c && c.invalid && (c.dirty || c.touched));
   }
 
+  expandedGroups = new Set<string>();
+
+  get groupedTemplates(): Array<{ type: string; label: string; templates: ContractTemplate[]; expanded: boolean }> {
+    const source = this.filterType
+      ? this.templates.filter(t => t.contractType === this.filterType)
+      : this.templates;
+    const map = new Map<string, ContractTemplate[]>();
+    for (const t of source) {
+      if (!map.has(t.contractType)) map.set(t.contractType, []);
+      map.get(t.contractType)!.push(t);
+    }
+    return Array.from(map.entries()).map(([type, tmpls]) => ({
+      type,
+      label: this.types.find(x => x.value === type)?.label || type,
+      templates: tmpls,
+      expanded: this.expandedGroups.has(type)
+    }));
+  }
+
+  toggleGroup(type: string): void {
+    if (this.expandedGroups.has(type)) this.expandedGroups.delete(type);
+    else this.expandedGroups.add(type);
+    this.cdr.markForCheck();
+  }
+
   get filtered(): ContractTemplate[] {
     if (!this.filterType) return this.templates;
     return this.templates.filter(t => t.contractType === this.filterType);

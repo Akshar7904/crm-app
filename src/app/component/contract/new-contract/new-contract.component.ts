@@ -7,6 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ContractService } from '../services/contract.service';
 import { ContractEnumItem, ContractTemplate } from '../models/contract.model';
 import { NotificationService } from '../../../service/notification.service';
+import { UserService } from '../../../service/user.service';
 
 @Component({
   standalone: false,
@@ -18,12 +19,19 @@ import { NotificationService } from '../../../service/notification.service';
 export class NewContractComponent implements OnInit {
 
   form: FormGroup;
+  tmplForm: FormGroup;
   types: ContractEnumItem[] = [];
   templates: ContractTemplate[] = [];
   loading = false;
   submitting = false;
   isEditMode = false;
   editingId: number | null = null;
+  isAdmin = false;
+  selectedTemplateId: number | null = null;
+  showAllTemplates = false;
+  showTemplateEditor = false;
+  editingTemplate: ContractTemplate | null = null;
+  savingTemplate = false;
 
   counterpartyTypes = [
     { value: 'VENDOR', label: 'Vendor / Supplier' },
@@ -40,10 +48,17 @@ export class NewContractComponent implements OnInit {
     private fb: FormBuilder,
     private contractSvc: ContractService,
     private notification: NotificationService,
+    private userSvc: UserService,
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef
   ) {
+    this.tmplForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3)]],
+      contractType: ['', Validators.required],
+      description: [''],
+      content: ['']
+    });
     this.form = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
       contractType: ['', Validators.required],
@@ -66,6 +81,8 @@ export class NewContractComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const user = this.userSvc.getUserFromLocalCache();
+    this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER'].includes(user?.role || '');
     this.contractSvc.getTypes().subscribe(t => { this.types = t; this.cdr.markForCheck(); });
     this.loadTemplates();
 
@@ -91,17 +108,53 @@ export class NewContractComponent implements OnInit {
 
   applyTemplate(templateId: string | null): void {
     if (!templateId) return;
-    const id = Number(templateId);
-    const template = this.templates.find(t => t.id === id);
-    if (!template) return;
+    const template = this.templates.find(t => t.id === Number(templateId));
+    if (template) this.useTemplate(template);
+  }
 
+  useTemplate(t: ContractTemplate): void {
+    this.selectedTemplateId = t.id!;
     this.form.patchValue({
-      templateId: id,
-      description: template.description || this.form.value.description,
-      content: template.content || ''
+      templateId: t.id,
+      description: t.description || this.form.value.description,
+      content: t.content || ''
     });
-    this.notification.onSuccess(`Template "${template.name}" applied`);
+    this.notification.onSuccess(`Template "${t.name}" applied`);
     this.cdr.markForCheck();
+  }
+
+  openEditTemplate(t: ContractTemplate): void {
+    this.editingTemplate = t;
+    this.tmplForm.patchValue({
+      name: t.name,
+      contractType: t.contractType,
+      description: t.description || '',
+      content: t.content || ''
+    });
+    this.showTemplateEditor = true;
+    this.cdr.markForCheck();
+  }
+
+  saveTemplateEdit(): void {
+    if (!this.editingTemplate?.id || this.tmplForm.invalid) return;
+    this.savingTemplate = true;
+    this.contractSvc.updateTemplate(this.editingTemplate.id, this.tmplForm.value).subscribe({
+      next: updated => {
+        this.savingTemplate = false;
+        this.showTemplateEditor = false;
+        this.templates = this.templates.map(t => t.id === updated.id ? updated : t);
+        if (this.selectedTemplateId === updated.id) {
+          this.form.patchValue({ description: updated.description || this.form.value.description, content: updated.content || '' });
+        }
+        this.notification.onSuccess('Template updated');
+        this.cdr.markForCheck();
+      },
+      error: e => {
+        this.savingTemplate = false;
+        this.notification.onError(e?.error?.message || 'Failed to update template');
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   loadForEdit(id: number): void {
