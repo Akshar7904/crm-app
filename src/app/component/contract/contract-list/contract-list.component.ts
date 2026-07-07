@@ -65,7 +65,7 @@ export class ContractListComponent implements OnInit {
   ngOnInit(): void {
     const user = this.userSvc.getUserFromLocalCache();
     this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER']
-      .includes(user?.role || '');
+      .includes(user?.roleName || '');
     this.loadMeta();
     this.loadStats();
     this.loadContracts();

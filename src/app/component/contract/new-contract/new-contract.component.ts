@@ -102,7 +102,7 @@ export class NewContractComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     const user = this.userSvc.getUserFromLocalCache();
-    this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER'].includes(user?.role || '');
+    this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER'].includes(user?.roleName || '');
     this.contractSvc.getTypes().subscribe(t => { this.types = t; this.cdr.markForCheck(); });
     this.loadTemplates();
 

@@ -108,7 +108,7 @@ export class ContractDetailComponent implements OnInit {
   ngOnInit(): void {
     const user = this.userSvc.getUserFromLocalCache();
     this.isAdmin = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN', 'ROLE_MANAGER']
-      .includes(user?.role || '');
+      .includes(user?.roleName || '');
     this.currentUserId = user?.id || null;
     this.currentUserName = user ? `${user.firstName} ${user.lastName}` : '';
     if (user?.companyId) {
@@ -187,7 +187,7 @@ export class ContractDetailComponent implements OnInit {
   signContract(): void {
     if (!this.contract?.id) return;
     const user = this.userSvc.getUserFromLocalCache();
-    this.contractSvc.sign(this.contract.id, user?.role).subscribe({
+    this.contractSvc.sign(this.contract.id, user?.roleName).subscribe({
       next: c => {
         this.contract = c; this.showSignModal = false;
         this.notification.onSuccess('Contract digitally signed');
