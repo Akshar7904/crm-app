@@ -3,6 +3,7 @@
 
 import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ContractService } from '../services/contract.service';
 import { ContractTemplate, ContractEnumItem } from '../models/contract.model';
 import { NotificationService } from '../../../service/notification.service';
@@ -29,6 +30,9 @@ export class ContractTemplatesComponent implements OnInit {
   editingId: number | null = null;
   submitting = false;
 
+  showPreviewModal = false;
+  previewTemplate: ContractTemplate | null = null;
+
   form: FormGroup;
 
   constructor(
@@ -36,6 +40,7 @@ export class ContractTemplatesComponent implements OnInit {
     private notification: NotificationService,
     private userSvc: UserService,
     private fb: FormBuilder,
+    private sanitizer: DomSanitizer,
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
@@ -132,6 +137,16 @@ export class ContractTemplatesComponent implements OnInit {
     });
   }
 
+  openPreview(t: ContractTemplate): void {
+    this.previewTemplate = t;
+    this.showPreviewModal = true;
+    this.cdr.markForCheck();
+  }
+
+  get safePreviewContent(): SafeHtml {
+    return this.sanitizer.bypassSecurityTrustHtml(this.previewTemplate?.content || '');
+  }
+
   deleteTemplate(t: ContractTemplate): void {
     if (!confirm(`Delete template "${t.name}"?`)) return;
     this.contractSvc.deleteTemplate(t.id!).subscribe({
@@ -194,6 +209,10 @@ export class ContractTemplatesComponent implements OnInit {
   get filtered(): ContractTemplate[] {
     if (!this.filterType) return this.templates;
     return this.templates.filter(t => t.contractType === this.filterType);
+  }
+
+  typeLabelFor(type: string): string {
+    return this.types.find(x => x.value === type)?.label || type;
   }
 
   get globalCount(): number { return this.templates.filter(t => t.global).length; }

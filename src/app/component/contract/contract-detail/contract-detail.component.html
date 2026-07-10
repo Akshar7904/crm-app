@@ -874,7 +874,12 @@
       <div *ngIf="selectedVersion.changeSummary" class="alert alert-info py-2 mb-3" style="font-size:0.82rem">
         <i class="bi bi-info-circle me-1"></i>{{ selectedVersion.changeSummary }}
       </div>
-      <pre class="contract-body-text">{{ selectedVersion.content || 'No content in this version.' }}</pre>
+      <div *ngIf="selectedVersion.content; else noVersionContent" class="contract-body-view">
+        <div class="contract-body-html" [innerHTML]="safeVersionContent"></div>
+      </div>
+      <ng-template #noVersionContent>
+        <p class="text-muted">No content in this version.</p>
+      </ng-template>
     </div>
     <div class="falcon-modal-footer">
       <button class="btn btn-outline-secondary btn-sm" (click)="showVersionModal = false">Close</button>

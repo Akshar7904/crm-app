@@ -49,6 +49,7 @@ export class ContractDetailComponent implements OnInit {
   showSignModal = false;
   showVersionModal = false;
   selectedVersion: ContractVersion | null = null;
+  safeVersionContent: SafeHtml | null = null;
 
   actioningStepId: number | null = null;
   actionComment = '';
@@ -323,7 +324,12 @@ export class ContractDetailComponent implements OnInit {
   }
 
   // ── Versions ─────────────────────────────────────────────────────────────
-  viewVersion(v: ContractVersion): void { this.selectedVersion = v; this.showVersionModal = true; this.cdr.markForCheck(); }
+  viewVersion(v: ContractVersion): void {
+    this.selectedVersion = v;
+    this.safeVersionContent = this.sanitizer.bypassSecurityTrustHtml(v.content || '');
+    this.showVersionModal = true;
+    this.cdr.markForCheck();
+  }
 
   restoreVersion(v: ContractVersion): void {
     if (!this.contract?.id || !v.id) return;

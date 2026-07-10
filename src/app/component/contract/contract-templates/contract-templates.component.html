@@ -67,9 +67,12 @@
         <div *ngFor="let t of (group.expanded ? group.templates : group.templates.slice(0, 2))" class="tmpl-card">
           <div class="tmpl-card-top">
             <div class="tmpl-card-name">{{ t.name }}</div>
-            <div class="action-btn-group" *ngIf="isAdmin">
-              <button class="btn-action btn-action-edit" (click)="openEdit(t)" title="Edit"><i class="bi bi-pencil"></i></button>
-              <button class="btn-action btn-action-delete" (click)="deleteTemplate(t)" title="Delete"><i class="bi bi-trash"></i></button>
+            <div class="action-btn-group">
+              <button class="btn-action btn-action-view" (click)="openPreview(t)" title="Preview"><i class="bi bi-eye"></i></button>
+              <ng-container *ngIf="isAdmin">
+                <button class="btn-action btn-action-edit" (click)="openEdit(t)" title="Edit"><i class="bi bi-pencil"></i></button>
+                <button class="btn-action btn-action-delete" (click)="deleteTemplate(t)" title="Delete"><i class="bi bi-trash"></i></button>
+              </ng-container>
             </div>
           </div>
           <div class="tmpl-card-desc" *ngIf="t.description">{{ t.description }}</div>
@@ -85,6 +88,51 @@
           {{ group.expanded ? 'Show less' : 'Show ' + (group.templates.length - 2) + ' more' }}
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal-backdrop-custom" *ngIf="showPreviewModal && previewTemplate">
+  <div class="falcon-modal" style="max-width:780px">
+    <div class="falcon-modal-header">
+      <span>
+        <i class="bi bi-layout-text-window-reverse text-primary me-2"></i>
+        {{ previewTemplate.name }}
+      </span>
+      <button class="btn-close-modal" (click)="showPreviewModal = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="falcon-modal-body" style="max-height:75vh; overflow-y:auto">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <span class="badge badge-soft-primary">
+          {{ typeLabelFor(previewTemplate.contractType) }}
+        </span>
+        <span class="badge" [ngClass]="previewTemplate.active ? 'badge-soft-success' : 'badge-soft-secondary'">
+          {{ previewTemplate.active ? 'Active' : 'Inactive' }}
+        </span>
+        <span class="badge" [ngClass]="previewTemplate.global ? 'badge-soft-info' : 'badge-soft-light border text-secondary'">
+          {{ previewTemplate.global ? 'Global' : 'Company' }}
+        </span>
+        <span class="text-muted ms-auto" style="font-size:0.78rem" *ngIf="previewTemplate.description">
+          {{ previewTemplate.description }}
+        </span>
+      </div>
+
+      <div *ngIf="previewTemplate.content; else noPreviewContent" class="contract-body-view">
+        <div class="contract-body-html" [innerHTML]="safePreviewContent"></div>
+      </div>
+      <ng-template #noPreviewContent>
+        <div class="empty-state-cell py-4">
+          <i class="bi bi-file-earmark-x d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">This template has no body content yet.</div>
+        </div>
+      </ng-template>
+    </div>
+    <div class="falcon-modal-footer">
+      <button class="btn btn-outline-secondary btn-sm" (click)="showPreviewModal = false">Close</button>
+      <button class="btn btn-outline-primary btn-sm" *ngIf="isAdmin" (click)="showPreviewModal = false; openEdit(previewTemplate!)">
+        <i class="bi bi-pencil me-1"></i>Edit Template
+      </button>
     </div>
   </div>
 </div>
