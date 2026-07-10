@@ -109,11 +109,19 @@ export class ContractTemplatesComponent implements OnInit {
         this.submitting = false;
         this.showModal = false;
         if (this.editingId) {
-          this.templates = this.templates.map(x => x.id === t.id ? t : x);
+          const forked = t.id !== this.editingId;
+          if (forked) {
+            // Backend created a company-specific copy — keep original global, add the fork
+            this.templates = [t, ...this.templates];
+            this.notification.onSuccess('A company copy was saved — the shared template was not changed');
+          } else {
+            this.templates = this.templates.map(x => x.id === t.id ? t : x);
+            this.notification.onSuccess('Template updated');
+          }
         } else {
           this.templates = [t, ...this.templates];
+          this.notification.onSuccess('Template created');
         }
-        this.notification.onSuccess(this.editingId ? 'Template updated' : 'Template created');
         this.cdr.markForCheck();
       },
       error: e => {
