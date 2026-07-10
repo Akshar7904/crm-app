@@ -36,9 +36,9 @@
   <div class="table-card">
     <div class="table-card-header">
       <span class="fw-semibold">
-        <span *ngIf="activeWindow === 30">⚠️ Expiring within 30 days</span>
-        <span *ngIf="activeWindow === 60">⏰ Expiring within 31–60 days</span>
-        <span *ngIf="activeWindow === 90">📅 Expiring within 61–90 days</span>
+        <span *ngIf="activeWindow === 30"><i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>Expiring within 30 days</span>
+        <span *ngIf="activeWindow === 60"><i class="bi bi-clock-fill text-warning me-1"></i>Expiring within 31–60 days</span>
+        <span *ngIf="activeWindow === 90"><i class="bi bi-calendar3 text-info me-1"></i>Expiring within 61–90 days</span>
       </span>
       <span class="badge badge-soft-secondary">{{ activeList.length }} contracts</span>
     </div>
