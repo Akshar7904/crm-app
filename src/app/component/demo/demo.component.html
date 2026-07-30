@@ -16,61 +16,63 @@
     </div>
   </header>
 
-  <!-- ══ HERO: Accordion ══════════════════════════════════════════ -->
-  <section class="lp-hero-acc">
-    <div class="hero-acc-inner">
+  <!-- ══ HERO ═════════════════════════════════════════════════════ -->
+  <section class="lp-hero">
+    <div class="lp-hero__inner">
 
-      <!-- Left: Text -->
-      <div class="hero-acc-text">
+      <!-- Left: headline -->
+      <div class="lp-hero__text">
         <div class="hero-eyebrow">Silver Spectrum Solutions &nbsp;·&nbsp; South Africa</div>
-        <h1 class="hero-acc-title">
-          Your complete<br>HR &amp; Payroll<br>command centre
+        <h1 class="lp-hero__title">
+          Your workforce,<br>effortlessly<br>managed.
         </h1>
-        <p class="hero-acc-desc">
-          Enterprize360 gives managers a real-time view of their entire workforce — who's in,
-          who's on leave, and where the money is going. Built for South African businesses.
+        <p class="lp-hero__desc">
+          Enterprize360 gives managers a real-time view of their entire
+          workforce — who's in, who's on leave, and where the money is
+          going. Built for South African businesses.
         </p>
-        <div class="hero-acc-actions">
+        <div class="lp-hero__actions">
           <a href="#contact" class="btn-hero-primary">Request a Demo</a>
           <a routerLink="/login" class="btn-hero-ghost">Sign In</a>
         </div>
-        <div class="hero-acc-trust">
-          <span><i class="bi bi-shield-check-fill"></i> ZAR native</span>
-          <span><i class="bi bi-cloud-check-fill"></i> Cloud hosted</span>
-          <span><i class="bi bi-building-check"></i> Multi-company</span>
+        <div class="lp-hero__stats">
+          <div class="stat-item"><strong>15+</strong><span>Modules</span></div>
+          <div class="stat-item"><strong>360°</strong><span>HR Coverage</span></div>
+        </div>
+        <div class="lp-hero__trust">
+          <span class="lp-hero__trust-label">TRUSTED ACROSS SOUTH AFRICA</span>
+          <div class="lp-hero__trust-marks">
+            <span><i class="bi bi-shield-check-fill"></i> ZAR native</span>
+            <span><i class="bi bi-cloud-check-fill"></i> Cloud hosted</span>
+            <span><i class="bi bi-building-check"></i> Multi-company</span>
+          </div>
         </div>
       </div>
 
-      <!-- Right: Image Accordion -->
-      <div class="hero-acc-panels">
-        <div
-          *ngFor="let mod of accordionModules; let i = index"
-          class="acc-panel"
-          [class.acc-panel--active]="activeAccordionIndex === i"
-          (mouseenter)="setAccordion(i)">
-          <img [src]="mod.image" [alt]="mod.title" class="acc-panel-img">
-          <div class="acc-panel-overlay"></div>
-          <div class="acc-panel-tag" [style.background]="mod.color">{{ mod.tag }}</div>
-          <div class="acc-panel-content">
-            <i class="bi acc-panel-icon" [ngClass]="mod.icon"></i>
-            <span class="acc-panel-label">{{ mod.title }}</span>
+      <!-- Right: card grid -->
+      <div class="lp-hero__cards">
+        <div class="hero-card hero-card--emerald">
+          <div class="hero-card__badge"><i class="bi bi-shield-check"></i> Secure by Design</div>
+          <div class="hero-card__body">Role-based access and audit trails<br>keep every payroll run accountable.</div>
+        </div>
+        <div class="hero-card hero-card--teal">
+          <div class="hero-card__label">Attendance</div>
+          <div class="hero-card__body">Real-time clock-in tracking<br>across every branch.</div>
+        </div>
+        <div class="hero-card hero-card--white">
+          <div class="hero-card__label">This Month's Payroll</div>
+          <div class="hero-card__amount">R 428,600 <span>processed</span></div>
+          <div class="hero-card__bars">
+            <span style="height:35%"></span>
+            <span style="height:60%"></span>
+            <span style="height:80%"></span>
+            <span style="height:100%"></span>
           </div>
         </div>
       </div>
 
     </div>
   </section>
-
-  <!-- ══ STATS BAR ════════════════════════════════════════════════ -->
-  <div class="lp-stats-bar">
-    <div class="stat-item"><strong>15+</strong><span>Modules</span></div>
-    <div class="sep"></div>
-    <div class="stat-item"><strong>360°</strong><span>HR Coverage</span></div>
-    <div class="sep"></div>
-    <div class="stat-item"><strong>ZAR</strong><span>South African</span></div>
-    <div class="sep"></div>
-    <div class="stat-item"><strong>Live</strong><span>Cloud Hosted</span></div>
-  </div>
 
   <!-- ══ MODULE MARQUEE ═══════════════════════════════════════════ -->
   <section class="lp-marquee-section" id="modules">
@@ -280,6 +282,7 @@
             <span>Enterprize360</span>
           </div>
           <p class="footer-tagline">HR &amp; Payroll for South Africa — by Silver Spectrum Solutions.</p>
+          <p class="footer-contact">1217 Pluimbal Avenue, Weltevreden Park, Roodepoort, 1709 &nbsp;·&nbsp; info@silverspectrumsolutions.co.za &nbsp;·&nbsp; +27 83 554 9197</p>
         </div>
         <div class="col-lg-4 mb-4 mb-lg-0">
           <div class="footer-links">

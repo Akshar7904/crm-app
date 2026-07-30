@@ -11,56 +11,6 @@ import { Component } from '@angular/core';
 })
 export class DemoComponent {
 
-  // ── Hero Accordion ──────────────────────────────────────────────────────
-  activeAccordionIndex = 5;
-
-  setAccordion(i: number): void { this.activeAccordionIndex = i; }
-
-  readonly accordionModules = [
-    {
-      title: 'Employee Management',
-      tag: 'People',
-      icon: 'bi-people-fill',
-      image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?q=80&w=2070&auto=format&fit=crop',
-      color: '#8b5cf6'
-    },
-    {
-      title: 'Leave Management',
-      tag: 'Time',
-      icon: 'bi-calendar2-check',
-      image: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?q=80&w=2068&auto=format&fit=crop',
-      color: '#6366f1'
-    },
-    {
-      title: 'Payroll & Payslips',
-      tag: 'Finance',
-      icon: 'bi-cash-stack',
-      image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=2011&auto=format&fit=crop',
-      color: '#10b981'
-    },
-    {
-      title: 'Attendance Tracking',
-      tag: 'Time',
-      icon: 'bi-clock-history',
-      image: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=2070&auto=format&fit=crop',
-      color: '#f59e0b'
-    },
-    {
-      title: 'Contract Management',
-      tag: 'Ops',
-      icon: 'bi-file-earmark-text',
-      image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2070&auto=format&fit=crop',
-      color: '#3b82f6'
-    },
-    {
-      title: 'Asset Management',
-      tag: 'Ops',
-      icon: 'bi-laptop',
-      image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop',
-      color: '#ef4444'
-    }
-  ];
-
   // ── Module Marquee ──────────────────────────────────────────────────────
   selectedModule: any = null;
 
