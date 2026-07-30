@@ -4,13 +4,12 @@
 // ========================================
 
 // ==================== PRIMARY COLORS ====================
-// Enterprize360 brand colors — emerald, extracted from the approved
-// landing-page reference design.
-$primary-dark: #064e3b;   // emerald-900
-$primary: #064e3b;
-$primary-medium: #065f46; // emerald-800
-$primary-light: #047857;  // emerald-700
-$primary-darker: #022c22;
+// Enterprize360 brand colors — user-specified palette.
+$primary-dark: #346739;
+$primary: #346739;
+$primary-medium: #79ae6f;
+$primary-light: #9fcb98;
+$primary-darker: #23481f;
 
 // Primary gradient (main brand gradient)
 $gradient-primary: linear-gradient(135deg, $primary-dark 0%, $primary-medium 100%);
@@ -18,14 +17,14 @@ $gradient-primary-hover: linear-gradient(135deg, $primary-medium 0%, $primary-li
 $gradient-primary-dark: linear-gradient(135deg, $primary-dark 0%, $primary-light 50%, $primary-darker 100%);
 
 // ==================== SECONDARY COLORS ====================
-// Teal accent (used in some components)
-$secondary-dark: #0f172a;  // slate-900
-$secondary: #2dd4bf;       // teal-400
-$secondary-light: #5eead4; // teal-300
+// Same palette, lighter tones used as the secondary accent.
+$secondary-dark: #346739;
+$secondary: #79ae6f;
+$secondary-light: #9fcb98;
 
 // Secondary gradient (accent gradient)
 $gradient-secondary: linear-gradient(135deg, $secondary-dark 0%, $secondary 100%);
-$gradient-secondary-hover: linear-gradient(135deg, #3a3d66 0%, #6867d8 100%);
+$gradient-secondary-hover: linear-gradient(135deg, $primary-medium 0%, $primary-light 100%);
 
 // ==================== SEMANTIC COLORS ====================
 // Success
@@ -63,7 +62,7 @@ $gray-900: #0f172a;
 $black: #000000;
 
 // Background colors
-$bg-body: #f3f5f7;
+$bg-body: #f2edc2;
 $bg-card: $white;
 $bg-input: $gray-50;
 $bg-disabled: #f3f4f6;
@@ -126,8 +125,8 @@ $shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 $shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.15);
 $shadow-xl: 0 10px 40px rgba(0, 0, 0, 0.2);
-$shadow-primary: 0 4px 8px rgba(6, 78, 59, 0.3);
-$shadow-secondary: 0 4px 6px rgba(72, 76, 127, 0.2);
+$shadow-primary: 0 4px 8px rgba(52, 103, 57, 0.3);
+$shadow-secondary: 0 4px 6px rgba(121, 174, 111, 0.2);
 
 // ==================== TRANSITIONS ====================
 $transition-fast: 0.15s ease;
@@ -171,7 +170,7 @@ $input-font-size: 0.95rem;
 $input-border-radius: $border-radius;
 $input-border-color: #ddd;
 $input-focus-border-color: $primary;
-$input-focus-shadow: 0 0 0 3px rgba(6, 78, 59, 0.15);
+$input-focus-shadow: 0 0 0 3px rgba(52, 103, 57, 0.15);
 
 // Tables
 $table-header-bg: $gray-100;
