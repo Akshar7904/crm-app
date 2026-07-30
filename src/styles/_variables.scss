@@ -4,12 +4,13 @@
 // ========================================
 
 // ==================== PRIMARY COLORS ====================
-// Main brand colors (from login page)
-$primary-dark: #005c8f;
-$primary: #005c8f;
-$primary-medium: #004d7a;
-$primary-light: #003d5c;
-$primary-darker: #002a40;
+// Enterprize360 brand colors — emerald, extracted from the approved
+// landing-page reference design.
+$primary-dark: #064e3b;   // emerald-900
+$primary: #064e3b;
+$primary-medium: #065f46; // emerald-800
+$primary-light: #047857;  // emerald-700
+$primary-darker: #022c22;
 
 // Primary gradient (main brand gradient)
 $gradient-primary: linear-gradient(135deg, $primary-dark 0%, $primary-medium 100%);
@@ -17,10 +18,10 @@ $gradient-primary-hover: linear-gradient(135deg, $primary-medium 0%, $primary-li
 $gradient-primary-dark: linear-gradient(135deg, $primary-dark 0%, $primary-light 50%, $primary-darker 100%);
 
 // ==================== SECONDARY COLORS ====================
-// Purple accent colors (used in some components)
-$secondary-dark: #484c7f;
-$secondary: #7978e9;
-$secondary-light: #9897f0;
+// Teal accent (used in some components)
+$secondary-dark: #0f172a;  // slate-900
+$secondary: #2dd4bf;       // teal-400
+$secondary-light: #5eead4; // teal-300
 
 // Secondary gradient (accent gradient)
 $gradient-secondary: linear-gradient(135deg, $secondary-dark 0%, $secondary 100%);
@@ -49,20 +50,20 @@ $info-dark: #0c5460;
 
 // ==================== NEUTRAL COLORS ====================
 $white: #ffffff;
-$gray-50: #f9fafb;
-$gray-100: #f8f9fa;
-$gray-200: #e5e7eb;
-$gray-300: #e0e0e0;
-$gray-400: #9ca3af;
-$gray-500: #6b7280;
-$gray-600: #666666;
-$gray-700: #374151;
-$gray-800: #333333;
-$gray-900: #1e293b;
+$gray-50: #f8fafc;
+$gray-100: #f1f5f9;
+$gray-200: #e2e8f0;
+$gray-300: #cbd5e1;
+$gray-400: #94a3b8;
+$gray-500: #64748b;
+$gray-600: #475569;
+$gray-700: #334155;
+$gray-800: #1e293b;
+$gray-900: #0f172a;
 $black: #000000;
 
 // Background colors
-$bg-body: #ecf2f5;
+$bg-body: #f3f5f7;
 $bg-card: $white;
 $bg-input: $gray-50;
 $bg-disabled: #f3f4f6;
@@ -125,7 +126,7 @@ $shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 $shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.15);
 $shadow-xl: 0 10px 40px rgba(0, 0, 0, 0.2);
-$shadow-primary: 0 4px 8px rgba(0, 92, 143, 0.3);
+$shadow-primary: 0 4px 8px rgba(6, 78, 59, 0.3);
 $shadow-secondary: 0 4px 6px rgba(72, 76, 127, 0.2);
 
 // ==================== TRANSITIONS ====================
@@ -170,7 +171,7 @@ $input-font-size: 0.95rem;
 $input-border-radius: $border-radius;
 $input-border-color: #ddd;
 $input-focus-border-color: $primary;
-$input-focus-shadow: 0 0 0 3px rgba(0, 92, 143, 0.15);
+$input-focus-shadow: 0 0 0 3px rgba(6, 78, 59, 0.15);
 
 // Tables
 $table-header-bg: $gray-100;
