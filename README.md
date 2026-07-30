@@ -1,6 +1,6 @@
-# ORION — LKCentrix Payroll System (Frontend)
+# Enterprize360 — Silver Spectrum Payroll System (Frontend)
 
-Angular 15 SPA for the ORION HR & Payroll Management Platform.
+Angular 15 SPA for the Enterprize360 HR & Payroll Management Platform.
 
 ---
 

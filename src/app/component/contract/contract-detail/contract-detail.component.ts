@@ -395,7 +395,7 @@ ${c.content ? `<div class="sec">Contract Terms &amp; Conditions</div><div class=
 ${c.signatures?.length ? `<div class="sec">Signatures</div><div class="sig-row">
   ${c.signatures.map(s => `<div class="sig-box"><strong>${s.signerName}</strong><br>${s.signerRole || ''}<br><span style="color:#666;font-size:8pt">${s.signedAt ? new Date(s.signedAt).toLocaleDateString('en-ZA') : ''}</span></div>`).join('')}
 </div>` : ''}
-<div class="ftr"><span>ORION — LKCentrix HR &amp; Payroll Management System</span><span>${c.contractNumber}</span></div>
+<div class="ftr"><span>Enterprize360 HR &amp; Payroll Management System</span><span>${c.contractNumber}</span></div>
 </body></html>`;
 
     const win = window.open('', '_blank', 'width=900,height=700');

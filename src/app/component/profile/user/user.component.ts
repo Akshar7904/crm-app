@@ -33,7 +33,7 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
  * - Document management
  * - Status auto-change (Pending → Active when complete)
  *
- * Company: LKCentrix Solutions (PTY) LTD
+ * Company: Silver Spectrum Solutions (PTY) LTD
  */
 @Component({
   standalone: false,

@@ -18,11 +18,11 @@ export class LegalComponent implements OnInit {
   activeSection: LegalSection = 'terms';
 
   readonly effectiveDate = '1 May 2026';
-  readonly companyName   = 'LKCentrix Solutions (PTY) LTD';
-  readonly productName   = 'ORION';
-  readonly supportEmail  = 'legal@lkcentrix.co.za';
-  readonly contactEmail  = 'support@lkcentrix.co.za';
-  readonly website       = 'www.lkcentrix.co.za';
+  readonly companyName   = 'Silver Spectrum Solutions (PTY) LTD';
+  readonly productName   = 'Enterprize360';
+  readonly supportEmail  = 'legal@silverspectrumsolutions.co.za';
+  readonly contactEmail  = 'support@silverspectrumsolutions.co.za';
+  readonly website       = 'www.silverspectrumsolutions.co.za';
   readonly regNumber     = '(Registration number to be inserted)';
   readonly address       = 'South Africa';
 

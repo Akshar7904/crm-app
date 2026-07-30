@@ -28,7 +28,7 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./component/demo/demo.module').then(m => m.DemoModule),
     pathMatch: 'full',
-    data: { title: 'ORION — HR & Payroll Platform' }
+    data: { title: 'Enterprize360 — HR & Payroll Platform' }
   },
 
   // =============================================

@@ -199,7 +199,7 @@ export class DemoComponent {
       label: '🇿🇦 Built for South Africa',
       icon: 'bi-shield-check',
       title: 'Built for South Africa',
-      desc: 'ORION is designed from the ground up for the South African context — no configuration needed to get started with local compliance.',
+      desc: 'Enterprize360 is designed from the ground up for the South African context — no configuration needed to get started with local compliance.',
       features: [
         'South African Rand (ZAR) currency throughout',
         'SAST timezone (Africa/Johannesburg)',
@@ -225,10 +225,10 @@ export class DemoComponent {
       label: '☁️ Cloud-Hosted & Fast',
       icon: 'bi-cloud-check-fill',
       title: 'Cloud-Hosted & Fast',
-      desc: 'ORION is deployed on enterprise-grade cloud infrastructure — accessible from any device, always up to date, with no installation required.',
+      desc: 'Enterprize360 is deployed on enterprise-grade cloud infrastructure — accessible from any device, always up to date, with no installation required.',
       features: [
-        'Hosted on Vercel (frontend) + Render (API)',
-        'PostgreSQL database on Supabase',
+        'Hosted on Railway (frontend + API)',
+        'PostgreSQL database on Railway',
         'Works on desktop, tablet and mobile',
         'Automatic updates — no IT department needed',
         'Global CDN for fast load times'

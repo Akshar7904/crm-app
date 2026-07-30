@@ -792,8 +792,6 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
 
   /** Map of company name keywords to static logo assets */
   private readonly COMPANY_LOGO_MAP: { keywords: string[]; asset: string }[] = [
-    { keywords: ['recoveries', 'lkcr'],   asset: 'assets/lkcrecoveries_logo.png' },
-    { keywords: ['trust'],                asset: 'assets/trust_x_logo.png'       },
     { keywords: ['lkcentrix', 'lkc'],     asset: 'assets/lkcentrix_logo.png'     },
   ];
 

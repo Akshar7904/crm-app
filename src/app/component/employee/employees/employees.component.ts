@@ -24,7 +24,7 @@ import { NotificationService } from 'src/app/service/notification.service';
  * - Export to CSV
  * - Enhanced filtering
  *
- * Company: LKCentrix Solutions (PTY) LTD
+ * Company: Silver Spectrum Solutions (PTY) LTD
  */
 @Component({
   standalone: false,
