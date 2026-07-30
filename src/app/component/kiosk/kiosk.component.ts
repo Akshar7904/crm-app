@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
-// LKCentrix HR & Payroll Management System — ORION
+// Enterprize360 HR & Payroll Management System
 
 import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, HostListener } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';

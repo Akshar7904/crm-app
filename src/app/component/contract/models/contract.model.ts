@@ -1,5 +1,5 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
-// LKCentrix HR & Payroll Management System — ORION
+// Enterprize360 HR & Payroll Management System
 
 export type ContractStatus =
   | 'DRAFT' | 'PENDING_APPROVAL' | 'ACTIVE' | 'EXPIRING_SOON' | 'EXPIRED' | 'TERMINATED' | 'RENEWED';
