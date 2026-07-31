@@ -17,28 +17,31 @@
     <!-- Loaded State - Role-Based Dashboard -->
     <ng-container *ngIf="state.dataState === DataState.LOADED">
 
-      <!-- Welcome Header -->
-      <div class="dashboard-header">
-        <div class="welcome-section">
-          <h1 class="dashboard-title">
-            <i class="bi bi-speedometer2 me-2"></i>
-            {{ (isAdmin || isManager) ? 'Admin Dashboard' : 'My Dashboard' }}
-          </h1>
-          <p class="dashboard-subtitle">
-            Welcome, <strong>{{ state.user?.firstName }} {{ state.user?.lastName }}</strong>!
+      <!-- Hero Banner -->
+      <div class="hero-banner">
+        <div class="hero-banner-main">
+          <div class="hero-date">{{ currentDate }}</div>
+          <h1 class="hero-greeting">Hello, {{ state.user?.firstName }}! <span class="hero-wave">👋</span></h1>
+          <p class="hero-subtitle">
+            {{ (isAdmin || isManager) ? 'Track & manage your team progress here' : 'Here\'s what\'s happening with your work today' }}
           </p>
-        </div>
-        <div class="header-actions">
-          <button (click)="refreshDashboard()" class="btn btn-refresh">
+          <button (click)="refreshDashboard()" class="btn-refresh">
             <i class="bi bi-arrow-clockwise"></i>
             <span>Refresh</span>
           </button>
+        </div>
+        <div class="hero-pills" *ngIf="statsCards.length">
+          <a *ngFor="let stat of statsCards.slice(0, 3)" class="hero-pill" [routerLink]="stat.route">
+            <div class="hero-pill-icon"><i class="bi" [ngClass]="stat.icon"></i></div>
+            <div class="hero-pill-value">{{ stat.value }}</div>
+            <div class="hero-pill-label">{{ stat.label }}</div>
+          </a>
         </div>
       </div>
 
       <!-- Stats Cards Grid -->
       <div class="stats-grid">
-        <div *ngFor="let stat of statsCards" class="stat-card" [class]="'stat-card-' + stat.iconClass">
+        <div *ngFor="let stat of statsCards.slice(3)" class="stat-card" [class]="'stat-card-' + stat.iconClass">
           <div class="stat-card-inner">
             <div class="stat-icon">
               <i class="bi" [ngClass]="stat.icon"></i>
@@ -56,6 +59,52 @@
 
       <!-- Additional Charts for Admin/Manager -->
       <ng-container *ngIf="isAdmin || isManager">
+
+        <!-- Chart Row: Attendance breakdown + Team composition -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="bi bi-pie-chart-fill me-2"></i>Today's Attendance</div>
+            </div>
+            <div class="chart-card-body" *ngIf="hasChartData(attendanceChartData); else noAttendanceChart">
+              <app-dashboard-chart [chartType]="'doughnut'" [chartData]="attendanceChartData"></app-dashboard-chart>
+            </div>
+            <ng-template #noAttendanceChart>
+              <div class="chart-card-body chart-empty">
+                <i class="bi bi-pie-chart"></i>
+                <p>No attendance recorded yet today.</p>
+              </div>
+            </ng-template>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="bi bi-people-fill me-2"></i>Team Composition</div>
+            </div>
+            <div class="chart-card-body" *ngIf="hasChartData(genderChartData); else noGenderChart">
+              <app-dashboard-chart [chartType]="'doughnut'" [chartData]="genderChartData"></app-dashboard-chart>
+            </div>
+            <ng-template #noGenderChart>
+              <div class="chart-card-body chart-empty">
+                <i class="bi bi-people"></i>
+                <p>No employee demographic data yet.</p>
+              </div>
+            </ng-template>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="bi bi-calendar-x me-2"></i>Leave Overview</div>
+            </div>
+            <div class="chart-card-body" *ngIf="hasChartData(leaveChartData); else noLeaveChart">
+              <app-dashboard-chart [chartType]="'bar'" [chartData]="leaveChartData"></app-dashboard-chart>
+            </div>
+            <ng-template #noLeaveChart>
+              <div class="chart-card-body chart-empty">
+                <i class="bi bi-calendar-x"></i>
+                <p>No leave activity this month.</p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
 
         <!-- MIDDLE GRID: Financial Summary + Announcements -->
         <div class="dashboard-middle-grid">
@@ -437,6 +486,38 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Chart Row: My attendance + Leave balance -->
+        <div class="charts-row">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="bi bi-pie-chart-fill me-2"></i>My Attendance</div>
+            </div>
+            <div class="chart-card-body" *ngIf="hasChartData(attendanceChartData); else noMyAttendanceChart">
+              <app-dashboard-chart [chartType]="'doughnut'" [chartData]="attendanceChartData"></app-dashboard-chart>
+            </div>
+            <ng-template #noMyAttendanceChart>
+              <div class="chart-card-body chart-empty">
+                <i class="bi bi-pie-chart"></i>
+                <p>No attendance recorded yet.</p>
+              </div>
+            </ng-template>
+          </div>
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <div class="chart-title"><i class="bi bi-calendar-week me-2"></i>Leave Balance</div>
+            </div>
+            <div class="chart-card-body" *ngIf="hasChartData(leaveChartData); else noMyLeaveChart">
+              <app-dashboard-chart [chartType]="'bar'" [chartData]="leaveChartData"></app-dashboard-chart>
+            </div>
+            <ng-template #noMyLeaveChart>
+              <div class="chart-card-body chart-empty">
+                <i class="bi bi-calendar-week"></i>
+                <p>No leave balance data available.</p>
+              </div>
+            </ng-template>
           </div>
         </div>
 

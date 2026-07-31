@@ -20,81 +20,158 @@
 }
 
 // ========================================
-// DASHBOARD HEADER — clean white card
+// HERO BANNER — gradient welcome card with key stat pills
 // ========================================
-.dashboard-header {
+.hero-banner {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
   align-items: center;
+  gap: $spacing-xl;
   margin-bottom: 24px;
-  padding: $spacing-lg $spacing-xl;
-  background: var(--bg-card, #ffffff);
+  padding: $spacing-xl;
   border-radius: $border-radius-xl;
-  box-shadow: var(--card-shadow, 0 2px 12px rgba(0,0,0,0.07));
-  border: 1px solid var(--border-color, #e9ecef);
+  background: linear-gradient(135deg, $primary-dark 0%, $primary 55%, $primary-medium 100%);
+  box-shadow: 0 8px 30px rgba($primary, 0.35);
   position: relative;
   overflow: hidden;
   animation: fadeInDown 0.5s ease forwards;
 
-  // Subtle left accent stripe
   &::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, $primary 0%, $primary-light 100%);
-    border-radius: $border-radius-xl 0 0 $border-radius-xl;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -70px;
+    right: 120px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
   }
 }
 
-.welcome-section { flex: 1; position: relative; z-index: 1; }
+.hero-banner-main {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+  z-index: 1;
+}
 
-.dashboard-title {
-  font-size: $font-size-xl;
-  font-weight: $font-weight-semibold;
-  color: var(--text-primary, #1a1a2e);
+.hero-date {
+  font-size: $font-size-xs;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: $font-weight-medium;
+  margin-bottom: 6px;
+}
+
+.hero-greeting {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: #fff;
   margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  i { color: $primary; font-size: 1.1rem; }
 }
 
-.dashboard-subtitle {
-  margin: 6px 0 0 0;
-  color: var(--text-muted, #6c757d);
+.hero-wave { display: inline-block; }
+
+.hero-subtitle {
+  margin: 6px 0 $spacing-md 0;
+  color: rgba(255, 255, 255, 0.85);
   font-size: $font-size-sm;
-
-  strong { color: var(--text-primary, #1a1a2e); font-weight: $font-weight-semibold; }
 }
-
-.header-actions { position: relative; z-index: 1; }
 
 .btn-refresh {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: $spacing-sm 16px;
-  background: transparent;
-  border: 1px solid var(--border-color, #dee2e6);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: $border-radius-md;
-  color: var(--text-secondary, #495057);
+  color: #fff;
   font-weight: $font-weight-medium;
   font-size: 0.82rem;
   cursor: pointer;
   transition: all $transition-base;
 
   &:hover {
-    background: var(--bg-hover, rgba(0,0,0,0.04));
-    border-color: $primary;
-    color: $primary;
+    background: rgba(255, 255, 255, 0.28);
     transform: translateY(-1px);
   }
 
   i { font-size: $font-size-base; }
+}
+
+.hero-pills {
+  display: flex;
+  gap: $spacing-md;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 110px;
+  padding: $spacing-md;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: $border-radius-lg;
+  backdrop-filter: blur(6px);
+  text-decoration: none;
+  transition: all $transition-base;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.22);
+    transform: translateY(-2px);
+  }
+}
+
+.hero-pill-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  @include flex-center;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.hero-pill-value {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: #fff;
+  line-height: 1;
+}
+
+.hero-pill-label {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  text-align: center;
+  @include truncate;
+  max-width: 100px;
+}
+
+// ========================================
+// CHARTS ROW — real doughnut/bar charts from live data
+// ========================================
+.charts-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  margin-bottom: 24px;
 }
 
 // ========================================

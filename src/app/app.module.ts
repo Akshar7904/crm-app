@@ -21,6 +21,7 @@ import { AuthModule } from './component/auth/auth.module';
 // Feature Modules (some lazy-loaded, some not)
 import { HomeModule } from './component/home/home.module';
 import { NavBarModule } from './component/navbar/navbar.module';
+import { TopnavModule } from './component/topnav/topnav.module';
 // REMOVE EmployeeModule from here - it's lazy loaded
 
 // Components declared here (not in lazy-loaded modules)
@@ -73,6 +74,7 @@ import { AppRoutingModule } from './app-routing.module';
 
     // Feature Modules
     NavBarModule,
+    TopnavModule,
     HomeModule,
 
     // MUST BE LAST - App Routing

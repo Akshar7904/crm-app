@@ -1198,4 +1198,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!amount && amount !== 0) return 'R 0';
     return 'R ' + Math.round(amount).toLocaleString('en-ZA');
   }
+
+  hasChartData(data: any): boolean {
+    return !!data?.datasets?.some((ds: any) => (ds.data || []).some((v: number) => v > 0));
+  }
 }

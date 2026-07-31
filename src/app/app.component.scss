@@ -203,3 +203,24 @@
   max-width: 500px;
   text-align: center;
 }
+
+// ─── Top Nav shell (alternative to sidebar) ────────────────────────────────
+// The top nav is sticky and already sits in normal document flow, so the
+// content area needs no reserved margin the way the fixed sidebar/navbar do.
+// Placed last so it wins over the .main-content-wrapper breakpoint rules
+// above, which share the same specificity.
+// The top nav sits in normal document flow above the content (not fixed,
+// like the sidebar), so the app container needs to stack them vertically
+// instead of the default row direction used for the fixed sidebar shell.
+.app-container.layout-topnav {
+  flex-direction: column;
+}
+
+.main-content-wrapper--topnav {
+  margin-left: 0 !important;
+  width: 100%;
+
+  .content-area {
+    margin-top: 0 !important;
+  }
+}

@@ -9,6 +9,7 @@ import { UserModel } from 'src/app/component/profile/user.model';
 import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 import { ThemeService, Theme } from 'src/app/service/theme.service';
+import { LayoutPreferenceService, LayoutMode } from 'src/app/service/layout-preference.service';
 import { Observable } from 'rxjs';
 import { Key } from 'src/app/enum/key.enum';
 
@@ -40,14 +41,21 @@ export class NavbarComponent {
   private cachedUserId: number = null;
 
   theme$: Observable<Theme>;
+  layoutMode$: Observable<LayoutMode>;
 
   constructor(
     private router: Router,
     private userService: UserService,
     private notification: NotificationService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private layoutPreference: LayoutPreferenceService
   ) {
     this.theme$ = this.themeService.theme$;
+    this.layoutMode$ = this.layoutPreference.mode$;
+  }
+
+  setLayoutMode(mode: LayoutMode): void {
+    this.layoutPreference.setMode(mode);
   }
 
   exitImpersonation(): void {

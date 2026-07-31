@@ -1,38 +1,65 @@
 <!-- Main App Container -->
-<div class="app-container" [class.sidebar-collapsed]="sidebarCollapsed" [class.sidebar-open]="sidebarOpen">
+<div class="app-container"
+     [class.sidebar-collapsed]="sidebarCollapsed"
+     [class.sidebar-open]="sidebarOpen"
+     [class.layout-topnav]="(layoutMode$ | async) === 'topnav'">
   <!-- Show dashboard layout only for authenticated users on non-public routes -->
   <ng-container *ngIf="!isPublicRoute && isAuthenticated && (user$ | async) as user; else unauthenticated">
 
-    <!-- Sidebar -->
-    <app-sidebar
-      [user]="user"
-      [collapsed]="sidebarCollapsed"
-      [mobileOpen]="sidebarOpen"
-      (closeMobileSidebar)="closeSidebar()">
-    </app-sidebar>
+    <ng-container *ngIf="(layoutMode$ | async) === 'topnav'; else sidebarShell">
 
-    <!-- Mobile Overlay -->
-    <div class="sidebar-overlay"
-         *ngIf="sidebarOpen && isMobile"
-         (click)="closeSidebar()">
-    </div>
-
-    <!-- Main Content Wrapper -->
-    <div class="main-content-wrapper">
-      <!-- Navbar -->
-      <app-navbar
+      <!-- Top Nav Shell -->
+      <app-topnav
         [user]="user"
-        [sidebarCollapsed]="sidebarCollapsed"
-        (toggleSidebar)="toggleSidebar()">
-      </app-navbar>
+        [mobileOpen]="sidebarOpen"
+        (toggleMobileMenu)="toggleSidebar()"
+        (closeMobileMenu)="closeSidebar()">
+      </app-topnav>
 
-      <!-- Main Content -->
-      <div class="content-area">
-        <div class="container-fluid py-4">
-          <router-outlet></router-outlet>
+      <div class="main-content-wrapper main-content-wrapper--topnav">
+        <div class="content-area">
+          <div class="container-fluid py-4">
+            <router-outlet></router-outlet>
+          </div>
         </div>
       </div>
-    </div>
+
+    </ng-container>
+
+    <ng-template #sidebarShell>
+
+      <!-- Sidebar -->
+      <app-sidebar
+        [user]="user"
+        [collapsed]="sidebarCollapsed"
+        [mobileOpen]="sidebarOpen"
+        (closeMobileSidebar)="closeSidebar()">
+      </app-sidebar>
+
+      <!-- Mobile Overlay -->
+      <div class="sidebar-overlay"
+           *ngIf="sidebarOpen && isMobile"
+           (click)="closeSidebar()">
+      </div>
+
+      <!-- Main Content Wrapper -->
+      <div class="main-content-wrapper">
+        <!-- Navbar -->
+        <app-navbar
+          [user]="user"
+          [sidebarCollapsed]="sidebarCollapsed"
+          (toggleSidebar)="toggleSidebar()">
+        </app-navbar>
+
+        <!-- Main Content -->
+        <div class="content-area">
+          <div class="container-fluid py-4">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+      </div>
+
+    </ng-template>
 
     <!-- Mobile Bottom Navigation (LinkedIn-style, phones only) -->
     <nav class="mobile-bottom-nav">

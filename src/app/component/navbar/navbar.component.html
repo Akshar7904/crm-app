@@ -108,6 +108,20 @@
 
           <li><hr class="dropdown-divider" /></li>
 
+          <li class="dropdown-section-label">Layout</li>
+          <li class="layout-switcher">
+            <button type="button" class="layout-switch-btn" [class.active]="(layoutMode$ | async) === 'sidebar'" (click)="setLayoutMode('sidebar')">
+              <i class="bi bi-layout-sidebar"></i>
+              Sidebar
+            </button>
+            <button type="button" class="layout-switch-btn" [class.active]="(layoutMode$ | async) === 'topnav'" (click)="setLayoutMode('topnav')">
+              <i class="bi bi-menu-up"></i>
+              Top Nav
+            </button>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
           <li *ngIf="isImpersonating">
             <a class="dropdown-item impersonate-exit-item" (click)="exitImpersonation()">
               <i class="bi bi-arrow-return-left"></i>

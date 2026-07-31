@@ -1,0 +1,179 @@
+<!-- Impersonation Banner -->
+<div class="impersonation-banner" *ngIf="isImpersonating">
+  <i class="bi bi-eye-fill me-2"></i>
+  Viewing as <strong>{{ impersonatedCompanyName }}</strong>
+  <button class="btn btn-sm btn-light ms-3" (click)="exitImpersonation()">
+    <i class="bi bi-arrow-return-left me-1"></i>Return to Super-Admin
+  </button>
+</div>
+
+<nav class="topnav">
+  <div class="topnav-container">
+
+    <!-- Logo -->
+    <a routerLink="/home" class="topnav-logo">
+      <img *ngIf="companyLogoUrl; else platformLogo"
+           [src]="companyLogoUrl"
+           [alt]="branding.branding?.name || companyName || 'Company'"
+           class="topnav-logo-img"
+           (error)="onLogoError()">
+      <ng-template #platformLogo>
+        <img src="../../../assets/logo_icon.png" alt="Enterprize360" class="topnav-logo-img">
+      </ng-template>
+    </a>
+
+    <!-- Desktop horizontal menu -->
+    <div class="topnav-menu">
+      <ng-container *ngFor="let item of filteredMenuItems">
+
+        <div class="dropdown nav-dropdown" *ngIf="item.children">
+          <button class="nav-link dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  [class.active]="isParentActive(item)">
+            <i class="bi" [ngClass]="item.icon"></i>
+            <span>{{ item.label }}</span>
+            <span *ngIf="item.badge?.count" class="nav-badge" [ngClass]="'badge-' + item.badge.type">{{ item.badge.count }}</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li *ngFor="let child of item.children">
+              <a class="dropdown-item" [routerLink]="child.route" [class.active]="isActive(child.route)">
+                <i class="bi" [ngClass]="child.icon"></i>
+                <span>{{ child.label }}</span>
+                <span *ngIf="child.badge?.count" class="nav-badge" [ngClass]="'badge-' + child.badge.type">{{ child.badge.count }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <a class="nav-link" *ngIf="!item.children" [routerLink]="item.route" [class.active]="isActive(item.route)">
+          <i class="bi" [ngClass]="item.icon"></i>
+          <span>{{ item.label }}</span>
+          <span *ngIf="item.badge?.count" class="nav-badge" [ngClass]="'badge-' + item.badge.type">{{ item.badge.count }}</span>
+        </a>
+
+      </ng-container>
+    </div>
+
+    <!-- Right: actions & profile -->
+    <div class="topnav-right">
+
+      <app-notification-dropdown></app-notification-dropdown>
+
+      <a [routerLink]="['/announcements']" class="nav-action-btn" title="Announcements">
+        <i class="bi bi-megaphone"></i>
+      </a>
+
+      <div class="dropdown user-dropdown">
+        <button class="btn user-profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <img class="user-avatar" [src]="getProfileImageUrl()" (error)="onProfileImageError($event)" [alt]="user?.firstName" />
+          <div class="user-info d-none d-lg-flex">
+            <span class="user-name">{{ user?.firstName }} {{ user?.lastName }}</span>
+            <span class="user-role">{{ user?.roleName || 'Employee' }}</span>
+          </div>
+          <i class="bi bi-chevron-down dropdown-arrow d-none d-lg-block"></i>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-end">
+          <li class="dropdown-header">
+            <div class="user-header-info">
+              <div class="user-header-avatar-wrapper">
+                <img class="user-header-avatar" [src]="getProfileImageUrl()" (error)="onProfileImageError($event)" />
+                <span class="avatar-status-dot"></span>
+              </div>
+              <div>
+                <span class="user-header-name">{{ user?.firstName }} {{ user?.lastName }}</span>
+                <span class="user-header-email">{{ user?.email }}</span>
+              </div>
+            </div>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
+          <li class="dropdown-section-label">Account</li>
+          <li>
+            <a class="dropdown-item" [routerLink]="['/profile']">
+              <i class="bi bi-person-circle"></i>
+              My Profile
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
+          <li class="dropdown-section-label">Layout</li>
+          <li class="layout-switcher">
+            <button type="button" class="layout-switch-btn" [class.active]="(layoutMode$ | async) === 'sidebar'" (click)="setLayoutMode('sidebar')">
+              <i class="bi bi-layout-sidebar"></i>
+              Sidebar
+            </button>
+            <button type="button" class="layout-switch-btn" [class.active]="(layoutMode$ | async) === 'topnav'" (click)="setLayoutMode('topnav')">
+              <i class="bi bi-menu-up"></i>
+              Top Nav
+            </button>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
+          <li *ngIf="isImpersonating">
+            <a class="dropdown-item impersonate-exit-item" (click)="exitImpersonation()">
+              <i class="bi bi-arrow-return-left"></i>
+              Exit — Return to Super-Admin
+            </a>
+          </li>
+
+          <li *ngIf="isImpersonating"><hr class="dropdown-divider" /></li>
+
+          <li>
+            <a class="dropdown-item logout-item" (click)="onLogout()">
+              <i class="bi bi-box-arrow-right"></i>
+              Sign Out
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button class="hamburger-btn mobile-only" type="button" aria-label="Toggle menu" (click)="onMobileToggleClick()">
+        <div class="hamburger-icon" [class.active]="mobileOpen">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+    </div>
+
+  </div>
+</nav>
+
+<!-- Mobile drawer (vertical accordion) -->
+<div class="topnav-mobile-drawer" [class.open]="mobileOpen">
+  <nav class="mobile-menu">
+    <ul class="mobile-menu-list">
+      <li *ngFor="let item of filteredMenuItems" class="mobile-menu-item-wrapper">
+        <a class="mobile-menu-item"
+           [class.active]="isActive(item.route)"
+           [class.has-children]="item.children"
+           [class.expanded]="item.expanded"
+           (click)="toggleMenu(item)">
+          <span class="menu-icon"><i class="bi" [ngClass]="item.icon"></i></span>
+          <span class="menu-label">{{ item.label }}</span>
+          <span *ngIf="item.badge?.count" class="nav-badge" [ngClass]="'badge-' + item.badge.type">{{ item.badge.count }}</span>
+          <span *ngIf="item.children" class="expand-icon">
+            <i class="bi" [ngClass]="item.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+          </span>
+        </a>
+        <ul class="mobile-submenu" *ngIf="item.children" [class.show]="item.expanded">
+          <li *ngFor="let child of item.children">
+            <a class="mobile-submenu-item" [class.active]="isActive(child.route)" (click)="onChildClick($event, child)">
+              <span class="menu-icon"><i class="bi" [ngClass]="child.icon"></i></span>
+              <span class="menu-label">{{ child.label }}</span>
+              <span *ngIf="child.badge?.count" class="nav-badge" [ngClass]="'badge-' + child.badge.type">{{ child.badge.count }}</span>
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+</div>
+<div class="topnav-mobile-overlay" *ngIf="mobileOpen" (click)="onMobileToggleClick()"></div>
