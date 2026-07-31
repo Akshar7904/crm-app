@@ -4,23 +4,23 @@
 // ========================================
 
 // ==================== PRIMARY COLORS ====================
-// Enterprize360 brand colors — user-specified palette.
-$primary-dark: #346739;
-$primary: #346739;
-$primary-medium: #79ae6f;
-$primary-light: #9fcb98;
-$primary-darker: #23481f;
+// Enterprize360 brand colors — user-specified "cold blue" palette.
+$primary-dark: #163172;
+$primary: #1e56a0;
+$primary-medium: #1a4589;
+$primary-light: #d6e4f0;
+$primary-darker: #0d1d47;
 
 // Primary gradient (main brand gradient)
 $gradient-primary: linear-gradient(135deg, $primary-dark 0%, $primary-medium 100%);
-$gradient-primary-hover: linear-gradient(135deg, $primary-medium 0%, $primary-light 100%);
-$gradient-primary-dark: linear-gradient(135deg, $primary-dark 0%, $primary-light 50%, $primary-darker 100%);
+$gradient-primary-hover: linear-gradient(135deg, $primary-medium 0%, $primary 100%);
+$gradient-primary-dark: linear-gradient(135deg, $primary-dark 0%, $primary 50%, $primary-darker 100%);
 
 // ==================== SECONDARY COLORS ====================
 // Same palette, lighter tones used as the secondary accent.
-$secondary-dark: #346739;
-$secondary: #79ae6f;
-$secondary-light: #9fcb98;
+$secondary-dark: #163172;
+$secondary: #1e56a0;
+$secondary-light: #d6e4f0;
 
 // Secondary gradient (accent gradient)
 $gradient-secondary: linear-gradient(135deg, $secondary-dark 0%, $secondary 100%);
@@ -62,7 +62,7 @@ $gray-900: #0f172a;
 $black: #000000;
 
 // Background colors
-$bg-body: #f2edc2;
+$bg-body: #f6f6f6;
 $bg-card: $white;
 $bg-input: $gray-50;
 $bg-disabled: #f3f4f6;
@@ -125,8 +125,8 @@ $shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 $shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
 $shadow-lg: 0 8px 12px rgba(0, 0, 0, 0.15);
 $shadow-xl: 0 10px 40px rgba(0, 0, 0, 0.2);
-$shadow-primary: 0 4px 8px rgba(52, 103, 57, 0.3);
-$shadow-secondary: 0 4px 6px rgba(121, 174, 111, 0.2);
+$shadow-primary: 0 4px 8px rgba(30, 86, 160, 0.3);
+$shadow-secondary: 0 4px 6px rgba(30, 86, 160, 0.2);
 
 // ==================== TRANSITIONS ====================
 $transition-fast: 0.15s ease;
@@ -170,7 +170,7 @@ $input-font-size: 0.95rem;
 $input-border-radius: $border-radius;
 $input-border-color: #ddd;
 $input-focus-border-color: $primary;
-$input-focus-shadow: 0 0 0 3px rgba(52, 103, 57, 0.15);
+$input-focus-shadow: 0 0 0 3px rgba(30, 86, 160, 0.15);
 
 // Tables
 $table-header-bg: $gray-100;

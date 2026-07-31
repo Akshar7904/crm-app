@@ -28,7 +28,7 @@
 
 // Brand primary — overridden at runtime by BrandingService via document.documentElement.style.setProperty
 :root {
-  --orion-primary: #346739;
+  --orion-primary: #1e56a0;
 }
 
 // Light Theme (default)
@@ -47,8 +47,8 @@
   --sidebar-text-active: var(--orion-primary);
   --sidebar-icon: #{$gray-400};
   --sidebar-icon-active: var(--orion-primary);
-  --sidebar-hover: rgba(52, 103, 57, 0.05);
-  --sidebar-active-bg: rgba(52, 103, 57, 0.08);
+  --sidebar-hover: rgba(30, 86, 160, 0.05);
+  --sidebar-active-bg: rgba(30, 86, 160, 0.08);
   --sidebar-active-border: var(--orion-primary);
   --sidebar-header-border: #{$gray-200};
   --sidebar-scrollbar: #{$gray-300};
@@ -63,7 +63,7 @@
   --navbar-icon: #{$gray-500};
   --navbar-icon-hover: #{$primary};
   --navbar-divider: #{$gray-200};
-  --navbar-btn-hover: rgba(52, 103, 57, 0.06);
+  --navbar-btn-hover: rgba(30, 86, 160, 0.06);
 
   // Text
   --text-primary: #{$gray-800};
@@ -89,7 +89,7 @@
   --dropdown-bg: #ffffff;
   --dropdown-border: #{$gray-200};
   --dropdown-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --dropdown-hover: rgba(52, 103, 57, 0.05);
+  --dropdown-hover: rgba(30, 86, 160, 0.05);
 
   // Forms
   --input-bg: #{$gray-50};
@@ -110,7 +110,7 @@
   --section-title-color: #{$gray-700};
 
   // Form focus ring
-  --input-focus-ring: rgba(52, 103, 57, 0.2);
+  --input-focus-ring: rgba(30, 86, 160, 0.2);
 }
 
 // Dark Theme
@@ -130,7 +130,7 @@
   --sidebar-icon: rgba(255, 255, 255, 0.4);
   --sidebar-icon-active: #{$secondary-light};
   --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-active-bg: rgba(52, 103, 57, 0.2);
+  --sidebar-active-bg: rgba(30, 86, 160, 0.2);
   --sidebar-active-border: #{$secondary-light};
   --sidebar-header-border: rgba(255, 255, 255, 0.06);
   --sidebar-scrollbar: rgba(255, 255, 255, 0.1);
