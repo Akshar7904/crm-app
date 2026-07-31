@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
 // Enterprize360 HR & Payroll Management System
 
-import { Component } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 @Component({
   standalone: false,
@@ -9,13 +9,27 @@ import { Component } from '@angular/core';
   templateUrl: './demo.component.html',
   styleUrls: ['./demo.component.scss']
 })
-export class DemoComponent {
+export class DemoComponent implements OnInit, OnDestroy {
 
-  // ── Module Marquee ──────────────────────────────────────────────────────
+  // ── Module Grid ──────────────────────────────────────────────────────────
   selectedModule: any = null;
+  shuffledModules: any[] = [];
+  isShuffling = false;
+  private shuffleTimer: any = null;
 
   openModule(mod: any): void { this.selectedModule = mod; }
   closeModule(): void { this.selectedModule = null; }
+
+  trackByModuleName(_index: number, mod: any): string { return mod.name; }
+
+  private shuffle<T>(array: T[]): T[] {
+    const copy = [...array];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
 
   readonly marqueeModules = [
     {
@@ -140,9 +154,29 @@ export class DemoComponent {
     }
   ];
 
-  // ── Why Tabs ────────────────────────────────────────────────────────────
+  // ── Why Tabs (scroll-driven) ─────────────────────────────────────────────
   activeWhyTab = 0;
   setWhyTab(index: number): void { this.activeWhyTab = index; }
+
+  @ViewChild('whySection') whySectionRef?: ElementRef<HTMLElement>;
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    const el = this.whySectionRef?.nativeElement;
+    if (!el) return;
+
+    const rect = el.getBoundingClientRect();
+    const scrolledPast = -rect.top;
+    const trackHeight = el.offsetHeight - window.innerHeight;
+    if (trackHeight <= 0) return;
+
+    const progress = Math.min(1, Math.max(0, scrolledPast / trackHeight));
+    const stepCount = this.whyTabs.length;
+    const index = Math.min(stepCount - 1, Math.floor(progress * stepCount));
+    if (index !== this.activeWhyTab && rect.top < window.innerHeight && rect.bottom > 0) {
+      this.activeWhyTab = index;
+    }
+  }
 
   readonly whyTabs = [
     {
@@ -198,4 +232,19 @@ export class DemoComponent {
       ]
     }
   ];
+
+  ngOnInit(): void {
+    this.shuffledModules = this.shuffle(this.marqueeModules);
+    this.shuffleTimer = setInterval(() => {
+      this.isShuffling = true;
+      setTimeout(() => {
+        this.shuffledModules = this.shuffle(this.marqueeModules);
+        this.isShuffling = false;
+      }, 350);
+    }, 3500);
+  }
+
+  ngOnDestroy(): void {
+    if (this.shuffleTimer) clearInterval(this.shuffleTimer);
+  }
 }

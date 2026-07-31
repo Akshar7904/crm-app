@@ -80,9 +80,22 @@
   }
 }
 
-/* ── WHY CHOOSE ──────────────────────────────────────────────────── */
-.lp-why { background: #{$primary}; padding: 80px 0; }
+/* ── WHY CHOOSE (scroll-driven) ────────────────────────────────────── */
+.lp-why {
+  background: #{$primary};
+  height: 400vh; /* scroll track: 100vh per tab, content pinned via sticky */
+  position: relative;
+}
 .lp-why .lp-section-title span { color: #FFFFFF; }
+.lp-why__sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px 0;
+}
 
 .why-tabs { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .why-tab {
@@ -91,6 +104,14 @@
   font-size: .9rem; font-weight: 600; color: rgba(255,255,255,.75);
   transition: all .2s; text-align: left; width: 100%;
   &.active, &:hover { background: #FFFFFF; color: #{$primary}; border-color: #FFFFFF; }
+}
+.why-progress {
+  display: flex; gap: 6px; margin-top: 18px; padding: 0 4px;
+  span {
+    flex: 1; height: 3px; border-radius: 2px; background: rgba(255,255,255,.2);
+    transition: background .3s;
+    &.active { background: #FFFFFF; }
+  }
 }
 .why-content-box {
   background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2);
@@ -321,9 +342,9 @@
   }
 }
 
-/* ══ MODULE MARQUEE ══════════════════════════════════════════════ */
-.lp-marquee-section {
-  background: #E5E7EB; padding: 72px 0; overflow: hidden;
+/* ══ MODULE GRID (shuffling tiles) ═══════════════════════════════ */
+.lp-modules-section {
+  background: #E5E7EB; padding: 72px 24px;
   border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB;
 }
 
@@ -333,45 +354,41 @@
   p { font-size: .9rem; color: #6B7280; margin: 0; }
 }
 
-.marquee-track-wrap {
-  width: 100%; overflow: hidden;
-  mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%);
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  max-width: 900px;
+  margin: 0 auto;
+
+  @media (min-width: 768px) { grid-template-columns: repeat(4, 1fr); }
 }
 
-.marquee-track {
-  display: flex; width: max-content;
-  animation: marquee-scroll 40s linear infinite;
-  &:hover { animation-play-state: paused; }
-}
+.module-tile {
+  aspect-ratio: 1 / 1;
+  border-radius: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  text-align: center;
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(17,24,39,.12);
+  transition: transform .4s ease, opacity .35s ease, box-shadow .25s ease;
 
-@keyframes marquee-scroll {
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
+  &:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 14px 30px rgba(17,24,39,.2); }
+  &--fade { opacity: 0; transform: scale(.92); }
 
-.marquee-set { display: flex; gap: 14px; padding: 12px 7px; flex-shrink: 0; }
-
-.mq-card {
-  background: #FFFFFF; border: 1.5px solid #E5E7EB; border-radius: 14px;
-  padding: 18px 20px; cursor: pointer; flex-shrink: 0; width: 175px;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
-  transition: transform .25s, border-color .25s, box-shadow .25s;
-  box-shadow: 0 2px 6px rgba(17,24,39,.05);
-  &:hover {
-    transform: translateY(-6px) scale(1.03);
-    border-color: var(--mc, #{$primary});
-    box-shadow: 0 14px 36px rgba(17,24,39,.1);
+  &__icon { font-size: 1.8rem; opacity: .95; }
+  &__name { font-size: .82rem; font-weight: 700; line-height: 1.2; }
+  &__tag {
+    font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    padding: 2px 8px; border-radius: 20px; background: rgba(255,255,255,.22);
   }
 }
-
-.mq-icon-wrap {
-  width: 42px; height: 42px; border-radius: 11px;
-  display: flex; align-items: center; justify-content: center;
-  i { font-size: 1.25rem; }
-}
-.mq-name { font-size: .86rem; font-weight: 700; color: #111827; line-height: 1.2; }
-.mq-tag { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 20px; }
 
 /* ══ MODULE DETAIL MODAL ═════════════════════════════════════════ */
 .mod-modal-backdrop {

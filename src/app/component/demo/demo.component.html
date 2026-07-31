@@ -74,28 +74,23 @@
     </div>
   </section>
 
-  <!-- ══ MODULE MARQUEE ═══════════════════════════════════════════ -->
-  <section class="lp-marquee-section" id="modules">
+  <!-- ══ MODULE GRID (shuffling) ═══════════════════════════════════ -->
+  <section class="lp-modules-section" id="modules">
     <div class="marquee-header">
       <h2 class="lp-section-title">Everything in <span>One Platform</span></h2>
       <p class="lp-section-sub">Click any module to learn more.</p>
     </div>
-    <div class="marquee-track-wrap">
-      <div class="marquee-track">
-        <!-- Two sets for seamless loop -->
-        <div class="marquee-set" *ngFor="let _ of [0,1]">
-          <div
-            *ngFor="let mod of marqueeModules"
-            class="mq-card"
-            [style.--mc]="mod.color"
-            (click)="openModule(mod)">
-            <div class="mq-icon-wrap" [style.background]="mod.color + '22'">
-              <i class="bi" [ngClass]="mod.icon" [style.color]="mod.color"></i>
-            </div>
-            <div class="mq-name">{{ mod.name }}</div>
-            <div class="mq-tag" [style.background]="mod.color + '22'" [style.color]="mod.color">{{ mod.tag }}</div>
-          </div>
-        </div>
+    <div class="module-grid">
+      <div
+        *ngFor="let mod of shuffledModules; trackBy: trackByModuleName"
+        class="module-tile"
+        [class.module-tile--fade]="isShuffling"
+        [style.--mc]="mod.color"
+        [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
+        (click)="openModule(mod)">
+        <i class="bi module-tile__icon" [ngClass]="mod.icon"></i>
+        <div class="module-tile__name">{{ mod.name }}</div>
+        <div class="module-tile__tag">{{ mod.tag }}</div>
       </div>
     </div>
   </section>
@@ -193,36 +188,41 @@
     </div>
   </section>
 
-  <!-- ══ WHY CHOOSE Enterprize360 ══════════════════════════════════════════ -->
-  <section class="lp-why" id="features">
-    <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
-      <div class="row mb-5">
-        <div class="col-12 text-center">
-          <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>Enterprize360</span>?</h2>
-          <p style="color:rgba(255,255,255,.5);font-size:.95rem;">Built differently — for businesses that need more than a spreadsheet.</p>
-        </div>
-      </div>
-      <div class="row g-4 align-items-start">
-        <div class="col-lg-3">
-          <div class="why-tabs">
-            <button *ngFor="let tab of whyTabs; let i = index"
-                    class="why-tab"
-                    [class.active]="activeWhyTab === i"
-                    (click)="setWhyTab(i)">
-              {{ tab.label }}
-            </button>
+  <!-- ══ WHY CHOOSE Enterprize360 (scroll-driven) ═══════════════════ -->
+  <section class="lp-why" id="features" #whySection>
+    <div class="lp-why__sticky">
+      <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
+        <div class="row mb-5">
+          <div class="col-12 text-center">
+            <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>Enterprize360</span>?</h2>
+            <p style="color:rgba(255,255,255,.5);font-size:.95rem;">Built differently — for businesses that need more than a spreadsheet. Scroll to explore.</p>
           </div>
         </div>
-        <div class="col-lg-9">
-          <div class="why-content-box">
-            <div class="why-icon"><i class="bi" [class]="whyTabs[activeWhyTab].icon"></i></div>
-            <h3>{{ whyTabs[activeWhyTab].title }}</h3>
-            <p>{{ whyTabs[activeWhyTab].desc }}</p>
-            <ul class="lp-feature-list">
-              <li *ngFor="let f of whyTabs[activeWhyTab].features">
-                <i class="bi bi-check-circle-fill"></i> {{ f }}
-              </li>
-            </ul>
+        <div class="row g-4 align-items-start">
+          <div class="col-lg-3">
+            <div class="why-tabs">
+              <button *ngFor="let tab of whyTabs; let i = index"
+                      class="why-tab"
+                      [class.active]="activeWhyTab === i"
+                      (click)="setWhyTab(i)">
+                {{ tab.label }}
+              </button>
+              <div class="why-progress">
+                <span *ngFor="let tab of whyTabs; let i = index" [class.active]="activeWhyTab === i"></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-9">
+            <div class="why-content-box">
+              <div class="why-icon"><i class="bi" [class]="whyTabs[activeWhyTab].icon"></i></div>
+              <h3>{{ whyTabs[activeWhyTab].title }}</h3>
+              <p>{{ whyTabs[activeWhyTab].desc }}</p>
+              <ul class="lp-feature-list">
+                <li *ngFor="let f of whyTabs[activeWhyTab].features">
+                  <i class="bi bi-check-circle-fill"></i> {{ f }}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
