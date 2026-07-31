@@ -1265,3 +1265,23 @@ textarea.form-control { resize: vertical; min-height: 100px; }
   gap: 8px;
 }
 
+.credentials-box {
+  border: 1px solid rgba($success, .3);
+  border-radius: 10px;
+  padding: $spacing-lg;
+  background: rgba($success, .04);
+}
+.credentials-header { font-size: .9rem; font-weight: 600; color: $success; margin-bottom: $spacing-md; }
+.credential-row {
+  display: flex; align-items: center; gap: $spacing-sm;
+  padding: 8px 0; border-bottom: 1px solid var(--border-color);
+  &:last-of-type { border-bottom: 0; }
+}
+.credential-label {
+  min-width: 80px; font-size: .78rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted);
+}
+.credential-value { flex: 1; font-family: monospace; font-size: .9rem; word-break: break-all; }
+.credential-password { background: rgba($warning, .1); border-radius: 4px; padding: 2px 6px; font-weight: 600; }
+.credential-note { margin-top: $spacing-sm; font-size: .78rem; color: var(--text-muted); }
+

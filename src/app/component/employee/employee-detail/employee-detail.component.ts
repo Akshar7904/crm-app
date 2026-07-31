@@ -66,6 +66,7 @@ export class EmployeeDetailComponent implements OnInit {
 
   // Password reset (admin)
   isResettingPassword: boolean = false;
+  resetPasswordResult: { email: string; temporaryPassword: string; emailSent: boolean } | null = null;
 
   setTab(tab: 'overview' | 'edit' | 'documents' | 'security'): void {
     this.activeTab = tab;
@@ -493,17 +494,24 @@ export class EmployeeDetailComponent implements OnInit {
   // ========== PASSWORD RESET ==========
 
   submitResetPassword(): void {
-    const employeeId = this.dataSubject.value?.data?.employee?.id;
+    const employee = this.dataSubject.value?.data?.employee;
+    const employeeId = employee?.id;
     if (!employeeId) return;
 
     if (!confirm('Reset this employee\'s password? A temporary password will be sent to their email address.')) return;
 
     this.isResettingPassword = true;
+    this.resetPasswordResult = null;
     this.cdr.markForCheck();
 
     this.http.put<any>(`${this.SERVER_URL}/employee/${employeeId}/reset-password`, {}).subscribe({
       next: (res) => {
         this.isResettingPassword = false;
+        this.resetPasswordResult = {
+          email: employee?.email,
+          temporaryPassword: res?.data?.temporaryPassword,
+          emailSent: !!res?.data?.emailSent
+        };
         this.notification.onSuccess(res?.message || 'Password reset. Temporary password sent to employee\'s email.');
         this.cdr.markForCheck();
       },
@@ -513,6 +521,16 @@ export class EmployeeDetailComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  closeResetPasswordResult(): void {
+    this.resetPasswordResult = null;
+  }
+
+  copyToClipboard(text: string): void {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() =>
+      this.notification.onDefault('Copied to clipboard'));
   }
 
   // ========== POLICY ACKNOWLEDGEMENT ==========

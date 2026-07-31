@@ -737,12 +737,41 @@
                         <p class="edit-section-sub">Generate a secure temporary password and send it to the employee's registered email address. The employee must change it on next login.</p>
                       </div>
                     </div>
-                    <div class="mt-3">
+                    <div class="mt-3" *ngIf="!resetPasswordResult">
                       <button class="btn btn-warning px-4" (click)="submitResetPassword()" [disabled]="isResettingPassword">
                         <span *ngIf="isResettingPassword" class="spinner-border spinner-border-sm me-2"></span>
                         <i *ngIf="!isResettingPassword" class="bi bi-envelope-arrow-up me-2"></i>
                         {{ isResettingPassword ? 'Sending...' : 'Reset &amp; Send Password via Email' }}
                       </button>
+                    </div>
+
+                    <!-- Credentials result -->
+                    <div *ngIf="resetPasswordResult" class="credentials-box mt-3">
+                      <div class="credentials-header">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i>
+                        Password reset{{ resetPasswordResult.emailSent ? ' — email sent to the employee' : '' }}.
+                      </div>
+                      <div class="credential-row">
+                        <span class="credential-label">Email</span>
+                        <span class="credential-value">{{ resetPasswordResult.email }}</span>
+                        <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(resetPasswordResult.email)">
+                          <i class="bi bi-copy"></i>
+                        </button>
+                      </div>
+                      <div class="credential-row">
+                        <span class="credential-label">Password</span>
+                        <span class="credential-value credential-password">{{ resetPasswordResult.temporaryPassword }}</span>
+                        <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(resetPasswordResult.temporaryPassword)">
+                          <i class="bi bi-copy"></i>
+                        </button>
+                      </div>
+                      <div class="credential-note" *ngIf="resetPasswordResult.emailSent">
+                        <i class="bi bi-info-circle me-1"></i>The employee must change this password on next login.
+                      </div>
+                      <div class="credential-note" *ngIf="!resetPasswordResult.emailSent">
+                        <i class="bi bi-exclamation-triangle-fill me-1 text-warning"></i>Delivery email failed — share this temporary password with the employee directly. They must change it on next login.
+                      </div>
+                      <button class="btn btn-primary mt-3 w-100" (click)="closeResetPasswordResult()">Done</button>
                     </div>
                   </div>
                 </div>
