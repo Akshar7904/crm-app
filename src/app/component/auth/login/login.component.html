@@ -1,35 +1,23 @@
 <section *ngIf="(loginState$ | async) as state" [ngSwitch]="state.dataState">
 
   <div class="login-container">
+    <div class="auth-card">
+      <div class="auth-card__glow"></div>
+      <div class="auth-card__inner">
 
-    <!-- ═══ LEFT BRANDING (always visible) ═══ -->
-    <div class="login-branding">
-      <div class="branding-content">
-        <!-- Company branding (shown after company is selected) -->
-        <ng-container *ngIf="branding.branding as b; else defaultBrand">
-          <img [src]="b.logoUrl" [alt]="b.name" class="brand-logo company-brand-logo"
-               (error)="$any($event.target).style.display='none'">
-          <h1 class="brand-title">{{ b.name }}</h1>
-          <p class="brand-tagline">{{ b.tagline || 'HR &amp; Payroll Made Simple' }}</p>
-        </ng-container>
-        <!-- Default Enterprize360 branding -->
-        <ng-template #defaultBrand>
-          <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-          <h1 class="brand-title">Enterprize360</h1>
-          <p class="brand-tagline">HR &amp; Payroll Made Simple</p>
-        </ng-template>
-        <div class="brand-features">
-          <div class="feature-item"><i class="bi bi-shield-check"></i><span>Secure & Reliable</span></div>
-          <div class="feature-item"><i class="bi bi-graph-up-arrow"></i><span>Smart Analytics</span></div>
-          <div class="feature-item"><i class="bi bi-people"></i><span>Team Management</span></div>
+        <div class="auth-card__brand">
+          <div class="auth-card__logo-box">
+            <ng-container *ngIf="branding.branding as b; else defaultLogo">
+              <img [src]="b.logoUrl" [alt]="b.name" class="auth-card__logo"
+                   (error)="$any($event.target).style.display='none'">
+            </ng-container>
+            <ng-template #defaultLogo>
+              <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
+            </ng-template>
+          </div>
         </div>
-      </div>
-      <div class="branding-footer"><p>&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p></div>
-    </div>
 
-    <!-- ═══ RIGHT PANEL ═══ -->
-    <div class="login-form-container">
-      <div class="login-form-wrapper">
+        <div class="login-form-wrapper">
 
         <!-- ── STEP 1: EMAIL ── -->
         <ng-container *ngIf="!state.loginSuccess && state.step === 'email'">
@@ -184,10 +172,10 @@
           </div>
         </ng-container>
 
+        </div>
       </div>
-
-
     </div>
+    <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 
 </section>

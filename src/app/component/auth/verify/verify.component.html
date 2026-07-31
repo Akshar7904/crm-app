@@ -3,16 +3,15 @@
   <!-- ─── LOADING ─── -->
   <ng-container *ngSwitchCase="DataState.LOADING">
     <div class="verify-container">
-      <div class="verify-branding">
-        <div class="branding-content">
-          <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-          <h1 class="brand-title">Enterprize360</h1>
-          <p class="brand-tagline">Payroll & HR Management System</p>
-        </div>
-        <div class="branding-footer"><p>&copy; 2025 Silver Spectrum Solutions (PTY) LTD</p></div>
-      </div>
-      <div class="verify-form-container">
-        <div class="verify-form-wrapper">
+      <div class="auth-card">
+        <div class="auth-card__glow"></div>
+        <div class="auth-card__inner">
+          <div class="auth-card__brand">
+            <div class="auth-card__logo-box">
+              <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
+            </div>
+          </div>
+          <div class="verify-form-wrapper">
           <div class="verify-icon verify-icon-loading">
             <i class="bi bi-shield-lock"></i>
           </div>
@@ -23,8 +22,10 @@
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
+          </div>
         </div>
       </div>
+      <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
     </div>
   </ng-container>
 
@@ -33,20 +34,15 @@
 
     <!-- Account Verified -->
     <div *ngIf="state.type === 'account'" class="verify-container">
-      <div class="verify-branding">
-        <div class="branding-content">
-          <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-          <h1 class="brand-title">Enterprize360</h1>
-          <p class="brand-tagline">Payroll & HR Management System</p>
-          <div class="brand-success-illustration">
-            <i class="bi bi-envelope-check"></i>
+      <div class="auth-card">
+        <div class="auth-card__glow"></div>
+        <div class="auth-card__inner">
+          <div class="auth-card__brand">
+            <div class="auth-card__logo-box">
+              <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
+            </div>
           </div>
-          <p class="brand-success-text">Your account has been verified successfully</p>
-        </div>
-        <div class="branding-footer"><p>&copy; 2025 Silver Spectrum Solutions (PTY) LTD</p></div>
-      </div>
-      <div class="verify-form-container">
-        <div class="verify-form-wrapper">
+          <div class="verify-form-wrapper">
           <div class="verify-icon verify-icon-success">
             <i class="bi bi-check-circle-fill"></i>
           </div>
@@ -71,33 +67,23 @@
               <a routerLink="/register" class="verify-link">Create another account</a>
             </p>
           </div>
+          </div>
         </div>
       </div>
+      <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
     </div>
 
     <!-- Set New Password -->
     <div *ngIf="state.type === 'password'" class="verify-container">
-      <div class="verify-branding">
-        <div class="branding-content">
-          <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-          <h1 class="brand-title">Enterprize360</h1>
-          <p class="brand-tagline">Payroll & HR Management System</p>
-          <div class="brand-features">
-            <div class="feature-item">
-              <i class="bi bi-shield-lock"></i><span>Secure Reset Process</span>
-            </div>
-            <div class="feature-item">
-              <i class="bi bi-key"></i><span>One-time Reset Link</span>
-            </div>
-            <div class="feature-item">
-              <i class="bi bi-lock"></i><span>Encrypted & Safe</span>
+      <div class="auth-card">
+        <div class="auth-card__glow"></div>
+        <div class="auth-card__inner">
+          <div class="auth-card__brand">
+            <div class="auth-card__logo-box">
+              <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
             </div>
           </div>
-        </div>
-        <div class="branding-footer"><p>&copy; 2025 Silver Spectrum Solutions (PTY) LTD</p></div>
-      </div>
-      <div class="verify-form-container">
-        <div class="verify-form-wrapper">
+          <div class="verify-form-wrapper">
           <div class="verify-icon verify-icon-key">
             <i class="bi bi-key"></i>
           </div>
@@ -145,8 +131,10 @@
             <p><a routerLink="/login" class="verify-link">Back to Sign In</a></p>
             <p><a routerLink="/resetpassword" class="verify-link">Request new reset link</a></p>
           </div>
+          </div>
         </div>
       </div>
+      <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
     </div>
 
   </ng-container>
@@ -154,16 +142,15 @@
   <!-- ─── ERROR ─── -->
   <ng-container *ngSwitchCase="DataState.ERROR">
     <div class="verify-container">
-      <div class="verify-branding">
-        <div class="branding-content">
-          <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-          <h1 class="brand-title">Enterprize360</h1>
-          <p class="brand-tagline">Payroll & HR Management System</p>
-        </div>
-        <div class="branding-footer"><p>&copy; 2025 Silver Spectrum Solutions (PTY) LTD</p></div>
-      </div>
-      <div class="verify-form-container">
-        <div class="verify-form-wrapper">
+      <div class="auth-card">
+        <div class="auth-card__glow"></div>
+        <div class="auth-card__inner">
+          <div class="auth-card__brand">
+            <div class="auth-card__logo-box">
+              <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
+            </div>
+          </div>
+          <div class="verify-form-wrapper">
           <div class="verify-icon verify-icon-error">
             <i class="bi bi-exclamation-triangle-fill"></i>
           </div>
@@ -177,8 +164,10 @@
               <a routerLink="/resetpassword" class="verify-link">Request a new reset link</a>
             </p>
           </div>
+          </div>
         </div>
       </div>
+      <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
     </div>
   </ng-container>
 

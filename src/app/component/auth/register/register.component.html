@@ -1,35 +1,15 @@
 <section *ngIf="(registerState$ | async) as state" [ngSwitch]="state.dataState">
   <!-- Registration Form -->
   <div *ngIf="!state.registerSuccess" class="register-container">
-    <!-- Left Side - Branding -->
-    <div class="register-branding">
-      <div class="branding-content">
-        <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-        <h1 class="brand-title">Enterprize360</h1>
-        <p class="brand-tagline">Payroll & HR Management System</p>
-        <div class="brand-features">
-          <div class="feature-item">
-            <i class="bi bi-person-plus"></i>
-            <span>Easy Registration</span>
-          </div>
-          <div class="feature-item">
-            <i class="bi bi-shield-lock"></i>
-            <span>Admin Approval Required</span>
-          </div>
-          <div class="feature-item">
-            <i class="bi bi-shield-check"></i>
-            <span>Secure Account</span>
+    <div class="auth-card">
+      <div class="auth-card__glow"></div>
+      <div class="auth-card__inner">
+        <div class="auth-card__brand">
+          <div class="auth-card__logo-box">
+            <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
           </div>
         </div>
-      </div>
-      <div class="branding-footer">
-        <p>&copy; 2025 Silver Spectrum Solutions (PTY) LTD</p>
-      </div>
-    </div>
-
-    <!-- Right Side - Registration Form -->
-    <div class="register-form-container">
-      <div class="register-form-wrapper">
+        <div class="register-form-wrapper">
         <div class="form-header">
           <h2>Create Account</h2>
           <p>Fill in your details to get started</p>
@@ -138,31 +118,23 @@
             </a>
           </p>
         </div>
+        </div>
       </div>
     </div>
+    <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 
   <!-- Success Screen -->
   <div *ngIf="state.registerSuccess" class="register-container">
-    <!-- Left Side - Branding -->
-    <div class="register-branding">
-      <div class="branding-content">
-        <img src="assets/logo_icon.png" alt="Enterprize360" class="brand-logo">
-        <h1 class="brand-title">Enterprize360</h1>
-        <p class="brand-tagline">Payroll & HR Management System</p>
-        <div class="success-illustration pending-illustration">
-          <i class="bi bi-hourglass-split"></i>
+    <div class="auth-card">
+      <div class="auth-card__glow"></div>
+      <div class="auth-card__inner">
+        <div class="auth-card__brand">
+          <div class="auth-card__logo-box">
+            <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
+          </div>
         </div>
-        <p class="success-info">Your account is awaiting administrator approval</p>
-      </div>
-      <div class="branding-footer">
-        <p>&copy; 2025 Silver Spectrum Solutions (PTY) LTD</p>
-      </div>
-    </div>
-
-    <!-- Right Side - Pending Approval Message -->
-    <div class="register-form-container">
-      <div class="register-form-wrapper">
+        <div class="register-form-wrapper">
         <div class="form-header success-header">
           <div class="success-icon pending-icon">
             <i class="bi bi-shield-check"></i>
@@ -207,7 +179,9 @@
             </a>
           </p>
         </div>
+        </div>
       </div>
     </div>
+    <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 </section>

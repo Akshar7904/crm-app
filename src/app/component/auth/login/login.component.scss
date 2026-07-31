@@ -1,9 +1,10 @@
 // ========================================
-// LOGIN PAGE - Modern Split Layout
+// LOGIN PAGE - Centered Card
 // Enterprize360 Payroll System
 // ========================================
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
+@import '../../../../styles/auth-card';
 
 // Host element - ensure full width
 :host {
@@ -21,12 +22,18 @@ section {
   padding: 0;
 }
 
-// Container - Full Screen Split
+// Full-screen backdrop hosting the centered auth card (shared shell in
+// styles/_auth-card.scss provides .auth-card/.auth-card__* /.auth-shell-copy)
 .login-container {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
   min-height: 100vh;
   width: 100vw;
-  background: $gray-100;
+  padding: 40px 20px;
+  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
   position: fixed;
   top: 0;
   left: 0;
@@ -36,160 +43,11 @@ section {
   z-index: 9999;
 }
 
-// Left Branding - 45% width
-.login-branding {
-  flex: 0 0 45%;
-  width: 45%;
-  min-width: 400px;
-  background: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary) 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 60px 40px;
-  position: relative;
-  overflow: hidden;
-
-  // Background Pattern
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image:
-      radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.03) 0%, transparent 60%);
-    pointer-events: none;
-  }
-
-  // Decorative Circles
-  &::after {
-    content: '';
-    position: absolute;
-    width: 400px;
-    height: 400px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    bottom: -100px;
-    left: -100px;
-  }
-}
-
-// Right Form - 55% width
-.login-form-container {
-  flex: 0 0 55%;
-  width: 55%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-  background: $white;
-  overflow-y: auto;
-}
-
-// Branding Content
-.branding-content {
-  position: relative;
-  z-index: 1;
-  text-align: center;
-  max-width: 400px;
-}
-
-.brand-logo {
-  width: auto;
-  height: 180px;
-  max-width: 320px;
-  object-fit: contain;
-  margin-bottom: 20px;
-  filter: brightness(0) invert(1);
-  &.company-brand-logo { filter: none; max-height: 120px; }
-}
-
-.brand-title {
-  color: $white;
-  font-size: 2.5rem;
-  font-weight: $font-weight-bold;
-  margin-bottom: 10px;
-  letter-spacing: -0.5px;
-}
-
-.brand-tagline {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: $font-size-lg;
-  margin-bottom: 40px;
-}
-
-// Feature Items
-.brand-features {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
-  margin-top: 30px;
-}
-
-.feature-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: rgba(255, 255, 255, 0.9);
-  font-size: $font-size-base;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: $border-radius-lg;
-  backdrop-filter: blur(10px);
-  transition: all $transition-slow;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateX(5px);
-  }
-
-  i {
-    font-size: $font-size-xl;
-    color: #4dd0e1;
-  }
-}
-
-// MFA Illustration
-.mfa-illustration {
-  margin: 40px 0;
-
-  i {
-    font-size: 80px;
-    color: rgba(255, 255, 255, 0.9);
-  }
-}
-
-.mfa-info {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: $font-size-sm;
-  line-height: 1.6;
-  max-width: 300px;
-  margin: 0 auto;
-}
-
-// Footer
-.branding-footer {
-  position: absolute;
-  bottom: 30px;
-  left: 0;
-  right: 0;
-  text-align: center;
-
-  p {
-    color: rgba(255, 255, 255, 0.5);
-    font-size: $badge-font-size;
-    margin: 0;
-  }
-}
+.company-brand-logo { max-height: 64px; }
 
 // Login Form Wrapper
 .login-form-wrapper {
   width: 100%;
-  max-width: 420px;
 }
 
 // Form Header

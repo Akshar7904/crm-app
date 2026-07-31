@@ -1,0 +1,61 @@
+// ========================================
+// Shared centered auth-card shell
+// Used by login / register / resetpassword
+// ========================================
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: $white;
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-xl;
+  border: 1px solid $gray-200;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card__glow {
+  position: absolute;
+  top: -80px;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to bottom, rgba($primary-light, 0.6), transparent);
+  filter: blur(40px);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.auth-card__inner {
+  position: relative;
+  padding: 40px 32px;
+}
+
+.auth-card__brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.auth-card__logo-box {
+  background: $white;
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-lg;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-card__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.auth-shell-copy {
+  color: $gray-500;
+  font-size: $font-size-xs;
+  text-align: center;
+  margin: 0;
+}
