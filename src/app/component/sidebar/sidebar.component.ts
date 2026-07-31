@@ -12,6 +12,7 @@ import { UserService } from 'src/app/service/user.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { ModuleAccessService } from 'src/app/service/module-access.service';
 import { BrandingService } from 'src/app/service/branding.service';
+import { Key } from 'src/app/enum/key.enum';
 
 type BadgeType = 'primary' | 'success' | 'warning' | 'danger' | 'info';
 
@@ -647,8 +648,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     const userRole = this.user.roleName;
     const employmentType = (this.user.employmentType || '').toUpperCase();
 
-    // SUPERADMIN gets a dedicated flat menu — no regular tenant items
-    if (userRole === 'ROLE_SUPERADMIN') {
+    const isImpersonating = !!localStorage.getItem(Key.SUPERADMIN_TOKEN);
+
+    // SUPERADMIN gets a dedicated flat menu — no regular tenant items —
+    // but only when NOT impersonating a company (see below).
+    if (userRole === 'ROLE_SUPERADMIN' && !isImpersonating) {
       this.filteredMenuItems = [
         { label: 'Overview',        icon: 'bi-speedometer2',                route: '/superadmin/dashboard'      },
         { label: 'Companies',       icon: 'bi-buildings-fill',              route: '/superadmin/companies'      },
@@ -663,11 +667,16 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       return;
     }
 
+    // Company menu items only declare requiredRoles like ROLE_ADMIN/
+    // ROLE_SYSADMIN — never ROLE_SUPERADMIN — so while impersonating, treat
+    // the superadmin as a sysadmin for menu-visibility purposes only.
+    const effectiveRole = (userRole === 'ROLE_SUPERADMIN' && isImpersonating) ? 'ROLE_SYSADMIN' : userRole;
+
     this.filteredMenuItems = this.fullMenuStructure
-      .filter(item => this.canShowMenuItem(item, userRole, employmentType))
+      .filter(item => this.canShowMenuItem(item, effectiveRole, employmentType))
       .map(item => {
         if (item.children) {
-          const filteredChildren = item.children.filter(child => this.canShowMenuItem(child, userRole, employmentType));
+          const filteredChildren = item.children.filter(child => this.canShowMenuItem(child, effectiveRole, employmentType));
 
           // Only show parent if it has visible children
           if (filteredChildren.length === 0 && item.children.length > 0) {

@@ -6,6 +6,7 @@ import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, ChangeDetectorRe
 import { Observable, BehaviorSubject, map, startWith, catchError, of, switchMap, forkJoin, interval, Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { DataState } from 'src/app/enum/datastate.enum';
+import { Key } from 'src/app/enum/key.enum';
 import { UserModel } from 'src/app/component/profile/user.model';
 import { NotificationService } from 'src/app/service/notification.service';
 import { DashboardService, DashboardStats, EmployeeDashboardStats } from 'src/app/service/dashboard.service';
@@ -579,10 +580,20 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.currentUser = JSON.parse(userString);
         this.determineUserRole();
 
-        // SUPERADMIN is a platform-level role — redirect to the super admin area
-        if (this.currentUser?.roleName === 'ROLE_SUPERADMIN') {
+        // SUPERADMIN is a platform-level role — redirect to the super admin
+        // area, UNLESS they're impersonating a company (Key.SUPERADMIN_TOKEN
+        // present means the original superadmin JWT is stashed while a
+        // company-scoped token is active as Key.TOKEN).
+        const isImpersonating = !!localStorage.getItem(Key.SUPERADMIN_TOKEN);
+        if (this.currentUser?.roleName === 'ROLE_SUPERADMIN' && !isImpersonating) {
           this.router.navigate(['/superadmin/companies']);
           return of({ dataState: DataState.LOADED, user: this.currentUser });
+        }
+        if (this.currentUser?.roleName === 'ROLE_SUPERADMIN' && isImpersonating) {
+          // Treat as admin so the company dashboard loads instead of redirecting.
+          this.isAdmin = true;
+          this.isManager = false;
+          this.isEmployee = false;
         }
 
         return of({ dataState: DataState.LOADING, user: this.currentUser });
