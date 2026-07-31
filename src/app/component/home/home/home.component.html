@@ -39,24 +39,6 @@
         </div>
       </div>
 
-      <!-- Stats Cards Grid -->
-      <div class="stats-grid">
-        <div *ngFor="let stat of statsCards.slice(3)" class="stat-card" [class]="'stat-card-' + stat.iconClass">
-          <div class="stat-card-inner">
-            <div class="stat-icon">
-              <i class="bi" [ngClass]="stat.icon"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-label">{{ stat.label }}</div>
-              <div class="stat-value">{{ stat.value }}</div>
-            </div>
-            <a *ngIf="stat.route" [routerLink]="stat.route" class="stat-link">
-              <i class="bi bi-arrow-right"></i>
-            </a>
-          </div>
-        </div>
-      </div>
-
       <!-- Additional Charts for Admin/Manager -->
       <ng-container *ngIf="isAdmin || isManager">
 
