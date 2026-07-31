@@ -20,9 +20,19 @@
     </div>
   </div>
 
+  <!-- Company Chip -->
+  <div class="sidebar-company-chip" *ngIf="!collapsed && (companyName || branding.branding?.name)">
+    <span class="company-chip-label">Your Company</span>
+    <div class="company-chip-box">
+      <span class="company-chip-dot"></span>
+      <span class="company-chip-name">{{ branding.branding?.name || companyName }}</span>
+    </div>
+  </div>
+
   <!-- Menu Floating Card -->
   <div class="sidebar-menu-card">
     <nav class="sidebar-menu">
+      <div class="menu-section-label" *ngIf="!collapsed">Main</div>
       <ul class="menu-list">
         <li *ngFor="let item of filteredMenuItems" class="menu-item-wrapper">
 
@@ -72,6 +82,7 @@
 
   <!-- Footer Floating Card -->
   <div class="sidebar-footer-card">
+    <div class="menu-section-label" *ngIf="!collapsed">Other</div>
     <a class="menu-item"
        routerLink="/policy"
        routerLinkActive="active"

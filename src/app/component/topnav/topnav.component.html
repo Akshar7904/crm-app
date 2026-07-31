@@ -27,7 +27,7 @@
       <ng-container *ngFor="let item of filteredMenuItems">
 
         <div class="dropdown nav-dropdown" *ngIf="item.children">
-          <button class="nav-link dropdown-toggle"
+          <button class="nav-link nav-link--toggle"
                   type="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
@@ -35,6 +35,7 @@
             <i class="bi" [ngClass]="item.icon"></i>
             <span>{{ item.label }}</span>
             <span *ngIf="item.badge?.count" class="nav-badge" [ngClass]="'badge-' + item.badge.type">{{ item.badge.count }}</span>
+            <i class="bi bi-chevron-down nav-chevron"></i>
           </button>
           <ul class="dropdown-menu">
             <li *ngFor="let child of item.children">

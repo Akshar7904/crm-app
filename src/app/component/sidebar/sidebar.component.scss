@@ -46,6 +46,61 @@
   text-overflow: ellipsis;
 }
 
+// ========================================
+// COMPANY CHIP
+// ========================================
+.sidebar-company-chip {
+  margin: 0 8px 8px;
+  flex-shrink: 0;
+}
+
+.company-chip-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-light, $gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 4px 4px;
+}
+
+.company-chip-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-lg;
+}
+
+.company-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $success;
+  flex-shrink: 0;
+}
+
+.company-chip-name {
+  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary, $gray-900);
+  @include truncate;
+}
+
+// ========================================
+// MENU SECTION LABEL
+// ========================================
+.menu-section-label {
+  font-size: 0.65rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-light, $gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 6px 12px 4px;
+}
+
 .sidebar-menu-card {
   margin: 0 8px;
   flex: 1;
@@ -234,7 +289,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px 8px 46px;
+  padding: 8px 12px 8px 34px;
   border-radius: $border-radius-md;
   color: var(--sidebar-text, $gray-600);
   text-decoration: none;
@@ -243,33 +298,15 @@
   font-size: 0.8rem;
   position: relative;
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 26px;
-    top: 50%;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--sidebar-scrollbar, $gray-300);
-    transform: translateY(-50%);
-    transition: all $transition-base;
-  }
-
   &:hover {
     background: var(--sidebar-hover, rgba($primary, 0.12));
     color: var(--sidebar-text-hover, $primary);
-    &::before { background: var(--sidebar-text-hover, $primary); }
   }
 
   &.active {
     color: var(--sidebar-text-active, $primary);
     font-weight: $font-weight-medium;
-    background: var(--sidebar-active-bg, rgba($primary, 0.06));
-    &::before {
-      background: var(--sidebar-active-border, $primary);
-      box-shadow: 0 0 6px rgba($primary, 0.3);
-    }
+    background: var(--sidebar-active-bg, rgba($primary, 0.1));
   }
 
   .menu-icon { width: 18px; height: 18px; i { font-size: 0.9rem; } }

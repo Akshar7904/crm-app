@@ -791,3 +791,49 @@
 
   .calendar-legend { display: none; }
 }
+
+/* ========================================
+   COMPACT MODE — small calendar card, no sidebar/legend
+   ======================================== */
+.ms-calendar.compact {
+  min-height: 0;
+
+  .calendar-header {
+    padding: 12px 14px;
+  }
+
+  .month-year {
+    font-size: 0.95rem;
+  }
+
+  .today-btn {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+  }
+
+  .calendar-layout {
+    min-height: 0;
+  }
+
+  .calendar-grid {
+    min-height: 0;
+  }
+
+  .day-cell {
+    min-height: 34px;
+    padding: 2px;
+  }
+
+  .weekday-cell {
+    font-size: 0.68rem;
+    padding: 6px 0;
+  }
+
+  .day-number {
+    font-size: 0.75rem;
+  }
+
+  .calendar-legend {
+    display: none;
+  }
+}

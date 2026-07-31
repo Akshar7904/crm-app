@@ -51,14 +51,14 @@ export class DashboardCalendarComponent implements OnInit, OnChanges {
   @Input() events: CalendarEvent[] = [];
   @Input() upcomingEvents: CalendarEvent[] = [];
   @Input() maxDisplay: number = 5;
+  @Input() showEventsSidebar: boolean = true;
+  @Input() compact: boolean = false;
   @Output() eventClick = new EventEmitter<CalendarEvent>();
 
   currentDate: Date = new Date();
   selectedDate: Date | null = null;
   calendarDays: CalendarDay[] = [];
   weekDays: string[] = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-  showEventsSidebar: boolean = true;
 
   // Popup state - uses fixed viewport positioning
   popupDay: CalendarDay | null = null;

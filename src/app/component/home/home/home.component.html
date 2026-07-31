@@ -60,8 +60,20 @@
       <!-- Additional Charts for Admin/Manager -->
       <ng-container *ngIf="isAdmin || isManager">
 
-        <!-- Chart Row: Attendance breakdown + Team composition -->
-        <div class="charts-row">
+        <!-- Overview Row: small calendar on the left + the 3 real-data charts -->
+        <div class="overview-row">
+          <div class="chart-card calendar-card-compact">
+            <div class="chart-card-body calendar-body p-0">
+              <app-dashboard-calendar
+                [title]="''"
+                [events]="calendarEvents"
+                [upcomingEvents]="upcomingEvents"
+                [showEventsSidebar]="false"
+                [compact]="true"
+                (eventClick)="onEventClick($event)">
+              </app-dashboard-calendar>
+            </div>
+          </div>
           <div class="chart-card">
             <div class="chart-card-header">
               <div class="chart-title"><i class="bi bi-pie-chart-fill me-2"></i>Today's Attendance</div>
@@ -106,7 +118,7 @@
           </div>
         </div>
 
-        <!-- MIDDLE GRID: Financial Summary + Announcements -->
+        <!-- Second Row: Financial Summary + Announcements + Recent Clock Events -->
         <div class="dashboard-middle-grid">
 
           <!-- Financial Summary Card -->
@@ -182,22 +194,6 @@
                   </div>
                 </li>
               </ul>
-            </div>
-          </div>
-        </div>
-
-        <!-- Calendar + Recent Clock-In/Out -->
-        <div class="admin-bottom-grid">
-
-          <!-- Calendar (compact) -->
-          <div class="chart-card calendar-card">
-            <div class="chart-card-body calendar-body p-0">
-              <app-dashboard-calendar
-                [title]="''"
-                [events]="calendarEvents"
-                [upcomingEvents]="upcomingEvents"
-                (eventClick)="onEventClick($event)">
-              </app-dashboard-calendar>
             </div>
           </div>
 
