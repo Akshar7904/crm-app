@@ -17,53 +17,55 @@
     <!-- Loaded State - Role-Based Dashboard -->
     <ng-container *ngIf="state.dataState === DataState.LOADED">
 
-      <!-- Hero Banner -->
-      <div class="hero-banner">
-        <div class="hero-banner-main">
-          <div class="hero-date">{{ currentDate }}</div>
-          <h1 class="hero-greeting">Hello, {{ state.user?.firstName }}! <span class="hero-wave">👋</span></h1>
-          <p class="hero-subtitle">
+      <!-- Dashboard Header -->
+      <div class="dash-header">
+        <div class="dash-greeting">
+          <span class="dash-greeting-eyebrow">{{ currentDate }}</span>
+          <h1 class="dash-greeting-name">{{ state.user?.firstName }} {{ state.user?.lastName }}</h1>
+          <p class="dash-greeting-sub">
             {{ (isAdmin || isManager) ? 'Track & manage your team progress here' : 'Here\'s what\'s happening with your work today' }}
           </p>
-          <button (click)="refreshDashboard()" class="btn-refresh">
+          <button (click)="refreshDashboard()" class="dash-refresh-btn">
             <i class="bi bi-arrow-clockwise"></i>
             <span>Refresh</span>
           </button>
         </div>
-        <div class="hero-pills" *ngIf="statsCards.length">
-          <a *ngFor="let stat of statsCards.slice(0, 3)" class="hero-pill" [routerLink]="stat.route">
-            <div class="hero-pill-icon"><i class="bi" [ngClass]="stat.icon"></i></div>
-            <div class="hero-pill-value">{{ stat.value }}</div>
-            <div class="hero-pill-label">{{ stat.label }}</div>
+        <div class="dash-kpis" *ngIf="statsCards.length">
+          <a *ngFor="let stat of statsCards.slice(0, 3)" class="kpi-circle" [routerLink]="stat.route">
+            <span class="kpi-circle-icon" [class]="'kpi-icon-' + stat.iconClass"><i class="bi" [ngClass]="stat.icon"></i></span>
+            <span class="kpi-circle-value">{{ stat.value }}</span>
+            <span class="kpi-circle-label">{{ stat.label }}</span>
           </a>
-        </div>
-      </div>
-
-      <!-- Stats Cards Grid -->
-      <div class="stats-grid">
-        <div *ngFor="let stat of statsCards.slice(3)" class="stat-card" [class]="'stat-card-' + stat.iconClass">
-          <div class="stat-card-inner">
-            <div class="stat-icon">
-              <i class="bi" [ngClass]="stat.icon"></i>
-            </div>
-            <div class="stat-content">
-              <div class="stat-label">{{ stat.label }}</div>
-              <div class="stat-value">{{ stat.value }}</div>
-            </div>
-            <a *ngIf="stat.route" [routerLink]="stat.route" class="stat-link">
-              <i class="bi bi-arrow-right"></i>
-            </a>
-          </div>
         </div>
       </div>
 
       <!-- Additional Charts for Admin/Manager -->
       <ng-container *ngIf="isAdmin || isManager">
 
-        <!-- Overview Row: small calendar on the left + the 3 real-data charts -->
-        <div class="overview-row">
-          <div class="chart-card calendar-card-compact">
-            <div class="chart-card-body calendar-body p-0">
+        <!-- Main Row: Attendance trend panel + Schedule -->
+        <div class="dash-main-row">
+          <div class="dash-panel dash-panel--wide">
+            <div class="dash-panel-head">
+              <h3>Attendance Overview</h3>
+              <span class="dash-panel-chip">Today</span>
+            </div>
+            <div class="dash-panel-body" *ngIf="hasChartData(attendanceChartData); else noAttendanceChart">
+              <app-dashboard-chart [chartType]="'bar'" [chartData]="attendanceChartData"></app-dashboard-chart>
+            </div>
+            <ng-template #noAttendanceChart>
+              <div class="dash-panel-body dash-empty">
+                <i class="bi bi-bar-chart-line"></i>
+                <p>No attendance recorded yet today.</p>
+              </div>
+            </ng-template>
+          </div>
+
+          <div class="dash-panel dash-panel--narrow">
+            <div class="dash-panel-head">
+              <h3>Your Schedule</h3>
+              <a routerLink="/holidays" class="dash-panel-link">See All</a>
+            </div>
+            <div class="dash-panel-body dash-panel-body--flush">
               <app-dashboard-calendar
                 [title]="''"
                 [events]="calendarEvents"
@@ -74,249 +76,149 @@
               </app-dashboard-calendar>
             </div>
           </div>
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title"><i class="bi bi-pie-chart-fill me-2"></i>Today's Attendance</div>
+        </div>
+
+        <!-- Activity Row: Recent Clock Events table + side panels -->
+        <div class="dash-activity-row">
+          <div class="dash-panel dash-panel--wide">
+            <div class="dash-panel-head">
+              <h3>Recent Clock Events</h3>
+              <a routerLink="/attendance" class="dash-panel-link">View All</a>
             </div>
-            <div class="chart-card-body" *ngIf="hasChartData(attendanceChartData); else noAttendanceChart">
-              <app-dashboard-chart [chartType]="'doughnut'" [chartData]="attendanceChartData"></app-dashboard-chart>
+            <div class="dash-panel-body dash-panel-body--flush" *ngIf="recentClockEvents.length; else noClockEvents">
+              <table class="activity-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Employee</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let evt of recentClockEvents; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ evt.employeeName || 'Employee' }}</td>
+                    <td>{{ evt.checkInTime ? (evt.checkInTime | date:'HH:mm') : '—' }}</td>
+                    <td>{{ evt.checkOutTime ? (evt.checkOutTime | date:'HH:mm') : '—' }}</td>
+                    <td>
+                      <span class="activity-status" [ngClass]="{
+                        'is-working': evt.status === 'WORKING',
+                        'is-break': evt.status === 'ON_BREAK1' || evt.status === 'ON_BREAK2' || evt.status === 'ON_LUNCH',
+                        'is-done': evt.status === 'CLOCKED_OUT'
+                      }">
+                        {{ evt.status === 'WORKING' ? 'Working' : evt.status === 'CLOCKED_OUT' ? 'Done' : 'On Break' }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
-            <ng-template #noAttendanceChart>
-              <div class="chart-card-body chart-empty">
-                <i class="bi bi-pie-chart"></i>
-                <p>No attendance recorded yet today.</p>
+            <ng-template #noClockEvents>
+              <div class="dash-panel-body dash-empty">
+                <i class="bi bi-clock"></i>
+                <p>No clock events today.</p>
               </div>
             </ng-template>
           </div>
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title"><i class="bi bi-people-fill me-2"></i>Team Composition</div>
-            </div>
-            <div class="chart-card-body" *ngIf="hasChartData(genderChartData); else noGenderChart">
-              <app-dashboard-chart [chartType]="'doughnut'" [chartData]="genderChartData"></app-dashboard-chart>
-            </div>
-            <ng-template #noGenderChart>
-              <div class="chart-card-body chart-empty">
-                <i class="bi bi-people"></i>
-                <p>No employee demographic data yet.</p>
+
+          <div class="dash-side-panels dash-panel--narrow">
+            <div class="mini-panel">
+              <div class="mini-panel-head">
+                <h4>Team Composition</h4>
               </div>
-            </ng-template>
-          </div>
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title"><i class="bi bi-calendar-x me-2"></i>Leave Overview</div>
-            </div>
-            <div class="chart-card-body" *ngIf="hasChartData(leaveChartData); else noLeaveChart">
-              <app-dashboard-chart [chartType]="'bar'" [chartData]="leaveChartData"></app-dashboard-chart>
-            </div>
-            <ng-template #noLeaveChart>
-              <div class="chart-card-body chart-empty">
-                <i class="bi bi-calendar-x"></i>
-                <p>No leave activity this month.</p>
+              <div class="mini-panel-body" *ngIf="hasChartData(genderChartData); else noGenderChart">
+                <app-dashboard-chart [chartType]="'doughnut'" [chartData]="genderChartData"></app-dashboard-chart>
               </div>
-            </ng-template>
+              <ng-template #noGenderChart>
+                <div class="mini-panel-body dash-empty dash-empty--tight">
+                  <i class="bi bi-people"></i>
+                  <p>No demographic data yet.</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="mini-panel">
+              <div class="mini-panel-head">
+                <h4>Leave Overview</h4>
+              </div>
+              <div class="mini-panel-body" *ngIf="hasChartData(leaveChartData); else noLeaveChart">
+                <app-dashboard-chart [chartType]="'bar'" [chartData]="leaveChartData"></app-dashboard-chart>
+              </div>
+              <ng-template #noLeaveChart>
+                <div class="mini-panel-body dash-empty dash-empty--tight">
+                  <i class="bi bi-calendar-x"></i>
+                  <p>No leave activity this month.</p>
+                </div>
+              </ng-template>
+            </div>
           </div>
         </div>
 
-        <!-- Second Row: Financial Summary + Announcements + Recent Clock Events -->
-        <div class="dashboard-middle-grid">
-
-          <!-- Financial Summary Card -->
-          <div class="chart-card financial-summary-card">
-            <div class="chart-card-header">
-              <div class="chart-title">
-                <i class="bi bi-graph-up-arrow me-2"></i>
-                Financial Overview — {{ currentYear }}
-              </div>
-              <a routerLink="/expenses/overview" class="view-more-link">
-                Full Report <i class="bi bi-arrow-right"></i>
-              </a>
+        <!-- Financial + Announcements Row -->
+        <div class="dash-info-row">
+          <div class="mini-panel">
+            <div class="mini-panel-head">
+              <h4>Financial Overview — {{ currentYear }}</h4>
+              <a routerLink="/expenses/overview" class="dash-panel-link">Full Report</a>
             </div>
-            <div class="chart-card-body" *ngIf="financialSummary; else noFinancials">
-              <div class="financial-kpis">
-                <div class="fin-kpi income">
-                  <div class="fin-kpi-label">Total Income</div>
-                  <div class="fin-kpi-value">{{ formatCurrency(financialSummary.totalIncome) }}</div>
-                </div>
-                <div class="fin-kpi expenses">
-                  <div class="fin-kpi-label">Total Expenses</div>
-                  <div class="fin-kpi-value">{{ formatCurrency(financialSummary.totalExpenses) }}</div>
-                </div>
-                <div class="fin-kpi" [class.profit]="financialSummary.netProfit >= 0" [class.loss]="financialSummary.netProfit < 0">
-                  <div class="fin-kpi-label">Net Profit / Loss</div>
-                  <div class="fin-kpi-value">{{ formatCurrency(financialSummary.netProfit) }}</div>
-                </div>
-                <div class="fin-kpi pending-claims">
-                  <div class="fin-kpi-label">Pending Claims</div>
-                  <div class="fin-kpi-value">{{ financialSummary.pendingClaims || 0 }}</div>
-                </div>
-              </div>
-
+            <div class="mini-panel-body" *ngIf="financialSummary; else noFinancials">
+              <ul class="fin-list">
+                <li><span>Total Income</span><strong class="is-positive">{{ formatCurrency(financialSummary.totalIncome) }}</strong></li>
+                <li><span>Total Expenses</span><strong class="is-negative">{{ formatCurrency(financialSummary.totalExpenses) }}</strong></li>
+                <li><span>Net Profit / Loss</span><strong [class.is-positive]="financialSummary.netProfit >= 0" [class.is-negative]="financialSummary.netProfit < 0">{{ formatCurrency(financialSummary.netProfit) }}</strong></li>
+                <li><span>Pending Claims</span><strong>{{ financialSummary.pendingClaims || 0 }}</strong></li>
+              </ul>
             </div>
             <ng-template #noFinancials>
-              <div class="chart-card-body chart-empty">
+              <div class="mini-panel-body dash-empty dash-empty--tight">
                 <i class="bi bi-graph-up-arrow"></i>
                 <p>No financial data available. <a routerLink="/expenses/entry">Record an expense</a>.</p>
               </div>
             </ng-template>
           </div>
 
-          <!-- Announcements Feed -->
-          <div class="chart-card announcements-card">
-            <div class="chart-card-header">
-              <div class="chart-title">
-                <i class="bi bi-megaphone-fill me-2"></i>
-                Recent Announcements
-              </div>
-              <a routerLink="/announcements" class="view-more-link">
-                View All <i class="bi bi-arrow-right"></i>
-              </a>
+          <div class="mini-panel">
+            <div class="mini-panel-head">
+              <h4>Recent Announcements</h4>
+              <a routerLink="/announcements" class="dash-panel-link">View All</a>
             </div>
-            <div class="announcements-body">
-              <div *ngIf="!recentAnnouncements.length" class="chart-empty">
+            <div class="mini-panel-body" *ngIf="recentAnnouncements.length; else noAnnouncements">
+              <ul class="announce-list">
+                <li *ngFor="let ann of recentAnnouncements" [routerLink]="['/announcements', ann.id]">
+                  <span class="badge-soft badge-soft-{{ getCategoryBadgeClass(ann.category) }}">{{ ann.category }}</span>
+                  <span class="announce-title">{{ ann.title }}</span>
+                  <span class="announce-date">{{ ann.createdAt | date:'d MMM' }}</span>
+                </li>
+              </ul>
+            </div>
+            <ng-template #noAnnouncements>
+              <div class="mini-panel-body dash-empty dash-empty--tight">
                 <i class="bi bi-chat-square-text"></i>
                 <p>No recent announcements.</p>
               </div>
-              <ul class="announcement-list" *ngIf="recentAnnouncements.length">
-                <li *ngFor="let ann of recentAnnouncements" class="announcement-item"
-                    [routerLink]="['/announcements', ann.id]">
-                  <div class="ann-icon ann-{{ getCategoryBadgeClass(ann.category) }}">
-                    <i class="bi bi-megaphone"></i>
-                  </div>
-                  <div class="ann-content">
-                    <div class="ann-title">{{ ann.title }}</div>
-                    <div class="ann-meta">
-                      <span class="badge-soft badge-soft-{{ getCategoryBadgeClass(ann.category) }}">
-                        {{ ann.category }}
-                      </span>
-                      <span class="ann-date">{{ ann.createdAt | date:'d MMM' }}</span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
+            </ng-template>
           </div>
-
-          <!-- Recent Clock-In/Out -->
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title">
-                <i class="bi bi-clock-history me-2"></i>Recent Clock Events
-              </div>
-              <a routerLink="/attendance" class="view-more-link">
-                View All <i class="bi bi-arrow-right"></i>
-              </a>
-            </div>
-            <div class="recent-clock-body">
-              <div *ngIf="!recentClockEvents.length" class="chart-empty">
-                <i class="bi bi-clock"></i>
-                <p>No clock events today.</p>
-              </div>
-              <ul class="clock-event-list" *ngIf="recentClockEvents.length">
-                <li *ngFor="let evt of recentClockEvents" class="clock-event-item">
-                  <div class="ce-avatar">
-                    <i class="bi bi-person-circle"></i>
-                  </div>
-                  <div class="ce-info">
-                    <div class="ce-name">{{ evt.employeeName || 'Employee' }}</div>
-                    <div class="ce-times">
-                      <span *ngIf="evt.checkInTime" class="ce-chip ce-in">
-                        <i class="bi bi-box-arrow-in-right me-1"></i>{{ evt.checkInTime | date:'HH:mm' }}
-                      </span>
-                      <span *ngIf="evt.checkOutTime" class="ce-chip ce-out">
-                        <i class="bi bi-box-arrow-right me-1"></i>{{ evt.checkOutTime | date:'HH:mm' }}
-                      </span>
-                    </div>
-                  </div>
-                  <span class="ce-status" [ngClass]="{
-                    'ce-working': evt.status === 'WORKING',
-                    'ce-break': evt.status === 'ON_BREAK1' || evt.status === 'ON_BREAK2' || evt.status === 'ON_LUNCH',
-                    'ce-done': evt.status === 'CLOCKED_OUT'
-                  }">
-                    {{ evt.status === 'WORKING' ? 'Working' : evt.status === 'CLOCKED_OUT' ? 'Done' : 'On Break' }}
-                  </span>
-                </li>
-              </ul>
-            </div>
-          </div>
-
         </div>
 
-        <!-- Quick Actions for Admin/Manager -->
-        <div class="quick-actions-section">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="bi bi-lightning-charge-fill me-2"></i>
-              Quick Actions
-            </h3>
-          </div>
-          <div class="quick-actions-grid">
-            <a [routerLink]="['/employee/new']" class="quick-action-card">
-              <div class="quick-action-icon primary">
-                <i class="bi bi-person-plus"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Add Employee</div>
-                <div class="quick-action-desc">Onboard new team member</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
+        <!-- Quick Actions -->
+        <div class="quick-bar">
+          <a [routerLink]="['/employee/new']" class="quick-pill"><i class="bi bi-person-plus"></i>Add Employee</a>
+          <a [routerLink]="['/admin/leave']" class="quick-pill"><i class="bi bi-calendar-check"></i>Manage Leaves</a>
+          <a [routerLink]="['/payroll']" class="quick-pill"><i class="bi bi-cash-stack"></i>Process Payroll</a>
+          <a [routerLink]="['/expenses/overview']" class="quick-pill"><i class="bi bi-graph-up-arrow"></i>Expenses</a>
+          <a [routerLink]="['/attendance']" class="quick-pill"><i class="bi bi-clock-history"></i>Attendance</a>
+          <a [routerLink]="['/announcements']" class="quick-pill"><i class="bi bi-megaphone"></i>Announcements</a>
+        </div>
 
-            <a [routerLink]="['/admin/leave']" class="quick-action-card">
-              <div class="quick-action-icon warning">
-                <i class="bi bi-calendar-check"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Manage Leaves</div>
-                <div class="quick-action-desc">Approve pending requests</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/payroll']" class="quick-action-card">
-              <div class="quick-action-icon success">
-                <i class="bi bi-cash-stack"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Process Payroll</div>
-                <div class="quick-action-desc">Manage salaries this month</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/expenses/overview']" class="quick-action-card">
-              <div class="quick-action-icon info">
-                <i class="bi bi-graph-up-arrow"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Expenses</div>
-                <div class="quick-action-desc">View financial overview</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/attendance']" class="quick-action-card">
-              <div class="quick-action-icon primary">
-                <i class="bi bi-clock-history"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Attendance</div>
-                <div class="quick-action-desc">Monitor team attendance</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/announcements']" class="quick-action-card">
-              <div class="quick-action-icon danger">
-                <i class="bi bi-megaphone"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Announcements</div>
-                <div class="quick-action-desc">Post company updates</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-          </div>
+        <!-- Secondary Stats Strip -->
+        <div class="quick-stats-strip" *ngIf="statsCards.length > 3">
+          <a *ngFor="let stat of statsCards.slice(3)" class="quick-stat-chip" [routerLink]="stat.route">
+            <i class="bi" [ngClass]="stat.icon" [class]="'chip-icon-' + stat.iconClass"></i>
+            <span class="quick-stat-value">{{ stat.value }}</span>
+            <span class="quick-stat-label">{{ stat.label }}</span>
+          </a>
         </div>
       </ng-container>
 
@@ -485,31 +387,53 @@
           </div>
         </div>
 
-        <!-- Chart Row: My attendance + Leave balance -->
-        <div class="charts-row">
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title"><i class="bi bi-pie-chart-fill me-2"></i>My Attendance</div>
+        <!-- Main Row: My Attendance + Schedule -->
+        <div class="dash-main-row">
+          <div class="dash-panel dash-panel--wide">
+            <div class="dash-panel-head">
+              <h3>My Attendance</h3>
             </div>
-            <div class="chart-card-body" *ngIf="hasChartData(attendanceChartData); else noMyAttendanceChart">
+            <div class="dash-panel-body" *ngIf="hasChartData(attendanceChartData); else noMyAttendanceChart">
               <app-dashboard-chart [chartType]="'doughnut'" [chartData]="attendanceChartData"></app-dashboard-chart>
             </div>
             <ng-template #noMyAttendanceChart>
-              <div class="chart-card-body chart-empty">
+              <div class="dash-panel-body dash-empty">
                 <i class="bi bi-pie-chart"></i>
                 <p>No attendance recorded yet.</p>
               </div>
             </ng-template>
           </div>
-          <div class="chart-card">
-            <div class="chart-card-header">
-              <div class="chart-title"><i class="bi bi-calendar-week me-2"></i>Leave Balance</div>
+
+          <div class="dash-panel dash-panel--narrow">
+            <div class="dash-panel-head">
+              <h3>My Schedule</h3>
+              <a routerLink="/holidays" class="dash-panel-link">See All</a>
             </div>
-            <div class="chart-card-body" *ngIf="hasChartData(leaveChartData); else noMyLeaveChart">
+            <div class="dash-panel-body dash-panel-body--flush">
+              <app-dashboard-calendar
+                [title]="''"
+                [events]="calendarEvents"
+                [upcomingEvents]="upcomingEvents"
+                [showEventsSidebar]="false"
+                [compact]="true"
+                (eventClick)="onEventClick($event)">
+              </app-dashboard-calendar>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leave Balance -->
+        <div class="dash-info-row">
+          <div class="mini-panel mini-panel--full">
+            <div class="mini-panel-head">
+              <h4>Leave Balance</h4>
+              <a routerLink="/employee/leave" class="dash-panel-link">Apply Leave</a>
+            </div>
+            <div class="mini-panel-body" *ngIf="hasChartData(leaveChartData); else noMyLeaveChart">
               <app-dashboard-chart [chartType]="'bar'" [chartData]="leaveChartData"></app-dashboard-chart>
             </div>
             <ng-template #noMyLeaveChart>
-              <div class="chart-card-body chart-empty">
+              <div class="mini-panel-body dash-empty dash-empty--tight">
                 <i class="bi bi-calendar-week"></i>
                 <p>No leave balance data available.</p>
               </div>
@@ -517,84 +441,13 @@
           </div>
         </div>
 
-        <!-- Calendar for Employees - Microsoft Style -->
-        <div class="charts-grid">
-          <div class="chart-card full-width calendar-card">
-            <div class="chart-card-body calendar-body">
-              <app-dashboard-calendar
-                [title]="''"
-                [events]="calendarEvents"
-                [upcomingEvents]="upcomingEvents"
-                (eventClick)="onEventClick($event)">
-              </app-dashboard-calendar>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Actions for Employees -->
-        <div class="quick-actions-section">
-          <div class="section-header">
-            <h3 class="section-title">
-              <i class="bi bi-lightning-charge-fill me-2"></i>
-              Quick Actions
-            </h3>
-          </div>
-          <div class="quick-actions-grid">
-            <a [routerLink]="['/attendance/my']" class="quick-action-card">
-              <div class="quick-action-icon primary">
-                <i class="bi bi-clock-history"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">My Attendance</div>
-                <div class="quick-action-desc">View attendance records</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/employee/leave']" class="quick-action-card">
-              <div class="quick-action-icon success">
-                <i class="bi bi-calendar-plus"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">Apply Leave</div>
-                <div class="quick-action-desc">Submit leave request</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/payroll/my-payslips']" class="quick-action-card">
-              <div class="quick-action-icon warning">
-                <i class="bi bi-receipt"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">My Payslips</div>
-                <div class="quick-action-desc">Access salary slips</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/expense-claims/my-claims']" class="quick-action-card">
-              <div class="quick-action-icon info">
-                <i class="bi bi-wallet2"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">My Claims</div>
-                <div class="quick-action-desc">Submit expense claims</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-
-            <a [routerLink]="['/holidays']" class="quick-action-card">
-              <div class="quick-action-icon success">
-                <i class="bi bi-calendar-event"></i>
-              </div>
-              <div class="quick-action-content">
-                <div class="quick-action-title">View Holidays</div>
-                <div class="quick-action-desc">See all company holidays</div>
-              </div>
-              <i class="bi bi-arrow-right quick-action-arrow"></i>
-            </a>
-          </div>
+        <!-- Quick Actions -->
+        <div class="quick-bar">
+          <a [routerLink]="['/attendance/my']" class="quick-pill"><i class="bi bi-clock-history"></i>My Attendance</a>
+          <a [routerLink]="['/employee/leave']" class="quick-pill"><i class="bi bi-calendar-plus"></i>Apply Leave</a>
+          <a [routerLink]="['/payroll/my-payslips']" class="quick-pill"><i class="bi bi-receipt"></i>My Payslips</a>
+          <a [routerLink]="['/expense-claims/my-claims']" class="quick-pill"><i class="bi bi-wallet2"></i>My Claims</a>
+          <a [routerLink]="['/holidays']" class="quick-pill"><i class="bi bi-calendar-event"></i>View Holidays</a>
         </div>
       </ng-container>
 
