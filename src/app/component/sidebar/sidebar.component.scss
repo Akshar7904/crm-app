@@ -58,7 +58,7 @@
   display: block;
   font-size: 0.65rem;
   font-weight: $font-weight-semibold;
-  color: var(--text-light, $gray-400);
+  color: var(--sidebar-text, rgba(255, 255, 255, 0.85));
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin: 0 4px 4px;
@@ -95,31 +95,28 @@
 .menu-section-label {
   font-size: 0.65rem;
   font-weight: $font-weight-semibold;
-  color: var(--text-light, $gray-400);
+  color: var(--sidebar-text, rgba(255, 255, 255, 0.85));
+  opacity: 0.75;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   padding: 6px 12px 4px;
 }
 
+// The menu and footer sit directly on the sidebar's own background (teal),
+// unlike the logo/company chip which stay on white "plates" — so their text
+// and icon colors (set to light tones for the teal bg) stay readable here.
 .sidebar-menu-card {
   margin: 0 8px;
   flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg-card, $white);
-  border: 1px solid var(--border-color, $gray-200);
-  border-radius: $border-radius-xl;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .sidebar-footer-card {
   margin: 6px 8px 10px;
   padding: $spacing-sm 10px;
-  background: var(--bg-card, $white);
-  border: 1px solid var(--border-color, $gray-200);
-  border-radius: $border-radius-xl;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--sidebar-footer-border, rgba(255, 255, 255, 0.18));
   flex-shrink: 0;
 }
 

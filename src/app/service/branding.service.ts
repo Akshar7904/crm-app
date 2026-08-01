@@ -19,7 +19,7 @@ export interface CompanyBranding {
 @Injectable()
 export class BrandingService {
 
-  private readonly DEFAULT_PRIMARY = '#1e56a0';
+  private readonly DEFAULT_PRIMARY = '#124076';
   private readonly CSS_VAR = '--orion-primary';
 
   private _branding: CompanyBranding | null = null;

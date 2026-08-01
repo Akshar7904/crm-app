@@ -4,6 +4,5 @@
 
 export const environment = {
   production: false,
-  // Change this to your backend URL when developing locally
-  apiUrl: ''  // Empty = same origin; Angular proxy forwards /api/* to localhost:8081
+  apiUrl: ''
 };

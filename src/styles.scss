@@ -28,7 +28,7 @@
 
 // Brand primary — overridden at runtime by BrandingService via document.documentElement.style.setProperty
 :root {
-  --orion-primary: #1e56a0;
+  --orion-primary: #124076;
 }
 
 // Light Theme (default)
@@ -39,21 +39,21 @@
   --bg-input: #{$gray-50};
   --bg-disabled: #f3f4f6;
 
-  // Sidebar
-  --bg-sidebar: #ffffff;
-  --sidebar-border: #{$gray-200};
-  --sidebar-text: #{$gray-600};
-  --sidebar-text-hover: #{$gray-900};
-  --sidebar-text-active: var(--orion-primary);
-  --sidebar-icon: #{$gray-400};
-  --sidebar-icon-active: var(--orion-primary);
-  --sidebar-hover: rgba(30, 86, 160, 0.05);
-  --sidebar-active-bg: rgba(30, 86, 160, 0.08);
-  --sidebar-active-border: var(--orion-primary);
-  --sidebar-header-border: #{$gray-200};
-  --sidebar-scrollbar: #{$gray-300};
-  --sidebar-scrollbar-hover: #{$gray-400};
-  --sidebar-footer-border: #{$gray-200};
+  // Sidebar — teal background, navy "selected" pill
+  --bg-sidebar: #{$secondary};
+  --sidebar-border: rgba(255, 255, 255, 0.18);
+  --sidebar-text: rgba(255, 255, 255, 0.85);
+  --sidebar-text-hover: #ffffff;
+  --sidebar-text-active: #ffffff;
+  --sidebar-icon: rgba(255, 255, 255, 0.7);
+  --sidebar-icon-active: #ffffff;
+  --sidebar-hover: rgba(255, 255, 255, 0.14);
+  --sidebar-active-bg: var(--orion-primary);
+  --sidebar-active-border: #{$accent-orange};
+  --sidebar-header-border: rgba(255, 255, 255, 0.18);
+  --sidebar-scrollbar: rgba(255, 255, 255, 0.3);
+  --sidebar-scrollbar-hover: rgba(255, 255, 255, 0.45);
+  --sidebar-footer-border: rgba(255, 255, 255, 0.18);
 
   // Navbar
   --bg-navbar: #ffffff;
@@ -63,7 +63,7 @@
   --navbar-icon: #{$gray-500};
   --navbar-icon-hover: #{$primary};
   --navbar-divider: #{$gray-200};
-  --navbar-btn-hover: rgba(30, 86, 160, 0.06);
+  --navbar-btn-hover: rgba(18, 64, 118, 0.06);
 
   // Text
   --text-primary: #{$gray-800};
@@ -89,7 +89,7 @@
   --dropdown-bg: #ffffff;
   --dropdown-border: #{$gray-200};
   --dropdown-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --dropdown-hover: rgba(30, 86, 160, 0.05);
+  --dropdown-hover: rgba(18, 64, 118, 0.05);
 
   // Forms
   --input-bg: #{$gray-50};
@@ -105,12 +105,12 @@
   --badge-muted-bg: #{$gray-100};
   --badge-muted-text: #{$gray-600};
 
-  // Page section headers
-  --page-header-bg: linear-gradient(135deg, var(--orion-primary) 0%, var(--orion-primary) 60%, var(--orion-primary) 100%);
+  // Page section headers — teal, matches the sidebar background.
+  --page-header-bg: #{$gradient-banner};
   --section-title-color: #{$gray-700};
 
   // Form focus ring
-  --input-focus-ring: rgba(30, 86, 160, 0.2);
+  --input-focus-ring: rgba(18, 64, 118, 0.2);
 }
 
 // Dark Theme
@@ -130,7 +130,7 @@
   --sidebar-icon: rgba(255, 255, 255, 0.4);
   --sidebar-icon-active: #{$secondary-light};
   --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-active-bg: rgba(30, 86, 160, 0.2);
+  --sidebar-active-bg: rgba(18, 64, 118, 0.2);
   --sidebar-active-border: #{$secondary-light};
   --sidebar-header-border: rgba(255, 255, 255, 0.06);
   --sidebar-scrollbar: rgba(255, 255, 255, 0.1);
