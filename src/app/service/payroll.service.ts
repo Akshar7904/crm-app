@@ -6,7 +6,7 @@ import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 import {HttpClient, HttpEvent, HttpParams} from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { tap, catchError, shareReplay } from 'rxjs/operators';
 import { CustomHttpResponse, Page } from '../interface/appstates';
 import { Payroll, PayrollDTO } from '../interface/payroll';
 
@@ -24,6 +24,7 @@ export class PayrollService {
 
   private payrollsSubject = new BehaviorSubject<CustomHttpResponse<Page<Payroll>> | null>(null);
   public payrolls$ = this.payrollsSubject.asObservable();
+  private listCache = new Map<string, Observable<CustomHttpResponse<Page<Payroll>>>>();
 
   constructor(private http: HttpClient) {}
 
@@ -103,6 +104,10 @@ export class PayrollService {
   /** Get all payrolls with pagination */
   getPayrolls(page: number = 0, size: number = 10):
     Observable<CustomHttpResponse<Page<Payroll>>> {
+    const key = `list:${page}:${size}`;
+    if (this.listCache.has(key)) {
+      return this.listCache.get(key)!;
+    }
 
     const params = new HttpParams()
       .set('page', page.toString())
@@ -110,7 +115,7 @@ export class PayrollService {
 
     console.log(`🌐 PayrollService.getPayrolls() calling: ${this.server}/payroll?page=${page}&size=${size}`);
 
-    return this.http.get<CustomHttpResponse<any>>(
+    const obs = this.http.get<CustomHttpResponse<any>>(
       `${this.server}/payroll`,
       { params }
     ).pipe(
@@ -139,8 +144,11 @@ export class PayrollService {
       catchError(err => {
         console.error('❌ PayrollService error:', err);
         throw err;
-      })
+      }),
+      shareReplay(1)
     );
+    this.listCache.set(key, obs);
+    return obs;
   }
 
   /** Get payroll by ID */
@@ -210,10 +218,14 @@ export class PayrollService {
   /** Payrolls by status */
   getPayrollsByStatus(status: string):
     Observable<CustomHttpResponse<Page<Payroll>>> {
+    const key = `status:${status}`;
+    if (this.listCache.has(key)) {
+      return this.listCache.get(key)!;
+    }
 
     console.log(`🌐 PayrollService.getPayrollsByStatus() calling: ${this.server}/payroll/status/${status}`);
 
-    return this.http.get<CustomHttpResponse<any>>(
+    const obs = this.http.get<CustomHttpResponse<any>>(
       `${this.server}/payroll/status/${status}`
     ).pipe(
       tap(response => {
@@ -241,8 +253,11 @@ export class PayrollService {
       catchError(err => {
         console.error('❌ PayrollService.getPayrollsByStatus() error:', err);
         throw err;
-      })
+      }),
+      shareReplay(1)
     );
+    this.listCache.set(key, obs);
+    return obs;
   }
 
   /** Payrolls between date period */
@@ -273,7 +288,7 @@ export class PayrollService {
     return this.http.post<CustomHttpResponse<{ payroll: Payroll }>>(
       `${this.server}/payroll`, dto
     ).pipe(
-      tap(response => console.log('✅ PayrollService.createPayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.createPayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.createPayroll() error:', err);
         throw err;
@@ -289,7 +304,7 @@ export class PayrollService {
     return this.http.put<CustomHttpResponse<{ payroll: Payroll }>>(
       `${this.server}/payroll/${id}`, dto
     ).pipe(
-      tap(response => console.log('✅ PayrollService.updatePayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.updatePayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.updatePayroll() error:', err);
         throw err;
@@ -303,7 +318,7 @@ export class PayrollService {
     return this.http.delete<CustomHttpResponse<void>>(
       `${this.server}/payroll/${id}`
     ).pipe(
-      tap(response => console.log('✅ PayrollService.deletePayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.deletePayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.deletePayroll() error:', err);
         throw err;
@@ -328,7 +343,7 @@ export class PayrollService {
       null,
       { params }
     ).pipe(
-      tap(response => console.log('✅ PayrollService.processEmployeePayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.processEmployeePayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.processEmployeePayroll() error:', err);
         throw err;
@@ -348,7 +363,7 @@ export class PayrollService {
       `${this.server}/payroll/process/bulk`,
       { employeeIds, periodStart, periodEnd }
     ).pipe(
-      tap(response => console.log('✅ PayrollService.processBulkPayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.processBulkPayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.processBulkPayroll() error:', err);
         throw err;
@@ -365,7 +380,7 @@ export class PayrollService {
       `${this.server}/payroll/${id}/recalculate`,
       null
     ).pipe(
-      tap(response => console.log('✅ PayrollService.recalculatePayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.recalculatePayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.recalculatePayroll() error:', err);
         throw err;
@@ -382,7 +397,7 @@ export class PayrollService {
       `${this.server}/payroll/${id}/approve`,
       null
     ).pipe(
-      tap(response => console.log('✅ PayrollService.approvePayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.approvePayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.approvePayroll() error:', err);
         throw err;
@@ -399,7 +414,7 @@ export class PayrollService {
       `${this.server}/payroll/${id}/paid`,
       null
     ).pipe(
-      tap(response => console.log('✅ PayrollService.markAsPaid() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.markAsPaid() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.markAsPaid() error:', err);
         throw err;
@@ -416,7 +431,7 @@ export class PayrollService {
       `${this.server}/payroll/${id}/cancel`,
       null
     ).pipe(
-      tap(response => console.log('✅ PayrollService.cancelPayroll() response:', response)),
+      tap(response => { this.listCache.clear(); console.log('✅ PayrollService.cancelPayroll() response:', response); }),
       catchError(err => {
         console.error('❌ PayrollService.cancelPayroll() error:', err);
         throw err;

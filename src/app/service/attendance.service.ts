@@ -5,7 +5,7 @@
 import { environment } from '@env/environment';
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap, EMPTY } from 'rxjs';
 import { Key } from '../enum/key.enum';
 import {
   Attendance,
@@ -34,6 +34,8 @@ export class AttendanceService {
   });
 
   public readonly state$ = this.attendanceState$.asObservable();
+
+  private loadedKeys = new Set<string>();
 
   constructor(private http: HttpClient, private ngZone: NgZone) {}
 
@@ -85,12 +87,14 @@ export class AttendanceService {
 
   // Create attendance
   createAttendance(form: AttendanceForm): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
-    return this.http.post<CustomHttpResponse<{ attendance: Attendance }>>(this.API_URL, form);
+    return this.http.post<CustomHttpResponse<{ attendance: Attendance }>>(this.API_URL, form)
+      .pipe(tap(() => { this.loadedKeys.clear(); }));
   }
 
   // Update attendance by ID
   updateAttendance(id: number, form: AttendanceForm): Observable<CustomHttpResponse<{ attendance: Attendance }>> {
-    return this.http.put<CustomHttpResponse<{ attendance: Attendance }>>(`${this.API_URL}/${id}`, form);
+    return this.http.put<CustomHttpResponse<{ attendance: Attendance }>>(`${this.API_URL}/${id}`, form)
+      .pipe(tap(() => { this.loadedKeys.clear(); }));
   }
 
   // Update attendance by employee and date
@@ -102,12 +106,13 @@ export class AttendanceService {
     return this.http.put<CustomHttpResponse<{ attendance: Attendance }>>(
       `${this.API_URL}/employee/${employeeId}/date/${date}`,
       form
-    );
+    ).pipe(tap(() => { this.loadedKeys.clear(); }));
   }
 
   // Delete attendance
   deleteAttendance(id: number): Observable<CustomHttpResponse<void>> {
-    return this.http.delete<CustomHttpResponse<void>>(`${this.API_URL}/${id}`);
+    return this.http.delete<CustomHttpResponse<void>>(`${this.API_URL}/${id}`)
+      .pipe(tap(() => { this.loadedKeys.clear(); }));
   }
 
   // Get attendance by ID
@@ -205,7 +210,11 @@ export class AttendanceService {
   }
 
   // Get monthly attendance (calendar view)
-  getMonthlyAttendance(year: number, month: number): Observable<CustomHttpResponse<{ attendances: EmployeeAttendance[] }>> {
+  getMonthlyAttendance(year: number, month: number, force: boolean = false): Observable<CustomHttpResponse<{ attendances: EmployeeAttendance[] }>> {
+    const cacheKey = `${year}-${month}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setLoading(true);
     const params = new HttpParams()
       .set('year', year.toString())
@@ -217,6 +226,7 @@ export class AttendanceService {
     ).pipe(
       tap({
         next: (response) => {
+          this.loadedKeys.add(cacheKey);
           this.updateState({
             attendances: response.data.attendances,
             loading: false,

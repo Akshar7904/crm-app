@@ -6,7 +6,7 @@ import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, shareReplay, tap } from 'rxjs/operators';
 import { Holiday, HolidayForm, ApiResponse, HolidayResponse } from '../component/holiday/holiday.model';
 import { CustomHttpResponse } from '../interface/appstates';
 
@@ -17,6 +17,7 @@ export class HolidayService {
   // State management with BehaviorSubject
   private holidaySubject = new BehaviorSubject<CustomHttpResponse<HolidayResponse>>(null!);
   public holidays$ = this.holidaySubject.asObservable();
+  private listCache = new Map<string, Observable<CustomHttpResponse<HolidayResponse>>>();
 
   constructor(private http: HttpClient) { }
 
@@ -24,15 +25,20 @@ export class HolidayService {
    * Get paginated holidays
    */
   getHolidays$(page: number = 0, size: number = 10): Observable<CustomHttpResponse<HolidayResponse>> {
-    const params = new HttpParams()
-      .set('page', page.toString())
-      .set('size', size.toString());
+    const key = `list:${page}:${size}`;
+    if (!this.listCache.has(key)) {
+      const params = new HttpParams()
+        .set('page', page.toString())
+        .set('size', size.toString());
 
-    return this.http.get<CustomHttpResponse<HolidayResponse>>(this.apiUrl, { params })
-      .pipe(
-        tap(response => this.holidaySubject.next(response)),
-        catchError(this.handleError)
-      );
+      this.listCache.set(key, this.http.get<CustomHttpResponse<HolidayResponse>>(this.apiUrl, { params })
+        .pipe(
+          tap(response => this.holidaySubject.next(response)),
+          catchError(this.handleError),
+          shareReplay(1)
+        ));
+    }
+    return this.listCache.get(key)!;
   }
 
   /**
@@ -48,7 +54,10 @@ export class HolidayService {
    */
   createHoliday$(holidayForm: HolidayForm): Observable<CustomHttpResponse<{ holiday: Holiday }>> {
     return this.http.post<CustomHttpResponse<{ holiday: Holiday }>>(this.apiUrl, holidayForm)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => { this.listCache.clear(); }),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -56,7 +65,10 @@ export class HolidayService {
    */
   updateHoliday$(id: number, holidayForm: HolidayForm): Observable<CustomHttpResponse<{ holiday: Holiday }>> {
     return this.http.put<CustomHttpResponse<{ holiday: Holiday }>>(`${this.apiUrl}/${id}`, holidayForm)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => { this.listCache.clear(); }),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -64,23 +76,31 @@ export class HolidayService {
    */
   deleteHoliday$(id: number): Observable<CustomHttpResponse<{ deleted: boolean }>> {
     return this.http.delete<CustomHttpResponse<{ deleted: boolean }>>(`${this.apiUrl}/${id}`)
-      .pipe(catchError(this.handleError));
+      .pipe(
+        tap(() => { this.listCache.clear(); }),
+        catchError(this.handleError)
+      );
   }
 
   /**
    * Search holidays
    */
   searchHolidays$(searchTerm: string, page: number = 0, size: number = 10): Observable<CustomHttpResponse<HolidayResponse>> {
-    const params = new HttpParams()
-      .set('name', searchTerm)
-      .set('page', page.toString())
-      .set('size', size.toString());
+    const key = `search:${searchTerm}:${page}:${size}`;
+    if (!this.listCache.has(key)) {
+      const params = new HttpParams()
+        .set('name', searchTerm)
+        .set('page', page.toString())
+        .set('size', size.toString());
 
-    return this.http.get<CustomHttpResponse<HolidayResponse>>(`${this.apiUrl}/search`, { params })
-      .pipe(
-        tap(response => this.holidaySubject.next(response)),
-        catchError(this.handleError)
-      );
+      this.listCache.set(key, this.http.get<CustomHttpResponse<HolidayResponse>>(`${this.apiUrl}/search`, { params })
+        .pipe(
+          tap(response => this.holidaySubject.next(response)),
+          catchError(this.handleError),
+          shareReplay(1)
+        ));
+    }
+    return this.listCache.get(key)!;
   }
 
   /**

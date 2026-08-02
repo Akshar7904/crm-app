@@ -5,7 +5,7 @@
 import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { BehaviorSubject, Observable, throwError, of } from 'rxjs';
+import { BehaviorSubject, Observable, throwError, of, EMPTY } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { DataState } from '../enum/datastate.enum';
 import {
@@ -32,6 +32,8 @@ export class LeaveService {
   });
 
   public readonly state$ = this.leaveState$.asObservable();
+
+  private loadedKeys = new Set<string>();
 
   constructor(private http: HttpClient) {}
 
@@ -74,6 +76,7 @@ export class LeaveService {
         return response.data;
       }),
       tap(leave => {
+        this.loadedKeys.clear();
         const currentLeaves = this.currentState.leaves || [];
         this.setLoadedState({
           leaves: [leave, ...currentLeaves],
@@ -99,6 +102,7 @@ export class LeaveService {
         return response.data;
       }),
       tap(updatedLeave => {
+        this.loadedKeys.clear();
         const currentLeaves = this.currentState.leaves || [];
         const leaves = currentLeaves.map(leave =>
           leave.id === id ? updatedLeave : leave
@@ -139,7 +143,11 @@ export class LeaveService {
   }
 
   // Get all leaves with pagination
-  getAllLeaves(page: number = 0, size: number = 10, sortBy: string = 'createdAt', sortDirection: string = 'DESC'): Observable<Leave[]> {
+  getAllLeaves(page: number = 0, size: number = 10, sortBy: string = 'createdAt', sortDirection: string = 'DESC', force: boolean = false): Observable<Leave[]> {
+    const cacheKey = `all:${page}:${size}:${sortBy}:${sortDirection}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setLoadingState();
     let params = new HttpParams()
       .set('page', page.toString())
@@ -156,6 +164,7 @@ export class LeaveService {
       }),
       tap(leaves => {
         this.setLoadedState({ leaves });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         const errorMessage = error.error?.message || error.message || 'Failed to fetch leaves';
@@ -166,7 +175,11 @@ export class LeaveService {
   }
 
   // Get leaves by employee
-  getLeavesByEmployee(employeeId: number, page: number = 0, size: number = 10): Observable<Leave[]> {
+  getLeavesByEmployee(employeeId: number, page: number = 0, size: number = 10, force: boolean = false): Observable<Leave[]> {
+    const cacheKey = `employee:${employeeId}:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setLoadingState();
     let params = new HttpParams()
       .set('page', page.toString())
@@ -181,6 +194,7 @@ export class LeaveService {
       }),
       tap(leaves => {
         this.setLoadedState({ leaves });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         const errorMessage = error.error?.message || error.message || 'Failed to fetch employee leaves';
@@ -191,7 +205,11 @@ export class LeaveService {
   }
 
   // Get leaves by status
-  getLeavesByStatus(status: LeaveStatus, page: number = 0, size: number = 10): Observable<Leave[]> {
+  getLeavesByStatus(status: LeaveStatus, page: number = 0, size: number = 10, force: boolean = false): Observable<Leave[]> {
+    const cacheKey = `status:${status}:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setLoadingState();
     let params = new HttpParams()
       .set('page', page.toString())
@@ -206,6 +224,7 @@ export class LeaveService {
       }),
       tap(leaves => {
         this.setLoadedState({ leaves });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         const errorMessage = error.error?.message || error.message || 'Failed to fetch leaves by status';
@@ -216,7 +235,11 @@ export class LeaveService {
   }
 
   // Search leaves
-  searchLeaves(query: string, page: number = 0, size: number = 10): Observable<Leave[]> {
+  searchLeaves(query: string, page: number = 0, size: number = 10, force: boolean = false): Observable<Leave[]> {
+    const cacheKey = `search:${query}:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setLoadingState();
     let params = new HttpParams()
       .set('query', query)
@@ -232,6 +255,7 @@ export class LeaveService {
       }),
       tap(leaves => {
         this.setLoadedState({ leaves });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         const errorMessage = error.error?.message || error.message || 'Failed to search leaves';
@@ -253,6 +277,7 @@ export class LeaveService {
         return response.data;
       }),
       tap(updatedLeave => {
+        this.loadedKeys.clear();
         const currentLeaves = this.currentState.leaves || [];
         const leaves = currentLeaves.map(leave =>
           leave.id === approval.leaveId ? updatedLeave : leave
@@ -282,6 +307,7 @@ export class LeaveService {
         return response.data;
       }),
       tap(updatedLeave => {
+        this.loadedKeys.clear();
         const currentLeaves = this.currentState.leaves || [];
         const leaves = currentLeaves.map(leave =>
           leave.id === approval.leaveId ? updatedLeave : leave
@@ -312,6 +338,7 @@ export class LeaveService {
         return response.data;
       }),
       tap(updatedLeave => {
+        this.loadedKeys.clear();
         const currentLeaves = this.currentState.leaves || [];
         const leaves = currentLeaves.map(leave =>
           leave.id === leaveId ? updatedLeave : leave
@@ -339,6 +366,7 @@ export class LeaveService {
         }
       }),
       tap(() => {
+        this.loadedKeys.clear();
         const currentLeaves = this.currentState.leaves || [];
         const leaves = currentLeaves.filter(leave => leave.id !== id);
         this.setLoadedState({

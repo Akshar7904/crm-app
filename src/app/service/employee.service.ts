@@ -13,7 +13,7 @@ import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpErrorResponse, HttpEvent } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, shareReplay, tap } from 'rxjs/operators';
 import { Employee, EmployeeForm, Department, Designation } from '../component/employee/employee.model';
 import { CustomHttpResponse, Page, EmployeeState } from '../interface/appstates';
 import { UserModel } from '../component/profile/user.model';
@@ -22,6 +22,7 @@ import { EmployeeStats } from '../interface/employee-state';
 @Injectable()
 export class EmployeeService {
   private readonly server: string = environment.apiUrl;
+  private listCache = new Map<string, Observable<any>>();
 
   constructor(private http: HttpClient) { }
 
@@ -114,13 +115,19 @@ export class EmployeeService {
   /**
    * Get paginated list of employees
    */
-  employees$ = (page: number = 0) => <Observable<CustomHttpResponse<Page<Employee> & UserModel & EmployeeStats>>>
-    this.http.get<CustomHttpResponse<Page<Employee> & UserModel & EmployeeStats>>
-    (`${this.server}/api/v1/employee/list?page=${page}`)
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      );
+  employees$ = (page: number = 0) => {
+    const key = `employees:${page}`;
+    if (!this.listCache.has(key)) {
+      this.listCache.set(key, this.http.get<CustomHttpResponse<Page<Employee> & UserModel & EmployeeStats>>
+        (`${this.server}/api/v1/employee/list?page=${page}`)
+        .pipe(
+          tap(console.log),
+          catchError(this.handleError),
+          shareReplay(1)
+        ));
+    }
+    return this.listCache.get(key) as Observable<CustomHttpResponse<Page<Employee> & UserModel & EmployeeStats>>;
+  };
 
   /**
    * Get employee by ID
@@ -150,13 +157,19 @@ export class EmployeeService {
    * Search employees by name, email, or employee ID
    * Backend expects 'query' parameter (not 'name')
    */
-  searchEmployees$ = (query: string = '', page: number = 0) => <Observable<CustomHttpResponse<Page<Employee> & UserModel>>>
-    this.http.get<CustomHttpResponse<Page<Employee> & UserModel>>
-    (`${this.server}/api/v1/employee/search?query=${query}&page=${page}`)
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      );
+  searchEmployees$ = (query: string = '', page: number = 0) => {
+    const key = `search:${query}:${page}`;
+    if (!this.listCache.has(key)) {
+      this.listCache.set(key, this.http.get<CustomHttpResponse<Page<Employee> & UserModel>>
+        (`${this.server}/api/v1/employee/search?query=${query}&page=${page}`)
+        .pipe(
+          tap(console.log),
+          catchError(this.handleError),
+          shareReplay(1)
+        ));
+    }
+    return this.listCache.get(key) as Observable<CustomHttpResponse<Page<Employee> & UserModel>>;
+  };
 
   /**
    * Get employees by department
@@ -190,6 +203,7 @@ export class EmployeeService {
     this.http.put<CustomHttpResponse<EmployeeState>>
     (`${this.server}/api/v1/employee/update`, employeeForm)
       .pipe(
+        tap(() => { this.listCache.clear(); }),
         tap(console.log),
         catchError(this.handleError)
       );
@@ -204,6 +218,7 @@ export class EmployeeService {
       this.http.patch<CustomHttpResponse<EmployeeState>>
       (`${this.server}/api/v1/employee/status/${employeeId}`, null, { params })
         .pipe(
+          tap(() => { this.listCache.clear(); }),
           tap(console.log),
           catchError(this.handleError)
         );
@@ -383,6 +398,7 @@ export class EmployeeService {
     this.http.post<CustomHttpResponse<Employee & UserModel>>
     (`${this.server}/api/v1/employee/create`, employeeForm)
       .pipe(
+        tap(() => { this.listCache.clear(); }),
         tap(console.log),
         catchError(this.handleError)
       );
@@ -395,6 +411,7 @@ export class EmployeeService {
     this.http.delete<CustomHttpResponse<any>>
     (`${this.server}/api/v1/employee/delete/${id}`)
       .pipe(
+        tap(() => { this.listCache.clear(); }),
         tap(console.log),
         catchError(this.handleError)
       );
@@ -425,24 +442,36 @@ export class EmployeeService {
   /**
    * Get all departments (for dropdowns)
    */
-  departments$ = () => <Observable<CustomHttpResponse<{ departments: Department[] } & UserModel>>>
-    this.http.get<CustomHttpResponse<{ departments: Department[] } & UserModel>>
-    (`${this.server}/api/v1/departments/all`)
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      );
+  departments$ = () => {
+    const key = 'departments';
+    if (!this.listCache.has(key)) {
+      this.listCache.set(key, this.http.get<CustomHttpResponse<{ departments: Department[] } & UserModel>>
+        (`${this.server}/api/v1/departments/all`)
+        .pipe(
+          tap(console.log),
+          catchError(this.handleError),
+          shareReplay(1)
+        ));
+    }
+    return this.listCache.get(key) as Observable<CustomHttpResponse<{ departments: Department[] } & UserModel>>;
+  };
 
   /**
    * Get all designations (for dropdowns)
    */
-  designations$ = () => <Observable<CustomHttpResponse<{ designations: Designation[] } & UserModel>>>
-    this.http.get<CustomHttpResponse<{ designations: Designation[] } & UserModel>>
-    (`${this.server}/api/v1/designations/list`)
-      .pipe(
-        tap(console.log),
-        catchError(this.handleError)
-      );
+  designations$ = () => {
+    const key = 'designations';
+    if (!this.listCache.has(key)) {
+      this.listCache.set(key, this.http.get<CustomHttpResponse<{ designations: Designation[] } & UserModel>>
+        (`${this.server}/api/v1/designations/list`)
+        .pipe(
+          tap(console.log),
+          catchError(this.handleError),
+          shareReplay(1)
+        ));
+    }
+    return this.listCache.get(key) as Observable<CustomHttpResponse<{ designations: Designation[] } & UserModel>>;
+  };
 
   /**
    * Create FormData for file upload

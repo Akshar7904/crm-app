@@ -5,7 +5,7 @@
 import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, EMPTY } from 'rxjs';
 import { tap, catchError, map } from 'rxjs/operators';
 import { Department, DepartmentForm } from '../component/department/department.model';
 import { DepartmentState } from '../interface/department-state';
@@ -32,6 +32,8 @@ export class DepartmentService {
 
   public departmentState$ = this.departmentStateSubject.asObservable();
 
+  private loadedKeys = new Set<string>();
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -56,7 +58,11 @@ export class DepartmentService {
   /**
    * Get all departments with pagination
    */
-  getDepartments(page: number = 0, size: number = 10): Observable<any> {
+  getDepartments(page: number = 0, size: number = 10, force: boolean = false): Observable<any> {
+    const cacheKey = `list:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     console.log(`📞 Calling getDepartments(page=${page}, size=${size})`);
     this.setState({ loading: true, error: null });
 
@@ -153,6 +159,7 @@ export class DepartmentService {
 
         console.log('💾 Saving state:', newState);
         this.setState(newState);
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         console.error('❌ Error loading departments:', error);
@@ -209,7 +216,11 @@ export class DepartmentService {
   /**
    * Search departments
    */
-  searchDepartments(query: string, page: number = 0, size: number = 10): Observable<any> {
+  searchDepartments(query: string, page: number = 0, size: number = 10, force: boolean = false): Observable<any> {
+    const cacheKey = `search:${query}:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     console.log(`📞 Calling searchDepartments(query="${query}", page=${page}, size=${size})`);
     this.setState({ loading: true, error: null });
 
@@ -261,6 +272,7 @@ export class DepartmentService {
           pageSize: size,
           loading: false
         });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         console.error('❌ Error searching departments:', error);
@@ -314,6 +326,7 @@ export class DepartmentService {
         return response.data?.department || response.data;
       }),
       tap(() => {
+        this.loadedKeys.clear();
         this.setState({ loading: false });
       }),
       catchError(error => {
@@ -339,6 +352,7 @@ export class DepartmentService {
         return response.data?.department || response.data;
       }),
       tap(() => {
+        this.loadedKeys.clear();
         this.setState({ loading: false });
       }),
       catchError(error => {
@@ -360,6 +374,7 @@ export class DepartmentService {
 
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
       tap(response => {
+        this.loadedKeys.clear();
         console.log('Delete department response:', response);
         const updatedDepartments = this.state.departments.filter(dept => dept.id !== id);
         this.setState({
