@@ -17,7 +17,7 @@ export class CompanyService {
     return this.http.get<any>(`${this.base}/my`);
   }
 
-  updateMyBranding$(data: { name?: string; tagline?: string; primaryColor?: string; email?: string; phone?: string; address?: string }): Observable<any> {
+  updateMyBranding$(data: { name?: string; tagline?: string; primaryColor?: string; theme?: string; email?: string; phone?: string; address?: string }): Observable<any> {
     return this.http.put<any>(`${this.base}/my/branding`, data);
   }
 
