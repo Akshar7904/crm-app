@@ -75,9 +75,24 @@
       </div>
     </div>
 
+    <!-- Document search -->
+    <div class="policy-search mb-3" *ngIf="policies.length > 0">
+      <div class="input-group">
+        <span class="input-group-text"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control" placeholder="Search documents..."
+               [(ngModel)]="searchQuery">
+      </div>
+    </div>
+
+    <!-- No documents match search -->
+    <div *ngIf="policies.length > 0 && filteredDocuments.length === 0" class="policy-empty">
+      <i class="bi bi-search display-3 text-muted opacity-25"></i>
+      <div class="mt-3 fw-semibold">No documents match your search</div>
+    </div>
+
     <!-- Grid of policy cards -->
-    <div class="policy-grid" *ngIf="policies.length > 0">
-      <div class="policy-card falcon-card" *ngFor="let p of policies">
+    <div class="policy-grid" *ngIf="filteredDocuments.length > 0">
+      <div class="policy-card falcon-card" *ngFor="let p of filteredDocuments">
 
         <!-- Delete confirm overlay -->
         <div class="delete-confirm-overlay" *ngIf="deletingId === p.id">

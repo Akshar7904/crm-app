@@ -37,6 +37,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   policies: PolicyMeta[] = [];
   policyTypes: PolicyType[] = [];
+  searchQuery = '';
 
   // Viewer state
   viewingPolicy: PolicyMeta | null = null;
@@ -254,5 +255,15 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   get uploadedTypes(): Set<string> {
     return new Set(this.policies.map(p => p.policyType));
+  }
+
+  get filteredDocuments(): PolicyMeta[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.policies;
+    return this.policies.filter(p =>
+      (p.displayName ?? '').toLowerCase().includes(q) ||
+      (p.fileName ?? '').toLowerCase().includes(q) ||
+      this.labelFor(p.policyType).toLowerCase().includes(q)
+    );
   }
 }
