@@ -46,7 +46,7 @@ export class CompanySettingsComponent implements OnInit {
     this.companyService.getMyCompany$().subscribe({
       next: res => {
         this.company = res?.data?.company ?? null;
-        this.theme = this.company?.themeJson ? JSON.parse(this.company.themeJson) : {};
+        this.theme = this.parseThemeJson(this.company?.themeJson);
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -101,6 +101,11 @@ export class CompanySettingsComponent implements OnInit {
 
   get logoUrl(): string | null {
     return this.company?.id ? `${environment.apiUrl}/api/v1/companies/${this.company.id}/logo` : null;
+  }
+
+  private parseThemeJson(raw: string | null | undefined): ThemeTokens {
+    if (!raw) return {};
+    try { return JSON.parse(raw); } catch { return {}; }
   }
 
   onBgChange(bgKey: keyof ThemeTokens, textKey: keyof ThemeTokens, value: string): void {
