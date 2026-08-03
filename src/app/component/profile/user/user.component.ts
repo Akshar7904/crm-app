@@ -17,6 +17,7 @@ import { KioskService } from '../../kiosk/kiosk.service';
 import { NgForm } from '@angular/forms';
 import { UserModel } from '../user.model';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { ThemeTokens, suggestTextColor, BrandingService } from 'src/app/service/branding.service';
 
 /**
  * User Component - Self-Service Profile Management
@@ -71,6 +72,11 @@ export class UserComponent implements OnInit {
   private showLogsSubject = new BehaviorSubject<boolean>(false);
   showLogs$ = this.showLogsSubject.asObservable();
 
+  // Theme personalization
+  personalTheme: ThemeTokens = {};
+  advancedTheme: { [K in keyof ThemeTokens]?: boolean } = {};
+  savingTheme = false;
+
   // MFA setup state
   mfaSetupMode = false;
   mfaDisableMode = false;
@@ -117,6 +123,7 @@ export class UserComponent implements OnInit {
     private employeeService: EmployeeService,
     private notification: NotificationService,
     private kioskService: KioskService,
+    private branding: BrandingService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -125,6 +132,7 @@ export class UserComponent implements OnInit {
     this.loadProfile();
     this.loadDropdownData();
     this.loadMyDocuments();
+    this.personalTheme = { ...this.branding.personalTheme };
   }
 
   /**
@@ -832,6 +840,40 @@ export class UserComponent implements OnInit {
         this.savingKioskPin = false;
         this.cdr.markForCheck();
       }
+    });
+  }
+
+  onBgChange(bgKey: keyof ThemeTokens, textKey: keyof ThemeTokens, value: string): void {
+    this.personalTheme = { ...this.personalTheme, [bgKey]: value };
+    if (!this.advancedTheme[textKey]) {
+      this.personalTheme = { ...this.personalTheme, [textKey]: suggestTextColor(value) };
+    }
+    this.cdr.markForCheck();
+  }
+
+  onTextChange(textKey: keyof ThemeTokens, value: string): void {
+    this.personalTheme = { ...this.personalTheme, [textKey]: value };
+    this.cdr.markForCheck();
+  }
+
+  toggleAdvanced(textKey: keyof ThemeTokens): void {
+    this.advancedTheme[textKey] = !this.advancedTheme[textKey];
+    this.cdr.markForCheck();
+  }
+
+  saveMyTheme(): void {
+    this.savingTheme = true;
+    this.branding.setPersonalTheme(this.personalTheme).subscribe({
+      next: () => { this.savingTheme = false; this.notification.onDefault('Your theme has been saved'); this.cdr.markForCheck(); },
+      error: err => { this.notification.onError(err); this.savingTheme = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  resetMyTheme(): void {
+    this.savingTheme = true;
+    this.branding.clearPersonalTheme().subscribe({
+      next: () => { this.personalTheme = {}; this.savingTheme = false; this.notification.onDefault('Reset to company default'); this.cdr.markForCheck(); },
+      error: err => { this.notification.onError(err); this.savingTheme = false; this.cdr.markForCheck(); }
     });
   }
 }

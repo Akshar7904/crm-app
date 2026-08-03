@@ -79,6 +79,10 @@
            aria-selected="false" role="tab">
           <i class="bi bi-bank"></i> Banking Info
         </a>
+        <a class="up-nav-link nav-link" id="theme" data-bs-toggle="pill" data-bs-target="#theme-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-palette2"></i> Theme
+        </a>
 
         <div class="up-nav-section">Security</div>
         <a class="up-nav-link nav-link" id="password" data-bs-toggle="pill" data-bs-target="#password-tab"
@@ -582,6 +586,71 @@
             </button>
           </div>
         </form>
+      </div>
+
+      <!-- ═══ Theme Tab ═══ -->
+      <div class="tab-pane fade" id="theme-tab" role="tabpanel" aria-labelledby="theme">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h5>My Theme</h5>
+            <p class="text-muted mb-0">Personalize colors for just your own view. Leave a field blank to use your company's default.</p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Sidebar Background <span class="text-muted small">(using company default if blank)</span></label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.sidebarBg || '#7f9f80'"
+                   (change)="onBgChange('sidebarBg', 'sidebarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Sidebar Text</label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.sidebarText || '#ffffff'"
+                   (change)="onTextChange('sidebarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Top Navbar Background</label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.navbarBg || '#ffffff'"
+                   (change)="onBgChange('navbarBg', 'navbarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Top Navbar Text</label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.navbarText || '#1a1a1a'"
+                   (change)="onTextChange('navbarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Content Background</label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.contentBg || '#f4f6f9'"
+                   (change)="onBgChange('contentBg', 'contentText', $any($event.target).value)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Body Text</label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.contentText || '#1a1a1a'"
+                   (change)="onTextChange('contentText', $any($event.target).value)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Accent Color</label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.accentColor || '#124076'"
+                   (change)="onTextChange('accentColor', $any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-outline-secondary" (click)="resetMyTheme()" [disabled]="savingTheme">
+            Reset to Company Default
+          </button>
+          <button type="button" class="btn btn-primary" (click)="saveMyTheme()" [disabled]="savingTheme">
+            <span *ngIf="savingTheme" class="spinner-border spinner-border-sm me-1"></span>
+            {{ savingTheme ? 'Saving…' : 'Save My Theme' }}
+          </button>
+        </div>
       </div>
 
       <!-- ═══ Password Tab ═══ -->
