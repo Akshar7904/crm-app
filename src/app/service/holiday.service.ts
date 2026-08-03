@@ -34,7 +34,7 @@ export class HolidayService {
       this.listCache.set(key, this.http.get<CustomHttpResponse<HolidayResponse>>(this.apiUrl, { params })
         .pipe(
           tap(response => this.holidaySubject.next(response)),
-          catchError(this.handleError),
+          catchError(err => { this.listCache.delete(key); return this.handleError(err); }),
           shareReplay(1)
         ));
     }
@@ -96,7 +96,7 @@ export class HolidayService {
       this.listCache.set(key, this.http.get<CustomHttpResponse<HolidayResponse>>(`${this.apiUrl}/search`, { params })
         .pipe(
           tap(response => this.holidaySubject.next(response)),
-          catchError(this.handleError),
+          catchError(err => { this.listCache.delete(key); return this.handleError(err); }),
           shareReplay(1)
         ));
     }

@@ -122,7 +122,7 @@ export class EmployeeService {
         (`${this.server}/api/v1/employee/list?page=${page}`)
         .pipe(
           tap(console.log),
-          catchError(this.handleError),
+          catchError(err => { this.listCache.delete(key); return this.handleError(err); }),
           shareReplay(1)
         ));
     }
@@ -164,7 +164,7 @@ export class EmployeeService {
         (`${this.server}/api/v1/employee/search?query=${query}&page=${page}`)
         .pipe(
           tap(console.log),
-          catchError(this.handleError),
+          catchError(err => { this.listCache.delete(key); return this.handleError(err); }),
           shareReplay(1)
         ));
     }
@@ -449,7 +449,7 @@ export class EmployeeService {
         (`${this.server}/api/v1/departments/all`)
         .pipe(
           tap(console.log),
-          catchError(this.handleError),
+          catchError(err => { this.listCache.delete(key); return this.handleError(err); }),
           shareReplay(1)
         ));
     }
@@ -466,7 +466,7 @@ export class EmployeeService {
         (`${this.server}/api/v1/designations/list`)
         .pipe(
           tap(console.log),
-          catchError(this.handleError),
+          catchError(err => { this.listCache.delete(key); return this.handleError(err); }),
           shareReplay(1)
         ));
     }

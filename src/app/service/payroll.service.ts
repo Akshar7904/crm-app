@@ -142,6 +142,7 @@ export class PayrollService {
         this.payrollsSubject.next(transformedResponse);
       }),
       catchError(err => {
+        this.listCache.delete(key);
         console.error('❌ PayrollService error:', err);
         throw err;
       }),
@@ -251,6 +252,7 @@ export class PayrollService {
         this.payrollsSubject.next(transformedResponse);
       }),
       catchError(err => {
+        this.listCache.delete(key);
         console.error('❌ PayrollService.getPayrollsByStatus() error:', err);
         throw err;
       }),
