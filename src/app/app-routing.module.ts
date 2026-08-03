@@ -257,7 +257,7 @@ const routes: Routes = [
     path: 'policy',
     component: CompanyPolicyComponent,
     canActivate: [AuthenticationGuard],
-    data: { title: 'Company Policy' }
+    data: { title: 'Company Documents' }
   },
   {
     path: 'documentation',

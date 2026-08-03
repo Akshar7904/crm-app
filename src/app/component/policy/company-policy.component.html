@@ -3,15 +3,15 @@
   <div class="banner-content">
     <div class="banner-icon"><i class="bi bi-shield-check-fill"></i></div>
     <div>
-      <div class="banner-title">Company Policies</div>
-      <div class="banner-subtitle">{{ companyName }} · Official policy documents</div>
+      <div class="banner-title">Company Documents</div>
+      <div class="banner-subtitle">Your Company Documents stored in one place</div>
     </div>
   </div>
   <div class="banner-actions" *ngIf="companyId && isAdmin">
-    <!-- Add new policy — dropdown of all types (backend upserts on same type) -->
+    <!-- Add new document — dropdown of all types (backend upserts on same type) -->
     <div class="dropdown" *ngIf="policyTypes.length > 0">
       <button class="btn-banner dropdown-toggle" data-bs-toggle="dropdown">
-        <i class="bi bi-plus-circle me-1"></i>Add Policy
+        <i class="bi bi-plus-circle me-1"></i>Add Company Document
       </button>
       <ul class="dropdown-menu dropdown-menu-end">
         <li *ngFor="let t of policyTypes">
@@ -68,10 +68,10 @@
     <!-- No policies uploaded yet -->
     <div *ngIf="policies.length === 0" class="policy-empty">
       <i class="bi bi-folder2-open display-3 text-muted opacity-25"></i>
-      <div class="mt-3 fw-semibold">No policy documents uploaded</div>
+      <div class="mt-3 fw-semibold">No documents uploaded</div>
       <div class="text-muted small mt-1">
-        <span *ngIf="isAdmin">Use the <strong>Add Policy</strong> button above to upload your first document.</span>
-        <span *ngIf="!isAdmin">Your company hasn't uploaded any policy documents yet. Contact your administrator.</span>
+        <span *ngIf="isAdmin">Use the <strong>Add Company Document</strong> button above to upload your first document.</span>
+        <span *ngIf="!isAdmin">Your company hasn't uploaded any documents yet. Contact your administrator.</span>
       </div>
     </div>
 
@@ -130,12 +130,12 @@
 <div class="upload-modal" *ngIf="showUploadModal">
   <div class="upload-modal-content">
     <div class="upload-modal-header">
-      <h6 class="mb-0 fw-semibold">Upload Policy Document</h6>
+      <h6 class="mb-0 fw-semibold">Upload Company Document</h6>
       <button class="btn-close" (click)="closeUploadModal()"></button>
     </div>
     <div class="upload-modal-body">
       <div class="mb-3">
-        <label class="form-label fw-medium">Policy Type</label>
+        <label class="form-label fw-medium">Document Type</label>
         <select class="form-select" [(ngModel)]="uploadType" [disabled]="uploading">
           <option value="" disabled>Select type…</option>
           <option *ngFor="let t of policyTypes" [value]="t.value">{{ t.label }}</option>

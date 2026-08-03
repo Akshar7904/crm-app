@@ -131,7 +131,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
       error: () => {
         this.viewerLoading = false;
         this.viewingPolicy = null;
-        this.notification.onError('Failed to load policy document.');
+        this.notification.onError('Failed to load document.');
         this.cdr.markForCheck();
       }
     });
@@ -157,7 +157,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
         // Revoke after a short delay to allow the download to start
         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
       },
-      error: () => this.notification.onError('Failed to download policy.')
+      error: () => this.notification.onError('Failed to download document.')
     });
   }
 
@@ -210,12 +210,12 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
       next: () => {
         this.uploading       = false;
         this.showUploadModal = false;
-        this.notification.onDefault('Policy uploaded successfully.');
+        this.notification.onDefault('Document uploaded successfully.');
         this.loadPolicies();
       },
       error: () => {
         this.uploading = false;
-        this.notification.onError('Failed to upload policy.');
+        this.notification.onError('Failed to upload document.');
         this.cdr.markForCheck();
       }
     });
@@ -237,12 +237,12 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
     this.http.delete<any>(`${this.api}/companies/${this.companyId}/policies/${policy.id}`).subscribe({
       next: () => {
         this.deletingId = null;
-        this.notification.onDefault('Policy removed.');
+        this.notification.onDefault('Document removed.');
         this.loadPolicies();
       },
       error: () => {
         this.deletingId = null;
-        this.notification.onError('Failed to remove policy.');
+        this.notification.onError('Failed to remove document.');
         this.cdr.markForCheck();
       }
     });
