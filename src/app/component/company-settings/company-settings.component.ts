@@ -141,6 +141,7 @@ export class CompanySettingsComponent implements OnInit {
   }
 
   resetTheme(): void {
+    if (!confirm('Reset the company theme to the platform default for everyone at your company?')) return;
     this.theme = {};
     this.saveTheme();
   }

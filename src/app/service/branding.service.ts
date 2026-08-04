@@ -5,7 +5,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { tap, catchError, map } from 'rxjs/operators';
+import { tap, catchError, map, switchMap } from 'rxjs/operators';
 import { environment } from '@env/environment';
 
 export interface ThemeTokens {
@@ -19,7 +19,7 @@ export interface ThemeTokens {
   accentColor?: string;
 }
 
-const DEFAULT_THEME: Required<ThemeTokens> = {
+export const DEFAULT_THEME: Required<ThemeTokens> = {
   sidebarBg: '#7f9f80',
   sidebarText: '#ffffff',
   navbarBg: '#ffffff',
@@ -105,18 +105,20 @@ export class BrandingService {
         };
         return branding;
       }),
-      tap(branding => {
+      switchMap(branding =>
+        this.http.get<any>(`${environment.apiUrl}/api/v1/users/me/theme`).pipe(
+          map(res => ({ branding, personalRaw: res?.data?.theme })),
+          catchError(() => of({ branding, personalRaw: null }))
+        )
+      ),
+      tap(({ branding, personalRaw }) => {
         this._branding = branding;
         this._loaded = true;
-        this.http.get<any>(`${environment.apiUrl}/api/v1/users/me/theme`).subscribe({
-          next: res => {
-            this._personalTheme = this.parseTheme(res?.data?.theme);
-            this.applyResolvedTheme(branding);
-          },
-          error: () => this.applyResolvedTheme(branding)
-        });
+        this._personalTheme = this.parseTheme(personalRaw);
+        this.applyResolvedTheme(branding);
         this.branding$.next(branding);
       }),
+      map(({ branding }) => branding),
       catchError(() => {
         this._loaded = true;
         this.applyResolvedTheme(null);
@@ -167,37 +169,80 @@ export class BrandingService {
 
   private applyResolvedTheme(branding: CompanyBranding | null): void {
     const companyTheme = branding?.theme ?? {};
-    const resolve = (key: keyof ThemeTokens): string =>
-      this._personalTheme[key] ?? companyTheme[key]
-        ?? (key === 'accentColor' ? (branding?.primaryColor ?? this.DEFAULT_PRIMARY) : DEFAULT_THEME[key]!);
-
-    const sidebarBg = resolve('sidebarBg');
-    const sidebarText = resolve('sidebarText');
-    const navbarBg = resolve('navbarBg');
-    const navbarText = resolve('navbarText');
-    const contentBg = resolve('contentBg');
-    const contentText = resolve('contentText');
-    const titleText = resolve('titleText');
-    const accentColor = resolve('accentColor');
-
+    const personalTheme = this._personalTheme;
     const root = document.documentElement.style;
+
+    const isValidHex = (v: unknown): v is string =>
+      typeof v === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(v);
+
+    const resolve = (key: keyof ThemeTokens): string => {
+      const candidate = personalTheme[key] ?? companyTheme[key]
+        ?? (key === 'accentColor' ? branding?.primaryColor : undefined);
+      if (isValidHex(candidate)) return candidate as string;
+      return key === 'accentColor' ? this.DEFAULT_PRIMARY : DEFAULT_THEME[key]!;
+    };
+
+    const hasAny = (...keys: (keyof ThemeTokens)[]): boolean =>
+      keys.some(k => isValidHex(personalTheme[k]) || isValidHex(companyTheme[k]));
+
+    // Accent — always resolvable (primaryColor/DEFAULT_PRIMARY back-compat), matches
+    // pre-feature behavior where every company already had a primaryColor.
+    const accentColor = resolve('accentColor');
     root.setProperty(this.CSS_VAR, accentColor);
-    root.setProperty('--bg-sidebar', sidebarBg);
-    root.setProperty('--sidebar-text', `rgba(${rgbString(sidebarText)}, 0.85)`);
-    root.setProperty('--sidebar-text-hover', sidebarText);
-    root.setProperty('--sidebar-icon', `rgba(${rgbString(sidebarText)}, 0.7)`);
-    root.setProperty('--sidebar-icon-active', sidebarText);
-    root.setProperty('--bg-navbar', navbarBg);
-    root.setProperty('--navbar-text', navbarText);
-    root.setProperty('--navbar-text-muted', `rgba(${rgbString(navbarText)}, 0.6)`);
-    root.setProperty('--navbar-icon', `rgba(${rgbString(navbarText)}, 0.6)`);
-    root.setProperty('--navbar-icon-hover', navbarText);
-    root.setProperty('--bg-body', contentBg);
-    root.setProperty('--text-primary', contentText);
-    root.setProperty('--text-secondary', `rgba(${rgbString(contentText)}, 0.75)`);
-    root.setProperty('--text-muted', `rgba(${rgbString(contentText)}, 0.55)`);
-    root.setProperty('--section-title-color', titleText);
-    root.setProperty('--logo-text-color', titleText);
+
+    // Sidebar — only touch these vars if a theme actually customizes the sidebar;
+    // otherwise clear any previously-applied override so the stylesheet's own
+    // [data-theme="light"] defaults take full, unmodified effect.
+    if (hasAny('sidebarBg', 'sidebarText')) {
+      const sidebarBg = resolve('sidebarBg');
+      const sidebarText = resolve('sidebarText');
+      root.setProperty('--bg-sidebar', sidebarBg);
+      root.setProperty('--sidebar-text', `rgba(${rgbString(sidebarText)}, 0.85)`);
+      root.setProperty('--sidebar-text-hover', sidebarText);
+      root.setProperty('--sidebar-text-active', sidebarText);
+      root.setProperty('--sidebar-icon', `rgba(${rgbString(sidebarText)}, 0.7)`);
+      root.setProperty('--sidebar-icon-active', sidebarText);
+      root.setProperty('--sidebar-hover', `rgba(${rgbString(sidebarText)}, 0.14)`);
+      root.setProperty('--sidebar-border', `rgba(${rgbString(sidebarText)}, 0.18)`);
+    } else {
+      ['--bg-sidebar', '--sidebar-text', '--sidebar-text-hover', '--sidebar-text-active',
+       '--sidebar-icon', '--sidebar-icon-active', '--sidebar-hover', '--sidebar-border']
+        .forEach(v => root.removeProperty(v));
+    }
+
+    // Navbar
+    if (hasAny('navbarBg', 'navbarText')) {
+      const navbarBg = resolve('navbarBg');
+      const navbarText = resolve('navbarText');
+      root.setProperty('--bg-navbar', navbarBg);
+      root.setProperty('--navbar-text', navbarText);
+      root.setProperty('--navbar-text-muted', `rgba(${rgbString(navbarText)}, 0.6)`);
+      root.setProperty('--navbar-icon', `rgba(${rgbString(navbarText)}, 0.6)`);
+      root.setProperty('--navbar-icon-hover', navbarText);
+      root.setProperty('--navbar-divider', `rgba(${rgbString(navbarText)}, 0.1)`);
+    } else {
+      ['--bg-navbar', '--navbar-text', '--navbar-text-muted', '--navbar-icon',
+       '--navbar-icon-hover', '--navbar-divider']
+        .forEach(v => root.removeProperty(v));
+    }
+
+    // Content
+    if (hasAny('contentBg', 'contentText', 'titleText')) {
+      const contentBg = resolve('contentBg');
+      const contentText = resolve('contentText');
+      const titleText = resolve('titleText');
+      root.setProperty('--bg-body', contentBg);
+      root.setProperty('--text-primary', contentText);
+      root.setProperty('--text-secondary', `rgba(${rgbString(contentText)}, 0.75)`);
+      root.setProperty('--text-muted', `rgba(${rgbString(contentText)}, 0.55)`);
+      root.setProperty('--text-light', `rgba(${rgbString(contentText)}, 0.35)`);
+      root.setProperty('--section-title-color', titleText);
+      root.setProperty('--logo-text-color', titleText);
+    } else {
+      ['--bg-body', '--text-primary', '--text-secondary', '--text-muted',
+       '--text-light', '--section-title-color', '--logo-text-color']
+        .forEach(v => root.removeProperty(v));
+    }
   }
 
   /** Re-applies the current branding+personal theme (call after either tier changes). */

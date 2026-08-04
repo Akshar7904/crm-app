@@ -17,7 +17,7 @@ import { KioskService } from '../../kiosk/kiosk.service';
 import { NgForm } from '@angular/forms';
 import { UserModel } from '../user.model';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
-import { ThemeTokens, suggestTextColor, BrandingService } from 'src/app/service/branding.service';
+import { ThemeTokens, suggestTextColor, BrandingService, DEFAULT_THEME } from 'src/app/service/branding.service';
 
 /**
  * User Component - Self-Service Profile Management
@@ -74,7 +74,6 @@ export class UserComponent implements OnInit {
 
   // Theme personalization
   personalTheme: ThemeTokens = {};
-  advancedTheme: { [K in keyof ThemeTokens]?: boolean } = {};
   savingTheme = false;
 
   // MFA setup state
@@ -844,10 +843,7 @@ export class UserComponent implements OnInit {
   }
 
   onBgChange(bgKey: keyof ThemeTokens, textKey: keyof ThemeTokens, value: string): void {
-    this.personalTheme = { ...this.personalTheme, [bgKey]: value };
-    if (!this.advancedTheme[textKey]) {
-      this.personalTheme = { ...this.personalTheme, [textKey]: suggestTextColor(value) };
-    }
+    this.personalTheme = { ...this.personalTheme, [bgKey]: value, [textKey]: suggestTextColor(value) };
     this.cdr.markForCheck();
   }
 
@@ -856,8 +852,14 @@ export class UserComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
-  toggleAdvanced(textKey: keyof ThemeTokens): void {
-    this.advancedTheme[textKey] = !this.advancedTheme[textKey];
+  companyDefault(key: keyof ThemeTokens): string {
+    return (this.branding.branding?.theme?.[key] as string) || DEFAULT_THEME[key];
+  }
+
+  clearPersonalField(key: keyof ThemeTokens): void {
+    const updated = { ...this.personalTheme };
+    delete updated[key];
+    this.personalTheme = updated;
     this.cdr.markForCheck();
   }
 

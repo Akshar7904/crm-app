@@ -599,45 +599,75 @@
 
         <div class="row g-3">
           <div class="col-md-6">
-            <label class="form-label">Sidebar Background <span class="text-muted small">(using company default if blank)</span></label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Sidebar Background</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('sidebarBg')" class="small" *ngIf="personalTheme.sidebarBg">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.sidebarBg || '#7f9f80'"
+                   [value]="personalTheme.sidebarBg || companyDefault('sidebarBg')"
                    (change)="onBgChange('sidebarBg', 'sidebarText', $any($event.target).value)">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Sidebar Text</label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Sidebar Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('sidebarText')" class="small" *ngIf="personalTheme.sidebarText">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.sidebarText || '#ffffff'"
+                   [value]="personalTheme.sidebarText || companyDefault('sidebarText')"
                    (change)="onTextChange('sidebarText', $any($event.target).value)">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Top Navbar Background</label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Top Navbar Background</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('navbarBg')" class="small" *ngIf="personalTheme.navbarBg">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.navbarBg || '#ffffff'"
+                   [value]="personalTheme.navbarBg || companyDefault('navbarBg')"
                    (change)="onBgChange('navbarBg', 'navbarText', $any($event.target).value)">
           </div>
           <div class="col-md-6">
-            <label class="form-label">Top Navbar Text</label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Top Navbar Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('navbarText')" class="small" *ngIf="personalTheme.navbarText">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.navbarText || '#1a1a1a'"
+                   [value]="personalTheme.navbarText || companyDefault('navbarText')"
                    (change)="onTextChange('navbarText', $any($event.target).value)">
           </div>
           <div class="col-md-4">
-            <label class="form-label">Content Background</label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Content Background</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('contentBg')" class="small" *ngIf="personalTheme.contentBg">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.contentBg || '#f4f6f9'"
+                   [value]="personalTheme.contentBg || companyDefault('contentBg')"
                    (change)="onBgChange('contentBg', 'contentText', $any($event.target).value)">
           </div>
           <div class="col-md-4">
-            <label class="form-label">Body Text</label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Body Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('contentText')" class="small" *ngIf="personalTheme.contentText">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.contentText || '#1a1a1a'"
+                   [value]="personalTheme.contentText || companyDefault('contentText')"
                    (change)="onTextChange('contentText', $any($event.target).value)">
           </div>
           <div class="col-md-4">
-            <label class="form-label">Accent Color</label>
+            <label class="form-label d-flex justify-content-between">
+              <span>Title Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('titleText')" class="small" *ngIf="personalTheme.titleText">Use company default</a>
+            </label>
             <input type="color" class="form-control form-control-color w-100"
-                   [value]="personalTheme.accentColor || '#124076'"
+                   [value]="personalTheme.titleText || companyDefault('titleText')"
+                   (change)="onTextChange('titleText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Accent Color</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('accentColor')" class="small" *ngIf="personalTheme.accentColor">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.accentColor || companyDefault('accentColor')"
                    (change)="onTextChange('accentColor', $any($event.target).value)">
           </div>
         </div>
