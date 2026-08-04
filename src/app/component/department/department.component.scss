@@ -10,7 +10,7 @@
   flex-wrap: wrap;
   gap: $spacing-md;
   padding: $spacing-md $spacing-xl;
-  background: $gradient-banner;
+  background: var(--page-header-bg, $gradient-banner);
   border-radius: $border-radius-xl;
   margin-bottom: $spacing-lg;
   box-shadow: 0 6px 24px rgba($secondary-dark, 0.28);

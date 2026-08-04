@@ -4,7 +4,7 @@
 
 import { environment } from '@env/environment';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, BehaviorSubject, map, startWith, catchError, of } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
 import { EventType } from 'src/app/enum/event-type.enum';
@@ -118,6 +118,7 @@ export class UserComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private userService: UserService,
     private employeeService: EmployeeService,
     private notification: NotificationService,
@@ -132,6 +133,12 @@ export class UserComponent implements OnInit {
     this.loadDropdownData();
     this.loadMyDocuments();
     this.personalTheme = { ...this.branding.personalTheme };
+
+    // Deep-link support: /profile?tab=theme opens straight on a given pill tab.
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab) {
+      setTimeout(() => document.getElementById(tab)?.click());
+    }
   }
 
   /**

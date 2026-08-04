@@ -97,6 +97,13 @@
       <span class="menu-icon"><i class="bi bi-book"></i></span>
       <span class="menu-label">System User Guide</span>
     </a>
+    <a class="menu-item"
+       [routerLink]="['/profile']"
+       [queryParams]="{tab: 'theme'}"
+       [attr.title]="collapsed ? 'My Theme' : null">
+      <span class="menu-icon"><i class="bi bi-palette2"></i></span>
+      <span class="menu-label">My Theme</span>
+    </a>
     <a class="logout-btn" (click)="onLogout()" [attr.title]="collapsed ? 'Logout' : null">
       <span class="menu-icon">
         <i class="bi bi-box-arrow-left"></i>

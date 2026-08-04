@@ -56,6 +56,13 @@ function rgbString(hex: string): string {
   return `${r}, ${g}, ${b}`;
 }
 
+/** Mixes a hex color toward black by `amount` (0–1), for gradient/hover shades. */
+function darken(hex: string, amount: number): string {
+  const { r, g, b } = hexToRgb(hex);
+  const mix = (c: number) => Math.round(c * (1 - amount));
+  return `#${[mix(r), mix(g), mix(b)].map(c => c.toString(16).padStart(2, '0')).join('')}`;
+}
+
 export interface CompanyBranding {
   id: number;
   name: string;
@@ -189,6 +196,7 @@ export class BrandingService {
     // pre-feature behavior where every company already had a primaryColor.
     const accentColor = resolve('accentColor');
     root.setProperty(this.CSS_VAR, accentColor);
+    root.setProperty('--page-header-bg', `linear-gradient(135deg, ${darken(accentColor, 0.35)} 0%, ${accentColor} 100%)`);
 
     // Sidebar — only touch these vars if a theme actually customizes the sidebar;
     // otherwise clear any previously-applied override so the stylesheet's own
