@@ -4,8 +4,7 @@
   <header class="lp-header">
     <div class="lp-header__inner">
       <div class="lp-logo">
-        <img src="assets/logo_icon.png" alt="Enterprize360">
-        <span>Enterprize360</span>
+        <img src="assets/enterprise360-logo.jpg" alt="Enterprise360">
       </div>
       <nav class="lp-nav">
         <a href="#about">About</a>
@@ -22,12 +21,12 @@
 
       <!-- Left: headline -->
       <div class="lp-hero__text">
-        <div class="hero-eyebrow">Silver Spectrum Solutions &nbsp;·&nbsp; South Africa</div>
+        <div class="hero-eyebrow">Enterprise360 &nbsp;·&nbsp; South Africa</div>
         <h1 class="lp-hero__title">
           Your workforce,<br>effortlessly<br>managed.
         </h1>
         <p class="lp-hero__desc">
-          Enterprize360 gives managers a real-time view of their entire
+          Enterprise360 gives managers a real-time view of their entire
           workforce — who's in, who's on leave, and where the money is
           going. Built for South African businesses.
         </p>
@@ -80,17 +79,29 @@
       <h2 class="lp-section-title">Everything in <span>One Platform</span></h2>
       <p class="lp-section-sub">Click any module to learn more.</p>
     </div>
-    <div class="module-grid">
-      <div
-        *ngFor="let mod of shuffledModules; trackBy: trackByModuleName"
-        class="module-tile"
-        [class.module-tile--fade]="isShuffling"
-        [style.--mc]="mod.color"
-        [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
-        (click)="openModule(mod)">
-        <i class="bi module-tile__icon" [ngClass]="mod.icon"></i>
-        <div class="module-tile__name">{{ mod.name }}</div>
-        <div class="module-tile__tag">{{ mod.tag }}</div>
+    <div class="module-marquee">
+      <div class="module-track">
+        <div
+          *ngFor="let mod of marqueeModules; trackBy: trackByModuleName"
+          class="module-tile"
+          [style.--mc]="mod.color"
+          [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
+          (click)="openModule(mod)">
+          <i class="bi module-tile__icon" [ngClass]="mod.icon"></i>
+          <div class="module-tile__name">{{ mod.name }}</div>
+          <div class="module-tile__tag">{{ mod.tag }}</div>
+        </div>
+        <div
+          *ngFor="let mod of marqueeModules; trackBy: trackByModuleName"
+          class="module-tile"
+          aria-hidden="true"
+          [style.--mc]="mod.color"
+          [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
+          (click)="openModule(mod)">
+          <i class="bi module-tile__icon" [ngClass]="mod.icon"></i>
+          <div class="module-tile__name">{{ mod.name }}</div>
+          <div class="module-tile__tag">{{ mod.tag }}</div>
+        </div>
       </div>
     </div>
   </section>
@@ -194,7 +205,7 @@
       <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
         <div class="row mb-5">
           <div class="col-12 text-center">
-            <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>Enterprize360</span>?</h2>
+            <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>Enterprise360</span>?</h2>
             <p style="color:rgba(255,255,255,.5);font-size:.95rem;">Built differently — for businesses that need more than a spreadsheet. Scroll to explore.</p>
           </div>
         </div>
@@ -256,7 +267,7 @@
         <div class="step-card">
           <div class="step-num">03</div>
           <div class="step-icon"><i class="bi bi-rocket-takeoff"></i></div>
-          <h4>Run HR &amp; Payroll</h4>
+          <h4>Run Your Enterprise</h4>
           <p>Process payroll, approve leave, track attendance, manage assets and send invoices — all in one place, every day.</p>
         </div>
       </div>
@@ -265,10 +276,12 @@
 
   <!-- ══ CONTACT / CTA ════════════════════════════════════════════ -->
   <section class="lp-cta" id="contact">
-    <img src="assets/logo_icon.png" alt="Enterprize360" class="cta-logo" (error)="$event.target.style.display='none'">
-    <h2>Ready to modernise your HR &amp; Payroll?</h2>
+    <div class="cta-logo-badge">
+      <img src="assets/enterprise360-logo.jpg" alt="Enterprise360" class="cta-logo" (error)="$event.target.style.display='none'">
+    </div>
+    <h2>Ready to modernise your Enterprise Management?</h2>
     <p>Join businesses across South Africa that run HR, payroll, attendance, accounting and more — in one platform.</p>
-    <a routerLink="/login" class="btn-cta-white">Sign In to Enterprize360</a>
+    <a routerLink="/login" class="btn-cta-white">Sign In to Enterprise360</a>
     <a href="mailto:info@silverspectrumsolutions.co.za" class="btn-cta-outline">Contact Us</a>
   </section>
 
@@ -278,17 +291,17 @@
       <div class="row">
         <div class="col-lg-4 mb-4 mb-lg-0">
           <div class="footer-brand">
-            <img src="assets/logo_icon.png" alt="Enterprize360" (error)="$event.target.style.display='none'">
-            <span>Enterprize360</span>
+            <img src="assets/enterprise360-icon.png" alt="Enterprise360" (error)="$event.target.style.display='none'">
+            <span>Enterprise360</span>
           </div>
-          <p class="footer-tagline">HR &amp; Payroll for South Africa — by Silver Spectrum Solutions.</p>
+          <p class="footer-tagline">Enterprise Management System for South Africa — by Silver Spectrum Solutions.</p>
           <p class="footer-contact">1217 Pluimbal Avenue, Weltevreden Park, Roodepoort, 1709 &nbsp;·&nbsp; info@silverspectrumsolutions.co.za &nbsp;·&nbsp; +27 83 554 9197</p>
         </div>
         <div class="col-lg-4 mb-4 mb-lg-0">
           <div class="footer-links">
             <h5>Platform</h5>
             <a href="#modules">Modules</a>
-            <a href="#features">Why Enterprize360</a>
+            <a href="#features">Why Enterprise360</a>
             <a href="#about">Features</a>
           </div>
         </div>

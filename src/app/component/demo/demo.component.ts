@@ -1,7 +1,7 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
 // Enterprize360 HR & Payroll Management System
 
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 
 @Component({
   standalone: false,
@@ -9,27 +9,15 @@ import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } fro
   templateUrl: './demo.component.html',
   styleUrls: ['./demo.component.scss']
 })
-export class DemoComponent implements OnInit, OnDestroy {
+export class DemoComponent {
 
   // ── Module Grid ──────────────────────────────────────────────────────────
   selectedModule: any = null;
-  shuffledModules: any[] = [];
-  isShuffling = false;
-  private shuffleTimer: any = null;
 
   openModule(mod: any): void { this.selectedModule = mod; }
   closeModule(): void { this.selectedModule = null; }
 
   trackByModuleName(_index: number, mod: any): string { return mod.name; }
-
-  private shuffle<T>(array: T[]): T[] {
-    const copy = [...array];
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
-  }
 
   readonly marqueeModules = [
     {
@@ -183,7 +171,7 @@ export class DemoComponent implements OnInit, OnDestroy {
       label: '🇿🇦 Built for South Africa',
       icon: 'bi-shield-check',
       title: 'Built for South Africa',
-      desc: 'Enterprize360 is designed from the ground up for the South African context — no configuration needed to get started with local compliance.',
+      desc: 'Enterprise360 is designed from the ground up for the South African context — no configuration needed to get started with local compliance.',
       features: [
         'South African Rand (ZAR) currency throughout',
         'SAST timezone (Africa/Johannesburg)',
@@ -209,7 +197,7 @@ export class DemoComponent implements OnInit, OnDestroy {
       label: '☁️ Cloud-Hosted & Fast',
       icon: 'bi-cloud-check-fill',
       title: 'Cloud-Hosted & Fast',
-      desc: 'Enterprize360 is deployed on enterprise-grade cloud infrastructure — accessible from any device, always up to date, with no installation required.',
+      desc: 'Enterprise360 is deployed on enterprise-grade cloud infrastructure — accessible from any device, always up to date, with no installation required.',
       features: [
         'Hosted on Railway (frontend + API)',
         'PostgreSQL database on Railway',
@@ -232,19 +220,4 @@ export class DemoComponent implements OnInit, OnDestroy {
       ]
     }
   ];
-
-  ngOnInit(): void {
-    this.shuffledModules = this.shuffle(this.marqueeModules);
-    this.shuffleTimer = setInterval(() => {
-      this.isShuffling = true;
-      setTimeout(() => {
-        this.shuffledModules = this.shuffle(this.marqueeModules);
-        this.isShuffling = false;
-      }, 350);
-    }, 3500);
-  }
-
-  ngOnDestroy(): void {
-    if (this.shuffleTimer) clearInterval(this.shuffleTimer);
-  }
 }

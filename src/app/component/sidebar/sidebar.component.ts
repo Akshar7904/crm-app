@@ -800,9 +800,7 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   staticFallbackLogo: string | null = null;
 
   /** Map of company name keywords to static logo assets */
-  private readonly COMPANY_LOGO_MAP: { keywords: string[]; asset: string }[] = [
-    { keywords: ['lkcentrix', 'lkc'],     asset: 'assets/lkcentrix_logo.png'     },
-  ];
+  private readonly COMPANY_LOGO_MAP: { keywords: string[]; asset: string }[] = [];
 
   get companyLogoUrl(): string | null {
     const companyId = this.user?.companyId;

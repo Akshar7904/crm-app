@@ -6,7 +6,7 @@ import { map } from 'rxjs/operators';
 import { LoadingService } from '../../../service/loading.service';
 import { BrandingService } from '../../../service/branding.service';
 
-const DEFAULT_LOGO = 'assets/logo_icon.png';
+const DEFAULT_LOGO = 'assets/enterprise360-icon.png';
 
 @Component({
   standalone: false,
