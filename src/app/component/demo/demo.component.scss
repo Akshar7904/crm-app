@@ -1,7 +1,19 @@
 @import '../../../styles/variables';
 
+// ── Landing-page-only brand palette ─────────────────────────────────────
+// Pulled directly from the Enterprise360 logo mark (blue/green globe +
+// navy wordmark) so the page reads as the same brand as the logo. This
+// reassigns the shared $primary/$secondary tokens for THIS FILE ONLY —
+// Sass resolves variables by most-recent assignment within a compilation
+// unit, so the rest of the (authenticated) app keeps the original palette
+// from styles/_variables.scss untouched.
+$primary-dark:   #063a5c;   // deep navy-blue, gradients/hover
+$primary:        #0778ba;   // main brand blue, sampled from the logo icon
+$primary-medium: #0ea5e0;   // brighter cyan-blue accent, sampled from the logo icon
+$primary-light:  #cdeafb;   // soft light-blue tint
+$secondary:      #4ea41b;   // vivid green, sampled from the logo icon
+
 // ── Exact Palette ─────────────────────────────────────────────────────
-// $primary (green, see styles/_variables.scss) : brand accent throughout
 // $black  : #111827   headings, dark text, footer
 // $grey   : #6B7280   body text, muted
 // $border : #E5E7EB   borders, dividers, alt-section bg
@@ -33,7 +45,7 @@
 }
 .lp-logo {
   display: flex; align-items: center; gap: 10px;
-  img { height: 38px; width: auto; object-fit: contain; }
+  img { height: 56px; width: auto; object-fit: contain; }
 }
 .lp-nav {
   display: flex; align-items: center; gap: 28px;
@@ -178,7 +190,7 @@
     background: #FFFFFF; padding: 12px 22px; border-radius: 14px;
     margin-bottom: 24px; box-shadow: 0 12px 30px rgba(0,0,0,.25);
   }
-  .cta-logo { height: 34px; width: auto; object-fit: contain; display: block; }
+  .cta-logo { height: 44px; width: auto; object-fit: contain; display: block; }
   h2 { font-size: 2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 14px; }
   p { font-size: 1rem; color: rgba(255,255,255,.75); margin-bottom: 36px; line-height: 1.75; max-width: 500px; margin-left: auto; margin-right: auto; }
 }
@@ -376,8 +388,8 @@
 }
 
 @keyframes module-marquee-scroll {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
 }
 
 .module-tile {
