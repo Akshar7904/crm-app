@@ -34,7 +34,7 @@
     <nav class="sidebar-menu">
       <div class="menu-section-label" *ngIf="!collapsed">Main</div>
       <ul class="menu-list">
-        <li *ngFor="let item of filteredMenuItems" class="menu-item-wrapper">
+        <li *ngFor="let item of filteredMenuItems; trackBy: trackById" class="menu-item-wrapper">
 
           <!-- Parent Menu Item -->
           <a class="menu-item"
@@ -59,7 +59,7 @@
 
           <!-- Submenu -->
           <ul class="submenu" *ngIf="item.children" [class.show]="item.expanded">
-            <li *ngFor="let child of item.children" class="submenu-item-wrapper">
+            <li *ngFor="let child of item.children; trackBy: trackById" class="submenu-item-wrapper">
               <a class="submenu-item"
                  [class.active]="isActive(child.route)"
                  (click)="onChildClick($event, child)"

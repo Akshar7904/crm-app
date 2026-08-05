@@ -2,7 +2,7 @@
 // Enterprize360 HR & Payroll Management System
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Observable, BehaviorSubject, map, startWith, catchError, of } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
@@ -28,7 +28,15 @@ export class NewcustomerComponent implements OnInit {
   isLoading$ = this.isLoadingSubject.asObservable();
   readonly DataState = DataState;
 
-  constructor(private customerService: CustomerService, private notification: NotificationService) { }
+  logoFile: File | null = null;
+  logoPreview: string | null = null;
+  private logoBase64: string | null = null;
+
+  constructor(
+    private customerService: CustomerService,
+    private notification: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.newCustomerState$ = this.customerService.customers$()
@@ -47,14 +55,46 @@ export class NewcustomerComponent implements OnInit {
       )
   }
 
+  onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+    const file = input.files[0];
+    if (!file.type.startsWith('image/')) {
+      this.notification.onError('Please select an image file (PNG, JPG or SVG).');
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      this.notification.onError('Logo file must be 2 MB or smaller.');
+      return;
+    }
+    this.logoFile = file;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.logoBase64 = reader.result as string;
+      this.logoPreview = this.logoBase64;
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  clearLogo(): void {
+    this.logoFile = null;
+    this.logoPreview = null;
+    this.logoBase64 = null;
+    this.cdr.markForCheck();
+  }
+
   createCustomer(newCustomerForm: NgForm): void {
     this.isLoadingSubject.next(true);
-    this.newCustomerState$ = this.customerService.newCustomers$(newCustomerForm.value)
+    const data = { ...newCustomerForm.value, imageUrl: this.logoBase64 ?? null };
+
+    this.newCustomerState$ = this.customerService.newCustomers$(data)
       .pipe(
         map(response => {
           this.notification.onDefault(response.message);
           console.log(response);
-          newCustomerForm.reset({ type: 'INDIVIDUAL', status: 'ACTIVE' });
+          newCustomerForm.reset({ status: 'ACTIVE', accountType: '', province: '' });
+          this.clearLogo();
           this.isLoadingSubject.next(false);
           return { dataState: DataState.LOADED, appData: this.dataSubject.value };
         }),

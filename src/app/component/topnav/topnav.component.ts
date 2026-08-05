@@ -295,20 +295,6 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           moduleKey: 'INVOICE_CUSTOMER'
         },
         {
-          label: 'Clients',
-          icon: 'bi-people',
-          route: '/customers',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          moduleKey: 'INVOICE_CUSTOMER'
-        },
-        {
-          label: 'Add Client',
-          icon: 'bi-person-plus-fill',
-          route: '/customers/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          moduleKey: 'INVOICE_CUSTOMER'
-        },
-        {
           label: 'Products & Services',
           icon: 'bi-box-seam',
           route: '/accounting/products',
@@ -363,6 +349,30 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           route: '/accounting/reports',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
           moduleKey: 'BUSINESS_EXPENSES'
+        }
+      ]
+    },
+    {
+      label: 'Customer Management',
+      icon: 'bi-people',
+      expanded: false,
+      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+      excludeRoles: ['ROLE_USER'],
+      moduleKey: 'INVOICE_CUSTOMER',
+      children: [
+        {
+          label: 'All Clients',
+          icon: 'bi-people-fill',
+          route: '/customers',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
+        },
+        {
+          label: 'Add Client',
+          icon: 'bi-person-plus-fill',
+          route: '/customers/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         }
       ]
     },

@@ -17,9 +17,6 @@
             <p class="banner-subtitle">Manage your clients and customers</p>
           </div>
           <div class="banner-actions">
-            <button class="btn btn-outline-secondary btn-sm" title="Export to Excel">
-              <i class="bi bi-file-earmark-excel me-1"></i> Export
-            </button>
             <a [routerLink]="['/customers/new']" class="btn btn-banner">
               <i class="bi bi-plus-circle me-1"></i> Add Client
             </a>
@@ -28,7 +25,7 @@
 
         <!-- Stats Cards -->
         <div class="row mb-4">
-          <div class="col-md-3 col-sm-6 mb-3">
+          <div class="col-md-6 col-sm-6 mb-3">
             <div class="stat-card">
               <div class="stat-icon bg-primary-subtle">
                 <i class="bi bi-people text-primary"></i>
@@ -39,7 +36,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-3 col-sm-6 mb-3">
+          <div class="col-md-6 col-sm-6 mb-3">
             <div class="stat-card">
               <div class="stat-icon bg-success-subtle">
                 <i class="bi bi-check-circle text-success"></i>
@@ -47,28 +44,6 @@
               <div class="stat-info">
                 <h3 class="stat-value">{{ getActiveCount(state) }}</h3>
                 <p class="stat-label">Active</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3">
-            <div class="stat-card">
-              <div class="stat-icon bg-info-subtle">
-                <i class="bi bi-receipt text-info"></i>
-              </div>
-              <div class="stat-info">
-                <h3 class="stat-value">{{ state?.appData?.data?.stats?.totalInvoices || 0 }}</h3>
-                <p class="stat-label">Total Invoices</p>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3 col-sm-6 mb-3">
-            <div class="stat-card">
-              <div class="stat-icon bg-warning-subtle">
-                <i class="bi bi-cash-stack text-warning"></i>
-              </div>
-              <div class="stat-info">
-                <h3 class="stat-value">{{ formatCurrency(state?.appData?.data?.stats?.totalBilled || 0) }}</h3>
-                <p class="stat-label">Total Billed</p>
               </div>
             </div>
           </div>
@@ -90,17 +65,16 @@
               <thead>
                 <tr>
                   <th>Client</th>
-                  <th>Type</th>
+                  <th>Account Type</th>
                   <th>Email</th>
                   <th>Phone</th>
-                  <th>Address</th>
-                  <th>Invoices</th>
+                  <th>Province</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let customer of state?.appData?.data?.page?.content">
+                <tr *ngFor="let customer of state?.appData?.data?.page?.content; trackBy: trackById">
                   <td>
                     <div class="d-flex align-items-center gap-3">
                       <div class="client-avatar-cell">
@@ -114,10 +88,13 @@
                       </div>
                       <div>
                         <div class="fw-semibold">{{ customer.name }}</div>
+                        <div class="text-muted" style="font-size:.75rem" *ngIf="customer.registrationNumber">
+                          Reg: {{ customer.registrationNumber }}
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td class="text-muted small">{{ customer.type || 'Client' }}</td>
+                  <td class="text-muted small">{{ formatAccountType(customer.accountType) }}</td>
                   <td>
                     <a [href]="'mailto:' + customer.email" class="text-muted small text-decoration-none">
                       <i class="bi bi-envelope me-1"></i>{{ customer.email }}
@@ -128,13 +105,7 @@
                       <i class="bi bi-telephone me-1"></i>{{ customer.phone }}
                     </a>
                   </td>
-                  <td class="text-muted small">{{ customer.address || '—' }}</td>
-                  <td>
-                    <span *ngIf="customer.invoices?.length > 0" class="invoice-count-badge">
-                      <i class="bi bi-receipt me-1"></i>{{ customer.invoices.length }}
-                    </span>
-                    <span *ngIf="!customer.invoices?.length" class="text-muted">—</span>
-                  </td>
+                  <td class="text-muted small">{{ formatProvince(customer.province) || '—' }}</td>
                   <td>
                     <span class="badge-soft"
                           [ngClass]="{
@@ -143,7 +114,7 @@
                             'badge-soft-danger':  customer.status === 'BANNED',
                             'badge-soft-secondary': customer.status === 'INACTIVE'
                           }">
-                      {{ customer.status }}
+                      {{ customer.status | titlecase }}
                     </span>
                   </td>
                   <td>
@@ -153,18 +124,12 @@
                               title="View Client">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button class="action-btn action-btn-success"
-                              [routerLink]="['/invoices/new']"
-                              [queryParams]="{customerId: customer.id}"
-                              title="Create Invoice">
-                        <i class="bi bi-receipt"></i>
-                      </button>
                     </div>
                   </td>
                 </tr>
 
                 <tr *ngIf="!state?.appData?.data?.page?.content?.length">
-                  <td colspan="8" class="empty-state-cell">
+                  <td colspan="7" class="empty-state-cell">
                     <i class="bi bi-people fs-2 d-block mb-2 text-muted"></i>
                     No clients found. <a [routerLink]="['/customers/new']">Add your first client</a>
                   </td>
@@ -183,7 +148,7 @@
               </a>
             </li>
             <li class="page-item"
-                *ngFor="let pageNumber of [].constructor(state?.appData?.data?.page?.totalPages); let i = index"
+                *ngFor="let pageNumber of [].constructor(state?.appData?.data?.page?.totalPages); let i = index; trackBy: trackByIndex"
                 [class.active]="i === (currentPage$ | async)">
               <a class="page-link" (click)="goToPage(i, searchForm.value.name)">{{ i + 1 }}</a>
             </li>

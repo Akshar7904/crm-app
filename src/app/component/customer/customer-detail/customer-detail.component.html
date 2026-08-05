@@ -16,17 +16,14 @@
         <div class="page-banner mb-4">
           <div class="banner-left">
             <h1 class="banner-title">
-              <i class="bi bi-person-circle"></i> {{ state?.appData?.data?.customer.name }}
+              <i class="bi bi-building"></i> {{ state?.appData?.data?.customer.name }}
             </h1>
-            <p class="banner-subtitle">Client profile and invoices</p>
+            <p class="banner-subtitle">Client profile and contact details</p>
           </div>
           <div class="banner-actions">
             <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/customers']">
               <i class="bi bi-arrow-left me-1"></i> Back
             </button>
-            <a [routerLink]="['/invoices/new']" class="btn btn-primary btn-sm">
-              <i class="bi bi-plus-lg me-1"></i> Create Invoice
-            </a>
           </div>
         </div>
 
@@ -55,7 +52,7 @@
                 </div>
 
                 <h5 class="profile-name">{{ state?.appData?.data?.customer.name }}</h5>
-                <p class="profile-type">{{ state?.appData?.data?.customer.type | titlecase }}</p>
+                <p class="profile-type">{{ formatAccountType(state?.appData?.data?.customer.accountType) }}</p>
 
                 <span class="status-pill"
                       [class.pill-success]="state?.appData?.data?.customer.status === 'ACTIVE'"
@@ -63,7 +60,7 @@
                       [class.pill-danger]="state?.appData?.data?.customer.status === 'BANNED'"
                       [class.pill-secondary]="state?.appData?.data?.customer.status === 'INACTIVE'">
                   <i class="bi bi-circle-fill"></i>
-                  {{ state?.appData?.data?.customer.status }}
+                  {{ state?.appData?.data?.customer.status | titlecase }}
                 </span>
 
                 <!-- Contact -->
@@ -75,6 +72,12 @@
                   <a class="contact-row" [href]="'tel:' + state?.appData?.data?.customer.phone">
                     <span class="contact-icon"><i class="bi bi-telephone"></i></span>
                     <span class="contact-value">{{ state?.appData?.data?.customer.phone }}</span>
+                  </a>
+                  <a *ngIf="state?.appData?.data?.customer.website"
+                     class="contact-row"
+                     [href]="state?.appData?.data?.customer.website" target="_blank" rel="noopener">
+                    <span class="contact-icon"><i class="bi bi-globe"></i></span>
+                    <span class="contact-value">{{ state?.appData?.data?.customer.website }}</span>
                   </a>
                   <div class="contact-row" *ngIf="state?.appData?.data?.customer.address">
                     <span class="contact-icon"><i class="bi bi-geo-alt"></i></span>
@@ -94,27 +97,81 @@
               </div>
             </div>
 
-            <!-- Stat Cards -->
-            <div class="mini-stats">
-              <div class="mini-stat">
-                <div class="mini-stat-icon bg-primary-subtle">
-                  <i class="bi bi-receipt text-primary"></i>
+            <!-- Key Details Card -->
+            <div class="key-details-card mb-3">
+              <div class="key-details-header">Key Details</div>
+              <div class="key-details-body">
+                <div class="key-detail-row" *ngIf="state?.appData?.data?.customer.registrationNumber">
+                  <span class="key-detail-label">Registration No.</span>
+                  <span class="key-detail-value">{{ state?.appData?.data?.customer.registrationNumber }}</span>
                 </div>
-                <div>
-                  <p class="mini-stat-value">{{ state?.appData?.data?.customer.invoices?.length || 0 }}</p>
-                  <p class="mini-stat-label">Total Invoices</p>
+                <div class="key-detail-row" *ngIf="state?.appData?.data?.customer.vatNumber">
+                  <span class="key-detail-label">VAT Number</span>
+                  <span class="key-detail-value">{{ state?.appData?.data?.customer.vatNumber }}</span>
                 </div>
-              </div>
-              <div class="mini-stat">
-                <div class="mini-stat-icon bg-success-subtle">
-                  <i class="bi bi-cash-stack text-success"></i>
+                <div class="key-detail-row" *ngIf="state?.appData?.data?.customer.province">
+                  <span class="key-detail-label">Province</span>
+                  <span class="key-detail-value">{{ formatProvince(state?.appData?.data?.customer.province) }}</span>
                 </div>
-                <div>
-                  <p class="mini-stat-value">R {{ state?.appData?.data?.customer.invoices | ExtractArrayValue: 'invoices' }}</p>
-                  <p class="mini-stat-label">Total Billed</p>
+                <div class="key-detail-row">
+                  <span class="key-detail-label">Member Since</span>
+                  <span class="key-detail-value">{{ state?.appData?.data?.customer.createdAt | date:'MMM yyyy' }}</span>
                 </div>
               </div>
             </div>
+
+            <!-- Primary Contact Card -->
+            <div class="contact-person-card" *ngIf="state?.appData?.data?.customer.primaryContactName || state?.appData?.data?.customer.primaryContactEmail">
+              <div class="contact-person-header">
+                <i class="bi bi-person-badge me-2 text-primary"></i>Primary Contact
+              </div>
+              <div class="contact-person-body">
+                <div class="contact-person-name">
+                  {{ state?.appData?.data?.customer.primaryContactName }}
+                  {{ state?.appData?.data?.customer.primaryContactSurname }}
+                </div>
+                <div class="contact-person-position text-muted" *ngIf="state?.appData?.data?.customer.primaryContactPosition">
+                  {{ state?.appData?.data?.customer.primaryContactPosition }}
+                </div>
+                <a *ngIf="state?.appData?.data?.customer.primaryContactEmail"
+                   [href]="'mailto:' + state?.appData?.data?.customer.primaryContactEmail"
+                   class="contact-person-link">
+                  <i class="bi bi-envelope me-1"></i>{{ state?.appData?.data?.customer.primaryContactEmail }}
+                </a>
+                <a *ngIf="state?.appData?.data?.customer.primaryContactCell"
+                   [href]="'tel:' + state?.appData?.data?.customer.primaryContactCell"
+                   class="contact-person-link">
+                  <i class="bi bi-phone me-1"></i>{{ state?.appData?.data?.customer.primaryContactCell }}
+                </a>
+              </div>
+            </div>
+
+            <!-- Secondary Contact Card -->
+            <div class="contact-person-card mt-3" *ngIf="state?.appData?.data?.customer.secondaryContactName || state?.appData?.data?.customer.secondaryContactEmail">
+              <div class="contact-person-header">
+                <i class="bi bi-person me-2 text-primary"></i>Secondary Contact
+              </div>
+              <div class="contact-person-body">
+                <div class="contact-person-name">
+                  {{ state?.appData?.data?.customer.secondaryContactName }}
+                  {{ state?.appData?.data?.customer.secondaryContactSurname }}
+                </div>
+                <div class="contact-person-position text-muted" *ngIf="state?.appData?.data?.customer.secondaryContactPosition">
+                  {{ state?.appData?.data?.customer.secondaryContactPosition }}
+                </div>
+                <a *ngIf="state?.appData?.data?.customer.secondaryContactEmail"
+                   [href]="'mailto:' + state?.appData?.data?.customer.secondaryContactEmail"
+                   class="contact-person-link">
+                  <i class="bi bi-envelope me-1"></i>{{ state?.appData?.data?.customer.secondaryContactEmail }}
+                </a>
+                <a *ngIf="state?.appData?.data?.customer.secondaryContactCell"
+                   [href]="'tel:' + state?.appData?.data?.customer.secondaryContactCell"
+                   class="contact-person-link">
+                  <i class="bi bi-phone me-1"></i>{{ state?.appData?.data?.customer.secondaryContactCell }}
+                </a>
+              </div>
+            </div>
+
           </div>
 
           <!-- ── Right Column ── -->
@@ -131,33 +188,77 @@
                   <input type="hidden" [ngModel]="state?.appData?.data?.customer.createdAt" name="createdAt">
                   <input type="hidden" [ngModel]="state?.appData?.data?.customer.companyId" name="companyId">
 
-                  <div class="row g-3">
+                  <!-- Company Info -->
+                  <p class="form-section-label">Company Information</p>
+                  <div class="row g-3 mb-3">
                     <div class="col-md-6">
-                      <label class="form-label">Full Name</label>
+                      <label class="form-label">Company Name</label>
                       <input type="text" class="form-control"
                              [ngModel]="state?.appData?.data?.customer.name" name="name"
                              [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Email Address</label>
-                      <input type="email" class="form-control"
-                             [ngModel]="state?.appData?.data?.customer.email" name="email"
+                      <label class="form-label">Registration Number</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.registrationNumber" name="registrationNumber"
+                             placeholder="e.g. 2021/123456/07"
                              [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Phone Number</label>
+                      <label class="form-label">VAT Number</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.vatNumber" name="vatNumber"
+                             placeholder="e.g. 4123456789"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Account Type</label>
+                      <select class="form-select"
+                              [ngModel]="state?.appData?.data?.customer.accountType" name="accountType"
+                              [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                        <option value="">Select…</option>
+                        <option value="POST_PAID">Post Paid</option>
+                        <option value="SUBSCRIPTION">Subscription</option>
+                        <option value="PRE_PAID">Pre-Paid</option>
+                        <option value="COD">COD</option>
+                        <option value="CREDIT_CARD">Credit Card</option>
+                        <option value="OTHER">Other</option>
+                      </select>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Telephone Number</label>
                       <input type="text" class="form-control"
                              [ngModel]="state?.appData?.data?.customer.phone" name="phone"
                              [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
                     </div>
                     <div class="col-md-6">
-                      <label class="form-label">Client Type</label>
+                      <label class="form-label">Company Email Address</label>
+                      <input type="email" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.email" name="email"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Website Address</label>
+                      <input type="url" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.website" name="website"
+                             placeholder="https://www.company.co.za"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Province</label>
                       <select class="form-select"
-                              [ngModel]="state?.appData?.data?.customer.type" name="type"
+                              [ngModel]="state?.appData?.data?.customer.province" name="province"
                               [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
-                        <option value="INDIVIDUAL">Individual</option>
-                        <option value="INSTITUTION">Institution</option>
-                        <option value="CORPORATE">Corporate</option>
+                        <option value="">Select…</option>
+                        <option value="EASTERN_CAPE">Eastern Cape</option>
+                        <option value="FREE_STATE">Free State</option>
+                        <option value="GAUTENG">Gauteng</option>
+                        <option value="KWAZULU_NATAL">KwaZulu-Natal</option>
+                        <option value="LIMPOPO">Limpopo</option>
+                        <option value="MPUMALANGA">Mpumalanga</option>
+                        <option value="NORTHERN_CAPE">Northern Cape</option>
+                        <option value="NORTH_WEST">North West</option>
+                        <option value="WESTERN_CAPE">Western Cape</option>
                       </select>
                     </div>
                     <div class="col-md-6">
@@ -171,13 +272,6 @@
                         <option value="BANNED">Banned</option>
                       </select>
                     </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Profile Image URL</label>
-                      <input type="text" class="form-control"
-                             [ngModel]="state?.appData?.data?.customer.imageUrl" name="imageUrl"
-                             placeholder="https://…"
-                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
-                    </div>
                     <div class="col-12">
                       <label class="form-label">Address</label>
                       <textarea class="form-control"
@@ -187,7 +281,83 @@
                     </div>
                   </div>
 
-                  <div class="d-flex justify-content-end mt-4">
+                  <!-- Primary Contact -->
+                  <p class="form-section-label mt-1">Primary Contact Person</p>
+                  <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                      <label class="form-label">Name</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.primaryContactName" name="primaryContactName"
+                             placeholder="First name"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Surname</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.primaryContactSurname" name="primaryContactSurname"
+                             placeholder="Last name"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Position</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.primaryContactPosition" name="primaryContactPosition"
+                             placeholder="e.g. Finance Manager"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Email Address</label>
+                      <input type="email" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.primaryContactEmail" name="primaryContactEmail"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Cell Number</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.primaryContactCell" name="primaryContactCell"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                  </div>
+
+                  <!-- Secondary Contact -->
+                  <p class="form-section-label mt-1">Secondary Contact Person</p>
+                  <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                      <label class="form-label">Name</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.secondaryContactName" name="secondaryContactName"
+                             placeholder="First name"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label">Surname</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.secondaryContactSurname" name="secondaryContactSurname"
+                             placeholder="Last name"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Position</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.secondaryContactPosition" name="secondaryContactPosition"
+                             placeholder="e.g. Operations Director"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Email Address</label>
+                      <input type="email" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.secondaryContactEmail" name="secondaryContactEmail"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Cell Number</label>
+                      <input type="text" class="form-control"
+                             [ngModel]="state?.appData?.data?.customer.secondaryContactCell" name="secondaryContactCell"
+                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary btn-sm"
                             [disabled]="state?.appData?.data?.user.roleName === 'ROLE_USER' || (isLoading$ | async)">
                       <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
@@ -196,70 +366,6 @@
                     </button>
                   </div>
                 </form>
-              </div>
-            </div>
-
-            <!-- Invoices Card -->
-            <div class="falcon-card">
-              <div class="falcon-card-header">
-                <h6><i class="bi bi-receipt me-2 text-primary"></i>Invoices</h6>
-                <span class="invoice-count-pill">
-                  {{ state?.appData?.data?.customer.invoices?.length || 0 }}
-                </span>
-              </div>
-
-              <!-- Invoices Table -->
-              <div class="table-responsive" *ngIf="state?.appData?.data?.customer.invoices?.length > 0">
-                <table class="table table-hover align-middle mb-0">
-                  <thead>
-                    <tr>
-                      <th>Invoice #</th>
-                      <th>Services</th>
-                      <th>Status</th>
-                      <th>Date</th>
-                      <th class="text-end">Total</th>
-                      <th class="text-center">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr *ngFor="let invoice of state?.appData?.data?.customer.invoices">
-                      <td>
-                        <span class="invoice-num">#{{ invoice.invoiceNumber }}</span>
-                      </td>
-                      <td class="services-cell">{{ invoice.services?.split(',')[0] || 'Services' }}</td>
-                      <td>
-                        <span class="badge-soft"
-                              [class.badge-soft-success]="invoice.status === 'PAID'"
-                              [class.badge-soft-primary]="invoice.status === 'PENDING'"
-                              [class.badge-soft-warning]="invoice.status === 'OVERDUE'"
-                              [class.badge-soft-danger]="invoice.status === 'CANCELED'">
-                          {{ invoice.status }}
-                        </span>
-                      </td>
-                      <td class="text-muted" style="font-size:0.82rem; white-space:nowrap">
-                        {{ invoice.date | date: 'mediumDate' }}
-                      </td>
-                      <td class="text-end fw-semibold" style="white-space:nowrap">
-                        R {{ invoice.total?.toLocaleString() }}
-                      </td>
-                      <td class="text-center">
-                        <button class="view-btn" [routerLink]="['/invoices', invoice.id, invoice.invoiceNumber]" title="View">
-                          <i class="bi bi-eye"></i>
-                        </button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Empty State -->
-              <div *ngIf="!state?.appData?.data?.customer.invoices?.length" class="no-invoices">
-                <i class="bi bi-receipt"></i>
-                <h6>No Invoices Yet</h6>
-                <p>Create the first invoice for this client</p>
-                <a [routerLink]="['/invoices/new']" class="btn btn-primary btn-sm">
-                  <i class="bi bi-plus-lg me-1"></i> Create Invoice
-                </a>
               </div>
             </div>
 

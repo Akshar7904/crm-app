@@ -386,6 +386,112 @@ textarea.form-control { resize: none; }
   p  { font-size: $font-size-sm; color: var(--text-muted); margin-bottom: 16px; }
 }
 
+// ─── Key Details Card ──────────────────────────────────────────────────────────
+.key-details-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  overflow: hidden;
+}
+
+.key-details-header {
+  padding: 12px 18px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  background: var(--bg-subtle, #f8f9fa);
+}
+
+.key-details-body { padding: 6px 0; }
+
+.key-detail-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 18px;
+  border-bottom: 1px solid var(--border-color, #f4f4f4);
+
+  &:last-child { border-bottom: none; }
+}
+
+.key-detail-label {
+  font-size: .78rem;
+  color: var(--text-muted);
+  font-weight: $font-weight-medium;
+  flex-shrink: 0;
+}
+
+.key-detail-value {
+  font-size: .82rem;
+  color: var(--text-primary);
+  font-weight: $font-weight-medium;
+  text-align: right;
+}
+
+// ─── Contact Person Cards ───────────────────────────────────────────────────────
+.contact-person-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  overflow: hidden;
+}
+
+.contact-person-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 18px;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  background: var(--bg-subtle, #f8f9fa);
+}
+
+.contact-person-body {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-person-name {
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  font-size: $font-size-sm;
+}
+
+.contact-person-position {
+  font-size: .78rem;
+  margin-bottom: 4px;
+}
+
+.contact-person-link {
+  display: flex;
+  align-items: center;
+  font-size: .8rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color $transition-base;
+
+  &:hover { color: $primary; }
+}
+
+// ─── Form section label ─────────────────────────────────────────────────────────
+.form-section-label {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--text-muted);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+}
+
 // ─── Buttons ───────────────────────────────────────────────────────────────────
 .btn {
   font-weight: $font-weight-medium;

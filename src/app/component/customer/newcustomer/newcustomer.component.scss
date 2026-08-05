@@ -125,9 +125,77 @@ textarea.form-control { resize: none; }
 // ─── Alert ────────────────────────────────────────────────────────────────────
 .alert-danger { border-radius: $border-radius-md; }
 
+// ─── Form Section Cards ───────────────────────────────────────────────────────
+.form-section-card {
+  background: var(--bg-card, #fff);
+  border: 1px solid var(--border-color, #e9ecef);
+  border-radius: $border-radius-xl;
+  box-shadow: var(--card-shadow, 0 2px 8px rgba(0,0,0,0.06));
+  overflow: hidden;
+}
+
+.form-section-header {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--border-color, #e9ecef);
+  background: var(--bg-card, #fff);
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, $primary 0%, $primary-light 100%);
+    border-radius: $border-radius-xl 0 0 0;
+  }
+}
+
+.form-section-body { padding: $spacing-xl 24px; }
+
+// ─── Logo Upload ──────────────────────────────────────────────────────────────
+.logo-upload-zone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--border-color, #dee2e6);
+  border-radius: 10px;
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  min-height: 120px;
+
+  &:hover,
+  &.has-logo {
+    border-color: $primary;
+    background: rgba($primary, .03);
+  }
+
+  input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.logo-preview-img {
+  max-height: 80px;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
 // ─── Responsive ───────────────────────────────────────────────────────────────
 @include respond-to('md') {
-  .form-card .card-body { padding: $spacing-lg 16px; }
+  .form-section-body { padding: $spacing-lg 16px; }
 
   .d-flex.justify-content-end {
     flex-direction: column;

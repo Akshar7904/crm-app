@@ -14,8 +14,8 @@
         <!-- Page Banner -->
         <div class="page-banner mb-4">
           <div class="banner-left">
-            <h1 class="banner-title"><i class="bi bi-person-plus"></i> New Client</h1>
-            <p class="banner-subtitle">Add a new client to your database</p>
+            <h1 class="banner-title"><i class="bi bi-building-add"></i> Add Client</h1>
+            <p class="banner-subtitle">Register a new client in your database</p>
           </div>
           <div class="banner-actions">
             <button class="btn btn-outline-secondary btn-sm" [routerLink]="['/customers']">
@@ -24,136 +24,246 @@
           </div>
         </div>
 
-        <!-- Form Card -->
-        <div class="row justify-content-center">
-          <div class="col-lg-8">
-            <div class="card form-card">
-              <div class="card-header">
-                <h6 class="mb-0"><i class="bi bi-person-lines-fill me-2 text-primary"></i>Client Information</h6>
+        <form #newCustomerForm="ngForm" (ngSubmit)="createCustomer(newCustomerForm)">
+
+          <!-- Company Information -->
+          <div class="form-section-card mb-4">
+            <div class="form-section-header">
+              <i class="bi bi-building me-2 text-primary"></i>Company Information
+            </div>
+            <div class="form-section-body">
+              <div *ngIf="state.error" class="alert alert-danger mb-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>{{ state.error }}
               </div>
-              <div class="card-body">
-                <!-- Error Alert -->
-                <div *ngIf="state.error"
-                     class="alert alert-danger alert-dismissible fade show"
-                     role="alert">
-                  <i class="bi bi-exclamation-triangle me-2"></i>
-                  {{ state.error }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+              <div class="row g-3">
+                <!-- Company Name -->
+                <div class="col-md-6">
+                  <label class="form-label">Company Name <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-building"></i></span>
+                    <input type="text" ngModel name="name" class="form-control"
+                           placeholder="Enter company name" required>
+                  </div>
                 </div>
 
-                <form #newCustomerForm="ngForm" (ngSubmit)="createCustomer(newCustomerForm)">
-                  <div class="row">
-                    <!-- Name -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">Full Name <span class="text-danger">*</span></label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                        <input type="text"
-                               ngModel
-                               name="name"
-                               class="form-control"
-                               placeholder="Enter full name"
-                               required>
-                      </div>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">Email Address <span class="text-danger">*</span></label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-envelope"></i></span>
-                        <input type="email"
-                               ngModel
-                               name="email"
-                               class="form-control"
-                               placeholder="Enter email address"
-                               required>
-                      </div>
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">Phone Number <span class="text-danger">*</span></label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                        <input type="text"
-                               ngModel
-                               name="phone"
-                               class="form-control"
-                               placeholder="Enter phone number"
-                               required>
-                      </div>
-                    </div>
-
-                    <!-- Type -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">Client Type <span class="text-danger">*</span></label>
-                      <select name="type" ngModel="INDIVIDUAL" class="form-select" required>
-                        <option value="INDIVIDUAL">Individual</option>
-                        <option value="INSTITUTION">Institution</option>
-                        <option value="CORPORATE">Corporate</option>
-                      </select>
-                    </div>
-
-                    <!-- Status -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">Status <span class="text-danger">*</span></label>
-                      <select name="status" ngModel="ACTIVE" class="form-select" required>
-                        <option value="ACTIVE">Active</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="INACTIVE">Inactive</option>
-                        <option value="BANNED">Banned</option>
-                      </select>
-                    </div>
-
-                    <!-- Image URL -->
-                    <div class="col-md-6 mb-3">
-                      <label class="form-label">Profile Image URL</label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-image"></i></span>
-                        <input type="text"
-                               ngModel
-                               name="imageUrl"
-                               class="form-control"
-                               placeholder="https://example.com/image.jpg">
-                      </div>
-                    </div>
-
-                    <!-- Address -->
-                    <div class="col-12 mb-3">
-                      <label class="form-label">Address <span class="text-danger">*</span></label>
-                      <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                        <textarea ngModel
-                                  name="address"
-                                  class="form-control"
-                                  placeholder="Enter full address"
-                                  rows="2"
-                                  required></textarea>
-                      </div>
-                    </div>
+                <!-- Registration Number -->
+                <div class="col-md-6">
+                  <label class="form-label">Registration Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-hash"></i></span>
+                    <input type="text" ngModel name="registrationNumber" class="form-control"
+                           placeholder="e.g. 2021/123456/07">
                   </div>
+                </div>
 
-                  <!-- Form Actions -->
-                  <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="button"
-                            class="btn btn-outline-secondary"
-                            [routerLink]="['/customers']">
-                      <i class="bi bi-x-lg me-1"></i> Cancel
-                    </button>
-                    <button type="submit"
-                            class="btn btn-primary"
-                            [disabled]="state.dataState === DataState.LOADING || newCustomerForm.invalid || newCustomerForm.pristine || (isLoading$ | async)">
-                      <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
-                      <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-1"></i>
-                      {{ (isLoading$ | async) ? 'Creating...' : 'Create Client' }}
-                    </button>
+                <!-- VAT Number -->
+                <div class="col-md-6">
+                  <label class="form-label">VAT Number</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-receipt"></i></span>
+                    <input type="text" ngModel name="vatNumber" class="form-control"
+                           placeholder="e.g. 4123456789">
                   </div>
-                </form>
+                </div>
+
+                <!-- Account Type -->
+                <div class="col-md-6">
+                  <label class="form-label">Account Type <span class="text-danger">*</span></label>
+                  <select name="accountType" ngModel="" class="form-select" required>
+                    <option value="" disabled>Select account type…</option>
+                    <option value="POST_PAID">Post Paid</option>
+                    <option value="SUBSCRIPTION">Subscription</option>
+                    <option value="PRE_PAID">Pre-Paid</option>
+                    <option value="COD">COD</option>
+                    <option value="CREDIT_CARD">Credit Card</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+
+                <!-- Telephone -->
+                <div class="col-md-6">
+                  <label class="form-label">Telephone Number <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                    <input type="text" ngModel name="phone" class="form-control"
+                           placeholder="e.g. 011 123 4567" required>
+                  </div>
+                </div>
+
+                <!-- Company Email -->
+                <div class="col-md-6">
+                  <label class="form-label">Company Email Address <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                    <input type="email" ngModel name="email" class="form-control"
+                           placeholder="info@company.co.za" required>
+                  </div>
+                </div>
+
+                <!-- Website -->
+                <div class="col-md-6">
+                  <label class="form-label">Website Address</label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                    <input type="url" ngModel name="website" class="form-control"
+                           placeholder="https://www.company.co.za">
+                  </div>
+                </div>
+
+                <!-- Province -->
+                <div class="col-md-6">
+                  <label class="form-label">Province</label>
+                  <select name="province" ngModel="" class="form-select">
+                    <option value="" disabled>Select province…</option>
+                    <option value="EASTERN_CAPE">Eastern Cape</option>
+                    <option value="FREE_STATE">Free State</option>
+                    <option value="GAUTENG">Gauteng</option>
+                    <option value="KWAZULU_NATAL">KwaZulu-Natal</option>
+                    <option value="LIMPOPO">Limpopo</option>
+                    <option value="MPUMALANGA">Mpumalanga</option>
+                    <option value="NORTHERN_CAPE">Northern Cape</option>
+                    <option value="NORTH_WEST">North West</option>
+                    <option value="WESTERN_CAPE">Western Cape</option>
+                  </select>
+                </div>
+
+                <!-- Address -->
+                <div class="col-12">
+                  <label class="form-label">Address <span class="text-danger">*</span></label>
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                    <textarea ngModel name="address" class="form-control"
+                              placeholder="Enter company street address" rows="2" required></textarea>
+                  </div>
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-6">
+                  <label class="form-label">Status <span class="text-danger">*</span></label>
+                  <select name="status" ngModel="ACTIVE" class="form-select" required>
+                    <option value="ACTIVE">Active</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="INACTIVE">Inactive</option>
+                    <option value="BANNED">Banned</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+
+          <!-- Primary Contact Person -->
+          <div class="form-section-card mb-4">
+            <div class="form-section-header">
+              <i class="bi bi-person-badge me-2 text-primary"></i>Primary Contact Person
+            </div>
+            <div class="form-section-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Name</label>
+                  <input type="text" ngModel name="primaryContactName" class="form-control"
+                         placeholder="First name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Surname</label>
+                  <input type="text" ngModel name="primaryContactSurname" class="form-control"
+                         placeholder="Last name">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Position</label>
+                  <input type="text" ngModel name="primaryContactPosition" class="form-control"
+                         placeholder="e.g. Finance Manager">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" ngModel name="primaryContactEmail" class="form-control"
+                         placeholder="contact@company.co.za">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Cell Number</label>
+                  <input type="text" ngModel name="primaryContactCell" class="form-control"
+                         placeholder="e.g. 082 123 4567">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Secondary Contact Person -->
+          <div class="form-section-card mb-4">
+            <div class="form-section-header">
+              <i class="bi bi-person me-2 text-primary"></i>Secondary Contact Person
+            </div>
+            <div class="form-section-body">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Name</label>
+                  <input type="text" ngModel name="secondaryContactName" class="form-control"
+                         placeholder="First name">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Surname</label>
+                  <input type="text" ngModel name="secondaryContactSurname" class="form-control"
+                         placeholder="Last name">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Position</label>
+                  <input type="text" ngModel name="secondaryContactPosition" class="form-control"
+                         placeholder="e.g. Operations Director">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" ngModel name="secondaryContactEmail" class="form-control"
+                         placeholder="contact2@company.co.za">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Cell Number</label>
+                  <input type="text" ngModel name="secondaryContactCell" class="form-control"
+                         placeholder="e.g. 083 987 6543">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Company Logo -->
+          <div class="form-section-card mb-4">
+            <div class="form-section-header">
+              <i class="bi bi-image me-2 text-primary"></i>Company Logo
+            </div>
+            <div class="form-section-body">
+              <div class="logo-upload-zone" [class.has-logo]="logoPreview">
+                <!-- Preview -->
+                <img *ngIf="logoPreview" [src]="logoPreview" class="logo-preview-img" alt="Logo preview">
+                <!-- Placeholder -->
+                <ng-container *ngIf="!logoPreview">
+                  <i class="bi bi-image fs-2 text-muted"></i>
+                  <div class="mt-2 small text-muted">Click to upload company logo</div>
+                  <div class="text-muted" style="font-size:.72rem">PNG, JPG or SVG · max 2 MB</div>
+                </ng-container>
+                <input type="file" accept="image/*" (change)="onLogoSelected($event)">
+              </div>
+              <div *ngIf="logoPreview" class="d-flex align-items-center gap-2 mt-2">
+                <span class="text-success small"><i class="bi bi-check-circle me-1"></i>{{ logoFile?.name }}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" (click)="clearLogo()">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form Actions -->
+          <div class="d-flex justify-content-end gap-2 mb-5">
+            <button type="button" class="btn btn-outline-secondary" [routerLink]="['/customers']">
+              <i class="bi bi-x-lg me-1"></i> Cancel
+            </button>
+            <button type="submit" class="btn btn-primary"
+                    [disabled]="newCustomerForm.invalid || (isLoading$ | async)">
+              <span *ngIf="isLoading$ | async" class="spinner-border spinner-border-sm me-1"></span>
+              <i *ngIf="!(isLoading$ | async)" class="bi bi-check-lg me-1"></i>
+              {{ (isLoading$ | async) ? 'Saving…' : 'Add Client' }}
+            </button>
+          </div>
+
+        </form>
       </div>
     </section>
   </ng-container>
