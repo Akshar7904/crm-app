@@ -100,7 +100,12 @@ export class CompanySettingsComponent implements OnInit {
   }
 
   get logoUrl(): string | null {
-    return this.company?.id ? `${environment.apiUrl}/api/v1/companies/${this.company.id}/logo` : null;
+    if (!this.company?.id) return null;
+    // Cache-bust with updatedAt — the logo endpoint has a 24h Cache-Control
+    // and a fixed URL, so without this a re-uploaded logo won't show until
+    // the browser cache expires.
+    const v = this.company.updatedAt ? new Date(this.company.updatedAt).getTime() : '';
+    return `${environment.apiUrl}/api/v1/companies/${this.company.id}/logo?v=${v}`;
   }
 
   private parseThemeJson(raw: string | null | undefined): ThemeTokens {

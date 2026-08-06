@@ -107,7 +107,10 @@ export class BrandingService {
           name:         c.name      ?? '',
           tagline:      c.tagline   ?? '',
           primaryColor: c.primaryColor ?? this.DEFAULT_PRIMARY,
-          logoUrl:      `${environment.apiUrl}/api/v1/companies/${c.id}/logo`,
+          // Cache-bust with updatedAt — the logo endpoint has a 24h Cache-Control
+          // and a fixed URL, so without this a re-uploaded logo won't show until
+          // the browser cache expires.
+          logoUrl:      `${environment.apiUrl}/api/v1/companies/${c.id}/logo?v=${c.updatedAt ? new Date(c.updatedAt).getTime() : ''}`,
           theme:        this.parseTheme(c.themeJson),
         };
         return branding;
@@ -148,7 +151,7 @@ export class BrandingService {
           name:         b.name         ?? '',
           tagline:      b.tagline       ?? '',
           primaryColor: b.primaryColor  ?? this.DEFAULT_PRIMARY,
-          logoUrl:      `${environment.apiUrl}/api/v1/companies/${b.id}/logo`,
+          logoUrl:      `${environment.apiUrl}/api/v1/companies/${b.id}/logo?v=${b.logoVersion ? new Date(b.logoVersion).getTime() : ''}`,
           theme:        this.parseTheme(b.theme),
         } as CompanyBranding;
       }),

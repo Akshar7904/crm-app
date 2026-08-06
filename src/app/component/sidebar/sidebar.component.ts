@@ -817,6 +817,9 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     if (!companyId) return null;
     if (this.staticFallbackLogo) return this.staticFallbackLogo;
     if (this.companyLogoFailed) return null;
+    // Prefer BrandingService's URL — it's cache-busted with the company's
+    // updatedAt so a freshly re-uploaded logo actually shows up.
+    if (this.branding.branding?.id === companyId) return this.branding.branding.logoUrl;
     return `${environment.apiUrl}/api/v1/companies/${companyId}/logo`;
   }
 

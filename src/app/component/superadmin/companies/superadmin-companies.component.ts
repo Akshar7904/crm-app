@@ -188,7 +188,11 @@ export class SuperadminCompaniesComponent implements OnInit {
   }
 
   getLogoUrl(company: any): string {
-    return this.superadminService.getCompanyLogoUrl(company.id);
+    // Cache-bust with updatedAt (bumped by the backend on every logo upload) —
+    // the logo endpoint is served at a fixed URL with a 24h Cache-Control,
+    // so without this the browser keeps showing the old image after a re-upload.
+    const v = company.updatedAt ? new Date(company.updatedAt).getTime() : '';
+    return `${this.superadminService.getCompanyLogoUrl(company.id)}?v=${v}`;
   }
 
   onLogoThumbError(event: Event): void {
