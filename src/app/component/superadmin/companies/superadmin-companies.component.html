@@ -149,12 +149,49 @@
             <input class="form-control" name="taxNumber" [ngModel]="editCompany?.taxNumber">
           </div>
           <div class="col-md-6">
+            <label class="form-label">VAT Number</label>
+            <input class="form-control" name="vatNumber" [ngModel]="editCompany?.vatNumber"
+                   placeholder="e.g. 4123456789">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Account Type</label>
+            <select class="form-select" name="accountType" [ngModel]="editCompany?.accountType">
+              <option value="" disabled>Select account type…</option>
+              <option value="POST_PAID">Post Paid</option>
+              <option value="SUBSCRIPTION">Subscription</option>
+              <option value="PRE_PAID">Pre-Paid</option>
+              <option value="COD">COD</option>
+              <option value="CREDIT_CARD">Credit Card</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="col-md-6">
             <label class="form-label">Email</label>
             <input class="form-control" name="email" type="email" [ngModel]="editCompany?.email">
           </div>
           <div class="col-md-6">
             <label class="form-label">Phone</label>
             <input class="form-control" name="phone" [ngModel]="editCompany?.phone">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Website Address</label>
+            <input class="form-control" name="website" type="url" [ngModel]="editCompany?.website"
+                   placeholder="https://www.company.co.za">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Province</label>
+            <select class="form-select" name="province" [ngModel]="editCompany?.province">
+              <option value="" disabled>Select province…</option>
+              <option value="EASTERN_CAPE">Eastern Cape</option>
+              <option value="FREE_STATE">Free State</option>
+              <option value="GAUTENG">Gauteng</option>
+              <option value="KWAZULU_NATAL">KwaZulu-Natal</option>
+              <option value="LIMPOPO">Limpopo</option>
+              <option value="MPUMALANGA">Mpumalanga</option>
+              <option value="NORTHERN_CAPE">Northern Cape</option>
+              <option value="NORTH_WEST">North West</option>
+              <option value="WESTERN_CAPE">Western Cape</option>
+            </select>
           </div>
           <div class="col-md-6">
             <label class="form-label">Country</label>
@@ -164,6 +201,59 @@
             <label class="form-label">Address</label>
             <input class="form-control" name="address" [ngModel]="editCompany?.address">
           </div>
+
+          <!-- Primary Contact Person -->
+          <div class="col-12">
+            <hr class="my-1">
+            <div class="small fw-semibold text-muted mb-2" style="letter-spacing:.04em;text-transform:uppercase;">Primary Contact Person</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Name</label>
+            <input class="form-control" name="primaryContactName" [ngModel]="editCompany?.primaryContactName" placeholder="First name">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Surname</label>
+            <input class="form-control" name="primaryContactSurname" [ngModel]="editCompany?.primaryContactSurname" placeholder="Last name">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Position</label>
+            <input class="form-control" name="primaryContactPosition" [ngModel]="editCompany?.primaryContactPosition" placeholder="e.g. Finance Manager">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Email Address</label>
+            <input class="form-control" name="primaryContactEmail" type="email" [ngModel]="editCompany?.primaryContactEmail">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Cell Number</label>
+            <input class="form-control" name="primaryContactCell" [ngModel]="editCompany?.primaryContactCell">
+          </div>
+
+          <!-- Secondary Contact Person -->
+          <div class="col-12">
+            <hr class="my-1">
+            <div class="small fw-semibold text-muted mb-2" style="letter-spacing:.04em;text-transform:uppercase;">Secondary Contact Person</div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Name</label>
+            <input class="form-control" name="secondaryContactName" [ngModel]="editCompany?.secondaryContactName" placeholder="First name">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Surname</label>
+            <input class="form-control" name="secondaryContactSurname" [ngModel]="editCompany?.secondaryContactSurname" placeholder="Last name">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Position</label>
+            <input class="form-control" name="secondaryContactPosition" [ngModel]="editCompany?.secondaryContactPosition" placeholder="e.g. Operations Director">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Email Address</label>
+            <input class="form-control" name="secondaryContactEmail" type="email" [ngModel]="editCompany?.secondaryContactEmail">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Cell Number</label>
+            <input class="form-control" name="secondaryContactCell" [ngModel]="editCompany?.secondaryContactCell">
+          </div>
+
           <!-- Branding -->
           <div class="col-12">
             <hr class="my-1">
