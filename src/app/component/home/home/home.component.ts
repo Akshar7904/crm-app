@@ -51,6 +51,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   dashboardState$: Observable<DashboardState>;
   private stateSubject = new BehaviorSubject<DashboardState>({ dataState: DataState.LOADING });
 
+  // Drives reloads without ever tearing down/re-subscribing dashboardState$
+  // itself — see loadDashboardOnce() for why that distinction matters.
+  private refreshTrigger$ = new BehaviorSubject<void>(undefined);
+  private hasLoadedOnce = false;
+  private lastGoodState: DashboardState | null = null;
+  isRefreshing = false;
+
   readonly DataState = DataState;
 
   // Current user
@@ -117,7 +124,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.loadDashboard();
+    // Built once — refreshes flow through refreshTrigger$ so the async pipe
+    // in the template never unsubscribes/resubscribes, which is what used
+    // to blank the whole dashboard out on every reload/refresh.
+    this.dashboardState$ = this.refreshTrigger$.pipe(
+      switchMap(() => this.loadDashboardOnce())
+    );
     this.startClock();
     this.checkClockInStatus();
   }
@@ -569,8 +581,21 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  private loadDashboard(): void {
-    this.dashboardState$ = of(null).pipe(
+  /**
+   * Builds one dashboard-load cycle. Called fresh each time refreshTrigger$
+   * emits (initial mount + every manual refresh).
+   *
+   * The first-ever load shows the full-page LOADING state (nothing rendered
+   * yet, nothing to lose). Every subsequent refresh leaves whatever's
+   * already on screen untouched — no startWith(LOADING) — so the page only
+   * ever updates in place once fresh data arrives, instead of blanking out
+   * and popping back in. isRefreshing drives a small spinner on the Refresh
+   * button instead.
+   */
+  private loadDashboardOnce(): Observable<DashboardState> {
+    const isFirstLoad = !this.hasLoadedOnce;
+
+    const load$ = of(null).pipe(
       switchMap(() => {
         const userString = localStorage.getItem('user');
         if (!userString) {
@@ -587,7 +612,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         const isImpersonating = !!localStorage.getItem(Key.SUPERADMIN_TOKEN);
         if (this.currentUser?.roleName === 'ROLE_SUPERADMIN' && !isImpersonating) {
           this.router.navigate(['/superadmin/companies']);
-          return of({ dataState: DataState.LOADED, user: this.currentUser });
+          return of({ dataState: DataState.LOADED, user: this.currentUser } as DashboardState);
         }
         if (this.currentUser?.roleName === 'ROLE_SUPERADMIN' && isImpersonating) {
           // Treat as admin so the company dashboard loads instead of redirecting.
@@ -596,29 +621,46 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.isEmployee = false;
         }
 
-        return of({ dataState: DataState.LOADING, user: this.currentUser });
+        return of({ dataState: DataState.LOADING, user: this.currentUser } as DashboardState);
       }),
       switchMap(state => {
         // LOADED means we already redirected (SUPERADMIN) — skip further API calls
         if (state.dataState === DataState.LOADED) {
           return of(state as DashboardState);
         }
-        if (this.isAdmin || this.isManager) {
-          return this.loadAdminDashboard(state.user);
-        } else {
-          return this.loadEmployeeDashboard(state.user);
-        }
+        return this.isAdmin || this.isManager
+          ? this.loadAdminDashboard(state.user)
+          : this.loadEmployeeDashboard(state.user);
       }),
-      startWith({ dataState: DataState.LOADING }),
+      map(state => {
+        this.isRefreshing = false;
+        // A refresh that failed shouldn't rip a working dashboard off the
+        // screen — keep showing the last good data and let the toast (fired
+        // inside loadAdminDashboard/loadEmployeeDashboard) carry the error.
+        if (state.dataState === DataState.ERROR && this.hasLoadedOnce && this.lastGoodState) {
+          return this.lastGoodState;
+        }
+        this.hasLoadedOnce = true;
+        this.lastGoodState = state;
+        return state;
+      }),
       catchError((error: any) => {
+        this.isRefreshing = false;
         console.error('Dashboard error:', error);
         this.notification.onError(error.message || 'Failed to load dashboard');
+        if (this.hasLoadedOnce && this.lastGoodState) {
+          return of(this.lastGoodState);
+        }
         return of({
           dataState: DataState.ERROR,
           error: error.message || 'Failed to load dashboard'
-        });
+        } as DashboardState);
       })
     );
+
+    return isFirstLoad
+      ? load$.pipe(startWith({ dataState: DataState.LOADING } as DashboardState))
+      : load$;
   }
 
   private loadAdminDashboard(user: UserModel): Observable<DashboardState> {
@@ -1180,10 +1222,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Refresh dashboard
+   * Refresh dashboard — re-runs the load cycle in place (see
+   * loadDashboardOnce) instead of tearing the page down while it reloads.
    */
   refreshDashboard(): void {
-    this.loadDashboard();
+    if (this.isRefreshing) return;
+    this.isRefreshing = true;
+    this.cdr.markForCheck();
+    this.refreshTrigger$.next();
   }
 
   getCategoryBadgeClass(category: string): string {

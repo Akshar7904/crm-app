@@ -77,6 +77,30 @@
     color: $primary;
     background: rgba($primary, 0.05);
   }
+
+  &.is-refreshing {
+    cursor: default;
+    border-color: $primary;
+    color: $primary;
+    i { animation: dash-refresh-spin 0.8s linear infinite; }
+  }
+}
+
+@keyframes dash-refresh-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.dash-loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-md;
+  min-height: 50vh;
+  color: var(--text-secondary, $gray-600);
+
+  p { margin: 0; font-size: 0.9rem; }
 }
 
 .dash-kpis {
