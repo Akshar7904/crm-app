@@ -67,136 +67,162 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
       route: '/home'
     },
     {
-      label: 'Organization',
-      icon: 'bi-building',
-      expanded: false,
-      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-      excludeRoles: ['ROLE_USER'],
-      children: [
-        {
-          label: 'Departments',
-          icon: 'bi-diagram-3',
-          route: '/departments',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        },
-        {
-          label: 'Designations',
-          icon: 'bi-briefcase',
-          route: '/designations',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        }
-      ]
-    },
-    {
-      label: 'Employees',
+      label: 'People',
       icon: 'bi-people-fill',
       expanded: false,
-      moduleKey: 'EMPLOYEE_MANAGEMENT',
       children: [
         {
-          label: 'All Employees',
-          icon: 'bi-person-badge',
-          route: '/employee',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
-        },
-        {
-          label: 'Add Employee',
-          icon: 'bi-person-plus-fill',
-          route: '/employee/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
-        },
-        {
-          label: 'My Employee Details',
-          icon: 'bi-person-circle',
-          route: '/profile',
-          requiredRole: 'ROLE_USER',
-          excludeRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        }
-      ]
-    },
-    {
-      label: 'Leave Management',
-      icon: 'bi-calendar-x',
-      expanded: false,
-      moduleKey: 'LEAVE_MANAGEMENT',
-      children: [
-        {
-          label: 'All Leave Applications',
-          icon: 'bi-calendar-plus',
-          route: '/admin/leave',
+          label: 'Organization',
+          icon: 'bi-building',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
           excludeRoles: ['ROLE_USER'],
-          badge: {
-            count: 0,
-            type: 'warning' as BadgeType
-          }
+          children: [
+            {
+              label: 'Departments',
+              icon: 'bi-diagram-3',
+              route: '/departments',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+            },
+            {
+              label: 'Designations',
+              icon: 'bi-briefcase',
+              route: '/designations',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+            }
+          ]
         },
         {
-          label: 'My Leave',
-          icon: 'bi-calendar-check',
-          route: '/employee/leave'
-        }
-      ]
-    },
-    {
-      label: 'Intern',
-      icon: 'bi-mortarboard-fill',
-      expanded: false,
-      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-      allowedEmploymentTypes: ['INTERN'],
-      moduleKey: 'INTERN_ATTENDANCE',
-      children: [
-        {
-          label: 'My School Days',
-          icon: 'bi-mortarboard',
-          route: '/intern/attendance/my'
+          label: 'Employees',
+          icon: 'bi-people-fill',
+          moduleKey: 'EMPLOYEE_MANAGEMENT',
+          children: [
+            {
+              label: 'All Employees',
+              icon: 'bi-person-badge',
+              route: '/employee',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER']
+            },
+            {
+              label: 'Add Employee',
+              icon: 'bi-person-plus-fill',
+              route: '/employee/new',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER']
+            },
+            {
+              label: 'My Employee Details',
+              icon: 'bi-person-circle',
+              route: '/profile',
+              requiredRole: 'ROLE_USER',
+              excludeRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+            }
+          ]
         },
         {
-          label: 'All School Requests',
-          icon: 'bi-list-check',
-          route: '/admin/intern-attendance/admin',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        }
-      ]
-    },
-    {
-      label: 'Attendance',
-      icon: 'bi-clock-history',
-      expanded: false,
-      moduleKey: 'ATTENDANCE_TRACKING',
-      children: [
+          label: 'Leave',
+          icon: 'bi-calendar-x',
+          moduleKey: 'LEAVE_MANAGEMENT',
+          children: [
+            {
+              label: 'All Leave Applications',
+              icon: 'bi-calendar-plus',
+              route: '/admin/leave',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER'],
+              badge: {
+                count: 0,
+                type: 'warning' as BadgeType
+              }
+            },
+            {
+              label: 'My Leave',
+              icon: 'bi-calendar-check',
+              route: '/employee/leave'
+            }
+          ]
+        },
         {
-          label: 'All Attendance',
-          icon: 'bi-list-check',
-          route: '/attendance',
+          label: 'Attendance',
+          icon: 'bi-clock-history',
+          moduleKey: 'ATTENDANCE_TRACKING',
+          children: [
+            {
+              label: 'All Attendance',
+              icon: 'bi-list-check',
+              route: '/attendance',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER']
+            },
+            {
+              label: 'My Attendance',
+              icon: 'bi-person-check',
+              route: '/attendance/my'
+            },
+            {
+              label: 'WhatsApp Attendance',
+              icon: 'bi-whatsapp',
+              route: '/attendance/whatsapp',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER']
+            },
+            {
+              label: 'Holidays',
+              icon: 'bi-calendar-week',
+              route: '/holidays'
+            },
+            {
+              label: 'Attendance Reports',
+              icon: 'bi-file-earmark-bar-graph',
+              route: '/attendance',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER']
+            }
+          ]
+        },
+        {
+          label: 'Intern',
+          icon: 'bi-mortarboard-fill',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
+          allowedEmploymentTypes: ['INTERN'],
+          moduleKey: 'INTERN_ATTENDANCE',
+          children: [
+            {
+              label: 'My School Days',
+              icon: 'bi-mortarboard',
+              route: '/intern/attendance/my'
+            },
+            {
+              label: 'All School Requests',
+              icon: 'bi-list-check',
+              route: '/admin/intern-attendance/admin',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
+            }
+          ]
         },
         {
-          label: 'My Attendance',
-          icon: 'bi-person-check',
-          route: '/attendance/my'
-        },
-        {
-          label: 'WhatsApp Attendance',
-          icon: 'bi-whatsapp',
-          route: '/attendance/whatsapp',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
-        },
-        {
-          label: 'Holidays',
-          icon: 'bi-calendar-week',
-          route: '/holidays'
-        },
-        {
-          label: 'Reports',
-          icon: 'bi-file-earmark-bar-graph',
-          route: '/attendance',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
+          label: 'Claims',
+          icon: 'bi-wallet2',
+          moduleKey: 'EXPENSE_CLAIMS',
+          children: [
+            {
+              label: 'All Claims',
+              icon: 'bi-wallet',
+              route: '/expense-claims',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              excludeRoles: ['ROLE_USER']
+            },
+            {
+              label: 'My Claims',
+              icon: 'bi-wallet2',
+              route: '/expense-claims/my-claims'
+            },
+            {
+              label: 'Submit Claim',
+              icon: 'bi-plus-circle',
+              route: '/expense-claims/new'
+            }
+          ]
         }
       ]
     },
@@ -242,37 +268,16 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
-      label: 'Claims',
-      icon: 'bi-wallet2',
-      expanded: false,
-      moduleKey: 'EXPENSE_CLAIMS',
-      children: [
-        {
-          label: 'All Claims',
-          icon: 'bi-wallet',
-          route: '/expense-claims',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
-        },
-        {
-          label: 'My Claims',
-          icon: 'bi-wallet2',
-          route: '/expense-claims/my-claims'
-        },
-        {
-          label: 'Submit Claim',
-          icon: 'bi-plus-circle',
-          route: '/expense-claims/new'
-        }
-      ]
-    },
-    {
-      label: 'Accounting',
+      label: 'Finance',
       icon: 'bi-journal-text',
       expanded: false,
       requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
       excludeRoles: ['ROLE_USER'],
       children: [
+        {
+          label: 'Accounting',
+          icon: 'bi-journal-text',
+          children: [
         {
           label: 'Overview',
           icon: 'bi-grid-1x2',
@@ -350,40 +355,34 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
           moduleKey: 'BUSINESS_EXPENSES'
         }
-      ]
-    },
-    {
-      label: 'Customer Management',
-      icon: 'bi-people',
-      expanded: false,
-      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-      excludeRoles: ['ROLE_USER'],
-      moduleKey: 'INVOICE_CUSTOMER',
-      children: [
-        {
-          label: 'All Clients',
-          icon: 'bi-people-fill',
-          route: '/customers',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          moduleKey: 'INVOICE_CUSTOMER'
+          ]
         },
         {
-          label: 'Add Client',
-          icon: 'bi-person-plus-fill',
-          route: '/customers/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          moduleKey: 'INVOICE_CUSTOMER'
-        }
-      ]
-    },
-    {
-      label: 'Expenses',
-      icon: 'bi-receipt',
-      expanded: false,
-      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-      excludeRoles: ['ROLE_USER'],
-      moduleKey: 'BUSINESS_EXPENSES',
-      children: [
+          label: 'Customers',
+          icon: 'bi-people',
+          moduleKey: 'INVOICE_CUSTOMER',
+          children: [
+            {
+              label: 'All Clients',
+              icon: 'bi-people-fill',
+              route: '/customers',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              moduleKey: 'INVOICE_CUSTOMER'
+            },
+            {
+              label: 'Add Client',
+              icon: 'bi-person-plus-fill',
+              route: '/customers/new',
+              requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+              moduleKey: 'INVOICE_CUSTOMER'
+            }
+          ]
+        },
+        {
+          label: 'Expenses',
+          icon: 'bi-receipt',
+          moduleKey: 'BUSINESS_EXPENSES',
+          children: [
         {
           label: 'Overview',
           icon: 'bi-bar-chart-line',
@@ -446,14 +445,20 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           route: '/expenses/budget-vs-actual',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
         }
+          ]
+        }
       ]
     },
     {
-      label: 'Contracts',
-      icon: 'bi-file-earmark-text',
+      label: 'Operations',
+      icon: 'bi-briefcase',
       expanded: false,
-      moduleKey: 'CONTRACT_MANAGEMENT',
       children: [
+        {
+          label: 'Contracts',
+          icon: 'bi-file-earmark-text',
+          moduleKey: 'CONTRACT_MANAGEMENT',
+          children: [
         {
           label: 'All Contracts',
           icon: 'bi-file-earmark-text',
@@ -484,14 +489,13 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           route: '/contracts/templates',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
         }
-      ]
-    },
-    {
-      label: 'Assets',
-      icon: 'bi-laptop',
-      expanded: false,
-      moduleKey: 'ASSET_MANAGEMENT',
-      children: [
+          ]
+        },
+        {
+          label: 'Assets',
+          icon: 'bi-laptop',
+          moduleKey: 'ASSET_MANAGEMENT',
+          children: [
         {
           label: 'All Assets',
           icon: 'bi-box-seam',
@@ -528,6 +532,15 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           icon: 'bi-list-check',
           route: '/assets/my-requests'
         }
+          ]
+        },
+        {
+          label: 'Manage Announcements',
+          icon: 'bi-megaphone-fill',
+          route: '/announcements/admin',
+          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          excludeRoles: ['ROLE_USER', 'ROLE_MANAGER']
+        }
       ]
     },
     {
@@ -536,33 +549,6 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
       route: '/settings/company',
       requiredRoles: ['ROLE_SYSADMIN', 'ROLE_ADMIN'],
       excludeRoles: ['ROLE_USER', 'ROLE_MANAGER']
-    },
-    {
-      label: 'Announcements',
-      icon: 'bi-megaphone-fill',
-      expanded: false,
-      children: [
-        {
-          label: 'View All',
-          icon: 'bi-list-ul',
-          route: '/announcements',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        },
-        {
-          label: 'Manage Announcements',
-          icon: 'bi-gear',
-          route: '/announcements/admin',
-          requiredRoles: ['ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER', 'ROLE_MANAGER']
-        },
-        {
-          label: 'Announcements',
-          icon: 'bi-megaphone',
-          route: '/announcements',
-          requiredRole: 'ROLE_USER',
-          excludeRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN']
-        }
-      ]
     },
     {
       label: 'Messages',
@@ -675,40 +661,50 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
     const effectiveRole = (userRole === 'ROLE_SUPERADMIN' && isImpersonating) ? 'ROLE_SYSADMIN' : userRole;
 
     this.filteredMenuItems = this.fullMenuStructure
-      .filter(item => this.canShowMenuItem(item, effectiveRole, employmentType))
-      .map(item => {
-        if (item.children) {
-          const filteredChildren = item.children.filter(child => this.canShowMenuItem(child, effectiveRole, employmentType));
-
-          if (filteredChildren.length === 0 && item.children.length > 0) {
-            return null;
-          }
-
-          if (filteredChildren.some(child => child.badge?.count)) {
-            const totalBadgeCount = filteredChildren
-              .filter(child => child.badge?.count)
-              .reduce((sum, child) => sum + (child.badge?.count || 0), 0);
-
-            return {
-              ...item,
-              children: filteredChildren,
-              badge: {
-                count: totalBadgeCount,
-                type: 'warning' as BadgeType
-              }
-            };
-          }
-
-          return {
-            ...item,
-            children: filteredChildren
-          };
-        }
-        return item;
-      })
-      .filter(item => item !== null);
+      .map(item => this.filterMenuItemRecursive(item, effectiveRole, employmentType))
+      .filter((item): item is MenuItem => item !== null);
 
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Recursively filters an item and its children by role/module/employment-type.
+   * Supports any nesting depth (the mega-menu categories are 2 levels deep:
+   * category -> subgroup -> leaf). Returns null if the item itself is gated out,
+   * or if it has children but none of them survive filtering.
+   */
+  private filterMenuItemRecursive(item: MenuItem, userRole: string, employmentType: string): MenuItem | null {
+    if (!this.canShowMenuItem(item, userRole, employmentType)) return null;
+
+    if (!item.children) return item;
+
+    const filteredChildren = item.children
+      .map(child => this.filterMenuItemRecursive(child, userRole, employmentType))
+      .filter((child): child is MenuItem => child !== null);
+
+    if (filteredChildren.length === 0 && item.children.length > 0) {
+      return null;
+    }
+
+    if (filteredChildren.some(child => child.badge?.count)) {
+      const totalBadgeCount = filteredChildren
+        .filter(child => child.badge?.count)
+        .reduce((sum, child) => sum + (child.badge?.count || 0), 0);
+
+      return {
+        ...item,
+        children: filteredChildren,
+        badge: {
+          count: totalBadgeCount,
+          type: 'warning' as BadgeType
+        }
+      };
+    }
+
+    return {
+      ...item,
+      children: filteredChildren
+    };
   }
 
   private canShowMenuItem(item: MenuItem, userRole: string, employmentType: string = ''): boolean {
@@ -762,7 +758,13 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
   }
 
   isParentActive(item: MenuItem): boolean {
-    return !!item.children?.some(child => this.isActive(child.route));
+    if (!item.children) return false;
+    return item.children.some(child => this.isActive(child.route) || this.isParentActive(child));
+  }
+
+  /** True when at least one child is itself a subgroup (mega-menu categories) — used to trigger the wider, multi-column dropdown layout. */
+  hasNestedChildren(item: MenuItem): boolean {
+    return !!item.children?.some(child => !!child.children);
   }
 
   onMobileToggleClick(): void {
@@ -818,6 +820,20 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
     if (img && img.src !== this.DEFAULT_AVATAR) {
       img.src = this.DEFAULT_AVATAR;
     }
+  }
+
+  getUserRoleName(): string {
+    if (!this.user) return '';
+
+    const roleMap: {[key: string]: string} = {
+      'ROLE_USER': 'Employee',
+      'ROLE_MANAGER': 'Manager',
+      'ROLE_ADMIN': 'Administrator',
+      'ROLE_SYSADMIN': 'System Admin',
+      'ROLE_SUPERADMIN': 'Super Admin'
+    };
+
+    return roleMap[this.user.roleName] || this.user.roleName;
   }
 
   companyLogoFailed = false;

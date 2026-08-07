@@ -110,6 +110,20 @@ export class NavbarComponent {
     }
   }
 
+  getUserRoleName(): string {
+    if (!this.user) return '';
+
+    const roleMap: {[key: string]: string} = {
+      'ROLE_USER': 'Employee',
+      'ROLE_MANAGER': 'Manager',
+      'ROLE_ADMIN': 'Administrator',
+      'ROLE_SYSADMIN': 'System Admin',
+      'ROLE_SUPERADMIN': 'Super Admin'
+    };
+
+    return roleMap[this.user.roleName] || this.user.roleName;
+  }
+
   onToggleSidebar(): void {
     this.toggleSidebar.emit();
   }

@@ -37,14 +37,28 @@
             <span *ngIf="item.badge?.count" class="nav-badge" [ngClass]="'badge-' + item.badge.type">{{ item.badge.count }}</span>
             <i class="bi bi-chevron-down nav-chevron"></i>
           </button>
-          <ul class="dropdown-menu">
-            <li *ngFor="let child of item.children">
-              <a class="dropdown-item" [routerLink]="child.route" [class.active]="isActive(child.route)">
-                <i class="bi" [ngClass]="child.icon"></i>
-                <span>{{ child.label }}</span>
-                <span *ngIf="child.badge?.count" class="nav-badge" [ngClass]="'badge-' + child.badge.type">{{ child.badge.count }}</span>
-              </a>
-            </li>
+          <ul class="dropdown-menu" [class.dropdown-menu--mega]="hasNestedChildren(item)">
+            <ng-container *ngFor="let child of item.children">
+              <!-- Subgroup: non-clickable section header, its own children listed flat beneath -->
+              <ng-container *ngIf="child.children">
+                <li class="dropdown-section"><h6 class="dropdown-header">{{ child.label }}</h6></li>
+                <li *ngFor="let leaf of child.children">
+                  <a class="dropdown-item" [routerLink]="leaf.route" [class.active]="isActive(leaf.route)">
+                    <i class="bi" [ngClass]="leaf.icon"></i>
+                    <span>{{ leaf.label }}</span>
+                    <span *ngIf="leaf.badge?.count" class="nav-badge" [ngClass]="'badge-' + leaf.badge.type">{{ leaf.badge.count }}</span>
+                  </a>
+                </li>
+              </ng-container>
+              <!-- Plain leaf item directly under the category -->
+              <li *ngIf="!child.children">
+                <a class="dropdown-item" [routerLink]="child.route" [class.active]="isActive(child.route)">
+                  <i class="bi" [ngClass]="child.icon"></i>
+                  <span>{{ child.label }}</span>
+                  <span *ngIf="child.badge?.count" class="nav-badge" [ngClass]="'badge-' + child.badge.type">{{ child.badge.count }}</span>
+                </a>
+              </li>
+            </ng-container>
           </ul>
         </div>
 
@@ -71,7 +85,7 @@
           <img class="user-avatar" [src]="getProfileImageUrl()" (error)="onProfileImageError($event)" [alt]="user?.firstName" />
           <div class="user-info d-none d-lg-flex">
             <span class="user-name">{{ user?.firstName }} {{ user?.lastName }}</span>
-            <span class="user-role">{{ user?.roleName || 'Employee' }}</span>
+            <span class="user-role">{{ getUserRoleName() || 'Employee' }}</span>
           </div>
           <i class="bi bi-chevron-down dropdown-arrow d-none d-lg-block"></i>
         </button>
@@ -171,13 +185,25 @@
           </span>
         </a>
         <ul class="mobile-submenu" *ngIf="item.children" [class.show]="item.expanded">
-          <li *ngFor="let child of item.children">
-            <a class="mobile-submenu-item" [class.active]="isActive(child.route)" (click)="onChildClick($event, child)">
-              <span class="menu-icon"><i class="bi" [ngClass]="child.icon"></i></span>
-              <span class="menu-label">{{ child.label }}</span>
-              <span *ngIf="child.badge?.count" class="nav-badge" [ngClass]="'badge-' + child.badge.type">{{ child.badge.count }}</span>
-            </a>
-          </li>
+          <ng-container *ngFor="let child of item.children">
+            <ng-container *ngIf="child.children">
+              <li class="mobile-submenu-header">{{ child.label }}</li>
+              <li *ngFor="let leaf of child.children">
+                <a class="mobile-submenu-item" [class.active]="isActive(leaf.route)" (click)="onChildClick($event, leaf)">
+                  <span class="menu-icon"><i class="bi" [ngClass]="leaf.icon"></i></span>
+                  <span class="menu-label">{{ leaf.label }}</span>
+                  <span *ngIf="leaf.badge?.count" class="nav-badge" [ngClass]="'badge-' + leaf.badge.type">{{ leaf.badge.count }}</span>
+                </a>
+              </li>
+            </ng-container>
+            <li *ngIf="!child.children">
+              <a class="mobile-submenu-item" [class.active]="isActive(child.route)" (click)="onChildClick($event, child)">
+                <span class="menu-icon"><i class="bi" [ngClass]="child.icon"></i></span>
+                <span class="menu-label">{{ child.label }}</span>
+                <span *ngIf="child.badge?.count" class="nav-badge" [ngClass]="'badge-' + child.badge.type">{{ child.badge.count }}</span>
+              </a>
+            </li>
+          </ng-container>
         </ul>
       </li>
     </ul>

@@ -68,7 +68,7 @@
             <span class="user-name">
               {{ user?.firstName }} {{ user?.lastName }}
             </span>
-            <span class="user-role">{{ user?.roleName || 'Employee' }}</span>
+            <span class="user-role">{{ getUserRoleName() || 'Employee' }}</span>
           </div>
 
           <i class="bi bi-chevron-down dropdown-arrow d-none d-lg-block"></i>

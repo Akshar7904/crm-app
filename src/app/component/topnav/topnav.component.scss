@@ -77,7 +77,7 @@
   gap: 8px;
   padding: 9px 14px;
   border-radius: $border-radius-md;
-  color: var(--sidebar-text, $gray-600);
+  color: var(--navbar-text, $gray-800);
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: $font-weight-medium;
@@ -88,24 +88,27 @@
   transition: all $transition-base;
   flex-shrink: 0;
 
-  i { font-size: 1rem; color: var(--sidebar-icon, $gray-400); }
+  // Navbar theming only defines text-color tokens (no hover/active background
+  // shades like the sidebar has), so interactive states use the brand primary
+  // directly rather than a mismatched --sidebar-* variable.
+  i { font-size: 1rem; color: var(--navbar-icon, $gray-400); }
 
   &:hover {
-    background: var(--sidebar-hover, rgba($primary, 0.1));
-    color: var(--sidebar-text-hover, $primary);
-    i { color: var(--sidebar-text-hover, $primary); }
+    background: rgba($primary, 0.1);
+    color: $primary;
+    i { color: $primary; }
   }
 
   &.active {
-    background: var(--sidebar-active-bg, rgba($primary, 0.14));
-    color: var(--sidebar-text-active, $primary);
-    i { color: var(--sidebar-icon-active, $primary); }
+    background: rgba($primary, 0.14);
+    color: $primary;
+    i { color: $primary; }
   }
 
   &[aria-expanded="true"] {
-    background: var(--sidebar-hover, rgba($primary, 0.1));
-    color: var(--sidebar-text-hover, $primary);
-    i:not(.nav-chevron) { color: var(--sidebar-text-hover, $primary); }
+    background: rgba($primary, 0.1);
+    color: $primary;
+    i:not(.nav-chevron) { color: $primary; }
   }
 }
 
@@ -160,6 +163,43 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+// Mega-menu variant: for categories whose children are themselves subgroups
+// (People, Finance, Operations) — too many leaf items for one narrow column,
+// so flow them into 2-3 CSS columns instead of one very tall list.
+.dropdown-menu--mega {
+  min-width: 560px;
+  max-width: 90vw;
+  max-height: none;
+  overflow: visible;
+  columns: 3 220px;
+  column-gap: $spacing-lg;
+  padding: $spacing-md;
+
+  @media (max-width: 991px) {
+    columns: 2 200px;
+    min-width: 420px;
+  }
+}
+
+.dropdown-section,
+.dropdown-menu--mega li {
+  break-inside: avoid;
+}
+
+.dropdown-header {
+  font-size: 0.7rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light, $gray-400);
+  padding: $spacing-sm 12px 4px;
+  margin: 0;
+}
+
+.dropdown-section:not(:first-child) .dropdown-header {
+  padding-top: $spacing-md;
+}
+
 .dropdown-item {
   display: flex;
   align-items: center;
@@ -179,7 +219,7 @@
   }
 
   &.active {
-    background: var(--sidebar-active-bg, rgba($primary, 0.08));
+    background: rgba($primary, 0.08);
     color: $primary;
     font-weight: $font-weight-medium;
   }
@@ -472,7 +512,21 @@
   max-height: 0;
   overflow: hidden;
   transition: max-height $transition-slow;
-  &.show { max-height: 600px; }
+  // Large enough for the mega categories (People/Finance run 20+ leaf items
+  // once expanded) — a generous fixed cap since CSS transitions need a value.
+  &.show { max-height: 2000px; }
+}
+
+.mobile-submenu-header {
+  font-size: 0.68rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  // Same drawer background as the surrounding items (--bg-sidebar), so this
+  // needs the sidebar's own muted-text treatment, not a content-page one.
+  color: var(--sidebar-text, rgba(255, 255, 255, 0.85));
+  opacity: 0.65;
+  padding: $spacing-sm 12px 4px 46px;
 }
 
 .mobile-submenu-item {
