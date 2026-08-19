@@ -46,7 +46,9 @@ export class ProjectService {
   }
 
   getCustomers(): Observable<any[]> {
-    return this.http.get<any>(`${this.base}/customers`).pipe(map(r => r.data.customers));
+    // Backend returns a Spring Data Page ({content, totalElements, ...}), not a bare array —
+    // unwrap .content so callers get a plain array as the Observable<any[]> signature promises.
+    return this.http.get<any>(`${this.base}/customers`).pipe(map(r => r.data.customers.content));
   }
 
   // ── Tasks ──────────────────────────────────────────────────────────────
