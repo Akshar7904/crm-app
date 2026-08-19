@@ -1,0 +1,122 @@
+<!-- Project List -->
+<div class="page-banner">
+  <div class="banner-title">Project Management</div>
+  <p class="banner-subtitle">Track projects, tasks and financials in one place</p>
+  <div class="banner-actions">
+    <button class="btn btn-banner" (click)="newProject()">
+      <i class="bi bi-plus-lg me-2"></i>New Project
+    </button>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4" *ngIf="stats">
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-primary">{{ stats.total }}</div>
+      <div class="stat-label">Total</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-success">{{ stats.active }}</div>
+      <div class="stat-label">Active</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-warning">{{ stats.onHold }}</div>
+      <div class="stat-label">On Hold</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-secondary">{{ stats.completed }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="table-card">
+  <div class="table-card-header">
+    <div class="d-flex align-items-center gap-2">
+      <strong>Projects</strong>
+    </div>
+    <div class="search-box">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search projects..." class="search-input"
+             [value]="term"
+             (input)="onSearch($any($event.target).value)">
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Project #</th>
+          <th>Name</th>
+          <th>Customer</th>
+          <th>Status</th>
+          <th>Budget</th>
+          <th>Profit</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="6" class="text-center py-4">
+            <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && projects.length === 0">
+          <td colspan="6" class="empty-state-cell">
+            <i class="bi bi-kanban fs-2 d-block mb-2 text-muted"></i>
+            No projects found
+          </td>
+        </tr>
+        <tr *ngFor="let p of projects" class="cursor-pointer" (click)="openProject(p.id)">
+          <td><span class="fw-semibold text-primary">{{ p.projectNumber }}</span></td>
+          <td>
+            <div class="fw-semibold">{{ p.name }}</div>
+            <small class="text-muted" *ngIf="p.ownerName">Owner: {{ p.ownerName }}</small>
+          </td>
+          <td>{{ p.customerName || '—' }}</td>
+          <td>
+            <span class="badge"
+                  [ngClass]="{
+                    'badge-soft-secondary': p.status === 'DRAFT',
+                    'badge-soft-success': p.status === 'ACTIVE',
+                    'badge-soft-warning': p.status === 'ON_HOLD',
+                    'badge-soft-info': p.status === 'COMPLETED',
+                    'badge-soft-danger': p.status === 'CANCELLED'
+                  }">{{ p.status }}</span>
+          </td>
+          <td>R {{ (p.budget || 0) | number:'1.2-2' }}</td>
+          <td>
+            <span [class.text-success]="(p.profit || 0) >= 0" [class.text-danger]="(p.profit || 0) < 0">
+              R {{ (p.profit || 0) | number:'1.2-2' }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex justify-content-end align-items-center px-3 py-2 border-top" *ngIf="totalPages > 1">
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="page === 0">
+          <button class="page-link" (click)="goToPage(page - 1)">‹</button>
+        </li>
+        <li *ngFor="let p of [].constructor(totalPages); let i = index" class="page-item" [class.active]="page === i">
+          <button class="page-link" (click)="goToPage(i)">{{ i + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="page >= totalPages - 1">
+          <button class="page-link" (click)="goToPage(page + 1)">›</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>

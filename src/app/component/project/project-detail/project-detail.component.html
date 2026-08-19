@@ -1,0 +1,295 @@
+<!-- Project Detail -->
+<div class="page-banner">
+  <button class="btn btn-sm btn-outline-light me-3" routerLink="/projects">
+    <i class="bi bi-arrow-left me-1"></i>Projects
+  </button>
+  <div class="d-flex align-items-center gap-3 mt-2">
+    <div class="banner-title">{{ project?.name || 'Project Detail' }}</div>
+    <span *ngIf="project?.status" class="badge badge-lg"
+          [ngClass]="{
+            'badge-soft-secondary': project?.status === 'DRAFT',
+            'badge-soft-success': project?.status === 'ACTIVE',
+            'badge-soft-warning': project?.status === 'ON_HOLD',
+            'badge-soft-info': project?.status === 'COMPLETED',
+            'badge-soft-danger': project?.status === 'CANCELLED'
+          }">{{ project?.status }}</span>
+  </div>
+  <p class="banner-subtitle" *ngIf="project?.projectNumber">
+    Ref: {{ project?.projectNumber }}
+    <span *ngIf="project?.customerName" class="ms-3 text-white-50">
+      <i class="bi bi-building me-1"></i>{{ project?.customerName }}
+    </span>
+  </p>
+
+  <div class="banner-actions" *ngIf="project">
+    <button class="btn btn-outline-light btn-sm" (click)="editProject()">
+      <i class="bi bi-pencil me-1"></i>Edit
+    </button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary"></div>
+</div>
+
+<ng-container *ngIf="!loading && project">
+
+  <!-- Tab Nav -->
+  <div class="detail-tab-nav mb-4">
+    <button class="detail-tab" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+      <i class="bi bi-info-circle me-1"></i>Overview
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'tasks'" (click)="activeTab = 'tasks'">
+      <i class="bi bi-list-check me-1"></i>Tasks
+      <span class="tab-badge" *ngIf="project.tasks?.length">{{ project.tasks?.length }}</span>
+    </button>
+    <button class="detail-tab" [class.active]="activeTab === 'financials'" (click)="activeTab = 'financials'">
+      <i class="bi bi-cash-coin me-1"></i>Financials
+    </button>
+  </div>
+
+  <!-- ══ OVERVIEW TAB ══ -->
+  <div *ngIf="activeTab === 'overview'" class="row g-4">
+    <div class="col-lg-8">
+      <div class="falcon-card mb-4">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-kanban text-primary"></i><strong>Project Details</strong>
+          </div>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-6 col-md-3">
+              <div class="info-label">Status</div>
+              <div class="info-value">{{ project.status }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Budget</div>
+              <div class="info-value fw-semibold text-primary">R {{ (project.budget || 0) | number:'1.2-2' }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">Start Date</div>
+              <div class="info-value">{{ project.startDate || '—' }}</div>
+            </div>
+            <div class="col-6 col-md-3">
+              <div class="info-label">End Date</div>
+              <div class="info-value">{{ project.endDate || '—' }}</div>
+            </div>
+          </div>
+
+          <hr class="my-3">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <div class="info-label">Customer</div>
+              <div class="info-value fw-semibold">{{ project.customerName || '—' }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-label">Owner</div>
+              <div class="info-value">{{ project.ownerName || '—' }}</div>
+            </div>
+            <div class="col-md-4">
+              <div class="info-label">Created By</div>
+              <div class="info-value">{{ project.createdByName || '—' }}</div>
+            </div>
+          </div>
+
+          <div class="mt-3" *ngIf="project.description">
+            <div class="info-label">Description</div>
+            <div class="info-value">{{ project.description }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="falcon-card">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle text-primary"></i><strong>Summary</strong>
+          </div>
+        </div>
+        <div class="card-body p-3">
+          <div class="summary-row"><span class="summary-label">Ref #</span><span class="summary-value">{{ project.projectNumber }}</span></div>
+          <div class="summary-row"><span class="summary-label">Total Income</span><span class="summary-value text-success">R {{ (project.totalIncome || 0) | number:'1.2-2' }}</span></div>
+          <div class="summary-row"><span class="summary-label">Total Expenses</span><span class="summary-value text-danger">R {{ (project.totalExpenses || 0) | number:'1.2-2' }}</span></div>
+          <div class="summary-row"><span class="summary-label">Profit</span>
+            <span class="summary-value fw-semibold" [class.text-success]="(project.profit || 0) >= 0" [class.text-danger]="(project.profit || 0) < 0">
+              R {{ (project.profit || 0) | number:'1.2-2' }}
+            </span>
+          </div>
+          <div class="summary-row"><span class="summary-label">Created</span><span class="summary-value">{{ project.createdAt | date:'dd MMM yyyy' }}</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TASKS TAB ══ -->
+  <div *ngIf="activeTab === 'tasks'">
+    <div class="falcon-card mb-3">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-list-check text-primary"></i><strong>Tasks</strong>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <div class="filter-tabs">
+            <button class="filter-tab" [class.active]="taskView === 'list'" (click)="taskView = 'list'">
+              <i class="bi bi-list-ul me-1"></i>List
+            </button>
+            <button class="filter-tab" [class.active]="taskView === 'kanban'" (click)="taskView = 'kanban'">
+              <i class="bi bi-kanban me-1"></i>Kanban
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-3">
+        <!-- Add task mini-form -->
+        <div class="d-flex gap-2 mb-3">
+          <input type="text" class="form-control" placeholder="Add a new task..."
+                 [(ngModel)]="newTaskTitle" (keyup.enter)="addTask()">
+          <select class="form-select" style="max-width:140px" [(ngModel)]="newTaskPriority">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+          </select>
+          <button class="btn btn-primary" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+
+        <div *ngIf="!project.tasks?.length" class="empty-state-cell py-4">
+          <i class="bi bi-list-check d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No tasks yet — add one above</div>
+        </div>
+
+        <!-- LIST VIEW: grouped by status -->
+        <div *ngIf="taskView === 'list' && project.tasks?.length">
+          <div *ngFor="let status of taskStatuses" class="mb-3">
+            <div class="task-group-header" *ngIf="tasksByStatus(status).length">
+              {{ status.replace('_', ' ') }} ({{ tasksByStatus(status).length }})
+            </div>
+            <div class="task-row" *ngFor="let task of tasksByStatus(status)">
+              <div class="task-main">
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-semibold">{{ task.title }}</span>
+                  <span class="badge"
+                        [ngClass]="{
+                          'badge-soft-secondary': task.priority === 'LOW',
+                          'badge-soft-warning': task.priority === 'MEDIUM',
+                          'badge-soft-danger': task.priority === 'HIGH'
+                        }">{{ task.priority }}</span>
+                </div>
+                <small class="text-muted" *ngIf="task.assigneeName">
+                  <i class="bi bi-person me-1"></i>{{ task.assigneeName }}
+                </small>
+              </div>
+              <div class="task-actions">
+                <select class="form-select form-select-sm" style="width:150px"
+                        [ngModel]="task.status" (ngModelChange)="changeTaskStatus(task, $event)">
+                  <option *ngFor="let s of taskStatuses" [value]="s">{{ s.replace('_', ' ') }}</option>
+                </select>
+                <button class="btn-action btn-action-view" (click)="toggleComments(task)" title="Comments">
+                  <i class="bi bi-chat-dots"></i>
+                  <span *ngIf="task.comments?.length" class="ms-1">{{ task.comments?.length }}</span>
+                </button>
+                <button class="btn-action btn-action-delete" (click)="deleteTask(task)" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+
+              <!-- Nested comment thread -->
+              <div class="task-comments" *ngIf="expandedTaskId === task.id">
+                <div class="comment-item" *ngFor="let c of task.comments">
+                  <span class="fw-semibold">{{ c.authorName }}</span>
+                  <span class="text-muted small ms-2">{{ c.createdAt | date:'dd MMM yyyy HH:mm' }}</span>
+                  <div>{{ c.body }}</div>
+                </div>
+                <div *ngIf="!task.comments?.length" class="text-muted small mb-2">No comments yet</div>
+                <div class="d-flex gap-2 mt-2">
+                  <input type="text" class="form-control form-control-sm" placeholder="Write a comment..."
+                         [(ngModel)]="newCommentBody" (keyup.enter)="addTaskComment(task)">
+                  <button class="btn btn-sm btn-primary" (click)="addTaskComment(task)" [disabled]="!newCommentBody.trim()">
+                    <i class="bi bi-send"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANBAN VIEW -->
+        <div class="kanban-board" *ngIf="taskView === 'kanban' && project.tasks?.length">
+          <div class="kanban-column" *ngFor="let status of taskStatuses">
+            <div class="kanban-column-header">{{ status.replace('_', ' ') }}
+              <span class="tab-badge">{{ tasksByStatus(status).length }}</span>
+            </div>
+            <div class="kanban-card" *ngFor="let task of tasksByStatus(status)">
+              <div class="fw-semibold">{{ task.title }}</div>
+              <span class="badge mt-1"
+                    [ngClass]="{
+                      'badge-soft-secondary': task.priority === 'LOW',
+                      'badge-soft-warning': task.priority === 'MEDIUM',
+                      'badge-soft-danger': task.priority === 'HIGH'
+                    }">{{ task.priority }}</span>
+              <div class="d-flex align-items-center justify-content-between mt-2">
+                <select class="form-select form-select-sm" style="width:120px"
+                        [ngModel]="task.status" (ngModelChange)="changeTaskStatus(task, $event)">
+                  <option *ngFor="let s of taskStatuses" [value]="s">{{ s.replace('_', ' ') }}</option>
+                </select>
+                <button class="btn-action btn-action-delete" (click)="deleteTask(task)" title="Delete">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FINANCIALS TAB ══ -->
+  <div *ngIf="activeTab === 'financials'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-cash-coin text-primary"></i><strong>Financial Ledger</strong>
+        </div>
+        <span class="text-muted small">{{ project.transactions?.length || 0 }} transaction(s)</span>
+      </div>
+      <div class="card-body p-0">
+        <div *ngIf="!project.transactions?.length" class="empty-state-cell py-5">
+          <i class="bi bi-cash-coin d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No financial transactions recorded for this project</div>
+        </div>
+
+        <div class="table-responsive" *ngIf="project.transactions?.length">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let tx of project.transactions">
+                <td>{{ tx.date | date:'dd MMM yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="tx.type === 'INCOME' ? 'badge-soft-success' : 'badge-soft-danger'">
+                    {{ tx.type }}
+                  </span>
+                </td>
+                <td>{{ tx.description || '—' }}</td>
+                <td class="text-end fw-semibold" [class.text-success]="tx.type === 'INCOME'" [class.text-danger]="tx.type === 'EXPENSE'">
+                  {{ tx.type === 'EXPENSE' ? '-' : '' }}R {{ tx.amount | number:'1.2-2' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</ng-container>

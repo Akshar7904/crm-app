@@ -1,0 +1,60 @@
+<!-- My Tasks -->
+<div class="page-banner">
+  <div class="banner-title">My Tasks</div>
+  <p class="banner-subtitle">Tasks assigned to you across all projects</p>
+</div>
+
+<div class="table-card">
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Task</th>
+          <th>Project</th>
+          <th>Priority</th>
+          <th>Due Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="5" class="text-center py-4">
+            <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && tasks.length === 0">
+          <td colspan="5" class="empty-state-cell">
+            <i class="bi bi-check2-square fs-2 d-block mb-2 text-muted"></i>
+            No tasks assigned to you
+          </td>
+        </tr>
+        <tr *ngFor="let task of tasks">
+          <td class="fw-semibold">{{ task.title }}</td>
+          <td>
+            <a class="text-primary cursor-pointer" (click)="openProject(task)">
+              <i class="bi bi-kanban me-1"></i>View Project
+            </a>
+          </td>
+          <td>
+            <span class="badge"
+                  [ngClass]="{
+                    'badge-soft-secondary': task.priority === 'LOW',
+                    'badge-soft-warning': task.priority === 'MEDIUM',
+                    'badge-soft-danger': task.priority === 'HIGH'
+                  }">{{ task.priority }}</span>
+          </td>
+          <td>{{ task.dueDate || '—' }}</td>
+          <td>
+            <select class="form-select form-select-sm" style="width:150px"
+                    [ngModel]="task.status" (ngModelChange)="changeStatus(task, $event)">
+              <option value="TODO">To Do</option>
+              <option value="IN_PROGRESS">In Progress</option>
+              <option value="IN_REVIEW">In Review</option>
+              <option value="DONE">Done</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

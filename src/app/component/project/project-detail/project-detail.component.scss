@@ -1,0 +1,200 @@
+@import '../../../../styles/variables';
+
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+// ── Tab Nav ───────────────────────────────────────────────────────────────
+.detail-tab-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.detail-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 0;
+  transition: color 0.15s;
+
+  &:hover { color: var(--text-primary); }
+
+  &.active {
+    color: $primary;
+    border-bottom-color: $primary;
+    font-weight: 600;
+  }
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  border-radius: 9px;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.active {
+    background: $primary;
+    color: #fff;
+    border-color: $primary;
+  }
+
+  &:hover:not(.active) {
+    background: var(--bg-hover);
+  }
+}
+
+// ── Info grid ─────────────────────────────────────────────────────────────
+.info-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+// ── Summary Sidebar ───────────────────────────────────────────────────────
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+
+  &:last-child { border-bottom: none; }
+}
+
+.summary-label { color: var(--text-muted); }
+.summary-value { font-weight: 500; text-align: right; }
+
+// ── Tasks ─────────────────────────────────────────────────────────────────
+.task-group-header {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child { border-bottom: none; }
+
+  .task-main { flex: 1; min-width: 200px; }
+
+  .task-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.task-comments {
+  flex-basis: 100%;
+  width: 100%;
+  background: var(--bg-hover);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.comment-item {
+  font-size: 0.82rem;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child { border-bottom: none; }
+}
+
+// ── Kanban ────────────────────────────────────────────────────────────────
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.kanban-column {
+  background: var(--bg-hover);
+  border-radius: 10px;
+  padding: 10px;
+  min-width: 220px;
+}
+
+.kanban-column-header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kanban-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+}
+
+.badge-lg { font-size: 0.9rem; padding: 6px 12px; }

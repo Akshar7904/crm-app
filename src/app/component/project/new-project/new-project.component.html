@@ -1,0 +1,90 @@
+<!-- New / Edit Project -->
+<div class="page-banner">
+  <button class="btn btn-sm btn-outline-light me-3" (click)="cancel()">
+    <i class="bi bi-arrow-left me-1"></i>Projects
+  </button>
+  <div class="banner-title">{{ editingId ? 'Edit Project' : 'New Project' }}</div>
+  <p class="banner-subtitle">{{ editingId ? 'Update project details' : 'Create a new project' }}</p>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <form [formGroup]="form">
+      <div class="falcon-card mb-3">
+        <div class="table-card-header">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-kanban text-primary"></i>
+            <strong>Project Details</strong>
+          </div>
+        </div>
+        <div class="card-body p-4">
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label">Project Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" formControlName="name"
+                     placeholder="e.g. Website Redesign"
+                     [class.is-invalid]="form.get('name')?.invalid && form.get('name')?.touched">
+              <div class="invalid-feedback">Project name is required</div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Status</label>
+              <select class="form-select" formControlName="status">
+                <option value="DRAFT">Draft</option>
+                <option value="ACTIVE">Active</option>
+                <option value="ON_HOLD">On Hold</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Customer</label>
+              <select class="form-select" formControlName="customerId">
+                <option [ngValue]="null">No customer</option>
+                <option *ngFor="let c of customers" [ngValue]="c.id">{{ c.name }}</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Budget</label>
+              <div class="input-group">
+                <span class="input-group-text">R</span>
+                <input type="number" class="form-control" formControlName="budget" min="0" step="0.01">
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Start Date</label>
+              <input type="date" class="form-control" formControlName="startDate">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">End Date</label>
+              <input type="date" class="form-control" formControlName="endDate">
+            </div>
+          </div>
+
+          <div class="mb-0">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" formControlName="description" rows="3"
+                      placeholder="Describe the project scope and goals..."></textarea>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="d-flex gap-2 justify-content-end mb-4">
+        <button type="button" class="btn btn-outline-secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="save()" [disabled]="saving || form.invalid">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+          {{ editingId ? 'Update Project' : 'Create Project' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

@@ -221,6 +221,16 @@ const routes: Routes = [
   },
 
   // =============================================
+  // PROJECT MANAGEMENT
+  // =============================================
+  {
+    path: 'projects',
+    loadChildren: () => import('./component/project/project.module').then(m => m.ProjectModule),
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Project Management', moduleKey: 'PROJECT_MANAGEMENT' }
+  },
+
+  // =============================================
   // ASSET MANAGEMENT
   // =============================================
   {
