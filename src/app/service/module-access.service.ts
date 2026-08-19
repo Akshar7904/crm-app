@@ -18,7 +18,9 @@ export type ModuleKey =
   | 'ATTENDANCE_TRACKING'
   | 'INVOICE_CUSTOMER'
   | 'BUDGET_MANAGEMENT'
-  | 'INTERN_ATTENDANCE';
+  | 'INTERN_ATTENDANCE'
+  | 'CONTRACT_MANAGEMENT'
+  | 'PROJECT_MANAGEMENT';
 
 @Injectable()
 export class ModuleAccessService {

@@ -492,6 +492,30 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           ]
         },
         {
+          label: 'Projects',
+          icon: 'bi-kanban',
+          moduleKey: 'PROJECT_MANAGEMENT',
+          children: [
+        {
+          label: 'All Projects',
+          icon: 'bi-kanban',
+          route: '/projects',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'New Project',
+          icon: 'bi-plus-circle',
+          route: '/projects/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'My Tasks',
+          icon: 'bi-check2-square',
+          route: '/projects/my-tasks'
+        }
+          ]
+        },
+        {
           label: 'Assets',
           icon: 'bi-laptop',
           moduleKey: 'ASSET_MANAGEMENT',
