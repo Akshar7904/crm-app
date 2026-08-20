@@ -4,6 +4,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { ProjectRoutingModule } from './project-routing.module';
 import { ProjectService } from './services/project.service';
 import { CompanyService } from '../../service/company.service';
@@ -23,6 +24,7 @@ import { MyTasksComponent } from './my-tasks/my-tasks.component';
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    DragDropModule,
     ProjectRoutingModule
   ],
   providers: [ProjectService, CompanyService]

@@ -218,27 +218,33 @@
         </div>
 
         <!-- KANBAN VIEW -->
-        <div class="kanban-board" *ngIf="taskView === 'kanban' && project.tasks?.length">
-          <div class="kanban-column" *ngFor="let status of taskStatuses">
-            <div class="kanban-column-header">{{ status.replace('_', ' ') }}
-              <span class="tab-badge">{{ tasksByStatus(status).length }}</span>
+        <div class="kanban-board" cdkDropListGroup *ngIf="taskView === 'kanban' && project.tasks?.length">
+          <div class="kanban-column" *ngFor="let column of kanbanColumns">
+            <div class="kanban-column-header">{{ column.status.replace('_', ' ') }}
+              <span class="tab-badge">{{ column.tasks.length }}</span>
             </div>
-            <div class="kanban-card" *ngFor="let task of tasksByStatus(status)">
-              <div class="fw-semibold">{{ task.title }}</div>
-              <span class="badge mt-1"
-                    [ngClass]="{
-                      'badge-soft-secondary': task.priority === 'LOW',
-                      'badge-soft-warning': task.priority === 'MEDIUM',
-                      'badge-soft-danger': task.priority === 'HIGH'
-                    }">{{ task.priority }}</span>
-              <div class="d-flex align-items-center justify-content-between mt-2">
-                <select class="form-select form-select-sm" style="width:120px"
-                        [ngModel]="task.status" (ngModelChange)="changeTaskStatus(task, $event)">
-                  <option *ngFor="let s of taskStatuses" [value]="s">{{ s.replace('_', ' ') }}</option>
-                </select>
-                <button class="btn-action btn-action-delete" (click)="deleteTask(task)" title="Delete">
-                  <i class="bi bi-trash"></i>
-                </button>
+            <div class="kanban-column-body"
+                 cdkDropList
+                 [cdkDropListData]="column.tasks"
+                 (cdkDropListDropped)="onTaskDrop($event, column.status)">
+              <div class="kanban-card" *ngFor="let task of column.tasks" cdkDrag>
+                <div class="kanban-card-placeholder" *cdkDragPlaceholder></div>
+                <div class="fw-semibold">{{ task.title }}</div>
+                <span class="badge mt-1"
+                      [ngClass]="{
+                        'badge-soft-secondary': task.priority === 'LOW',
+                        'badge-soft-warning': task.priority === 'MEDIUM',
+                        'badge-soft-danger': task.priority === 'HIGH'
+                      }">{{ task.priority }}</span>
+                <div class="d-flex align-items-center justify-content-between mt-2">
+                  <select class="form-select form-select-sm" style="width:120px"
+                          [ngModel]="task.status" (ngModelChange)="changeTaskStatus(task, $event)">
+                    <option *ngFor="let s of taskStatuses" [value]="s">{{ s.replace('_', ' ') }}</option>
+                  </select>
+                  <button class="btn-action btn-action-delete" (click)="deleteTask(task)" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
