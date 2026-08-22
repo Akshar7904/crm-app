@@ -4,6 +4,7 @@
 export type ProjectStatus = 'DRAFT' | 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANCELLED';
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+export type MilestoneStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'READY_FOR_REVIEW' | 'COMPLETED';
 
 export interface TaskComment {
   id: number;
@@ -25,6 +26,7 @@ export interface ProjectTask {
   assigneeName?: string;
   dueDate?: string;
   sortOrder?: number;
+  milestoneId?: number;
   createdById?: number;
   createdByName?: string;
   createdAt: string;
@@ -41,6 +43,37 @@ export interface ProjectTransaction {
   linkedEntityType?: string;
   linkedEntityId?: number;
   createdAt: string;
+}
+
+export interface MilestoneAttachment {
+  id: number;
+  fileName: string;
+  contentType?: string;
+  fileSize?: number;
+  uploadedByName?: string;
+  uploadedAt: string;
+}
+
+export interface Milestone {
+  id: number;
+  projectId: number;
+  name: string;
+  description?: string;
+  status: MilestoneStatus;
+  targetDate: string;
+  actualDate?: string;
+  sortOrder?: number;
+  dependsOnMilestoneId?: number;
+  dependsOnMilestoneName?: string;
+  progressPercent?: number;
+  overdue?: boolean;
+  reviewedById?: number;
+  reviewedByName?: string;
+  createdById?: number;
+  createdByName?: string;
+  createdAt: string;
+  updatedAt?: string;
+  attachments?: MilestoneAttachment[];
 }
 
 export interface Project {
@@ -65,6 +98,7 @@ export interface Project {
   createdAt: string;
   updatedAt?: string;
   tasks?: ProjectTask[];
+  milestones?: Milestone[];
   transactions?: ProjectTransaction[];
 }
 

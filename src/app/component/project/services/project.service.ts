@@ -6,7 +6,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Project, ProjectPage, ProjectStats, ProjectTask, TaskComment, ProjectTransaction, TaskStatus } from '../models/project.model';
+import { Project, ProjectPage, ProjectStats, ProjectTask, TaskComment, ProjectTransaction, TaskStatus, Milestone, MilestoneStatus } from '../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -92,5 +92,41 @@ export class ProjectService {
 
   deleteTransaction(transactionId: number): Observable<void> {
     return this.http.delete<any>(`${this.base}/transactions/${transactionId}`).pipe(map(() => undefined));
+  }
+
+  // ── Milestones ────────────────────────────────────────────────────────
+  getMilestones(projectId: number): Observable<Milestone[]> {
+    return this.http.get<any>(`${this.base}/${projectId}/milestones`).pipe(map(r => r.data.milestones));
+  }
+
+  createMilestone(projectId: number, milestone: Partial<Milestone>): Observable<Milestone> {
+    return this.http.post<any>(`${this.base}/${projectId}/milestones`, milestone).pipe(map(r => r.data.milestone));
+  }
+
+  updateMilestone(projectId: number, milestoneId: number, milestone: Partial<Milestone>): Observable<Milestone> {
+    return this.http.put<any>(`${this.base}/${projectId}/milestones/${milestoneId}`, milestone).pipe(map(r => r.data.milestone));
+  }
+
+  updateMilestoneStatus(projectId: number, milestoneId: number, status: MilestoneStatus): Observable<Milestone> {
+    return this.http.put<any>(`${this.base}/${projectId}/milestones/${milestoneId}/status`, null, { params: { status } }).pipe(map(r => r.data.milestone));
+  }
+
+  deleteMilestone(projectId: number, milestoneId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${projectId}/milestones/${milestoneId}`).pipe(map(() => undefined));
+  }
+
+  // ── Milestone Attachments ──────────────────────────────────────────────
+  uploadMilestoneAttachment(projectId: number, milestoneId: number, file: File): Observable<any> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<any>(`${this.base}/${projectId}/milestones/${milestoneId}/attachments`, form).pipe(map(r => r.data.attachment));
+  }
+
+  getMilestoneAttachmentUrl(projectId: number, milestoneId: number, attachmentId: number): string {
+    return `${this.base}/${projectId}/milestones/${milestoneId}/attachments/${attachmentId}`;
+  }
+
+  deleteMilestoneAttachment(projectId: number, milestoneId: number, attachmentId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${projectId}/milestones/${milestoneId}/attachments/${attachmentId}`).pipe(map(() => undefined));
   }
 }
