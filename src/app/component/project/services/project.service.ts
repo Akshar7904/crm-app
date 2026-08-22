@@ -122,8 +122,8 @@ export class ProjectService {
     return this.http.post<any>(`${this.base}/${projectId}/milestones/${milestoneId}/attachments`, form).pipe(map(r => r.data.attachment));
   }
 
-  getMilestoneAttachmentUrl(projectId: number, milestoneId: number, attachmentId: number): string {
-    return `${this.base}/${projectId}/milestones/${milestoneId}/attachments/${attachmentId}`;
+  downloadMilestoneAttachment(projectId: number, milestoneId: number, attachmentId: number): Observable<Blob> {
+    return this.http.get(`${this.base}/${projectId}/milestones/${milestoneId}/attachments/${attachmentId}`, { responseType: 'blob' });
   }
 
   deleteMilestoneAttachment(projectId: number, milestoneId: number, attachmentId: number): Observable<void> {

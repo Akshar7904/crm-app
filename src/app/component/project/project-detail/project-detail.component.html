@@ -147,7 +147,7 @@
           <select class="form-select form-select-sm" style="max-width:180px" [(ngModel)]="taskMilestoneFilter">
             <option value="all">All milestones</option>
             <option value="none">No milestone</option>
-            <option *ngFor="let m of milestones" [value]="m.id">{{ m.name }}</option>
+            <option *ngFor="let m of milestones" [ngValue]="m.id">{{ m.name }}</option>
           </select>
         </div>
       </div>
@@ -335,7 +335,7 @@
             <div class="d-flex align-items-center gap-2 mb-1" *ngFor="let a of milestone.attachments">
               <a href="javascript:void(0)" (click)="downloadAttachment(milestone, a.id)">{{ a.fileName }}</a>
               <span class="text-muted small">({{ a.uploadedByName }}, {{ a.uploadedAt | date:'dd MMM yyyy' }})</span>
-              <button class="btn-action btn-action-delete" *ngIf="isManagerOrAbove" (click)="deleteAttachment(milestone, a.id)" title="Delete">
+              <button class="btn-action btn-action-delete" *ngIf="isAdminOrAbove" (click)="deleteAttachment(milestone, a.id)" title="Delete">
                 <i class="bi bi-trash"></i>
               </button>
             </div>

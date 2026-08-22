@@ -32,6 +32,7 @@ export class ProjectDetailComponent implements OnInit {
   // Milestones
   milestones: Milestone[] = [];
   isManagerOrAbove = false;
+  isAdminOrAbove = false;
   newMilestoneName = '';
   newMilestoneTargetDate = '';
   newMilestoneDependsOn: number | null = null;
@@ -63,6 +64,7 @@ export class ProjectDetailComponent implements OnInit {
   ngOnInit(): void {
     const user = this.userSvc.getUserFromLocalCache();
     this.isManagerOrAbove = ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
+    this.isAdminOrAbove = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.load(id);
   }
@@ -96,6 +98,7 @@ export class ProjectDetailComponent implements OnInit {
       this.newTaskTitle = '';
       this.newTaskMilestoneId = null;
       this.rebuildKanbanColumns();
+      this.refreshMilestones();
     });
   }
 
@@ -104,6 +107,7 @@ export class ProjectDetailComponent implements OnInit {
     this.projectService.updateTaskStatus(this.project.id, task.id, status).subscribe(updated => {
       task.status = updated.status;
       this.rebuildKanbanColumns();
+      this.refreshMilestones();
     });
   }
 
@@ -112,6 +116,14 @@ export class ProjectDetailComponent implements OnInit {
     this.projectService.deleteTask(this.project.id, task.id).subscribe(() => {
       this.project!.tasks = (this.project!.tasks ?? []).filter(t => t.id !== task.id);
       this.rebuildKanbanColumns();
+      this.refreshMilestones();
+    });
+  }
+
+  private refreshMilestones(): void {
+    if (!this.project) return;
+    this.projectService.getMilestones(this.project.id).subscribe(milestones => {
+      this.milestones = milestones;
     });
   }
 
@@ -164,6 +176,7 @@ export class ProjectDetailComponent implements OnInit {
     let failed = false;
     updates.forEach(t => {
       this.projectService.updateTask(this.project!.id, t.id, { status: t.status, sortOrder: t.sortOrder }).subscribe({
+        next: () => this.refreshMilestones(),
         error: () => {
           if (!failed) { failed = true; rollback(); }
         }
@@ -218,11 +231,15 @@ export class ProjectDetailComponent implements OnInit {
 
   changeMilestoneStatus(milestone: Milestone, status: MilestoneStatus): void {
     if (!this.project) return;
+    const previousStatus = milestone.status;
     this.projectService.updateMilestoneStatus(this.project.id, milestone.id, status).subscribe({
       next: (updated) => {
         this.milestones = this.milestones.map(m => m.id === updated.id ? updated : m);
       },
-      error: e => this.notification.onError(e?.error?.message || 'Failed to update milestone status')
+      error: e => {
+        this.notification.onError(e?.error?.message || 'Failed to update milestone status');
+        this.milestones = this.milestones.map(m => m.id === milestone.id ? { ...m, status: previousStatus } : m);
+      }
     });
   }
 
@@ -257,7 +274,20 @@ export class ProjectDetailComponent implements OnInit {
 
   downloadAttachment(milestone: Milestone, attachmentId: number): void {
     if (!this.project) return;
-    window.open(this.projectService.getMilestoneAttachmentUrl(this.project.id, milestone.id, attachmentId), '_blank');
+    const attachment = (milestone.attachments ?? []).find(a => a.id === attachmentId);
+    this.projectService.downloadMilestoneAttachment(this.project.id, milestone.id, attachmentId).subscribe({
+      next: (blob: Blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = attachment?.fileName || `attachment-${attachmentId}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => this.notification.onError('Failed to download attachment')
+    });
   }
 
   deleteAttachment(milestone: Milestone, attachmentId: number): void {
