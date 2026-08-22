@@ -43,6 +43,10 @@
       <i class="bi bi-list-check me-1"></i>Tasks
       <span class="tab-badge" *ngIf="project.tasks?.length">{{ project.tasks?.length }}</span>
     </button>
+    <button class="detail-tab" [class.active]="activeTab === 'milestones'" (click)="activeTab = 'milestones'">
+      <i class="bi bi-flag me-1"></i>Milestones
+      <span class="tab-badge" *ngIf="milestones.length">{{ milestones.length }}</span>
+    </button>
     <button class="detail-tab" [class.active]="activeTab === 'financials'" (click)="activeTab = 'financials'">
       <i class="bi bi-cash-coin me-1"></i>Financials
     </button>
@@ -140,6 +144,11 @@
               <i class="bi bi-kanban me-1"></i>Kanban
             </button>
           </div>
+          <select class="form-select form-select-sm" style="max-width:180px" [(ngModel)]="taskMilestoneFilter">
+            <option value="all">All milestones</option>
+            <option value="none">No milestone</option>
+            <option *ngFor="let m of milestones" [value]="m.id">{{ m.name }}</option>
+          </select>
         </div>
       </div>
       <div class="card-body p-3">
@@ -151,6 +160,10 @@
             <option value="LOW">Low</option>
             <option value="MEDIUM">Medium</option>
             <option value="HIGH">High</option>
+          </select>
+          <select class="form-select" style="max-width:160px" [(ngModel)]="newTaskMilestoneId">
+            <option [ngValue]="null">No milestone</option>
+            <option *ngFor="let m of milestones" [ngValue]="m.id">{{ m.name }}</option>
           </select>
           <button class="btn btn-primary" (click)="addTask()" [disabled]="!newTaskTitle.trim()">
             <i class="bi bi-plus-lg"></i>
@@ -165,10 +178,10 @@
         <!-- LIST VIEW: grouped by status -->
         <div *ngIf="taskView === 'list' && project.tasks?.length">
           <div *ngFor="let status of taskStatuses" class="mb-3">
-            <div class="task-group-header" *ngIf="tasksByStatus(status).length">
-              {{ status.replace('_', ' ') }} ({{ tasksByStatus(status).length }})
+            <div class="task-group-header" *ngIf="filteredTasksByStatus(status).length">
+              {{ status.replace('_', ' ') }} ({{ filteredTasksByStatus(status).length }})
             </div>
-            <div class="task-row" *ngFor="let task of tasksByStatus(status)">
+            <div class="task-row" *ngFor="let task of filteredTasksByStatus(status)">
               <div class="task-main">
                 <div class="d-flex align-items-center gap-2">
                   <span class="fw-semibold">{{ task.title }}</span>
@@ -246,6 +259,91 @@
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MILESTONES TAB ══ -->
+  <div *ngIf="activeTab === 'milestones'">
+    <div class="falcon-card mb-3">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-flag text-primary"></i><strong>Milestones</strong>
+        </div>
+      </div>
+      <div class="card-body p-3">
+        <div class="d-flex gap-2 mb-3" *ngIf="isManagerOrAbove">
+          <input type="text" class="form-control" placeholder="Phase name..."
+                 [(ngModel)]="newMilestoneName">
+          <input type="date" class="form-control" style="max-width:170px"
+                 [(ngModel)]="newMilestoneTargetDate">
+          <select class="form-select" style="max-width:200px" [(ngModel)]="newMilestoneDependsOn">
+            <option [ngValue]="null">No dependency</option>
+            <option *ngFor="let m of milestones" [ngValue]="m.id">Depends on: {{ m.name }}</option>
+          </select>
+          <button class="btn btn-primary" (click)="addMilestone()" [disabled]="!newMilestoneName.trim() || !newMilestoneTargetDate">
+            <i class="bi bi-plus-lg"></i>
+          </button>
+        </div>
+
+        <div *ngIf="!milestones.length" class="empty-state-cell py-4">
+          <i class="bi bi-flag d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No milestones yet</div>
+        </div>
+
+        <div class="milestone-card" *ngFor="let milestone of milestones">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <span class="fw-semibold">{{ milestone.name }}</span>
+              <span class="badge ms-2"
+                    [ngClass]="{
+                      'badge-soft-secondary': milestone.status === 'NOT_STARTED',
+                      'badge-soft-info': milestone.status === 'IN_PROGRESS',
+                      'badge-soft-warning': milestone.status === 'READY_FOR_REVIEW',
+                      'badge-soft-success': milestone.status === 'COMPLETED'
+                    }">{{ milestone.status.replace('_', ' ') }}</span>
+              <span class="badge badge-soft-danger ms-1" *ngIf="milestone.overdue">Overdue</span>
+              <span class="text-muted small ms-2" *ngIf="milestone.dependsOnMilestoneName">
+                <i class="bi bi-link-45deg"></i> depends on: {{ milestone.dependsOnMilestoneName }}
+              </span>
+            </div>
+            <button class="btn-action btn-action-delete" *ngIf="isManagerOrAbove" (click)="deleteMilestone(milestone)" title="Delete">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+
+          <div class="progress mt-2" style="height:6px">
+            <div class="progress-bar" [style.width.%]="milestone.progressPercent || 0"></div>
+          </div>
+          <div class="text-muted small mt-1">
+            {{ milestone.progressPercent || 0 }}% complete · Target: {{ milestone.targetDate }}
+            <span *ngIf="milestone.actualDate">· Completed: {{ milestone.actualDate }}</span>
+          </div>
+
+          <div class="d-flex align-items-center gap-2 mt-2">
+            <select class="form-select form-select-sm" style="width:180px" [ngModel]="milestone.status" (ngModelChange)="changeMilestoneStatus(milestone, $event)">
+              <option *ngFor="let s of milestoneStatuses" [value]="s" [disabled]="s === 'COMPLETED' && !isManagerOrAbove">{{ s.replace('_', ' ') }}</option>
+            </select>
+            <span class="text-muted small" *ngIf="!isManagerOrAbove && milestone.status === 'READY_FOR_REVIEW'">Awaiting Manager sign-off</span>
+          </div>
+
+          <div class="mt-3">
+            <div class="fw-semibold small mb-1">Attachments</div>
+            <div class="d-flex align-items-center gap-2 mb-1" *ngFor="let a of milestone.attachments">
+              <a href="javascript:void(0)" (click)="downloadAttachment(milestone, a.id)">{{ a.fileName }}</a>
+              <span class="text-muted small">({{ a.uploadedByName }}, {{ a.uploadedAt | date:'dd MMM yyyy' }})</span>
+              <button class="btn-action btn-action-delete" *ngIf="isManagerOrAbove" (click)="deleteAttachment(milestone, a.id)" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+            <div class="d-flex gap-2 mt-1" *ngIf="isManagerOrAbove">
+              <input type="file" class="form-control form-control-sm" (change)="onAttachmentFileSelected($event)">
+              <button class="btn btn-sm btn-outline-primary" (click)="uploadAttachment(milestone)" [disabled]="!selectedAttachmentFile">
+                <i class="bi bi-upload"></i>
+              </button>
             </div>
           </div>
         </div>

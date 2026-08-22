@@ -5,8 +5,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ProjectService } from '../services/project.service';
-import { Project, ProjectTask, TaskStatus, TaskComment } from '../models/project.model';
+import { Project, ProjectTask, TaskStatus, TaskComment, Milestone, MilestoneStatus } from '../models/project.model';
 import { NotificationService } from '../../../service/notification.service';
+import { UserService } from '../../../service/user.service';
 
 @Component({
   standalone: false,
@@ -16,15 +17,26 @@ import { NotificationService } from '../../../service/notification.service';
 })
 export class ProjectDetailComponent implements OnInit {
   project: Project | null = null;
-  activeTab: 'overview' | 'tasks' | 'financials' = 'overview';
+  activeTab: 'overview' | 'tasks' | 'milestones' | 'financials' = 'overview';
   taskView: 'list' | 'kanban' = 'list';
   loading = false;
 
   // New-task form state
   newTaskTitle = '';
   newTaskPriority: 'LOW' | 'MEDIUM' | 'HIGH' = 'MEDIUM';
+  newTaskMilestoneId: number | null = null;
 
   readonly taskStatuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
+  readonly milestoneStatuses: MilestoneStatus[] = ['NOT_STARTED', 'IN_PROGRESS', 'READY_FOR_REVIEW', 'COMPLETED'];
+
+  // Milestones
+  milestones: Milestone[] = [];
+  isManagerOrAbove = false;
+  newMilestoneName = '';
+  newMilestoneTargetDate = '';
+  newMilestoneDependsOn: number | null = null;
+  taskMilestoneFilter: number | 'all' | 'none' = 'all';
+  selectedAttachmentFile: File | null = null;
 
   // Task comment thread (nested per-task expand) — not part of the Task 6/7 brief's
   // verbatim TypeScript, added to support the comment thread described in the
@@ -44,10 +56,13 @@ export class ProjectDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private projectService: ProjectService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private userSvc: UserService
   ) {}
 
   ngOnInit(): void {
+    const user = this.userSvc.getUserFromLocalCache();
+    this.isManagerOrAbove = ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.load(id);
   }
@@ -55,7 +70,7 @@ export class ProjectDetailComponent implements OnInit {
   load(id: number): void {
     this.loading = true;
     this.projectService.getById(id).subscribe({
-      next: (p) => { this.project = p; this.loading = false; this.rebuildKanbanColumns(); },
+      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.loading = false; this.rebuildKanbanColumns(); },
       error: () => { this.loading = false; }
     });
   }
@@ -76,9 +91,10 @@ export class ProjectDetailComponent implements OnInit {
 
   addTask(): void {
     if (!this.project || !this.newTaskTitle.trim()) return;
-    this.projectService.createTask(this.project.id, { title: this.newTaskTitle, priority: this.newTaskPriority }).subscribe(task => {
+    this.projectService.createTask(this.project.id, { title: this.newTaskTitle, priority: this.newTaskPriority, milestoneId: this.newTaskMilestoneId ?? undefined }).subscribe(task => {
       this.project!.tasks = [...(this.project!.tasks ?? []), task];
       this.newTaskTitle = '';
+      this.newTaskMilestoneId = null;
       this.rebuildKanbanColumns();
     });
   }
@@ -180,5 +196,86 @@ export class ProjectDetailComponent implements OnInit {
       task.comments = [...(task.comments ?? []), comment];
       this.newCommentBody = '';
     });
+  }
+
+  // ── Milestones ───────────────────────────────────────────────────────────
+  addMilestone(): void {
+    if (!this.project || !this.newMilestoneName.trim() || !this.newMilestoneTargetDate) return;
+    this.projectService.createMilestone(this.project.id, {
+      name: this.newMilestoneName,
+      targetDate: this.newMilestoneTargetDate,
+      dependsOnMilestoneId: this.newMilestoneDependsOn ?? undefined
+    }).subscribe({
+      next: (milestone) => {
+        this.milestones = [...this.milestones, milestone];
+        this.newMilestoneName = '';
+        this.newMilestoneTargetDate = '';
+        this.newMilestoneDependsOn = null;
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to create milestone')
+    });
+  }
+
+  changeMilestoneStatus(milestone: Milestone, status: MilestoneStatus): void {
+    if (!this.project) return;
+    this.projectService.updateMilestoneStatus(this.project.id, milestone.id, status).subscribe({
+      next: (updated) => {
+        this.milestones = this.milestones.map(m => m.id === updated.id ? updated : m);
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to update milestone status')
+    });
+  }
+
+  deleteMilestone(milestone: Milestone): void {
+    if (!this.project) return;
+    this.projectService.deleteMilestone(this.project.id, milestone.id).subscribe({
+      next: () => {
+        this.milestones = this.milestones.filter(m => m.id !== milestone.id);
+        // Detached tasks lose their milestoneId server-side — reflect that locally too.
+        (this.project!.tasks ?? []).forEach(t => { if (t.milestoneId === milestone.id) t.milestoneId = undefined; });
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to delete milestone')
+    });
+  }
+
+  onAttachmentFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedAttachmentFile = input.files?.[0] || null;
+  }
+
+  uploadAttachment(milestone: Milestone): void {
+    if (!this.project || !this.selectedAttachmentFile) return;
+    this.projectService.uploadMilestoneAttachment(this.project.id, milestone.id, this.selectedAttachmentFile).subscribe({
+      next: (attachment) => {
+        milestone.attachments = [...(milestone.attachments ?? []), attachment];
+        this.selectedAttachmentFile = null;
+        this.notification.onSuccess('Attachment uploaded');
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Upload failed')
+    });
+  }
+
+  downloadAttachment(milestone: Milestone, attachmentId: number): void {
+    if (!this.project) return;
+    window.open(this.projectService.getMilestoneAttachmentUrl(this.project.id, milestone.id, attachmentId), '_blank');
+  }
+
+  deleteAttachment(milestone: Milestone, attachmentId: number): void {
+    if (!this.project) return;
+    this.projectService.deleteMilestoneAttachment(this.project.id, milestone.id, attachmentId).subscribe({
+      next: () => {
+        milestone.attachments = (milestone.attachments ?? []).filter(a => a.id !== attachmentId);
+        this.notification.onSuccess('Attachment deleted');
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Delete failed')
+    });
+  }
+
+  // ── Tasks tab: milestone filter ─────────────────────────────────────────
+  filteredTasksByStatus(status: TaskStatus): ProjectTask[] {
+    const tasks = this.tasksByStatus(status);
+    if (this.taskMilestoneFilter === 'all') return tasks;
+    if (this.taskMilestoneFilter === 'none') return tasks.filter(t => !t.milestoneId);
+    return tasks.filter(t => t.milestoneId === this.taskMilestoneFilter);
   }
 }
