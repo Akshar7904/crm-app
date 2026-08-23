@@ -6,9 +6,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { ProjectService } from '../services/project.service';
-import { Project, ProjectTask, TaskStatus, TaskComment, Milestone, MilestoneAttachment, MilestoneStatus } from '../models/project.model';
+import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus } from '../models/project.model';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
+import { EmployeeService } from '../../../service/employee.service';
 
 @Component({
   standalone: false,
@@ -46,6 +47,29 @@ export class ProjectDetailComponent implements OnInit {
   viewingAttachment: { milestone: Milestone; attachment: MilestoneAttachment; safeSrc: SafeResourceUrl | SafeUrl | null; type: 'pdf' | 'image' | 'other' } | null = null;
   private viewerBlobUrl: string | null = null;
 
+  // Milestone edit — the same mini-form used to create a milestone is reused
+  // for editing: editingMilestoneId set means "Save" calls update instead of
+  // create, and the fields are pre-filled from the milestone being edited.
+  editingMilestoneId: number | null = null;
+  newMilestoneDescription = '';
+
+  // Financials — add/edit share one form (editingTransactionId set = editing).
+  employees: any[] = [];
+  editingTransactionId: number | null = null;
+  txDate = '';
+  txType: 'INCOME' | 'EXPENSE' = 'INCOME';
+  txAmount: number | null = null;
+  txDescription = '';
+
+  // Task edit modal
+  editingTask: ProjectTask | null = null;
+  editTaskTitle = '';
+  editTaskDescription = '';
+  editTaskPriority: TaskPriority = 'MEDIUM';
+  editTaskAssigneeId: number | null = null;
+  editTaskDueDate = '';
+  editTaskMilestoneId: number | null = null;
+
   // Task comment thread (nested per-task expand) — not part of the Task 6/7 brief's
   // verbatim TypeScript, added to support the comment thread described in the
   // brief's HTML prose (mirrors contract-detail's own message thread handling).
@@ -66,7 +90,8 @@ export class ProjectDetailComponent implements OnInit {
     private projectService: ProjectService,
     private notification: NotificationService,
     private userSvc: UserService,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private employeeService: EmployeeService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +100,10 @@ export class ProjectDetailComponent implements OnInit {
     this.isAdminOrAbove = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.load(id);
+    this.employeeService.searchEmployees$().subscribe({
+      next: (response: any) => { this.employees = response.data?.employees || []; },
+      error: () => { /* assignee picker just stays empty — not fatal to the page */ }
+    });
   }
 
   load(id: number): void {
@@ -126,6 +155,46 @@ export class ProjectDetailComponent implements OnInit {
       this.rebuildKanbanColumns();
       this.refreshMilestones();
     });
+  }
+
+  // ── Task edit (title/description/priority/assignee/dueDate/milestone) ────
+  // Any authenticated user can edit a task, matching the backend's
+  // isAuthenticated()-only gate on PUT .../tasks/{id} (the GitHub/GitLab
+  // Issues-style collaborative model this feature was built around).
+  openTaskEdit(task: ProjectTask): void {
+    this.editingTask = task;
+    this.editTaskTitle = task.title;
+    this.editTaskDescription = task.description || '';
+    this.editTaskPriority = task.priority;
+    this.editTaskAssigneeId = task.assigneeId ?? null;
+    this.editTaskDueDate = task.dueDate || '';
+    this.editTaskMilestoneId = task.milestoneId ?? null;
+  }
+
+  saveTaskEdit(): void {
+    if (!this.project || !this.editingTask || !this.editTaskTitle.trim()) return;
+    const assignee = this.employees.find(e => e.id === this.editTaskAssigneeId);
+    this.projectService.updateTask(this.project.id, this.editingTask.id, {
+      title: this.editTaskTitle,
+      description: this.editTaskDescription || undefined,
+      priority: this.editTaskPriority,
+      assigneeId: this.editTaskAssigneeId ?? undefined,
+      assigneeName: assignee ? `${assignee.firstName} ${assignee.lastName}` : undefined,
+      dueDate: this.editTaskDueDate || undefined,
+      milestoneId: this.editTaskMilestoneId ?? undefined
+    }).subscribe({
+      next: (updated) => {
+        this.project!.tasks = (this.project!.tasks ?? []).map(t => t.id === updated.id ? updated : t);
+        this.rebuildKanbanColumns();
+        this.refreshMilestones();
+        this.closeTaskEdit();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to save task')
+    });
+  }
+
+  closeTaskEdit(): void {
+    this.editingTask = null;
   }
 
   private refreshMilestones(): void {
@@ -220,21 +289,44 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   // ── Milestones ───────────────────────────────────────────────────────────
-  addMilestone(): void {
+  // One form serves both create and edit — editingMilestoneId set means
+  // saveMilestone() calls update instead of create.
+  saveMilestone(): void {
     if (!this.project || !this.newMilestoneName.trim() || !this.newMilestoneTargetDate) return;
-    this.projectService.createMilestone(this.project.id, {
+    const payload = {
       name: this.newMilestoneName,
+      description: this.newMilestoneDescription || undefined,
       targetDate: this.newMilestoneTargetDate,
       dependsOnMilestoneId: this.newMilestoneDependsOn ?? undefined
-    }).subscribe({
+    };
+    const request$ = this.editingMilestoneId
+      ? this.projectService.updateMilestone(this.project.id, this.editingMilestoneId, payload)
+      : this.projectService.createMilestone(this.project.id, payload);
+    request$.subscribe({
       next: (milestone) => {
-        this.milestones = [...this.milestones, milestone];
-        this.newMilestoneName = '';
-        this.newMilestoneTargetDate = '';
-        this.newMilestoneDependsOn = null;
+        this.milestones = this.editingMilestoneId
+          ? this.milestones.map(m => m.id === milestone.id ? milestone : m)
+          : [...this.milestones, milestone];
+        this.cancelMilestoneEdit();
       },
-      error: e => this.notification.onError(e?.error?.message || 'Failed to create milestone')
+      error: e => this.notification.onError(e?.error?.message || 'Failed to save milestone')
     });
+  }
+
+  editMilestone(milestone: Milestone): void {
+    this.editingMilestoneId = milestone.id;
+    this.newMilestoneName = milestone.name;
+    this.newMilestoneDescription = milestone.description || '';
+    this.newMilestoneTargetDate = milestone.targetDate;
+    this.newMilestoneDependsOn = milestone.dependsOnMilestoneId ?? null;
+  }
+
+  cancelMilestoneEdit(): void {
+    this.editingMilestoneId = null;
+    this.newMilestoneName = '';
+    this.newMilestoneDescription = '';
+    this.newMilestoneTargetDate = '';
+    this.newMilestoneDependsOn = null;
   }
 
   changeMilestoneStatus(milestone: Milestone, status: MilestoneStatus): void {
@@ -351,5 +443,50 @@ export class ProjectDetailComponent implements OnInit {
     if (this.taskMilestoneFilter === 'all') return tasks;
     if (this.taskMilestoneFilter === 'none') return tasks.filter(t => !t.milestoneId);
     return tasks.filter(t => t.milestoneId === this.taskMilestoneFilter);
+  }
+
+  // ── Financials ───────────────────────────────────────────────────────────
+  // One form serves both add and edit — editingTransactionId set means
+  // saveTransaction() calls update instead of create. Reload the whole
+  // project afterward so Overview's totalIncome/totalExpenses/profit (which
+  // the backend recomputes but doesn't return from these endpoints) stay
+  // correct without duplicating that math client-side.
+  saveTransaction(): void {
+    if (!this.project || !this.txDate || this.txAmount === null || this.txAmount <= 0) return;
+    const payload = { date: this.txDate, type: this.txType, amount: this.txAmount, description: this.txDescription || undefined };
+    const request$ = this.editingTransactionId
+      ? this.projectService.updateTransaction(this.editingTransactionId, payload)
+      : this.projectService.addTransaction(this.project.id, payload);
+    request$.subscribe({
+      next: () => {
+        this.cancelTransactionEdit();
+        this.load(this.project!.id);
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to save transaction')
+    });
+  }
+
+  editTransaction(tx: ProjectTransaction): void {
+    this.editingTransactionId = tx.id;
+    this.txDate = tx.date;
+    this.txType = tx.type;
+    this.txAmount = tx.amount;
+    this.txDescription = tx.description || '';
+  }
+
+  cancelTransactionEdit(): void {
+    this.editingTransactionId = null;
+    this.txDate = '';
+    this.txType = 'INCOME';
+    this.txAmount = null;
+    this.txDescription = '';
+  }
+
+  deleteTransactionRow(tx: ProjectTransaction): void {
+    if (!this.project) return;
+    this.projectService.deleteTransaction(tx.id).subscribe({
+      next: () => this.load(this.project!.id),
+      error: e => this.notification.onError(e?.error?.message || 'Failed to delete transaction')
+    });
   }
 }

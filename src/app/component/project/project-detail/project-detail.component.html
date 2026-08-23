@@ -205,6 +205,9 @@
                   <i class="bi bi-chat-dots"></i>
                   <span *ngIf="task.comments?.length" class="ms-1">{{ task.comments?.length }}</span>
                 </button>
+                <button class="btn-action btn-action-edit" (click)="openTaskEdit(task)" title="Edit this task">
+                  <i class="bi bi-pencil"></i>
+                </button>
                 <button class="btn-action btn-action-delete" (click)="deleteTask(task)" title="Delete">
                   <i class="bi bi-trash"></i>
                 </button>
@@ -254,6 +257,9 @@
                           [ngModel]="task.status" (ngModelChange)="changeTaskStatus(task, $event)">
                     <option *ngFor="let s of taskStatuses" [value]="s">{{ s.replace('_', ' ') }}</option>
                   </select>
+                  <button class="btn-action btn-action-edit" (click)="openTaskEdit(task)" title="Edit this task">
+                    <i class="bi bi-pencil"></i>
+                  </button>
                   <button class="btn-action btn-action-delete" (click)="deleteTask(task)" title="Delete">
                     <i class="bi bi-trash"></i>
                   </button>
@@ -275,18 +281,24 @@
         </div>
       </div>
       <div class="card-body p-3">
-        <div class="d-flex gap-2 mb-3" *ngIf="isManagerOrAbove">
-          <input type="text" class="form-control" placeholder="Phase name..."
-                 [(ngModel)]="newMilestoneName">
-          <input type="date" class="form-control" style="max-width:170px"
-                 [(ngModel)]="newMilestoneTargetDate">
-          <select class="form-select" style="max-width:200px" [(ngModel)]="newMilestoneDependsOn">
-            <option [ngValue]="null">No dependency</option>
-            <option *ngFor="let m of milestones" [ngValue]="m.id">Depends on: {{ m.name }}</option>
-          </select>
-          <button class="btn btn-primary" (click)="addMilestone()" [disabled]="!newMilestoneName.trim() || !newMilestoneTargetDate">
-            <i class="bi bi-plus-lg me-1"></i>Add Milestone
-          </button>
+        <div class="mb-3" *ngIf="isManagerOrAbove">
+          <div class="d-flex gap-2 flex-wrap">
+            <input type="text" class="form-control" placeholder="Phase name..." style="max-width:220px"
+                   [(ngModel)]="newMilestoneName">
+            <input type="text" class="form-control" placeholder="Description (optional)"
+                   [(ngModel)]="newMilestoneDescription">
+            <input type="date" class="form-control" style="max-width:170px"
+                   [(ngModel)]="newMilestoneTargetDate">
+            <select class="form-select" style="max-width:200px" [(ngModel)]="newMilestoneDependsOn">
+              <option [ngValue]="null">No dependency</option>
+              <option *ngFor="let m of milestones" [ngValue]="m.id" [disabled]="m.id === editingMilestoneId">Depends on: {{ m.name }}</option>
+            </select>
+            <button class="btn btn-primary" (click)="saveMilestone()" [disabled]="!newMilestoneName.trim() || !newMilestoneTargetDate">
+              <i class="bi" [ngClass]="editingMilestoneId ? 'bi-check-lg' : 'bi-plus-lg'"></i>
+              {{ editingMilestoneId ? ' Save Changes' : ' Add Milestone' }}
+            </button>
+            <button class="btn btn-outline-secondary" *ngIf="editingMilestoneId" (click)="cancelMilestoneEdit()">Cancel</button>
+          </div>
         </div>
 
         <div *ngIf="!milestones.length" class="empty-state-cell py-4">
@@ -310,10 +322,16 @@
                 <i class="bi bi-link-45deg"></i> depends on: {{ milestone.dependsOnMilestoneName }}
               </span>
             </div>
-            <button class="btn-action btn-action-delete" *ngIf="isManagerOrAbove" (click)="deleteMilestone(milestone)" title="Delete">
-              <i class="bi bi-trash"></i>
-            </button>
+            <div class="d-flex gap-1" *ngIf="isManagerOrAbove">
+              <button class="btn btn-sm btn-outline-secondary" (click)="editMilestone(milestone)" title="Edit this milestone">
+                <i class="bi bi-pencil me-1"></i>Edit
+              </button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteMilestone(milestone)" title="Delete this milestone">
+                <i class="bi bi-trash me-1"></i>Delete
+              </button>
+            </div>
           </div>
+          <div class="text-muted small mt-1" *ngIf="milestone.description">{{ milestone.description }}</div>
 
           <div class="progress mt-2" style="height:6px">
             <div class="progress-bar" [style.width.%]="milestone.progressPercent || 0"></div>
@@ -366,7 +384,22 @@
         </div>
         <span class="text-muted small">{{ project.transactions?.length || 0 }} transaction(s)</span>
       </div>
-      <div class="card-body p-0">
+      <div class="card-body">
+        <div class="d-flex gap-2 flex-wrap mb-3" *ngIf="isManagerOrAbove">
+          <input type="date" class="form-control" style="max-width:170px" [(ngModel)]="txDate">
+          <select class="form-select" style="max-width:140px" [(ngModel)]="txType">
+            <option value="INCOME">Income</option>
+            <option value="EXPENSE">Expense</option>
+          </select>
+          <input type="number" class="form-control" placeholder="Amount" style="max-width:150px" min="0.01" step="0.01" [(ngModel)]="txAmount">
+          <input type="text" class="form-control" placeholder="Description (optional)" [(ngModel)]="txDescription">
+          <button class="btn btn-primary" (click)="saveTransaction()" [disabled]="!txDate || txAmount === null || txAmount <= 0">
+            <i class="bi" [ngClass]="editingTransactionId ? 'bi-check-lg' : 'bi-plus-lg'"></i>
+            {{ editingTransactionId ? ' Save Changes' : ' Add Transaction' }}
+          </button>
+          <button class="btn btn-outline-secondary" *ngIf="editingTransactionId" (click)="cancelTransactionEdit()">Cancel</button>
+        </div>
+
         <div *ngIf="!project.transactions?.length" class="empty-state-cell py-5">
           <i class="bi bi-cash-coin d-block mb-2 fs-2 text-muted"></i>
           <div class="text-muted">No financial transactions recorded for this project</div>
@@ -380,6 +413,7 @@
                 <th>Type</th>
                 <th>Description</th>
                 <th class="text-end">Amount</th>
+                <th class="text-end" *ngIf="isManagerOrAbove">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -393,6 +427,14 @@
                 <td>{{ tx.description || '—' }}</td>
                 <td class="text-end fw-semibold" [class.text-success]="tx.type === 'INCOME'" [class.text-danger]="tx.type === 'EXPENSE'">
                   {{ tx.type === 'EXPENSE' ? '-' : '' }}R {{ tx.amount | number:'1.2-2' }}
+                </td>
+                <td class="text-end" *ngIf="isManagerOrAbove">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="editTransaction(tx)" title="Edit this transaction">
+                    <i class="bi bi-pencil me-1"></i>Edit
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger ms-1" (click)="deleteTransactionRow(tx)" title="Delete this transaction">
+                    <i class="bi bi-trash me-1"></i>Delete
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -447,5 +489,62 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ══ TASK EDIT MODAL ══ -->
+<div class="task-edit-overlay" *ngIf="editingTask" (click)="closeTaskEdit()">
+  <div class="task-edit-panel" (click)="$event.stopPropagation()">
+    <div class="task-edit-header">
+      <strong>Edit Task</strong>
+      <button class="attachment-viewer-close" (click)="closeTaskEdit()" title="Close">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="task-edit-body">
+      <label class="form-label small text-muted">Title</label>
+      <input type="text" class="form-control mb-3" [(ngModel)]="editTaskTitle">
+
+      <label class="form-label small text-muted">Description</label>
+      <textarea class="form-control mb-3" rows="3" [(ngModel)]="editTaskDescription"></textarea>
+
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <label class="form-label small text-muted">Priority</label>
+          <select class="form-select" [(ngModel)]="editTaskPriority">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label class="form-label small text-muted">Due Date</label>
+          <input type="date" class="form-control" [(ngModel)]="editTaskDueDate">
+        </div>
+      </div>
+
+      <div class="row g-2 mb-3">
+        <div class="col-6">
+          <label class="form-label small text-muted">Assignee</label>
+          <select class="form-select" [(ngModel)]="editTaskAssigneeId">
+            <option [ngValue]="null">Unassigned</option>
+            <option *ngFor="let e of employees" [ngValue]="e.id">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label class="form-label small text-muted">Milestone</label>
+          <select class="form-select" [(ngModel)]="editTaskMilestoneId">
+            <option [ngValue]="null">No milestone</option>
+            <option *ngFor="let m of milestones" [ngValue]="m.id">{{ m.name }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="task-edit-footer">
+      <button class="btn btn-outline-secondary" (click)="closeTaskEdit()">Cancel</button>
+      <button class="btn btn-primary" (click)="saveTaskEdit()" [disabled]="!editTaskTitle.trim()">
+        <i class="bi bi-check-lg me-1"></i>Save Changes
+      </button>
+    </div>
   </div>
 </div>

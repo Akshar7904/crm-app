@@ -409,3 +409,53 @@
   from { opacity: 0; }
   to   { opacity: 1; }
 }
+
+// ── Task edit modal ─────────────────────────────────────────────────────────
+.task-edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  animation: attachmentViewerFadeIn 0.2s ease;
+}
+
+.task-edit-panel {
+  background: var(--bg-card);
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.task-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.task-edit-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.task-edit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}

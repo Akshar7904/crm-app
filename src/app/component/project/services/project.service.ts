@@ -90,6 +90,10 @@ export class ProjectService {
     return this.http.post<any>(`${this.base}/${projectId}/transactions`, tx).pipe(map(r => r.data.transaction));
   }
 
+  updateTransaction(transactionId: number, tx: Partial<ProjectTransaction>): Observable<ProjectTransaction> {
+    return this.http.put<any>(`${this.base}/transactions/${transactionId}`, tx).pipe(map(r => r.data.transaction));
+  }
+
   deleteTransaction(transactionId: number): Observable<void> {
     return this.http.delete<any>(`${this.base}/transactions/${transactionId}`).pipe(map(() => undefined));
   }
