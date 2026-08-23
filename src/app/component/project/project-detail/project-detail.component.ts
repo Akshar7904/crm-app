@@ -4,8 +4,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { ProjectService } from '../services/project.service';
-import { Project, ProjectTask, TaskStatus, TaskComment, Milestone, MilestoneStatus } from '../models/project.model';
+import { Project, ProjectTask, TaskStatus, TaskComment, Milestone, MilestoneAttachment, MilestoneStatus } from '../models/project.model';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
 
@@ -39,6 +40,12 @@ export class ProjectDetailComponent implements OnInit {
   taskMilestoneFilter: number | 'all' | 'none' = 'all';
   selectedAttachmentFile: File | null = null;
 
+  // In-app attachment viewer — mirrors employee-detail.component.ts's
+  // document viewer (blob URL + DomSanitizer, PDF/image inline, other falls
+  // back to a "download to view" message).
+  viewingAttachment: { milestone: Milestone; attachment: MilestoneAttachment; safeSrc: SafeResourceUrl | SafeUrl | null; type: 'pdf' | 'image' | 'other' } | null = null;
+  private viewerBlobUrl: string | null = null;
+
   // Task comment thread (nested per-task expand) — not part of the Task 6/7 brief's
   // verbatim TypeScript, added to support the comment thread described in the
   // brief's HTML prose (mirrors contract-detail's own message thread handling).
@@ -58,7 +65,8 @@ export class ProjectDetailComponent implements OnInit {
     private router: Router,
     private projectService: ProjectService,
     private notification: NotificationService,
-    private userSvc: UserService
+    private userSvc: UserService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -288,6 +296,42 @@ export class ProjectDetailComponent implements OnInit {
       },
       error: () => this.notification.onError('Failed to download attachment')
     });
+  }
+
+  viewAttachment(milestone: Milestone, attachmentId: number): void {
+    if (!this.project) return;
+    const attachment = (milestone.attachments ?? []).find(a => a.id === attachmentId);
+    if (!attachment) return;
+    this.projectService.downloadMilestoneAttachment(this.project.id, milestone.id, attachmentId).subscribe({
+      next: (blob: Blob) => {
+        if (this.viewerBlobUrl) {
+          window.URL.revokeObjectURL(this.viewerBlobUrl);
+        }
+        this.viewerBlobUrl = window.URL.createObjectURL(blob);
+        const contentType = attachment.contentType || '';
+        let type: 'pdf' | 'image' | 'other' = 'other';
+        let safeSrc: SafeResourceUrl | SafeUrl | null = null;
+
+        if (contentType === 'application/pdf') {
+          type = 'pdf';
+          safeSrc = this.sanitizer.bypassSecurityTrustResourceUrl(this.viewerBlobUrl);
+        } else if (contentType.startsWith('image/')) {
+          type = 'image';
+          safeSrc = this.sanitizer.bypassSecurityTrustUrl(this.viewerBlobUrl);
+        }
+
+        this.viewingAttachment = { milestone, attachment, safeSrc, type };
+      },
+      error: () => this.notification.onError('Failed to load attachment for viewing')
+    });
+  }
+
+  closeAttachmentViewer(): void {
+    if (this.viewerBlobUrl) {
+      window.URL.revokeObjectURL(this.viewerBlobUrl);
+      this.viewerBlobUrl = null;
+    }
+    this.viewingAttachment = null;
   }
 
   deleteAttachment(milestone: Milestone, attachmentId: number): void {
