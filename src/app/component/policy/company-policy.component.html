@@ -22,6 +22,10 @@
         </li>
       </ul>
     </div>
+    <!-- Document types failed to load — never fail silently, give the admin a way to recover -->
+    <button class="btn-banner" *ngIf="policyTypesError" (click)="loadPolicyTypes()">
+      <i class="bi bi-arrow-clockwise me-1"></i>Couldn't load document types — Retry
+    </button>
   </div>
 </div>
 

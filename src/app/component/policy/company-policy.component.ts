@@ -37,6 +37,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   policies: PolicyMeta[] = [];
   policyTypes: PolicyType[] = [];
+  policyTypesError = false;
   searchQuery = '';
 
   // Viewer state
@@ -90,9 +91,15 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
   }
 
   loadPolicyTypes(): void {
+    this.policyTypesError = false;
     this.http.get<any>(`${this.api}/companies/${this.companyId}/policies/types`).subscribe({
       next: res => {
         this.policyTypes = res.data?.types ?? [];
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.policyTypesError = true;
+        this.notification.onError('Failed to load document types. Please refresh the page to try again.');
         this.cdr.markForCheck();
       }
     });
