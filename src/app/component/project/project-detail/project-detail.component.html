@@ -47,6 +47,10 @@
       <i class="bi bi-flag me-1"></i>Milestones
       <span class="tab-badge" *ngIf="milestones.length">{{ milestones.length }}</span>
     </button>
+    <button class="detail-tab" [class.active]="activeTab === 'team'" (click)="activeTab = 'team'">
+      <i class="bi bi-people me-1"></i>Team
+      <span class="tab-badge" *ngIf="members.length">{{ members.length }}</span>
+    </button>
     <button class="detail-tab" [class.active]="activeTab === 'financials'" (click)="activeTab = 'financials'">
       <i class="bi bi-cash-coin me-1"></i>Financials
     </button>
@@ -370,6 +374,48 @@
               </button>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TEAM TAB ══ -->
+  <div *ngIf="activeTab === 'team'">
+    <div class="falcon-card mb-3">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-people text-primary"></i><strong>Team</strong>
+        </div>
+      </div>
+      <div class="card-body p-3">
+        <div class="mb-3" *ngIf="isManagerOrAbove">
+          <div class="d-flex gap-2 flex-wrap">
+            <select class="form-select" style="max-width:260px" [(ngModel)]="newMemberEmployeeId">
+              <option [ngValue]="null" disabled>Select staff member…</option>
+              <option *ngFor="let e of availableEmployeesForTeam" [ngValue]="e.id">{{ e.firstName }} {{ e.lastName }}</option>
+            </select>
+            <input type="text" class="form-control" placeholder="Role on this project (optional), e.g. Developer" style="max-width:260px"
+                   [(ngModel)]="newMemberRoleLabel">
+            <button class="btn btn-primary" (click)="addMember()" [disabled]="!newMemberEmployeeId">
+              <i class="bi bi-person-plus me-1"></i>Add Staff or Resource
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="!members.length" class="empty-state-cell py-4">
+          <i class="bi bi-people d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No staff or resources added to this project yet</div>
+        </div>
+
+        <div class="member-row d-flex align-items-center justify-content-between" *ngFor="let member of members">
+          <div>
+            <span class="fw-semibold">{{ member.employeeName }}</span>
+            <span class="badge badge-soft-secondary ms-2" *ngIf="member.roleLabel">{{ member.roleLabel }}</span>
+            <span class="text-muted small ms-2" *ngIf="member.addedByName">Added by {{ member.addedByName }}</span>
+          </div>
+          <button class="btn btn-sm btn-outline-danger" *ngIf="isManagerOrAbove" (click)="removeMember(member)" title="Remove from project team">
+            <i class="bi bi-trash me-1"></i>Remove
+          </button>
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { ProjectService } from '../services/project.service';
-import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus } from '../models/project.model';
+import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus, ProjectMember } from '../models/project.model';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
 import { EmployeeService } from '../../../service/employee.service';
@@ -19,7 +19,7 @@ import { EmployeeService } from '../../../service/employee.service';
 })
 export class ProjectDetailComponent implements OnInit {
   project: Project | null = null;
-  activeTab: 'overview' | 'tasks' | 'milestones' | 'financials' = 'overview';
+  activeTab: 'overview' | 'tasks' | 'milestones' | 'team' | 'financials' = 'overview';
   taskView: 'list' | 'kanban' = 'list';
   loading = false;
 
@@ -52,6 +52,12 @@ export class ProjectDetailComponent implements OnInit {
   // create, and the fields are pre-filled from the milestone being edited.
   editingMilestoneId: number | null = null;
   newMilestoneDescription = '';
+
+  // Team — staff/resources associated with the project as a whole (distinct
+  // from per-task assignees). Add form: pick an employee + optional role label.
+  members: ProjectMember[] = [];
+  newMemberEmployeeId: number | null = null;
+  newMemberRoleLabel = '';
 
   // Financials — add/edit share one form (editingTransactionId set = editing).
   employees: any[] = [];
@@ -109,7 +115,7 @@ export class ProjectDetailComponent implements OnInit {
   load(id: number): void {
     this.loading = true;
     this.projectService.getById(id).subscribe({
-      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.loading = false; this.rebuildKanbanColumns(); },
+      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.members = p.members ?? []; this.loading = false; this.rebuildKanbanColumns(); },
       error: () => { this.loading = false; }
     });
   }
@@ -434,6 +440,38 @@ export class ProjectDetailComponent implements OnInit {
         this.notification.onSuccess('Attachment deleted');
       },
       error: e => this.notification.onError(e?.error?.message || 'Delete failed')
+    });
+  }
+
+  // ── Team ──────────────────────────────────────────────────────────────────
+  get availableEmployeesForTeam(): any[] {
+    const existingIds = new Set(this.members.map(m => m.employeeId));
+    return this.employees.filter(e => !existingIds.has(e.id));
+  }
+
+  addMember(): void {
+    if (!this.project || !this.newMemberEmployeeId) return;
+    const employee = this.employees.find(e => e.id === this.newMemberEmployeeId);
+    if (!employee) return;
+    this.projectService.addMember(this.project.id, {
+      employeeId: employee.id,
+      employeeName: `${employee.firstName} ${employee.lastName}`,
+      roleLabel: this.newMemberRoleLabel.trim() || undefined
+    }).subscribe({
+      next: (member) => {
+        this.members = [...this.members, member];
+        this.newMemberEmployeeId = null;
+        this.newMemberRoleLabel = '';
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to add team member')
+    });
+  }
+
+  removeMember(member: ProjectMember): void {
+    if (!this.project) return;
+    this.projectService.removeMember(this.project.id, member.id).subscribe({
+      next: () => { this.members = this.members.filter(m => m.id !== member.id); },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to remove team member')
     });
   }
 

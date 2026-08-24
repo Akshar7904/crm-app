@@ -67,6 +67,16 @@
             </div>
           </div>
 
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Project Owner</label>
+              <select class="form-select" formControlName="ownerId">
+                <option [ngValue]="null">No owner assigned</option>
+                <option *ngFor="let e of employees" [ngValue]="e.id">{{ e.firstName }} {{ e.lastName }}</option>
+              </select>
+            </div>
+          </div>
+
           <div class="mb-0">
             <label class="form-label">Description</label>
             <textarea class="form-control" formControlName="description" rows="3"

@@ -76,6 +76,17 @@ export interface Milestone {
   attachments?: MilestoneAttachment[];
 }
 
+export interface ProjectMember {
+  id: number;
+  projectId: number;
+  employeeId: number;
+  employeeName: string;
+  roleLabel?: string;
+  addedById?: number;
+  addedByName?: string;
+  createdAt: string;
+}
+
 export interface Project {
   id: number;
   projectNumber: string;
@@ -100,6 +111,7 @@ export interface Project {
   tasks?: ProjectTask[];
   milestones?: Milestone[];
   transactions?: ProjectTransaction[];
+  members?: ProjectMember[];
 }
 
 export interface ProjectPage {

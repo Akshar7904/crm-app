@@ -234,6 +234,14 @@
   margin-bottom: 12px;
 }
 
+.member-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
 .progress {
   background: var(--bg-hover);
   border-radius: 4px;

@@ -6,7 +6,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Project, ProjectPage, ProjectStats, ProjectTask, TaskComment, ProjectTransaction, TaskStatus, Milestone, MilestoneStatus } from '../models/project.model';
+import { Project, ProjectPage, ProjectStats, ProjectTask, TaskComment, ProjectTransaction, TaskStatus, Milestone, MilestoneStatus, ProjectMember } from '../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -132,5 +132,18 @@ export class ProjectService {
 
   deleteMilestoneAttachment(projectId: number, milestoneId: number, attachmentId: number): Observable<void> {
     return this.http.delete<any>(`${this.base}/${projectId}/milestones/${milestoneId}/attachments/${attachmentId}`).pipe(map(() => undefined));
+  }
+
+  // ── Team Members ───────────────────────────────────────────────────────
+  getMembers(projectId: number): Observable<ProjectMember[]> {
+    return this.http.get<any>(`${this.base}/${projectId}/members`).pipe(map(r => r.data.members));
+  }
+
+  addMember(projectId: number, member: Partial<ProjectMember>): Observable<ProjectMember> {
+    return this.http.post<any>(`${this.base}/${projectId}/members`, member).pipe(map(r => r.data.member));
+  }
+
+  removeMember(projectId: number, memberId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${projectId}/members/${memberId}`).pipe(map(() => undefined));
   }
 }
