@@ -431,15 +431,21 @@
         <span class="text-muted small">{{ project.transactions?.length || 0 }} transaction(s)</span>
       </div>
       <div class="card-body">
-        <div class="d-flex gap-2 flex-wrap mb-3" *ngIf="isManagerOrAbove">
-          <input type="date" class="form-control" style="max-width:170px" [(ngModel)]="txDate">
+        <div class="d-flex gap-2 flex-wrap align-items-start mb-3" *ngIf="isManagerOrAbove">
+          <div>
+            <input type="date" class="form-control" style="max-width:170px" required
+                   [class.is-invalid]="!txDate" [(ngModel)]="txDate" title="Date is required">
+            <div class="invalid-feedback" *ngIf="!txDate">Date is required</div>
+          </div>
           <select class="form-select" style="max-width:140px" [(ngModel)]="txType">
             <option value="INCOME">Income</option>
             <option value="EXPENSE">Expense</option>
           </select>
-          <input type="number" class="form-control" placeholder="Amount" style="max-width:150px" min="0.01" step="0.01" [(ngModel)]="txAmount">
+          <input type="number" class="form-control" placeholder="Amount (required)" style="max-width:170px" min="0.01" step="0.01" required
+                 [(ngModel)]="txAmount" title="Amount must be greater than 0">
           <input type="text" class="form-control" placeholder="Description (optional)" [(ngModel)]="txDescription">
-          <button class="btn btn-primary" (click)="saveTransaction()" [disabled]="!txDate || txAmount === null || txAmount <= 0">
+          <button class="btn btn-primary" (click)="saveTransaction()" [disabled]="!txDate || txAmount === null || txAmount <= 0"
+                  [title]="(!txDate || txAmount === null || txAmount <= 0) ? 'Enter a date and an amount greater than 0 first' : ''">
             <i class="bi" [ngClass]="editingTransactionId ? 'bi-check-lg' : 'bi-plus-lg'"></i>
             {{ editingTransactionId ? ' Save Changes' : ' Add Transaction' }}
           </button>

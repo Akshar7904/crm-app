@@ -62,7 +62,11 @@ export class ProjectDetailComponent implements OnInit {
   // Financials — add/edit share one form (editingTransactionId set = editing).
   employees: any[] = [];
   editingTransactionId: number | null = null;
-  txDate = '';
+  // Defaults to today — the "Add Transaction" button stays disabled until a
+  // date is set, and an empty date field gave no visual sign it was required,
+  // so the button just looked unresponsive if someone filled in amount/type
+  // and skipped it.
+  txDate = new Date().toISOString().slice(0, 10);
   txType: 'INCOME' | 'EXPENSE' = 'INCOME';
   txAmount: number | null = null;
   txDescription = '';
@@ -514,7 +518,7 @@ export class ProjectDetailComponent implements OnInit {
 
   cancelTransactionEdit(): void {
     this.editingTransactionId = null;
-    this.txDate = '';
+    this.txDate = new Date().toISOString().slice(0, 10);
     this.txType = 'INCOME';
     this.txAmount = null;
     this.txDescription = '';
