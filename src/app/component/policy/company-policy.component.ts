@@ -22,6 +22,8 @@ export interface PolicyType {
   label: string;
 }
 
+const QUICK_PICK_TYPES = ['COMPANY_DOCUMENT', 'COMPLIANCE_DOCUMENT', 'FINANCIAL_DOCUMENT', 'LEGAL_DOCUMENT', 'CONTRACT_DOCUMENT', 'OTHER'];
+
 @Component({
   standalone: false,
   selector: 'app-company-policy',
@@ -53,6 +55,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
   uploadLabel     = '';
   selectedFile: File | null = null;
   uploading       = false;
+  replacingPolicyId: number | null = null;
 
   // Delete confirm state
   deletingId: number | null = null;
@@ -178,20 +181,22 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   // ── Upload modal ────────────────────────────────────────────────────────────
 
-  openUploadModal(type = '', label = ''): void {
+  openUploadModal(type = '', label = '', policyId: number | null = null): void {
     this.uploadType      = type;
     this.uploadLabel     = label;
+    this.replacingPolicyId = policyId;
     this.selectedFile    = null;
     this.showUploadModal = true;
     this.cdr.markForCheck();
   }
 
   openReplaceModal(policy: PolicyMeta): void {
-    this.openUploadModal(policy.policyType, policy.displayName);
+    this.openUploadModal(policy.policyType, policy.displayName, policy.id);
   }
 
   closeUploadModal(): void {
     this.showUploadModal = false;
+    this.replacingPolicyId = null;
     this.cdr.markForCheck();
   }
 
@@ -209,15 +214,20 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   submitUpload(): void {
     if (!this.selectedFile || !this.uploadType || !this.companyId) return;
+    if (this.isOtherSelected && !this.uploadLabel.trim()) return;
     this.uploading = true;
     const form = new FormData();
     form.append('file', this.selectedFile);
     form.append('policyType', this.uploadType);
     form.append('displayName', this.uploadLabel);
+    if (this.replacingPolicyId != null) {
+      form.append('policyId', String(this.replacingPolicyId));
+    }
     this.http.post<any>(`${this.api}/companies/${this.companyId}/policies`, form).subscribe({
       next: () => {
         this.uploading       = false;
         this.showUploadModal = false;
+        this.replacingPolicyId = null;
         this.notification.onDefault('Document uploaded successfully.');
         this.loadPolicies();
       },
@@ -272,5 +282,15 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
       (p.fileName ?? '').toLowerCase().includes(q) ||
       this.labelFor(p.policyType).toLowerCase().includes(q)
     );
+  }
+
+  get quickPickTypes(): PolicyType[] {
+    return QUICK_PICK_TYPES
+      .map(v => this.policyTypes.find(t => t.value === v))
+      .filter((t): t is PolicyType => !!t);
+  }
+
+  get isOtherSelected(): boolean {
+    return this.uploadType === 'OTHER';
   }
 }

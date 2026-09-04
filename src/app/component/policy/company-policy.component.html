@@ -14,10 +14,10 @@
         <i class="bi bi-plus-circle me-1"></i>Add Company Document
       </button>
       <ul class="dropdown-menu dropdown-menu-end">
-        <li *ngFor="let t of policyTypes">
-          <button class="dropdown-item" (click)="openUploadModal(t.value, t.label)">
+        <li *ngFor="let t of quickPickTypes">
+          <button class="dropdown-item" (click)="openUploadModal(t.value, '')">
             {{ t.label }}
-            <span *ngIf="uploadedTypes.has(t.value)" class="text-muted ms-1" style="font-size:.75rem">(replace)</span>
+            <span *ngIf="t.value !== 'OTHER' && uploadedTypes.has(t.value)" class="text-muted ms-1" style="font-size:.75rem">(replace)</span>
           </button>
         </li>
       </ul>
@@ -161,8 +161,17 @@
         </select>
       </div>
       <div class="mb-3">
-        <label class="form-label fw-medium">Display Name <span class="text-muted fw-normal">(optional)</span></label>
-        <input class="form-control" [(ngModel)]="uploadLabel" placeholder="e.g. Code of Conduct 2026" [disabled]="uploading">
+        <label class="form-label fw-medium">
+          Display Name
+          <span class="text-muted fw-normal" *ngIf="!isOtherSelected">(optional)</span>
+          <span class="text-danger" *ngIf="isOtherSelected">*</span>
+        </label>
+        <input class="form-control" [(ngModel)]="uploadLabel"
+               [placeholder]="isOtherSelected ? 'Name this document, e.g. Site Access Permit' : 'e.g. Code of Conduct 2026'"
+               [disabled]="uploading">
+        <div class="form-text text-danger" *ngIf="isOtherSelected && !uploadLabel.trim()">
+          A name is required for "Other" documents.
+        </div>
       </div>
       <div class="mb-3">
         <label class="form-label fw-medium">PDF File</label>
@@ -180,7 +189,7 @@
     <div class="upload-modal-footer">
       <button class="btn btn-outline-secondary" (click)="closeUploadModal()" [disabled]="uploading">Cancel</button>
       <button class="btn btn-primary" (click)="submitUpload()"
-              [disabled]="!selectedFile || !uploadType || uploading">
+              [disabled]="!selectedFile || !uploadType || uploading || (isOtherSelected && !uploadLabel.trim())">
         <span *ngIf="uploading"><span class="spinner-border spinner-border-sm me-1"></span>Uploading…</span>
         <span *ngIf="!uploading"><i class="bi bi-upload me-1"></i>Upload</span>
       </button>
