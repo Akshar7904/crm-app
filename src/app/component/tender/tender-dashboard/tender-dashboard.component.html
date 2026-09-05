@@ -1,0 +1,165 @@
+<div class="page-banner">
+  <div class="banner-title">Tender Management</div>
+  <p class="banner-subtitle">Track tenders from decision through submission and outcome</p>
+  <div class="banner-actions">
+    <button class="btn btn-banner" (click)="openAddModal()">
+      <i class="bi bi-plus-lg me-2"></i>Add Tender
+    </button>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4" *ngIf="stats">
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-primary">{{ stats.activeCount }}</div>
+      <div class="stat-label">Active Tenders</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-warning">{{ stats.closingSoonCount }}</div>
+      <div class="stat-label">Closing Soon</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-info">{{ stats.submittedCount }}</div>
+      <div class="stat-label">Submitted</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="falcon-card p-3 text-center">
+      <div class="stat-value text-success">{{ stats.wonCount }}</div>
+      <div class="stat-label">Won — R {{ (stats.wonValue || 0) | number:'1.0-0' }}</div>
+    </div>
+  </div>
+</div>
+
+<!-- Table Card -->
+<div class="table-card">
+  <div class="table-card-header">
+    <strong>Current Tenders</strong>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover mb-0">
+      <thead>
+        <tr>
+          <th>Tender</th>
+          <th>Status</th>
+          <th>Progress</th>
+          <th>Closing Date</th>
+          <th>Bid Lead</th>
+          <th>Go/No-Go Owner</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="7" class="text-center py-4">
+            <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
+          </td>
+        </tr>
+        <tr *ngIf="!loading && tenders.length === 0">
+          <td colspan="7" class="empty-state-cell">
+            <i class="bi bi-file-earmark-text fs-2 d-block mb-2 text-muted"></i>
+            No tenders yet
+          </td>
+        </tr>
+        <tr *ngFor="let t of tenders" class="cursor-pointer" (click)="openTender(t.id)">
+          <td>
+            <div class="fw-semibold">{{ t.title }}</div>
+            <small class="text-muted">{{ t.tenderReference }} · {{ t.issuingOrganisation || '—' }}</small>
+          </td>
+          <td>
+            <span class="badge"
+                  [ngClass]="{
+                    'badge-soft-secondary': t.status === 'NEW',
+                    'badge-soft-warning': t.status === 'DECISION_REQUIRED',
+                    'badge-soft-info': t.status === 'IN_PROGRESS' || t.status === 'FINAL_REVIEW',
+                    'badge-soft-primary': t.status === 'SUBMITTED',
+                    'badge-soft-success': t.status === 'CLOSED'
+                  }">{{ t.status }}</span>
+          </td>
+          <td>{{ t.progressPercent || 0 }}%</td>
+          <td>
+            <div>{{ t.closingDate ? (t.closingDate | date:'d MMM yyyy') : '—' }}</div>
+            <small class="text-muted" *ngIf="closingCountdownDays(t) !== null">
+              {{ closingCountdownDays(t)! >= 0 ? closingCountdownDays(t) + ' days left' : 'Closed' }}
+            </small>
+          </td>
+          <td>{{ t.bidLeadName || '—' }}</td>
+          <td>{{ t.goNoGoOwnerName || '—' }}</td>
+          <td>R {{ (t.estimatedValue || 0) | number:'1.0-0' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="d-flex justify-content-end align-items-center px-3 py-2 border-top" *ngIf="totalPages > 1">
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="page === 0">
+          <button class="page-link" (click)="goToPage(page - 1)">‹</button>
+        </li>
+        <li *ngFor="let p of [].constructor(totalPages); let i = index" class="page-item" [class.active]="page === i">
+          <button class="page-link" (click)="goToPage(i)">{{ i + 1 }}</button>
+        </li>
+        <li class="page-item" [class.disabled]="page >= totalPages - 1">
+          <button class="page-link" (click)="goToPage(page + 1)">›</button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- Add Tender Modal -->
+<div class="modal-backdrop-custom" *ngIf="showAddModal" (click)="closeAddModal()"></div>
+<div class="upload-modal" *ngIf="showAddModal">
+  <div class="upload-modal-content">
+    <div class="upload-modal-header">
+      <h6 class="mb-0 fw-semibold">Add Tender</h6>
+      <button class="btn-close" (click)="closeAddModal()"></button>
+    </div>
+    <div class="upload-modal-body">
+      <div class="mb-3">
+        <label class="form-label fw-medium">Tender Title *</label>
+        <input class="form-control" [(ngModel)]="newTender.title" [disabled]="saving">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Issuing Organisation</label>
+        <input class="form-control" [(ngModel)]="newTender.issuingOrganisation" [disabled]="saving">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Tender Reference</label>
+        <input class="form-control" [(ngModel)]="newTender.tenderReference" placeholder="e.g. GT/GDID/118/2026" [disabled]="saving">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Closing Date</label>
+        <input type="datetime-local" class="form-control" [(ngModel)]="newTender.closingDate" [disabled]="saving">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Bid Lead</label>
+        <select class="form-select" (change)="onBidLeadChange($any($event.target).value)" [disabled]="saving">
+          <option value="">Select…</option>
+          <option *ngFor="let e of employees" [value]="e.id">{{ e.firstName }} {{ e.lastName }}</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Go/No-Go Owner</label>
+        <select class="form-select" (change)="onGoNoGoOwnerChange($any($event.target).value)" [disabled]="saving">
+          <option value="">Select…</option>
+          <option *ngFor="let e of employees" [value]="e.id">{{ e.firstName }} {{ e.lastName }}</option>
+        </select>
+      </div>
+    </div>
+    <div class="upload-modal-footer">
+      <button class="btn btn-outline-secondary" (click)="closeAddModal()" [disabled]="saving">Cancel</button>
+      <button class="btn btn-primary" (click)="submitNewTender()" [disabled]="!newTender.title.trim() || saving">
+        <span *ngIf="saving"><span class="spinner-border spinner-border-sm me-1"></span>Saving…</span>
+        <span *ngIf="!saving">Add Tender</span>
+      </button>
+    </div>
+  </div>
+</div>

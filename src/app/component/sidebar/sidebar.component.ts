@@ -511,6 +511,25 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
       ]
     },
     {
+      label: 'Tenders',
+      icon: 'bi-file-earmark-text',
+      expanded: false,
+      moduleKey: 'TENDER_MANAGEMENT',
+      children: [
+        {
+          label: 'All Tenders',
+          icon: 'bi-file-earmark-text',
+          route: '/tenders',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Document Vault',
+          icon: 'bi-shield-check',
+          route: '/policy'
+        }
+      ]
+    },
+    {
       label: 'Assets',
       icon: 'bi-laptop',
       expanded: false,

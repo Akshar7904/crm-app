@@ -231,6 +231,16 @@ const routes: Routes = [
   },
 
   // =============================================
+  // TENDER MANAGEMENT
+  // =============================================
+  {
+    path: 'tenders',
+    loadChildren: () => import('./component/tender/tender.module').then(m => m.TenderModule),
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Tender Management', moduleKey: 'TENDER_MANAGEMENT' }
+  },
+
+  // =============================================
   // ASSET MANAGEMENT
   // =============================================
   {
