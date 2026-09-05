@@ -231,6 +231,41 @@
     </div>
   </div>
 
+  <!-- Bid Documents -->
+  <div *ngIf="activeTab === 'documents'">
+    <div class="table-card">
+      <div class="table-card-header">
+        <strong>Bid Documents</strong>
+        <button class="btn btn-sm btn-primary" (click)="openAddBidDocumentModal()"><i class="bi bi-plus-lg me-1"></i>Add Document</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Document</th><th>Category</th><th>Description</th><th>Version</th><th>Updated</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngIf="!tender.bidDocuments?.length"><td colspan="6" class="empty-state-cell">No bid documents yet</td></tr>
+            <tr *ngFor="let d of tender.bidDocuments">
+              <td class="fw-semibold">{{ d.displayName || d.fileName }}</td>
+              <td><span class="badge badge-soft-secondary">{{ d.category }}</span></td>
+              <td>{{ d.description || '—' }}</td>
+              <td>v{{ d.version }}</td>
+              <td>{{ d.updatedAt ? (d.updatedAt | date:'d MMM yyyy') : (d.createdAt | date:'d MMM yyyy') }}</td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-primary" (click)="viewBidDocument(d)" title="View"><i class="bi bi-eye"></i></button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="downloadBidDocumentFile(d)" title="Download"><i class="bi bi-download"></i></button>
+                <button class="btn btn-sm btn-outline-secondary" (click)="openEditBidDocumentModal(d)" title="Edit"><i class="bi bi-pencil"></i></button>
+                <label class="btn btn-sm btn-outline-secondary mb-0" title="Replace">
+                  <i class="bi bi-arrow-repeat"></i>
+                  <input type="file" hidden (change)="onReplaceFileSelected(d, $event)" [disabled]="replacingBidDocumentId === d.id">
+                </label>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteBidDocument(d)" title="Delete"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- Add/Edit Task Modal -->
   <div class="modal-backdrop-custom" *ngIf="showTaskModal" (click)="closeTaskModal()"></div>
   <div class="upload-modal" *ngIf="showTaskModal">
@@ -340,6 +375,54 @@
       <div class="upload-modal-footer">
         <button class="btn btn-outline-secondary" (click)="closePricingLineModal()" [disabled]="savingPricingLine">Cancel</button>
         <button class="btn btn-primary" (click)="submitPricingLine()" [disabled]="!pricingLineForm.itemName.trim() || savingPricingLine">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Bid Document Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showBidDocumentModal" (click)="closeBidDocumentModal()"></div>
+  <div class="upload-modal" *ngIf="showBidDocumentModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ bidDocumentModalMode === 'add' ? 'Add Document' : 'Edit Document' }}</h6>
+        <button class="btn-close" (click)="closeBidDocumentModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <select class="form-select" [(ngModel)]="bidDocumentForm.category">
+            <option value="COVER_LETTER">Cover Letter</option>
+            <option value="PROPOSAL">Proposal</option>
+            <option value="SUPPORTING_SCHEDULE">Supporting Schedule</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">
+            Display Name <span class="text-danger" *ngIf="bidDocumentDisplayNameRequired">*</span>
+          </label>
+          <input class="form-control" [(ngModel)]="bidDocumentForm.displayName"
+                 [placeholder]="bidDocumentDisplayNameRequired ? 'Name this document' : 'Optional'">
+        </div>
+        <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="bidDocumentForm.description"></div>
+        <div class="mb-3" *ngIf="bidDocumentModalMode === 'add'">
+          <label class="form-label">File</label>
+          <div class="file-drop-zone" [class.has-file]="bidDocumentFile">
+            <i class="bi bi-file-earmark fs-2" [class.text-danger]="bidDocumentFile" [class.text-muted]="!bidDocumentFile"></i>
+            <div class="mt-2 small">
+              <span *ngIf="bidDocumentFile">{{ bidDocumentFile.name }}</span>
+              <span *ngIf="!bidDocumentFile">Click to select a file</span>
+            </div>
+            <input type="file" (change)="onBidDocumentFileSelected($event)">
+          </div>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeBidDocumentModal()" [disabled]="savingBidDocument">Cancel</button>
+        <button class="btn btn-primary" (click)="submitBidDocument()"
+                [disabled]="savingBidDocument || (bidDocumentDisplayNameRequired && !bidDocumentForm.displayName.trim()) || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
+          Save
+        </button>
       </div>
     </div>
   </div>

@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
-import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine } from '../models/tender.model';
+import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine, TenderBidDocument } from '../models/tender.model';
 
 export type TenderDetailTab = 'overview' | 'tasks' | 'requirements' | 'pricing' | 'documents' | 'submission' | 'postbid';
 
@@ -358,6 +358,108 @@ export class TenderDetailComponent implements OnInit {
     this.tenderService.finalisePricing(this.tender.id).subscribe({
       next: t => { this.tender = { ...this.tender, ...t }; this.finalisingPricing = false; this.notification.onDefault('Bid price finalised.'); },
       error: () => { this.finalisingPricing = false; this.notification.onError('Failed to finalise pricing.'); }
+    });
+  }
+
+  // ── Bid Documents ──────────────────────────────────────────────────────
+  showBidDocumentModal = false;
+  bidDocumentModalMode: 'add' | 'edit' = 'add';
+  editingBidDocumentId: number | null = null;
+  bidDocumentForm = this.emptyBidDocumentForm();
+  bidDocumentFile: File | null = null;
+  savingBidDocument = false;
+  replacingBidDocumentId: number | null = null;
+
+  private emptyBidDocumentForm() {
+    return { category: 'COVER_LETTER' as TenderBidDocument['category'], displayName: '', description: '' };
+  }
+
+  get bidDocumentDisplayNameRequired(): boolean {
+    return this.bidDocumentForm.category === 'OTHER';
+  }
+
+  openAddBidDocumentModal(): void {
+    this.bidDocumentForm = this.emptyBidDocumentForm();
+    this.bidDocumentFile = null;
+    this.bidDocumentModalMode = 'add';
+    this.editingBidDocumentId = null;
+    this.showBidDocumentModal = true;
+  }
+
+  openEditBidDocumentModal(doc: TenderBidDocument): void {
+    this.bidDocumentForm = { category: doc.category, displayName: doc.displayName || '', description: doc.description || '' };
+    this.bidDocumentModalMode = 'edit';
+    this.editingBidDocumentId = doc.id;
+    this.showBidDocumentModal = true;
+  }
+
+  closeBidDocumentModal(): void { this.showBidDocumentModal = false; }
+
+  onBidDocumentFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.bidDocumentFile = input.files?.length ? input.files[0] : null;
+  }
+
+  submitBidDocument(): void {
+    if (!this.tender) return;
+    if (this.bidDocumentDisplayNameRequired && !this.bidDocumentForm.displayName.trim()) return;
+    this.savingBidDocument = true;
+    if (this.bidDocumentModalMode === 'add') {
+      if (!this.bidDocumentFile) { this.savingBidDocument = false; return; }
+      this.tenderService.createBidDocument(this.tender.id, this.bidDocumentFile, this.bidDocumentForm.category, this.bidDocumentForm.displayName, this.bidDocumentForm.description).subscribe({
+        next: () => { this.savingBidDocument = false; this.showBidDocumentModal = false; this.reload(); this.notification.onDefault('Document uploaded.'); },
+        error: () => { this.savingBidDocument = false; this.notification.onError('Failed to upload document.'); }
+      });
+    } else if (this.editingBidDocumentId) {
+      this.tenderService.updateBidDocument(this.tender.id, this.editingBidDocumentId, this.bidDocumentForm).subscribe({
+        next: () => { this.savingBidDocument = false; this.showBidDocumentModal = false; this.reload(); this.notification.onDefault('Document updated.'); },
+        error: () => { this.savingBidDocument = false; this.notification.onError('Failed to update document.'); }
+      });
+    }
+  }
+
+  onReplaceFileSelected(doc: TenderBidDocument, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!this.tender || !input.files?.length) return;
+    this.replacingBidDocumentId = doc.id;
+    this.tenderService.replaceBidDocument(this.tender.id, doc.id, input.files[0]).subscribe({
+      next: () => { this.replacingBidDocumentId = null; this.reload(); this.notification.onDefault('Document replaced.'); },
+      error: () => { this.replacingBidDocumentId = null; this.notification.onError('Failed to replace document.'); }
+    });
+  }
+
+  viewBidDocument(doc: TenderBidDocument): void {
+    if (!this.tender) return;
+    this.tenderService.downloadBidDocument(this.tender.id, doc.id).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      },
+      error: () => this.notification.onError('Failed to open document.')
+    });
+  }
+
+  downloadBidDocumentFile(doc: TenderBidDocument): void {
+    if (!this.tender) return;
+    this.tenderService.downloadBidDocument(this.tender.id, doc.id).subscribe({
+      next: blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = doc.fileName || 'document';
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      },
+      error: () => this.notification.onError('Failed to download document.')
+    });
+  }
+
+  deleteBidDocument(doc: TenderBidDocument): void {
+    if (!this.tender) return;
+    this.tenderService.deleteBidDocument(this.tender.id, doc.id).subscribe({
+      next: () => { this.reload(); this.notification.onDefault('Document removed.'); },
+      error: () => this.notification.onError('Failed to delete document.')
     });
   }
 }
