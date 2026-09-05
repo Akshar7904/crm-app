@@ -1,0 +1,99 @@
+<div *ngIf="loading" class="text-center py-5">
+  <div class="spinner-border text-primary"></div>
+</div>
+
+<ng-container *ngIf="!loading && tender">
+  <div class="page-banner">
+    <div class="banner-title">{{ tender.title }}</div>
+    <p class="banner-subtitle">{{ tender.tenderReference }} · {{ tender.issuingOrganisation || '—' }}</p>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'overview'" (click)="setTab('overview')">Overview</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'tasks'" (click)="setTab('tasks')">Tasks</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'requirements'" (click)="setTab('requirements')">Requirements</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'pricing'" (click)="setTab('pricing')">Pricing</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'documents'" (click)="setTab('documents')">Bid Documents</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'submission'" (click)="setTab('submission')">Submission</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'postbid'" (click)="setTab('postbid')">Post-bid</button></li>
+  </ul>
+
+  <!-- Overview -->
+  <div *ngIf="activeTab === 'overview'">
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ tender.progressPercent || 0 }}%</div><div class="stat-label">Progress</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ tender.goNoGoDecision }}</div><div class="stat-label">Go/No-Go</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ (tender.tasks?.length || 0) }}</div><div class="stat-label">Tasks</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ (tender.requirements?.length || 0) }}</div><div class="stat-label">Requirements</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ (tender.bidDocuments?.length || 0) }}</div><div class="stat-label">Bid Documents</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ tender.pricingFinalised ? 'Final' : 'Draft' }}</div><div class="stat-label">Pricing</div></div></div>
+    </div>
+
+    <div class="falcon-card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-start">
+        <strong>Tender Summary</strong>
+        <button class="btn btn-sm btn-outline-secondary" (click)="startEditOverview()" *ngIf="!editingOverview">
+          <i class="bi bi-pencil me-1"></i>Edit
+        </button>
+      </div>
+
+      <div *ngIf="!editingOverview" class="row g-3 mt-1">
+        <div class="col-md-4"><small class="text-muted d-block">Issuing Organisation</small>{{ tender.issuingOrganisation || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Tender Reference</small>{{ tender.tenderReference || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Estimated Value</small>R {{ (tender.estimatedValue || 0) | number:'1.0-0' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Closing Date</small>{{ tender.closingDate ? (tender.closingDate | date:'d MMM yyyy, HH:mm') : '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Bid Lead</small>{{ tender.bidLeadName || '—' }}</div>
+        <div class="col-md-4">
+          <small class="text-muted d-block">Published Tender Document</small>
+          <span *ngIf="!tender.attachmentFileName">No document uploaded</span>
+          <button *ngIf="tender.attachmentFileName" class="btn btn-sm btn-link p-0" (click)="downloadAttachment()">{{ tender.attachmentFileName }}</button>
+          <label class="btn btn-sm btn-outline-secondary ms-2 mb-0">
+            {{ tender.attachmentFileName ? 'Replace' : 'Upload' }}
+            <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
+          </label>
+        </div>
+      </div>
+
+      <div *ngIf="editingOverview" class="row g-3 mt-1">
+        <div class="col-md-6"><label class="form-label">Title</label><input class="form-control" [(ngModel)]="overviewForm.title"></div>
+        <div class="col-md-6"><label class="form-label">Issuing Organisation</label><input class="form-control" [(ngModel)]="overviewForm.issuingOrganisation"></div>
+        <div class="col-md-6"><label class="form-label">Tender Reference</label><input class="form-control" [(ngModel)]="overviewForm.tenderReference"></div>
+        <div class="col-md-6"><label class="form-label">Estimated Value</label><input type="number" class="form-control" [(ngModel)]="overviewForm.estimatedValue"></div>
+        <div class="col-md-6"><label class="form-label">Closing Date</label><input type="datetime-local" class="form-control" [(ngModel)]="overviewForm.closingDate"></div>
+        <div class="col-md-6">
+          <label class="form-label">Bid Lead</label>
+          <select class="form-select" (change)="onOverviewBidLeadChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === overviewForm.bidLeadId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-primary btn-sm" (click)="saveOverview()" [disabled]="savingOverview">Save</button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="cancelEditOverview()" [disabled]="savingOverview">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3">
+      <strong>Go/No-Go Decision</strong>
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
+          <label class="form-label">Allocated To</label>
+          <select class="form-select" (change)="onGoNoGoOwnerChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === goNoGoOwnerId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Decision Reason</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="goNoGoReason"></textarea>
+        </div>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-success btn-sm" (click)="submitGoNoGo('GO')" [disabled]="savingGoNoGo">Go</button>
+          <button class="btn btn-outline-danger btn-sm" (click)="submitGoNoGo('NO_GO')" [disabled]="savingGoNoGo">No-Go</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>

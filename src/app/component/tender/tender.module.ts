@@ -7,10 +7,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TenderRoutingModule } from './tender-routing.module';
 import { TenderService } from './services/tender.service';
 import { TenderDashboardComponent } from './tender-dashboard/tender-dashboard.component';
+import { TenderDetailComponent } from './tender-detail/tender-detail.component';
 
 @NgModule({
   declarations: [
-    TenderDashboardComponent
+    TenderDashboardComponent,
+    TenderDetailComponent
   ],
   imports: [
     CommonModule,
