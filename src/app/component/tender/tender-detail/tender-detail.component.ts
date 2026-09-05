@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
-import { Tender } from '../models/tender.model';
+import { Tender, TenderTaskItem, TenderRequirement } from '../models/tender.model';
 
 export type TenderDetailTab = 'overview' | 'tasks' | 'requirements' | 'pricing' | 'documents' | 'submission' | 'postbid';
 
@@ -185,6 +185,120 @@ export class TenderDetailComponent implements OnInit {
         this.savingGoNoGo = false;
         this.notification.onError('Failed to save decision.');
       }
+    });
+  }
+
+  // ── Tasks ──────────────────────────────────────────────────────────────
+  showTaskModal = false;
+  editingTaskId: number | null = null;
+  taskForm = this.emptyTaskForm();
+  savingTask = false;
+
+  private emptyTaskForm() {
+    return { description: '', allocatedToId: null as number | null, allocatedToName: '', dueDate: '', status: 'NOT_STARTED' as TenderTaskItem['status'] };
+  }
+
+  openAddTaskModal(): void {
+    this.taskForm = this.emptyTaskForm();
+    this.editingTaskId = null;
+    this.showTaskModal = true;
+  }
+
+  openEditTaskModal(task: TenderTaskItem): void {
+    this.taskForm = { description: task.description, allocatedToId: task.allocatedToId ?? null, allocatedToName: task.allocatedToName || '', dueDate: task.dueDate || '', status: task.status };
+    this.editingTaskId = task.id;
+    this.showTaskModal = true;
+  }
+
+  closeTaskModal(): void { this.showTaskModal = false; }
+
+  onTaskAllocatedToChange(employeeId: string): void {
+    const emp = this.employees.find(e => String(e.id) === employeeId);
+    this.taskForm.allocatedToId = emp ? emp.id : null;
+    this.taskForm.allocatedToName = emp ? `${emp.firstName} ${emp.lastName}` : '';
+  }
+
+  submitTask(): void {
+    if (!this.tender || !this.taskForm.description.trim()) return;
+    this.savingTask = true;
+    const body = {
+      description: this.taskForm.description,
+      allocatedToId: this.taskForm.allocatedToId ?? undefined,
+      allocatedToName: this.taskForm.allocatedToName || undefined,
+      dueDate: this.taskForm.dueDate || undefined,
+      status: this.taskForm.status
+    };
+    const req = this.editingTaskId
+      ? this.tenderService.updateTask(this.tender.id, this.editingTaskId, body)
+      : this.tenderService.createTask(this.tender.id, body);
+    req.subscribe({
+      next: () => { this.savingTask = false; this.showTaskModal = false; this.reload(); this.notification.onDefault('Task saved.'); },
+      error: () => { this.savingTask = false; this.notification.onError('Failed to save task.'); }
+    });
+  }
+
+  deleteTask(task: TenderTaskItem): void {
+    if (!this.tender) return;
+    this.tenderService.deleteTask(this.tender.id, task.id).subscribe({
+      next: () => { this.reload(); this.notification.onDefault('Task removed.'); },
+      error: () => this.notification.onError('Failed to delete task.')
+    });
+  }
+
+  // ── Requirements ───────────────────────────────────────────────────────
+  showRequirementModal = false;
+  editingRequirementId: number | null = null;
+  requirementForm = this.emptyRequirementForm();
+  savingRequirement = false;
+
+  private emptyRequirementForm() {
+    return { type: 'MANDATORY' as TenderRequirement['type'], description: '', ownerId: null as number | null, ownerName: '', status: 'NOT_STARTED' as TenderRequirement['status'] };
+  }
+
+  openAddRequirementModal(): void {
+    this.requirementForm = this.emptyRequirementForm();
+    this.editingRequirementId = null;
+    this.showRequirementModal = true;
+  }
+
+  openEditRequirementModal(req: TenderRequirement): void {
+    this.requirementForm = { type: req.type, description: req.description, ownerId: req.ownerId ?? null, ownerName: req.ownerName || '', status: req.status };
+    this.editingRequirementId = req.id;
+    this.showRequirementModal = true;
+  }
+
+  closeRequirementModal(): void { this.showRequirementModal = false; }
+
+  onRequirementOwnerChange(employeeId: string): void {
+    const emp = this.employees.find(e => String(e.id) === employeeId);
+    this.requirementForm.ownerId = emp ? emp.id : null;
+    this.requirementForm.ownerName = emp ? `${emp.firstName} ${emp.lastName}` : '';
+  }
+
+  submitRequirement(): void {
+    if (!this.tender || !this.requirementForm.description.trim()) return;
+    this.savingRequirement = true;
+    const body = {
+      type: this.requirementForm.type,
+      description: this.requirementForm.description,
+      ownerId: this.requirementForm.ownerId ?? undefined,
+      ownerName: this.requirementForm.ownerName || undefined,
+      status: this.requirementForm.status
+    };
+    const req = this.editingRequirementId
+      ? this.tenderService.updateRequirement(this.tender.id, this.editingRequirementId, body)
+      : this.tenderService.createRequirement(this.tender.id, body);
+    req.subscribe({
+      next: () => { this.savingRequirement = false; this.showRequirementModal = false; this.reload(); this.notification.onDefault('Requirement saved.'); },
+      error: () => { this.savingRequirement = false; this.notification.onError('Failed to save requirement.'); }
+    });
+  }
+
+  deleteRequirement(req: TenderRequirement): void {
+    if (!this.tender) return;
+    this.tenderService.deleteRequirement(this.tender.id, req.id).subscribe({
+      next: () => { this.reload(); this.notification.onDefault('Requirement removed.'); },
+      error: () => this.notification.onError('Failed to delete requirement.')
     });
   }
 }

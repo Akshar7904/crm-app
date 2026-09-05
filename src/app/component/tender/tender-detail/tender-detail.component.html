@@ -96,4 +96,152 @@
       </div>
     </div>
   </div>
+
+  <!-- Tasks -->
+  <div *ngIf="activeTab === 'tasks'">
+    <div class="table-card">
+      <div class="table-card-header">
+        <strong>Tasks</strong>
+        <button class="btn btn-sm btn-primary" (click)="openAddTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add Task</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Task</th><th>Allocated To</th><th>Due Date</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngIf="!tender.tasks?.length"><td colspan="5" class="empty-state-cell">No tasks yet</td></tr>
+            <tr *ngFor="let t of tender.tasks">
+              <td>{{ t.description }}</td>
+              <td>{{ t.allocatedToName || '—' }}</td>
+              <td>{{ t.dueDate ? (t.dueDate | date:'d MMM yyyy') : '—' }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-soft-secondary': t.status === 'NOT_STARTED',
+                  'badge-soft-info': t.status === 'IN_PROGRESS',
+                  'badge-soft-success': t.status === 'COMPLETE',
+                  'badge-soft-danger': t.status === 'OVERDUE'
+                }">{{ t.status }}</span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-secondary" (click)="openEditTaskModal(t)"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(t)"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requirements -->
+  <div *ngIf="activeTab === 'requirements'">
+    <div class="table-card">
+      <div class="table-card-header">
+        <strong>Requirements</strong>
+        <button class="btn btn-sm btn-primary" (click)="openAddRequirementModal()"><i class="bi bi-plus-lg me-1"></i>Add Requirement</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Type</th><th>Requirement</th><th>Owner</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngIf="!tender.requirements?.length"><td colspan="5" class="empty-state-cell">No requirements yet</td></tr>
+            <tr *ngFor="let r of tender.requirements">
+              <td><span class="badge badge-soft-secondary">{{ r.type }}</span></td>
+              <td>{{ r.description }}</td>
+              <td>{{ r.ownerName || '—' }}</td>
+              <td>
+                <span class="badge" [ngClass]="{
+                  'badge-soft-secondary': r.status === 'NOT_STARTED',
+                  'badge-soft-info': r.status === 'IN_PROGRESS',
+                  'badge-soft-warning': r.status === 'AT_RISK',
+                  'badge-soft-success': r.status === 'COMPLETE'
+                }">{{ r.status }}</span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-secondary" (click)="openEditRequirementModal(r)"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteRequirement(r)"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Task Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showTaskModal" (click)="closeTaskModal()"></div>
+  <div class="upload-modal" *ngIf="showTaskModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingTaskId ? 'Edit Task' : 'Add Task' }}</h6>
+        <button class="btn-close" (click)="closeTaskModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Task</label><input class="form-control" [(ngModel)]="taskForm.description"></div>
+        <div class="mb-3">
+          <label class="form-label">Allocated To</label>
+          <select class="form-select" (change)="onTaskAllocatedToChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === taskForm.allocatedToId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" class="form-control" [(ngModel)]="taskForm.dueDate"></div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="taskForm.status">
+            <option value="NOT_STARTED">Not started</option>
+            <option value="IN_PROGRESS">In progress</option>
+            <option value="COMPLETE">Complete</option>
+            <option value="OVERDUE">Overdue</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeTaskModal()" [disabled]="savingTask">Cancel</button>
+        <button class="btn btn-primary" (click)="submitTask()" [disabled]="!taskForm.description.trim() || savingTask">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Requirement Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showRequirementModal" (click)="closeRequirementModal()"></div>
+  <div class="upload-modal" *ngIf="showRequirementModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingRequirementId ? 'Edit Requirement' : 'Add Requirement' }}</h6>
+        <button class="btn-close" (click)="closeRequirementModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3">
+          <label class="form-label">Type</label>
+          <select class="form-select" [(ngModel)]="requirementForm.type">
+            <option value="MANDATORY">Mandatory</option>
+            <option value="FUNCTIONALITY">Functionality</option>
+            <option value="TECHNICAL">Technical</option>
+            <option value="COMMERCIAL">Commercial</option>
+          </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Requirement</label><input class="form-control" [(ngModel)]="requirementForm.description"></div>
+        <div class="mb-3">
+          <label class="form-label">Owner</label>
+          <select class="form-select" (change)="onRequirementOwnerChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === requirementForm.ownerId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="requirementForm.status">
+            <option value="NOT_STARTED">Not started</option>
+            <option value="IN_PROGRESS">In progress</option>
+            <option value="AT_RISK">At risk</option>
+            <option value="COMPLETE">Complete</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeRequirementModal()" [disabled]="savingRequirement">Cancel</button>
+        <button class="btn btn-primary" (click)="submitRequirement()" [disabled]="!requirementForm.description.trim() || savingRequirement">Save</button>
+      </div>
+    </div>
+  </div>
 </ng-container>
