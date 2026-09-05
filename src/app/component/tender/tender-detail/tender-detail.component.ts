@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
-import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine, TenderBidDocument } from '../models/tender.model';
+import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine, TenderBidDocument, TenderFollowUp } from '../models/tender.model';
 
 export type TenderDetailTab = 'overview' | 'tasks' | 'requirements' | 'pricing' | 'documents' | 'submission' | 'postbid';
 
@@ -59,6 +59,7 @@ export class TenderDetailComponent implements OnInit {
         this.goNoGoOwnerId = t.goNoGoOwnerId ?? null;
         this.goNoGoOwnerName = t.goNoGoOwnerName ?? '';
         this.goNoGoReason = t.goNoGoReason ?? '';
+        this.postBidForm = { outcome: t.outcome, outcomeReason: t.outcomeReason || '', lessonLearned: t.lessonLearned || '' };
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -460,6 +461,118 @@ export class TenderDetailComponent implements OnInit {
     this.tenderService.deleteBidDocument(this.tender.id, doc.id).subscribe({
       next: () => { this.reload(); this.notification.onDefault('Document removed.'); },
       error: () => this.notification.onError('Failed to delete document.')
+    });
+  }
+
+  // ── Submission ─────────────────────────────────────────────────────────
+  savingSubmissionChecks = false;
+  exportingBid = false;
+
+  get submissionReadinessChecks(): { label: string; ready: boolean }[] {
+    if (!this.tender) return [];
+    const allReqsComplete = !!this.tender.requirements?.length && this.tender.requirements.every(r => r.status === 'COMPLETE');
+    return [
+      { label: 'Go/No-Go approved', ready: this.tender.goNoGoDecision === 'GO' },
+      { label: 'All requirements completed', ready: allReqsComplete },
+      { label: 'Bid documents attached', ready: !!this.tender.bidDocuments?.length },
+      { label: 'Pricing finalised', ready: !!this.tender.pricingFinalised }
+    ];
+  }
+
+  toggleSubmissionCheck(field: 'execSignOffRecorded' | 'fileNamesAndOrderChecked' | 'portalUploadTestCompleted' | 'proofOfSubmissionSaved'): void {
+    if (!this.tender) return;
+    this.tender[field] = !this.tender[field];
+    this.savingSubmissionChecks = true;
+    this.tenderService.updateSubmissionChecks(this.tender.id, {
+      execSignOffRecorded: !!this.tender.execSignOffRecorded,
+      fileNamesAndOrderChecked: !!this.tender.fileNamesAndOrderChecked,
+      portalUploadTestCompleted: !!this.tender.portalUploadTestCompleted,
+      proofOfSubmissionSaved: !!this.tender.proofOfSubmissionSaved
+    }).subscribe({
+      next: t => { this.tender = { ...this.tender, ...t }; this.savingSubmissionChecks = false; },
+      error: () => { this.savingSubmissionChecks = false; this.notification.onError('Failed to save submission checks.'); }
+    });
+  }
+
+  exportBid(): void {
+    if (!this.tender) return;
+    this.exportingBid = true;
+    this.tenderService.exportBid(this.tender.id).subscribe({
+      next: blob => {
+        this.exportingBid = false;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tender-bid-${this.tender!.tenderReference || this.tender!.id}.pdf`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      },
+      error: () => { this.exportingBid = false; this.notification.onError('Failed to export bid.'); }
+    });
+  }
+
+  printSubmissionChecklist(): void {
+    window.print();
+  }
+
+  // ── Post-bid ────────────────────────────────────────────────────────────
+  showFollowUpModal = false;
+  followUpForm = this.emptyFollowUpForm();
+  savingFollowUp = false;
+
+  postBidForm: { outcome: Tender['outcome']; outcomeReason: string; lessonLearned: string } = { outcome: 'PENDING', outcomeReason: '', lessonLearned: '' };
+  savingPostBid = false;
+
+  private emptyFollowUpForm() {
+    return { description: '', dueDate: '' };
+  }
+
+  openAddFollowUpModal(): void {
+    this.followUpForm = this.emptyFollowUpForm();
+    this.showFollowUpModal = true;
+  }
+
+  closeFollowUpModal(): void { this.showFollowUpModal = false; }
+
+  submitFollowUp(): void {
+    if (!this.tender || !this.followUpForm.description.trim()) return;
+    this.savingFollowUp = true;
+    this.tenderService.createFollowUp(this.tender.id, {
+      description: this.followUpForm.description,
+      dueDate: this.followUpForm.dueDate || undefined
+    }).subscribe({
+      next: () => { this.savingFollowUp = false; this.showFollowUpModal = false; this.reload(); this.notification.onDefault('Follow-up added.'); },
+      error: () => { this.savingFollowUp = false; this.notification.onError('Failed to add follow-up.'); }
+    });
+  }
+
+  toggleFollowUpStatus(followUp: TenderFollowUp): void {
+    if (!this.tender) return;
+    const status = followUp.status === 'OPEN' ? 'DONE' : 'OPEN';
+    this.tenderService.updateFollowUp(this.tender.id, followUp.id, { status }).subscribe({
+      next: () => this.reload(),
+      error: () => this.notification.onError('Failed to update follow-up.')
+    });
+  }
+
+  deleteFollowUp(followUp: TenderFollowUp): void {
+    if (!this.tender) return;
+    this.tenderService.deleteFollowUp(this.tender.id, followUp.id).subscribe({
+      next: () => { this.reload(); this.notification.onDefault('Follow-up removed.'); },
+      error: () => this.notification.onError('Failed to delete follow-up.')
+    });
+  }
+
+  submitPostBid(): void {
+    if (!this.tender) return;
+    this.savingPostBid = true;
+    this.tenderService.updatePostBid(this.tender.id, {
+      outcome: this.postBidForm.outcome,
+      outcomeReason: this.postBidForm.outcomeReason || undefined,
+      lessonLearned: this.postBidForm.lessonLearned || undefined
+    }).subscribe({
+      next: t => { this.tender = { ...this.tender, ...t }; this.savingPostBid = false; this.notification.onDefault('Outcome saved.'); },
+      error: () => { this.savingPostBid = false; this.notification.onError('Failed to save outcome.'); }
     });
   }
 }

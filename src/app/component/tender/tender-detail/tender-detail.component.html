@@ -266,6 +266,122 @@
     </div>
   </div>
 
+  <!-- Submission -->
+  <div *ngIf="activeTab === 'submission'">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="falcon-card p-3 mb-3">
+          <strong>Submission Readiness</strong>
+          <ul class="list-unstyled mt-2 mb-0">
+            <li *ngFor="let c of submissionReadinessChecks" class="d-flex justify-content-between py-1 border-bottom">
+              <span>{{ c.label }}</span>
+              <span class="badge" [ngClass]="c.ready ? 'badge-soft-success' : 'badge-soft-secondary'">{{ c.ready ? 'Ready' : 'Outstanding' }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="falcon-card p-3">
+          <strong>Final Submission Checks</strong>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="check1" [checked]="tender.execSignOffRecorded" (change)="toggleSubmissionCheck('execSignOffRecorded')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check1">Executive sign-off recorded</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="check2" [checked]="tender.fileNamesAndOrderChecked" (change)="toggleSubmissionCheck('fileNamesAndOrderChecked')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check2">File names and page order checked</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="check3" [checked]="tender.portalUploadTestCompleted" (change)="toggleSubmissionCheck('portalUploadTestCompleted')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check3">Portal upload test completed</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="check4" [checked]="tender.proofOfSubmissionSaved" (change)="toggleSubmissionCheck('proofOfSubmissionSaved')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check4">Proof of submission saved</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <strong>Export Tender Bid</strong>
+          <div class="row g-2 mt-1 mb-3">
+            <div class="col-6"><small class="text-muted d-block">Readiness</small>{{ tender.progressPercent || 0 }}%</div>
+            <div class="col-6"><small class="text-muted d-block">Final Bid Price</small>R {{ (tender.finalTotalInclVat || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">Bid Documents</small>{{ tender.bidDocuments?.length || 0 }}</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm" (click)="exportBid()" [disabled]="exportingBid">
+              <i class="bi bi-download me-1"></i>Export Complete Tender Bid
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="printSubmissionChecklist()">
+              <i class="bi bi-printer me-1"></i>Print Submission Checklist
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Post-bid -->
+  <div *ngIf="activeTab === 'postbid'">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="table-card">
+          <div class="table-card-header">
+            <strong>Post-bid Follow-ups</strong>
+            <button class="btn btn-sm btn-primary" (click)="openAddFollowUpModal()"><i class="bi bi-plus-lg me-1"></i>Add Follow-up</button>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item text-muted" *ngIf="!tender.followUps?.length">No follow-ups yet</li>
+            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let f of tender.followUps">
+              <div>
+                <div [class.text-decoration-line-through]="f.status === 'DONE'">{{ f.description }}</div>
+                <small class="text-muted" *ngIf="f.dueDate">Due {{ f.dueDate | date:'d MMM yyyy' }}</small>
+              </div>
+              <div class="d-flex gap-2">
+                <button class="btn btn-sm" [ngClass]="f.status === 'DONE' ? 'btn-outline-secondary' : 'btn-outline-success'" (click)="toggleFollowUpStatus(f)">
+                  {{ f.status === 'DONE' ? 'Reopen' : 'Mark Done' }}
+                </button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deleteFollowUp(f)"><i class="bi bi-trash"></i></button>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <strong>Outcome and Lessons</strong>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Tender Outcome</label>
+            <select class="form-select" [(ngModel)]="postBidForm.outcome">
+              <option value="PENDING">Pending</option>
+              <option value="WON">Won</option>
+              <option value="LOST">Lost</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Primary Reason</label>
+            <select class="form-select" [(ngModel)]="postBidForm.outcomeReason">
+              <option value="">—</option>
+              <option value="PRICE">Price</option>
+              <option value="TECHNICAL_SCORE">Technical score</option>
+              <option value="REFERENCES">References</option>
+              <option value="COMPLIANCE">Compliance</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Lesson Learned</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="postBidForm.lessonLearned"></textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="submitPostBid()" [disabled]="savingPostBid">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Add/Edit Task Modal -->
   <div class="modal-backdrop-custom" *ngIf="showTaskModal" (click)="closeTaskModal()"></div>
   <div class="upload-modal" *ngIf="showTaskModal">
@@ -423,6 +539,25 @@
                 [disabled]="savingBidDocument || (bidDocumentDisplayNameRequired && !bidDocumentForm.displayName.trim()) || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
           Save
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Follow-up Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showFollowUpModal" (click)="closeFollowUpModal()"></div>
+  <div class="upload-modal" *ngIf="showFollowUpModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">Add Follow-up</h6>
+        <button class="btn-close" (click)="closeFollowUpModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="followUpForm.description"></div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" class="form-control" [(ngModel)]="followUpForm.dueDate"></div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeFollowUpModal()" [disabled]="savingFollowUp">Cancel</button>
+        <button class="btn btn-primary" (click)="submitFollowUp()" [disabled]="!followUpForm.description.trim() || savingFollowUp">Save</button>
       </div>
     </div>
   </div>
