@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthenticationGuard } from '../../guard/authentication.guard';
 import { TenderDashboardComponent } from './tender-dashboard/tender-dashboard.component';
 import { TenderDetailComponent } from './tender-detail/tender-detail.component';
+import { TenderReportingComponent } from './tender-reporting/tender-reporting.component';
 
 const routes: Routes = [
   {
@@ -13,6 +14,7 @@ const routes: Routes = [
     canActivate: [AuthenticationGuard],
     children: [
       { path: '', component: TenderDashboardComponent },
+      { path: 'reporting', component: TenderReportingComponent },
       { path: ':id', component: TenderDetailComponent }
     ]
   }

@@ -8,11 +8,13 @@ import { TenderRoutingModule } from './tender-routing.module';
 import { TenderService } from './services/tender.service';
 import { TenderDashboardComponent } from './tender-dashboard/tender-dashboard.component';
 import { TenderDetailComponent } from './tender-detail/tender-detail.component';
+import { TenderReportingComponent } from './tender-reporting/tender-reporting.component';
 
 @NgModule({
   declarations: [
     TenderDashboardComponent,
-    TenderDetailComponent
+    TenderDetailComponent,
+    TenderReportingComponent
   ],
   imports: [
     CommonModule,
