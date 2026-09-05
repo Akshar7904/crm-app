@@ -516,6 +516,30 @@ export class TopnavComponent implements OnInit, OnDestroy, OnChanges {
           ]
         },
         {
+          label: 'Tenders',
+          icon: 'bi-file-earmark-text',
+          moduleKey: 'TENDER_MANAGEMENT',
+          children: [
+        {
+          label: 'All Tenders',
+          icon: 'bi-file-earmark-text',
+          route: '/tenders',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Reporting',
+          icon: 'bi-bar-chart-line',
+          route: '/tenders/reporting',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Document Vault',
+          icon: 'bi-shield-check',
+          route: '/policy'
+        }
+          ]
+        },
+        {
           label: 'Assets',
           icon: 'bi-laptop',
           moduleKey: 'ASSET_MANAGEMENT',
