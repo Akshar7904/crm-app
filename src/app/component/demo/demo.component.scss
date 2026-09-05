@@ -94,7 +94,7 @@ $secondary:      #4ea41b;   // vivid green, sampled from the logo icon
 /* ── WHY CHOOSE (scroll-driven) ────────────────────────────────────── */
 .lp-why {
   background: #{$primary};
-  height: 400vh; /* scroll track: 100vh per tab, content pinned via sticky */
+  height: 260vh; /* scroll track: shortened so the pinned section doesn't linger too long */
   position: relative;
 }
 .lp-why .lp-section-title span { color: #FFFFFF; }
@@ -189,6 +189,9 @@ $secondary:      #4ea41b;   // vivid green, sampled from the logo icon
     display: inline-flex; align-items: center; justify-content: center;
     background: #FFFFFF; padding: 12px 22px; border-radius: 14px;
     margin-bottom: 24px; box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    &.cta-logo-badge--plain {
+      background: transparent; padding: 0; border-radius: 0; box-shadow: none;
+    }
   }
   .cta-logo { height: 44px; width: auto; object-fit: contain; display: block; }
   h2 { font-size: 2rem; font-weight: 800; color: #FFFFFF; margin-bottom: 14px; }
@@ -278,7 +281,7 @@ $secondary:      #4ea41b;   // vivid green, sampled from the logo icon
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 48px;
+  gap: 24px;
   align-items: center;
   @media (max-width: 991px) { grid-template-columns: 1fr; }
 }
@@ -486,6 +489,25 @@ $secondary:      #4ea41b;   // vivid green, sampled from the logo icon
     border-radius: 10px; font-weight: 600; font-size: .88rem;
     cursor: pointer; border: none;
   }
+}
+
+/* ── Contact Us / Request a Demo modal form ─────────────────────────── */
+.contact-modal { max-width: 480px; max-height: 90vh; overflow-y: auto; }
+.contact-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.contact-form-group {
+  margin-bottom: 14px;
+  label { display: block; font-size: .8rem; font-weight: 600; color: #374151; margin-bottom: 5px; }
+  input, textarea {
+    width: 100%; padding: 10px 14px; border-radius: 8px;
+    border: 1px solid #E5E7EB; font-size: .875rem; color: #111827;
+    background: #F9FAFB; transition: border-color .2s, background .2s;
+    &:focus { outline: none; border-color: #{$primary}; background: #FFFFFF; }
+  }
+  textarea { resize: vertical; min-height: 90px; }
+}
+.contact-submit-btn {
+  width: 100%; border: none; margin-top: 4px;
+  &:disabled { opacity: .5; cursor: not-allowed; }
 }
 
 /* ── Responsive ──────────────────────────────────────────────────── */

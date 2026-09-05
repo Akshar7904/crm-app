@@ -24,7 +24,13 @@ export class RegisterComponent {
   constructor(private userService: UserService, private notification: NotificationService) { }
 
   register(registerForm: NgForm): void {
-    this.registerState$ = this.userService.save$(registerForm.value)
+    // The visible form no longer collects a password — the account is
+    // pending administrator review anyway, so the applicant can't sign in
+    // yet. A random placeholder still has to be sent because the backend
+    // requires a non-empty password; the real one gets set later via the
+    // existing "Forgot Password?" flow once the account is approved.
+    const payload = { ...registerForm.value, password: this.generatePlaceholderPassword() };
+    this.registerState$ = this.userService.save$(payload)
       .pipe(
         map(response => {
           this.notification.onDefault(response.message);
@@ -42,6 +48,10 @@ export class RegisterComponent {
 
   createAccountForm(): void {
     this.registerState$ = of({ dataState: DataState.LOADED, registerSuccess: false });
+  }
+
+  private generatePlaceholderPassword(): string {
+    return `Pending-${crypto.randomUUID()}`;
   }
 
 }

@@ -11,8 +11,8 @@
         </div>
         <div class="register-form-wrapper">
         <div class="form-header">
-          <h2>Create Account</h2>
-          <p>Fill in your details to get started</p>
+          <h2>Register</h2>
+          <p>Create your Enterprise360 workspace. Register your details below to get access to the Enterprise360 Platform.</p>
         </div>
 
         <!-- Error Alert -->
@@ -80,19 +80,18 @@
           </div>
 
           <div class="form-group">
-            <label for="password">Password</label>
+            <label for="phone">Contact Number</label>
             <div class="input-wrapper">
-              <i class="bi bi-lock"></i>
+              <i class="bi bi-telephone"></i>
               <input
                 [disabled]="state.dataState === DataState.LOADING"
                 ngModel
-                type="password"
-                name="password"
-                id="password"
+                type="tel"
+                name="phone"
+                id="phone"
                 class="form-control"
-                placeholder="Create a password"
-                required
-                minlength="4">
+                placeholder="Enter your contact number"
+                required>
             </div>
           </div>
 
@@ -101,8 +100,8 @@
             type="submit"
             class="btn-register">
             <span *ngIf="state.dataState === DataState.LOADING" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            <span *ngIf="state.dataState === DataState.LOADING">Creating Account...</span>
-            <span *ngIf="!(state.dataState === DataState.LOADING)">Create Account</span>
+            <span *ngIf="state.dataState === DataState.LOADING">Registering...</span>
+            <span *ngIf="!(state.dataState === DataState.LOADING)">Register My Business</span>
           </button>
         </form>
 
@@ -121,7 +120,7 @@
         </div>
       </div>
     </div>
-    <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
+    <p class="auth-shell-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 
   <!-- Success Screen -->
@@ -182,6 +181,6 @@
         </div>
       </div>
     </div>
-    <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
+    <p class="auth-shell-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 </section>

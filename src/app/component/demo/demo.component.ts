@@ -11,6 +11,50 @@ import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 })
 export class DemoComponent {
 
+  // ── Contact / Demo Request Modal ─────────────────────────────────────────
+  showContactModal = false;
+  contactSubmitting = false;
+  contactSubmitted = false;
+  contactForm = this.emptyContactForm();
+
+  private emptyContactForm() {
+    return { firstName: '', lastName: '', companyName: '', email: '', contactNumber: '', subject: '', message: '' };
+  }
+
+  openContactModal(subject: string = ''): void {
+    this.contactForm = this.emptyContactForm();
+    this.contactForm.subject = subject;
+    this.contactSubmitted = false;
+    this.showContactModal = true;
+  }
+
+  closeContactModal(): void {
+    this.showContactModal = false;
+  }
+
+  submitContactForm(): void {
+    const f = this.contactForm;
+    if (!f.firstName.trim() || !f.lastName.trim() || !f.email.trim() || !f.message.trim()) return;
+    this.contactSubmitting = true;
+
+    const bodyLines = [
+      `First Name: ${f.firstName}`,
+      `Last Name: ${f.lastName}`,
+      `Company Name: ${f.companyName}`,
+      `Email Address: ${f.email}`,
+      `Contact Number: ${f.contactNumber}`,
+      `Subject: ${f.subject}`,
+      '',
+      f.message
+    ];
+    const subjectLine = f.subject ? f.subject : 'Enterprise360 website enquiry';
+    const mailto = `mailto:akshar@silverspectrumsolutions.co.za?subject=${encodeURIComponent(subjectLine)}&body=${encodeURIComponent(bodyLines.join('\n'))}`;
+    window.location.href = mailto;
+
+    this.contactSubmitting = false;
+    this.contactSubmitted = true;
+  }
+
   // ── Module Grid ──────────────────────────────────────────────────────────
   selectedModule: any = null;
 
@@ -41,8 +85,8 @@ export class DemoComponent {
       tag: 'Finance',
       icon: 'bi-cash-stack',
       color: '#10b981',
-      desc: 'End-to-end payroll processing with built-in PayFast payment gateway and automated payslip delivery.',
-      features: ['Payslip PDF generation per employee', 'Bulk email delivery by pay period', 'Draft → Processed → Paid workflow', 'PayFast payment gateway built-in', 'Monthly salary breakdown view']
+      desc: 'End-to-end payroll processing with a built-in payment gateway and automated payslip delivery.',
+      features: ['Payslip PDF generation per employee', 'Bulk email delivery by pay period', 'Draft → Processed → Paid workflow', 'Payment gateway integrations available', 'Monthly salary breakdown view']
     },
     {
       name: 'Attendance',
@@ -177,7 +221,7 @@ export class DemoComponent {
         'SAST timezone (Africa/Johannesburg)',
         'SA public holidays pre-loaded',
         'SA Labour Law leave defaults (Annual, Sick, Family, Maternity)',
-        'PayFast payment gateway integration'
+        'Payment gateway integration'
       ]
     },
     {
