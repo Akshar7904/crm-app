@@ -527,11 +527,6 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           icon: 'bi-bar-chart-line',
           route: '/tenders/reporting',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
-        },
-        {
-          label: 'Document Vault',
-          icon: 'bi-shield-check',
-          route: '/policy'
         }
       ]
     },
