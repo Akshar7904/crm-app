@@ -167,6 +167,70 @@
     </div>
   </div>
 
+  <!-- Pricing -->
+  <div *ngIf="activeTab === 'pricing'">
+    <div class="table-card mb-3">
+      <div class="table-card-header">
+        <strong>Costing</strong>
+        <button class="btn btn-sm btn-primary" (click)="openAddPricingLineModal()"><i class="bi bi-plus-lg me-1"></i>Add Product or Service</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>Item</th><th>Qty</th><th>Supplier</th><th>Unit Cost</th><th>Total Cost</th><th>Profit %</th><th>Profit</th><th>Sell excl. VAT</th><th>VAT</th><th>Total incl. VAT</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!tender.pricingLines?.length"><td colspan="11" class="empty-state-cell">No pricing lines yet</td></tr>
+            <tr *ngFor="let l of tender.pricingLines">
+              <td><div class="fw-semibold">{{ l.itemName }}</div><small class="text-muted">{{ l.description }}</small></td>
+              <td>{{ l.quantity }}</td>
+              <td>{{ l.supplierName || '—' }}<br><small class="text-muted">{{ l.supplierReference }}</small></td>
+              <td>R {{ l.unitCost | number:'1.2-2' }}</td>
+              <td>R {{ (l.totalCost || 0) | number:'1.2-2' }}</td>
+              <td>{{ l.profitMarkupPercent }}%</td>
+              <td>R {{ (l.profitAmount || 0) | number:'1.2-2' }}</td>
+              <td>R {{ (l.sellExclVat || 0) | number:'1.2-2' }}</td>
+              <td>R {{ (l.vatAmount || 0) | number:'1.2-2' }}</td>
+              <td class="fw-semibold">R {{ (l.totalInclVat || 0) | number:'1.2-2' }}</td>
+              <td class="text-end">
+                <button class="btn btn-sm btn-outline-secondary" (click)="openEditPricingLineModal(l)"><i class="bi bi-pencil"></i></button>
+                <button class="btn btn-sm btn-outline-danger" (click)="deletePricingLine(l)"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <strong>How This Price Was Built</strong>
+          <div class="row g-2 mt-1">
+            <div class="col-6"><small class="text-muted d-block">Supplier Cost (excl. VAT)</small>R {{ (tender.supplierCostExclVat || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">Expected Profit</small>R {{ (tender.expectedProfit || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">Average Markup</small>{{ tender.averageMarkupPercent != null ? (tender.averageMarkupPercent | number:'1.1-1') + '%' : '—' }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <strong>Final Bid Price</strong>
+            <button class="btn btn-sm btn-success" (click)="finalisePricing()" [disabled]="finalisingPricing || tender.pricingFinalised">
+              {{ tender.pricingFinalised ? 'Finalised' : 'Finalise Bid Price' }}
+            </button>
+          </div>
+          <div class="row g-2 mt-1">
+            <div class="col-6"><small class="text-muted d-block">Selling (excl. VAT)</small>R {{ (tender.finalSellExclVat || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">VAT</small>R {{ (tender.finalVatAmount || 0) | number:'1.2-2' }}</div>
+            <div class="col-12"><small class="text-muted d-block">Total (incl. VAT)</small><span class="fs-5 fw-bold">R {{ (tender.finalTotalInclVat || 0) | number:'1.2-2' }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Add/Edit Task Modal -->
   <div class="modal-backdrop-custom" *ngIf="showTaskModal" (click)="closeTaskModal()"></div>
   <div class="upload-modal" *ngIf="showTaskModal">
@@ -241,6 +305,41 @@
       <div class="upload-modal-footer">
         <button class="btn btn-outline-secondary" (click)="closeRequirementModal()" [disabled]="savingRequirement">Cancel</button>
         <button class="btn btn-primary" (click)="submitRequirement()" [disabled]="!requirementForm.description.trim() || savingRequirement">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Pricing Line Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showPricingLineModal" (click)="closePricingLineModal()"></div>
+  <div class="upload-modal" *ngIf="showPricingLineModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingPricingLineId ? 'Edit Line' : 'Add Product or Service' }}</h6>
+        <button class="btn-close" (click)="closePricingLineModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Product / Service Name</label><input class="form-control" [(ngModel)]="pricingLineForm.itemName"></div>
+        <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="pricingLineForm.description"></div>
+        <div class="row g-2 mb-3">
+          <div class="col-6"><label class="form-label">Quantity</label><input type="number" class="form-control" [(ngModel)]="pricingLineForm.quantity"></div>
+          <div class="col-6"><label class="form-label">Unit Cost (excl. VAT)</label><input type="number" class="form-control" [(ngModel)]="pricingLineForm.unitCost"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Supplier</label><input class="form-control" [(ngModel)]="pricingLineForm.supplierName"></div>
+        <div class="mb-3"><label class="form-label">Supplier Quote / Reference</label><input class="form-control" [(ngModel)]="pricingLineForm.supplierReference"></div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label">VAT Rate</label>
+            <select class="form-select" [(ngModel)]="pricingLineForm.vatRate">
+              <option [ngValue]="15">15%</option>
+              <option [ngValue]="0">0% (VAT exempt)</option>
+            </select>
+          </div>
+          <div class="col-6"><label class="form-label">Profit Markup %</label><input type="number" class="form-control" [(ngModel)]="pricingLineForm.profitMarkupPercent"></div>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closePricingLineModal()" [disabled]="savingPricingLine">Cancel</button>
+        <button class="btn btn-primary" (click)="submitPricingLine()" [disabled]="!pricingLineForm.itemName.trim() || savingPricingLine">Save</button>
       </div>
     </div>
   </div>

@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
-import { Tender, TenderTaskItem, TenderRequirement } from '../models/tender.model';
+import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine } from '../models/tender.model';
 
 export type TenderDetailTab = 'overview' | 'tasks' | 'requirements' | 'pricing' | 'documents' | 'submission' | 'postbid';
 
@@ -299,6 +299,65 @@ export class TenderDetailComponent implements OnInit {
     this.tenderService.deleteRequirement(this.tender.id, req.id).subscribe({
       next: () => { this.reload(); this.notification.onDefault('Requirement removed.'); },
       error: () => this.notification.onError('Failed to delete requirement.')
+    });
+  }
+
+  // ── Pricing ────────────────────────────────────────────────────────────
+  showPricingLineModal = false;
+  editingPricingLineId: number | null = null;
+  pricingLineForm = this.emptyPricingLineForm();
+  savingPricingLine = false;
+  finalisingPricing = false;
+
+  private emptyPricingLineForm() {
+    return { itemName: '', description: '', quantity: 1, supplierName: '', supplierReference: '', unitCost: 0, vatRate: 15, profitMarkupPercent: 0 };
+  }
+
+  openAddPricingLineModal(): void {
+    this.pricingLineForm = this.emptyPricingLineForm();
+    this.editingPricingLineId = null;
+    this.showPricingLineModal = true;
+  }
+
+  openEditPricingLineModal(line: TenderPricingLine): void {
+    this.pricingLineForm = {
+      itemName: line.itemName, description: line.description || '', quantity: line.quantity,
+      supplierName: line.supplierName || '', supplierReference: line.supplierReference || '',
+      unitCost: line.unitCost, vatRate: line.vatRate, profitMarkupPercent: line.profitMarkupPercent
+    };
+    this.editingPricingLineId = line.id;
+    this.showPricingLineModal = true;
+  }
+
+  closePricingLineModal(): void { this.showPricingLineModal = false; }
+
+  submitPricingLine(): void {
+    if (!this.tender || !this.pricingLineForm.itemName.trim()) return;
+    this.savingPricingLine = true;
+    const body = { ...this.pricingLineForm };
+    const req = this.editingPricingLineId
+      ? this.tenderService.updatePricingLine(this.tender.id, this.editingPricingLineId, body)
+      : this.tenderService.createPricingLine(this.tender.id, body);
+    req.subscribe({
+      next: () => { this.savingPricingLine = false; this.showPricingLineModal = false; this.reload(); this.notification.onDefault('Pricing line saved.'); },
+      error: () => { this.savingPricingLine = false; this.notification.onError('Failed to save pricing line.'); }
+    });
+  }
+
+  deletePricingLine(line: TenderPricingLine): void {
+    if (!this.tender) return;
+    this.tenderService.deletePricingLine(this.tender.id, line.id).subscribe({
+      next: () => { this.reload(); this.notification.onDefault('Pricing line removed.'); },
+      error: () => this.notification.onError('Failed to delete pricing line.')
+    });
+  }
+
+  finalisePricing(): void {
+    if (!this.tender) return;
+    this.finalisingPricing = true;
+    this.tenderService.finalisePricing(this.tender.id).subscribe({
+      next: t => { this.tender = { ...this.tender, ...t }; this.finalisingPricing = false; this.notification.onDefault('Bid price finalised.'); },
+      error: () => { this.finalisingPricing = false; this.notification.onError('Failed to finalise pricing.'); }
     });
   }
 }
