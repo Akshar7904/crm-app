@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
+import { UserService } from '../../../service/user.service';
 import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine, TenderBidDocument, TenderFollowUp } from '../models/tender.model';
 
 export type TenderDetailTab = 'overview' | 'tasks' | 'requirements' | 'pricing' | 'documents' | 'submission' | 'postbid';
@@ -23,6 +24,12 @@ export class TenderDetailComponent implements OnInit {
 
   employees: any[] = [];
 
+  // Role gating — mirrors project-detail.component.ts: only Manager+ may
+  // mutate tender data (edit/add/finalise/go-no-go/delete); the backend
+  // enforces the same @PreAuthorize("hasAnyRole(...MANAGER...)") guard.
+  isManagerOrAbove = false;
+  isAdminOrAbove = false;
+
   // Overview edit state
   editingOverview = false;
   overviewForm = this.emptyOverviewForm();
@@ -39,10 +46,14 @@ export class TenderDetailComponent implements OnInit {
     private route: ActivatedRoute,
     protected tenderService: TenderService,
     private employeeService: EmployeeService,
-    protected notification: NotificationService
+    protected notification: NotificationService,
+    private userSvc: UserService
   ) {}
 
   ngOnInit(): void {
+    const user = this.userSvc.getUserFromLocalCache();
+    this.isManagerOrAbove = ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
+    this.isAdminOrAbove = ['ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.load(id);
     this.employeeService.searchEmployees$().subscribe({
@@ -238,11 +249,22 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
-  deleteTask(task: TenderTaskItem): void {
+  // Delete confirm state
+  deletingTaskId: number | null = null;
+
+  confirmDeleteTask(task: TenderTaskItem): void {
+    this.deletingTaskId = task.id;
+  }
+
+  cancelDeleteTask(): void {
+    this.deletingTaskId = null;
+  }
+
+  executeDeleteTask(task: TenderTaskItem): void {
     if (!this.tender) return;
     this.tenderService.deleteTask(this.tender.id, task.id).subscribe({
-      next: () => { this.reload(); this.notification.onDefault('Task removed.'); },
-      error: () => this.notification.onError('Failed to delete task.')
+      next: () => { this.deletingTaskId = null; this.reload(); this.notification.onDefault('Task removed.'); },
+      error: () => { this.deletingTaskId = null; this.notification.onError('Failed to delete task.'); }
     });
   }
 
@@ -295,11 +317,22 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
-  deleteRequirement(req: TenderRequirement): void {
+  // Delete confirm state
+  deletingRequirementId: number | null = null;
+
+  confirmDeleteRequirement(req: TenderRequirement): void {
+    this.deletingRequirementId = req.id;
+  }
+
+  cancelDeleteRequirement(): void {
+    this.deletingRequirementId = null;
+  }
+
+  executeDeleteRequirement(req: TenderRequirement): void {
     if (!this.tender) return;
     this.tenderService.deleteRequirement(this.tender.id, req.id).subscribe({
-      next: () => { this.reload(); this.notification.onDefault('Requirement removed.'); },
-      error: () => this.notification.onError('Failed to delete requirement.')
+      next: () => { this.deletingRequirementId = null; this.reload(); this.notification.onDefault('Requirement removed.'); },
+      error: () => { this.deletingRequirementId = null; this.notification.onError('Failed to delete requirement.'); }
     });
   }
 
@@ -345,11 +378,22 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
-  deletePricingLine(line: TenderPricingLine): void {
+  // Delete confirm state
+  deletingPricingLineId: number | null = null;
+
+  confirmDeletePricingLine(line: TenderPricingLine): void {
+    this.deletingPricingLineId = line.id;
+  }
+
+  cancelDeletePricingLine(): void {
+    this.deletingPricingLineId = null;
+  }
+
+  executeDeletePricingLine(line: TenderPricingLine): void {
     if (!this.tender) return;
     this.tenderService.deletePricingLine(this.tender.id, line.id).subscribe({
-      next: () => { this.reload(); this.notification.onDefault('Pricing line removed.'); },
-      error: () => this.notification.onError('Failed to delete pricing line.')
+      next: () => { this.deletingPricingLineId = null; this.reload(); this.notification.onDefault('Pricing line removed.'); },
+      error: () => { this.deletingPricingLineId = null; this.notification.onError('Failed to delete pricing line.'); }
     });
   }
 
@@ -456,11 +500,22 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
-  deleteBidDocument(doc: TenderBidDocument): void {
+  // Delete confirm state
+  deletingBidDocumentId: number | null = null;
+
+  confirmDeleteBidDocument(doc: TenderBidDocument): void {
+    this.deletingBidDocumentId = doc.id;
+  }
+
+  cancelDeleteBidDocument(): void {
+    this.deletingBidDocumentId = null;
+  }
+
+  executeDeleteBidDocument(doc: TenderBidDocument): void {
     if (!this.tender) return;
     this.tenderService.deleteBidDocument(this.tender.id, doc.id).subscribe({
-      next: () => { this.reload(); this.notification.onDefault('Document removed.'); },
-      error: () => this.notification.onError('Failed to delete document.')
+      next: () => { this.deletingBidDocumentId = null; this.reload(); this.notification.onDefault('Document removed.'); },
+      error: () => { this.deletingBidDocumentId = null; this.notification.onError('Failed to delete document.'); }
     });
   }
 
@@ -555,11 +610,22 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
-  deleteFollowUp(followUp: TenderFollowUp): void {
+  // Delete confirm state
+  deletingFollowUpId: number | null = null;
+
+  confirmDeleteFollowUp(followUp: TenderFollowUp): void {
+    this.deletingFollowUpId = followUp.id;
+  }
+
+  cancelDeleteFollowUp(): void {
+    this.deletingFollowUpId = null;
+  }
+
+  executeDeleteFollowUp(followUp: TenderFollowUp): void {
     if (!this.tender) return;
     this.tenderService.deleteFollowUp(this.tender.id, followUp.id).subscribe({
-      next: () => { this.reload(); this.notification.onDefault('Follow-up removed.'); },
-      error: () => this.notification.onError('Failed to delete follow-up.')
+      next: () => { this.deletingFollowUpId = null; this.reload(); this.notification.onDefault('Follow-up removed.'); },
+      error: () => { this.deletingFollowUpId = null; this.notification.onError('Failed to delete follow-up.'); }
     });
   }
 

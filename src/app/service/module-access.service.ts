@@ -20,7 +20,8 @@ export type ModuleKey =
   | 'BUDGET_MANAGEMENT'
   | 'INTERN_ATTENDANCE'
   | 'CONTRACT_MANAGEMENT'
-  | 'PROJECT_MANAGEMENT';
+  | 'PROJECT_MANAGEMENT'
+  | 'TENDER_MANAGEMENT';
 
 @Injectable()
 export class ModuleAccessService {

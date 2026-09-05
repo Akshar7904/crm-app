@@ -33,7 +33,7 @@
     <div class="falcon-card p-3 mb-3">
       <div class="d-flex justify-content-between align-items-start">
         <strong>Tender Summary</strong>
-        <button class="btn btn-sm btn-outline-secondary" (click)="startEditOverview()" *ngIf="!editingOverview">
+        <button class="btn btn-sm btn-outline-secondary" (click)="startEditOverview()" *ngIf="!editingOverview && isManagerOrAbove">
           <i class="bi bi-pencil me-1"></i>Edit
         </button>
       </div>
@@ -48,7 +48,7 @@
           <small class="text-muted d-block">Published Tender Document</small>
           <span *ngIf="!tender.attachmentFileName">No document uploaded</span>
           <button *ngIf="tender.attachmentFileName" class="btn btn-sm btn-link p-0" (click)="downloadAttachment()">{{ tender.attachmentFileName }}</button>
-          <label class="btn btn-sm btn-outline-secondary ms-2 mb-0">
+          <label class="btn btn-sm btn-outline-secondary ms-2 mb-0" *ngIf="isManagerOrAbove">
             {{ tender.attachmentFileName ? 'Replace' : 'Upload' }}
             <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
           </label>
@@ -80,16 +80,16 @@
       <div class="row g-3 mt-1">
         <div class="col-md-4">
           <label class="form-label">Allocated To</label>
-          <select class="form-select" (change)="onGoNoGoOwnerChange($any($event.target).value)">
+          <select class="form-select" (change)="onGoNoGoOwnerChange($any($event.target).value)" [disabled]="!isManagerOrAbove">
             <option value="">Select…</option>
             <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === goNoGoOwnerId">{{ e.firstName }} {{ e.lastName }}</option>
           </select>
         </div>
         <div class="col-md-8">
           <label class="form-label">Decision Reason</label>
-          <textarea class="form-control" rows="2" [(ngModel)]="goNoGoReason"></textarea>
+          <textarea class="form-control" rows="2" [(ngModel)]="goNoGoReason" [disabled]="!isManagerOrAbove"></textarea>
         </div>
-        <div class="col-12 d-flex gap-2">
+        <div class="col-12 d-flex gap-2" *ngIf="isManagerOrAbove">
           <button class="btn btn-success btn-sm" (click)="submitGoNoGo('GO')" [disabled]="savingGoNoGo">Go</button>
           <button class="btn btn-outline-danger btn-sm" (click)="submitGoNoGo('NO_GO')" [disabled]="savingGoNoGo">No-Go</button>
         </div>
@@ -102,7 +102,7 @@
     <div class="table-card">
       <div class="table-card-header">
         <strong>Tasks</strong>
-        <button class="btn btn-sm btn-primary" (click)="openAddTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add Task</button>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add Task</button>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -121,9 +121,16 @@
                   'badge-soft-danger': t.status === 'OVERDUE'
                 }">{{ t.status }}</span>
               </td>
-              <td class="text-end">
-                <button class="btn btn-sm btn-outline-secondary" (click)="openEditTaskModal(t)"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(t)"><i class="bi bi-trash"></i></button>
+              <td class="text-end" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingTaskId !== t.id; else confirmDeleteTaskTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditTaskModal(t)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteTask(t)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeleteTaskTpl>
+                  <span class="me-2 small text-muted">Delete this task?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteTask(t)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteTask()">Cancel</button>
+                </ng-template>
               </td>
             </tr>
           </tbody>
@@ -137,7 +144,7 @@
     <div class="table-card">
       <div class="table-card-header">
         <strong>Requirements</strong>
-        <button class="btn btn-sm btn-primary" (click)="openAddRequirementModal()"><i class="bi bi-plus-lg me-1"></i>Add Requirement</button>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddRequirementModal()"><i class="bi bi-plus-lg me-1"></i>Add Requirement</button>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -156,9 +163,16 @@
                   'badge-soft-success': r.status === 'COMPLETE'
                 }">{{ r.status }}</span>
               </td>
-              <td class="text-end">
-                <button class="btn btn-sm btn-outline-secondary" (click)="openEditRequirementModal(r)"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteRequirement(r)"><i class="bi bi-trash"></i></button>
+              <td class="text-end" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingRequirementId !== r.id; else confirmDeleteRequirementTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditRequirementModal(r)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteRequirement(r)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeleteRequirementTpl>
+                  <span class="me-2 small text-muted">Delete this requirement?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteRequirement(r)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteRequirement()">Cancel</button>
+                </ng-template>
               </td>
             </tr>
           </tbody>
@@ -172,7 +186,7 @@
     <div class="table-card mb-3">
       <div class="table-card-header">
         <strong>Costing</strong>
-        <button class="btn btn-sm btn-primary" (click)="openAddPricingLineModal()"><i class="bi bi-plus-lg me-1"></i>Add Product or Service</button>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddPricingLineModal()"><i class="bi bi-plus-lg me-1"></i>Add Product or Service</button>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -192,9 +206,16 @@
               <td>R {{ (l.sellExclVat || 0) | number:'1.2-2' }}</td>
               <td>R {{ (l.vatAmount || 0) | number:'1.2-2' }}</td>
               <td class="fw-semibold">R {{ (l.totalInclVat || 0) | number:'1.2-2' }}</td>
-              <td class="text-end">
-                <button class="btn btn-sm btn-outline-secondary" (click)="openEditPricingLineModal(l)"><i class="bi bi-pencil"></i></button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deletePricingLine(l)"><i class="bi bi-trash"></i></button>
+              <td class="text-end" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingPricingLineId !== l.id; else confirmDeletePricingLineTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditPricingLineModal(l)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeletePricingLine(l)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeletePricingLineTpl>
+                  <span class="me-2 small text-muted">Delete this line?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeletePricingLine(l)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeletePricingLine()">Cancel</button>
+                </ng-template>
               </td>
             </tr>
           </tbody>
@@ -217,7 +238,7 @@
         <div class="falcon-card p-3">
           <div class="d-flex justify-content-between align-items-start">
             <strong>Final Bid Price</strong>
-            <button class="btn btn-sm btn-success" (click)="finalisePricing()" [disabled]="finalisingPricing || tender.pricingFinalised">
+            <button class="btn btn-sm btn-success" *ngIf="isManagerOrAbove" (click)="finalisePricing()" [disabled]="finalisingPricing || tender.pricingFinalised">
               {{ tender.pricingFinalised ? 'Finalised' : 'Finalise Bid Price' }}
             </button>
           </div>
@@ -236,7 +257,7 @@
     <div class="table-card">
       <div class="table-card-header">
         <strong>Bid Documents</strong>
-        <button class="btn btn-sm btn-primary" (click)="openAddBidDocumentModal()"><i class="bi bi-plus-lg me-1"></i>Add Document</button>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddBidDocumentModal()"><i class="bi bi-plus-lg me-1"></i>Add Document</button>
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -250,14 +271,23 @@
               <td>v{{ d.version }}</td>
               <td>{{ d.updatedAt ? (d.updatedAt | date:'d MMM yyyy') : (d.createdAt | date:'d MMM yyyy') }}</td>
               <td class="text-end">
-                <button class="btn btn-sm btn-outline-primary" (click)="viewBidDocument(d)" title="View"><i class="bi bi-eye"></i></button>
-                <button class="btn btn-sm btn-outline-secondary" (click)="downloadBidDocumentFile(d)" title="Download"><i class="bi bi-download"></i></button>
-                <button class="btn btn-sm btn-outline-secondary" (click)="openEditBidDocumentModal(d)" title="Edit"><i class="bi bi-pencil"></i></button>
-                <label class="btn btn-sm btn-outline-secondary mb-0" title="Replace">
-                  <i class="bi bi-arrow-repeat"></i>
-                  <input type="file" hidden (change)="onReplaceFileSelected(d, $event)" [disabled]="replacingBidDocumentId === d.id">
-                </label>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteBidDocument(d)" title="Delete"><i class="bi bi-trash"></i></button>
+                <ng-container *ngIf="deletingBidDocumentId !== d.id; else confirmDeleteBidDocumentTpl">
+                  <button class="btn btn-sm btn-outline-primary" (click)="viewBidDocument(d)" title="View"><i class="bi bi-eye"></i></button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="downloadBidDocumentFile(d)" title="Download"><i class="bi bi-download"></i></button>
+                  <ng-container *ngIf="isManagerOrAbove">
+                    <button class="btn btn-sm btn-outline-secondary" (click)="openEditBidDocumentModal(d)" title="Edit"><i class="bi bi-pencil"></i></button>
+                    <label class="btn btn-sm btn-outline-secondary mb-0" title="Replace">
+                      <i class="bi bi-arrow-repeat"></i>
+                      <input type="file" hidden (change)="onReplaceFileSelected(d, $event)" [disabled]="replacingBidDocumentId === d.id">
+                    </label>
+                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteBidDocument(d)" title="Delete"><i class="bi bi-trash"></i></button>
+                  </ng-container>
+                </ng-container>
+                <ng-template #confirmDeleteBidDocumentTpl>
+                  <span class="me-2 small text-muted">Delete this document?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteBidDocument(d)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteBidDocument()">Cancel</button>
+                </ng-template>
               </td>
             </tr>
           </tbody>
@@ -329,7 +359,7 @@
         <div class="table-card">
           <div class="table-card-header">
             <strong>Post-bid Follow-ups</strong>
-            <button class="btn btn-sm btn-primary" (click)="openAddFollowUpModal()"><i class="bi bi-plus-lg me-1"></i>Add Follow-up</button>
+            <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddFollowUpModal()"><i class="bi bi-plus-lg me-1"></i>Add Follow-up</button>
           </div>
           <ul class="list-group list-group-flush">
             <li class="list-group-item text-muted" *ngIf="!tender.followUps?.length">No follow-ups yet</li>
@@ -338,12 +368,19 @@
                 <div [class.text-decoration-line-through]="f.status === 'DONE'">{{ f.description }}</div>
                 <small class="text-muted" *ngIf="f.dueDate">Due {{ f.dueDate | date:'d MMM yyyy' }}</small>
               </div>
-              <div class="d-flex gap-2">
+              <div class="d-flex gap-2" *ngIf="deletingFollowUpId !== f.id; else confirmDeleteFollowUpTpl">
                 <button class="btn btn-sm" [ngClass]="f.status === 'DONE' ? 'btn-outline-secondary' : 'btn-outline-success'" (click)="toggleFollowUpStatus(f)">
                   {{ f.status === 'DONE' ? 'Reopen' : 'Mark Done' }}
                 </button>
-                <button class="btn btn-sm btn-outline-danger" (click)="deleteFollowUp(f)"><i class="bi bi-trash"></i></button>
+                <button class="btn btn-sm btn-outline-danger" *ngIf="isManagerOrAbove" (click)="confirmDeleteFollowUp(f)"><i class="bi bi-trash"></i></button>
               </div>
+              <ng-template #confirmDeleteFollowUpTpl>
+                <div class="d-flex gap-2 align-items-center">
+                  <span class="small text-muted">Delete?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteFollowUp(f)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteFollowUp()">Cancel</button>
+                </div>
+              </ng-template>
             </li>
           </ul>
         </div>

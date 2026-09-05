@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
+import { UserService } from '../../../service/user.service';
 import { Tender, TenderDashboardStats } from '../models/tender.model';
 
 @Component({
@@ -27,14 +28,22 @@ export class TenderDashboardComponent implements OnInit {
   saving = false;
   newTender = this.emptyNewTender();
 
+  // Role gating — mirrors project-detail.component.ts: only Manager+ may
+  // add tenders; the backend enforces the same
+  // @PreAuthorize("hasAnyRole(...MANAGER...)") guard.
+  isManagerOrAbove = false;
+
   constructor(
     private tenderService: TenderService,
     private employeeService: EmployeeService,
     private notification: NotificationService,
-    private router: Router
+    private router: Router,
+    private userSvc: UserService
   ) {}
 
   ngOnInit(): void {
+    const user = this.userSvc.getUserFromLocalCache();
+    this.isManagerOrAbove = ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN'].includes(user?.roleName || '');
     this.load(0);
     this.tenderService.getDashboardStats().subscribe({ next: s => this.stats = s, error: () => {} });
     this.employeeService.searchEmployees$().subscribe({

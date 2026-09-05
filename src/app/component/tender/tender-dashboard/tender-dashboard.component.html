@@ -1,7 +1,7 @@
 <div class="page-banner">
   <div class="banner-title">Tender Management</div>
   <p class="banner-subtitle">Track tenders from decision through submission and outcome</p>
-  <div class="banner-actions">
+  <div class="banner-actions" *ngIf="isManagerOrAbove">
     <button class="btn btn-banner" (click)="openAddModal()">
       <i class="bi bi-plus-lg me-2"></i>Add Tender
     </button>

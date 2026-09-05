@@ -1,2 +1,28 @@
-// Uses the app's global falcon-card / table-card / progress-bar styling — no
-// component-local overrides needed.
+// Card/table styling copied from project-list.component.scss — this app
+// declares these per-component (view-encapsulated), not globally.
+@import '../../../../styles/variables';
+
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
