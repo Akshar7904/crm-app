@@ -12,5 +12,6 @@ FROM node:20-alpine
 WORKDIR /app
 RUN npm install -g serve
 COPY --from=build /app/dist/payroll-orion ./dist
+COPY serve.json ./dist/serve.json
 EXPOSE 8080
 CMD ["serve", "-s", "dist", "-l", "8080"]
