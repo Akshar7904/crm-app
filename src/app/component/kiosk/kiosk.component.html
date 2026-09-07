@@ -37,7 +37,7 @@
       <div class="kiosk-card" (click)="$event.stopPropagation()">
         <h2 class="kiosk-card-title">Enter Employee Number</h2>
         <div class="kiosk-display">
-          <span class="kiosk-display-prefix">LKC</span>
+          <span class="kiosk-display-prefix">{{ employeeIdPrefix }}</span>
           <span class="kiosk-display-value">{{ employeeIdInput || '——' }}</span>
         </div>
         <div class="kiosk-numpad">
@@ -60,7 +60,7 @@
     <ng-container *ngIf="state === 'ENTER_PIN'">
       <div class="kiosk-card" (click)="$event.stopPropagation()">
         <h2 class="kiosk-card-title">Enter PIN</h2>
-        <p class="kiosk-card-sub">LKC{{ paddedEmployeeId }}</p>
+        <p class="kiosk-card-sub">{{ employeeIdPrefix }}{{ paddedEmployeeId }}</p>
         <div class="kiosk-pin-dots">
           <span *ngFor="let filled of pinDots" class="kiosk-dot"
                 [class.kiosk-dot--filled]="filled"></span>

@@ -66,6 +66,7 @@ function darken(hex: string, amount: number): string {
 export interface CompanyBranding {
   id: number;
   name: string;
+  code: string;
   tagline: string;
   primaryColor: string;
   logoUrl: string;
@@ -105,6 +106,7 @@ export class BrandingService {
         const branding: CompanyBranding = {
           id:           c.id,
           name:         c.name      ?? '',
+          code:         c.code      ?? '',
           tagline:      c.tagline   ?? '',
           primaryColor: c.primaryColor ?? this.DEFAULT_PRIMARY,
           // Cache-bust with updatedAt — the logo endpoint has a 24h Cache-Control
@@ -149,6 +151,7 @@ export class BrandingService {
         return {
           id:           b.id,
           name:         b.name         ?? '',
+          code:         b.code         ?? '',
           tagline:      b.tagline       ?? '',
           primaryColor: b.primaryColor  ?? this.DEFAULT_PRIMARY,
           logoUrl:      `${environment.apiUrl}/api/v1/companies/${b.id}/logo?v=${b.logoVersion ? new Date(b.logoVersion).getTime() : ''}`,

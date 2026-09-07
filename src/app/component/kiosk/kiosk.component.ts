@@ -128,6 +128,10 @@ export class KioskComponent implements OnInit, OnDestroy {
     return (this.employeeIdInput ?? '').padStart(4, '0');
   }
 
+  get employeeIdPrefix(): string {
+    return this.branding.branding?.code ?? '';
+  }
+
   pressKey(key: string): void {
     if (this.state === 'ENTER_ID') {
       if (this.employeeIdInput.length < 4) this.employeeIdInput += key;
@@ -156,7 +160,7 @@ export class KioskComponent implements OnInit, OnDestroy {
     if (this.pinInput.length < 4 || !this.companyId) return;
     this.state = 'CONFIRMING';
     this.cdr.markForCheck();
-    const fullEmployeeId = 'LKC' + this.employeeIdInput.trim().padStart(4, '0');
+    const fullEmployeeId = this.employeeIdPrefix + this.employeeIdInput.trim().padStart(4, '0');
     this.kioskService.punch(fullEmployeeId, this.pinInput, this.companyId)
       .subscribe({ next: res => this.handleResponse(res), error: err => this.handleError(err) });
   }
@@ -166,7 +170,7 @@ export class KioskComponent implements OnInit, OnDestroy {
     clearTimeout(this.resetTimer);
     this.state = 'CONFIRMING';
     this.cdr.markForCheck();
-    const fullEmployeeId = 'LKC' + this.employeeIdInput.trim().padStart(4, '0');
+    const fullEmployeeId = this.employeeIdPrefix + this.employeeIdInput.trim().padStart(4, '0');
     this.kioskService.punch(fullEmployeeId, this.pinInput, this.companyId, opt.action)
       .subscribe({ next: res => this.handleResponse(res), error: err => this.handleError(err) });
   }
