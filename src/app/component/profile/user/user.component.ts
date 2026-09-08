@@ -79,6 +79,7 @@ export class UserComponent implements OnInit {
   // MFA setup state
   mfaSetupMode = false;
   mfaDisableMode = false;
+  mfaEmailMode = false;
   savingKioskPin = false;
   mfaSetupData: { secret: string; qrCodeDataUri: string; issuer: string; email: string } | null = null;
   mfaCode = '';
@@ -548,9 +549,36 @@ export class UserComponent implements OnInit {
     });
   }
 
+  /**
+   * Enable "Email code at login" MFA — toggles usingMfa directly via the existing
+   * PATCH /user/togglemfa endpoint, WITHOUT going through the TOTP QR-code setup flow.
+   * This is the mutually-exclusive alternative to the authenticator-app setup above:
+   * with no TOTP secret configured, the backend's login flow falls back to emailing a
+   * one-time code instead of prompting for an authenticator code.
+   */
+  enableEmailMfa(): void {
+    this.isLoadingSubject.next(true);
+    this.userService.toggleMfa$().subscribe({
+      next: (response) => {
+        this.dataSubject.next(response);
+        this.profileState$ = of({ dataState: DataState.LOADED, appData: response });
+        this.mfaEmailMode = false;
+        this.isLoadingSubject.next(false);
+        this.notification.onSuccess(response.message || 'Email code at login enabled successfully');
+        this.cdr.markForCheck();
+      },
+      error: (error: string) => {
+        this.isLoadingSubject.next(false);
+        this.notification.onError(error || 'Failed to enable email code at login');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   cancelMfaSetup(): void {
     this.mfaSetupMode = false;
     this.mfaDisableMode = false;
+    this.mfaEmailMode = false;
     this.mfaSetupData = null;
     this.mfaCode = '';
     this.cdr.markForCheck();

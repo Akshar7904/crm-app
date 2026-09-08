@@ -898,19 +898,24 @@
                   <i class="bi bi-shield-lock-fill"></i>
                 </div>
                 <div class="up-security-info flex-grow-1">
-                  <strong>Multi-Factor Authentication (TOTP)</strong>
+                  <strong>Multi-Factor Authentication</strong>
                   <span *ngIf="state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-on ms-2">Enabled</span>
                   <span *ngIf="!state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-off ms-2">Disabled</span>
-                  <p class="text-muted small mb-0 mt-1">Use an authenticator app (Google Authenticator, Authy) for sign-in verification</p>
+                  <p class="text-muted small mb-0 mt-1">Choose one of two ways to verify sign-in: an authenticator app (Google Authenticator, Authy), or a one-time code emailed to you at login</p>
                 </div>
 
-                <!-- Enable button (not set up yet) -->
-                <button *ngIf="!state?.appData?.data?.user?.usingMfa && !mfaSetupMode"
-                        (click)="setupMfa()" [disabled]="(isLoading$ | async)"
-                        class="btn btn-sm btn-primary">
-                  <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
-                  <i class="bi bi-qr-code me-1"></i> Set Up MFA
-                </button>
+                <!-- Enable buttons (not set up yet) — two mutually exclusive options -->
+                <div *ngIf="!state?.appData?.data?.user?.usingMfa && !mfaSetupMode && !mfaEmailMode" class="d-flex gap-2">
+                  <button (click)="setupMfa()" [disabled]="(isLoading$ | async)"
+                          class="btn btn-sm btn-primary">
+                    <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                    <i class="bi bi-qr-code me-1"></i> Set Up Authenticator App
+                  </button>
+                  <button (click)="mfaEmailMode = true" [disabled]="(isLoading$ | async)"
+                          class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-envelope-check me-1"></i> Use Email Code Instead
+                  </button>
+                </div>
 
                 <!-- Disable button (MFA active) -->
                 <button *ngIf="state?.appData?.data?.user?.usingMfa && !mfaDisableMode"
@@ -918,6 +923,26 @@
                         class="btn btn-sm btn-outline-danger">
                   <i class="bi bi-shield-x me-1"></i> Disable MFA
                 </button>
+              </div>
+
+              <!-- Email Code Confirmation Panel -->
+              <div *ngIf="mfaEmailMode" class="mfa-setup-panel w-100">
+                <div class="mfa-setup-body">
+                  <p class="mfa-setup-step">
+                    <i class="bi bi-envelope-check me-2"></i>
+                    Instead of scanning a QR code, we'll email a one-time verification code to your registered email address every time you log in.
+                  </p>
+                  <p class="mfa-setup-step text-muted small">
+                    This is an alternative to the authenticator app — you can only have one method active at a time. If you previously set up an authenticator app, switching to email codes means you won't be asked for an authenticator code going forward.
+                  </p>
+                  <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-primary" (click)="enableEmailMfa()" [disabled]="(isLoading$ | async)">
+                      <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                      Confirm — Use Email Code
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="cancelMfaSetup()" [disabled]="(isLoading$ | async)">Cancel</button>
+                  </div>
+                </div>
               </div>
 
               <!-- QR Code Setup Panel -->
