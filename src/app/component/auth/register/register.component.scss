@@ -224,6 +224,148 @@ section {
   cursor: pointer;
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// Wizard — account type chooser
+// ─────────────────────────────────────────────────────────────────────────
+.account-type-choice {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.account-type-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 20px 22px;
+  background: $gray-50;
+  border: $border-width-md solid $gray-200;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  text-align: left;
+  transition: all $transition-base;
+  font-size: 1rem;
+  font-weight: $font-weight-semibold;
+  color: $gray-900;
+
+  i {
+    font-size: 1.6rem;
+    color: $primary;
+    flex-shrink: 0;
+  }
+
+  &:hover {
+    border-color: $primary;
+    background: $white;
+    box-shadow: 0 4px 14px rgba($primary, 0.12);
+    transform: translateY(-2px);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Wizard — Step 4: plan picker
+// ─────────────────────────────────────────────────────────────────────────
+.plan-cards {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.plan-card {
+  padding: 20px 22px;
+  background: $gray-50;
+  border: $border-width-md solid $gray-200;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 1.05rem;
+    font-weight: $font-weight-bold;
+    color: $gray-900;
+  }
+
+  &:hover {
+    border-color: $primary;
+    background: $white;
+  }
+
+  &--selected {
+    border-color: $primary;
+    background: $white;
+    box-shadow: 0 0 0 4px rgba($primary, 0.1);
+  }
+}
+
+.plan-price {
+  margin: 0 0 4px;
+  font-weight: $font-weight-semibold;
+  color: $primary;
+}
+
+.plan-desc {
+  margin: 0;
+  color: $text-muted;
+  font-size: 0.88rem;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Wizard — Step 5: confirm checkboxes
+// ─────────────────────────────────────────────────────────────────────────
+.confirm-step {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  .form-check-input {
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .form-check-label {
+    color: $gray-700;
+    font-size: 0.92rem;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Wizard — navigation (Back / Next / Submit)
+// ─────────────────────────────────────────────────────────────────────────
+.wizard-nav {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: 30px;
+
+  .btn-register {
+    margin-top: 0;
+  }
+}
+
+.btn-secondary {
+  flex: 0 0 auto;
+  padding: 14px 24px;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $gray-700;
+  background: $gray-100;
+  border: $border-width-md solid $gray-200;
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover:not(:disabled) {
+    background: $gray-200;
+  }
+}
+
 // Success Content
 .success-content {
   text-align: center;

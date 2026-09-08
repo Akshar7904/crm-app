@@ -2,14 +2,19 @@
 // Enterprize360 HR & Payroll Management System
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { NgForm } from '@angular/forms';
-import { Observable, catchError, map, of, startWith } from 'rxjs';
-import { DataState } from 'src/app/enum/datastate.enum';
-import { RegisterState } from 'src/app/interface/appstates';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
+import { Plan, PlanService } from 'src/app/service/plan.service';
 
+// Multi-step self-service registration wizard. Replaces the old single-step
+// admin-approval registration form: applicants now pick an account type
+// (Company vs Individual), fill type-specific steps 1-3 (added by Tasks 10/11
+// via the #companySteps/#individualSteps ng-templates below), choose a plan
+// (step 4, shared — consumes PlanService from Task 8), and confirm (step 5,
+// shared). Submission hits the new self-service /auth/register endpoint
+// (Task 2) rather than the old /user/register admin-review endpoint.
 @Component({
   standalone: false,
   selector: 'app-register',
@@ -17,41 +22,70 @@ import { UserService } from 'src/app/service/user.service';
   styleUrls: ['./register.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RegisterComponent {
-  registerState$: Observable<RegisterState> = of({ dataState: DataState.LOADED });
-  readonly DataState = DataState;
+export class RegisterComponent implements OnInit {
+  accountType: 'COMPANY' | 'INDIVIDUAL' | null = null;
+  currentStep = 1; // 1-5, only meaningful once accountType is chosen
+  submitting = false;
+  submitted = false;
+  errorMessage: string | null = null;
+  plans: Plan[] = [];
 
-  constructor(private userService: UserService, private notification: NotificationService) { }
+  form: any = {
+    accountType: '', companyName: '', tradingName: '', companyRegistrationNumber: '',
+    companyType: '', industry: '', numberOfEmployees: null, estimatedCustomers: null,
+    vatRegistered: false, vatNumber: '', companyEmail: '', website: '',
+    idNumberOrPassport: '', countryOfResidence: '', occupation: '', operatingAs: '',
+    country: 'South Africa', city: '', province: '', address: '', postalCode: '',
+    alternativeContactNumber: '',
+    firstName: '', lastName: '', position: '', email: '', mobile: '',
+    password: '', confirmPassword: '',
+    planKey: '',
+    termsAccepted: false, popiaAccepted: false, accuracyConfirmed: false, marketingOptIn: false
+  };
 
-  register(registerForm: NgForm): void {
-    // The visible form no longer collects a password — the account is
-    // pending administrator review anyway, so the applicant can't sign in
-    // yet. A random placeholder still has to be sent because the backend
-    // requires a non-empty password; the real one gets set later via the
-    // existing "Forgot Password?" flow once the account is approved.
-    const payload = { ...registerForm.value, password: this.generatePlaceholderPassword() };
-    this.registerState$ = this.userService.save$(payload)
-      .pipe(
-        map(response => {
-          this.notification.onDefault(response.message);
-          console.log(response);
-          registerForm.reset();
-          return { dataState: DataState.LOADED, registerSuccess: true, message: response.message };
-        }),
-        startWith({ dataState: DataState.LOADING, registerSuccess: false }),
-        catchError((error: string) => {
-          this.notification.onError(error);
-          return of({ dataState: DataState.ERROR, registerSuccess: false, error })
-        })
-      );
+  readonly COMPANY_TYPES = [
+    'Private Company (Pty) Ltd', 'Public Company Ltd', 'Personal Liability Company Inc',
+    'State-Owned Company SOC Ltd', 'Non-Profit Company NPC', 'Sole Proprietorship', 'Partnership'
+  ];
+  readonly INDUSTRIES = ['Consulting', 'Retail', 'Construction', 'IT', 'Finance', 'Healthcare', 'Manufacturing', 'Other'];
+  readonly OPERATING_AS_OPTIONS = ['Individual', 'Freelancer', 'Independent Contractor', 'Sole Proprietor', 'Other'];
+  readonly PROVINCES = ['Eastern Cape', 'Free State', 'Gauteng', 'KwaZulu-Natal', 'Limpopo', 'Mpumalanga', 'Northern Cape', 'North West', 'Western Cape'];
+
+  constructor(
+    private userService: UserService,
+    private planService: PlanService,
+    private router: Router,
+    private notification: NotificationService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit(): void {
+    this.planService.getAll$().subscribe(plans => { this.plans = plans; this.cdr.markForCheck(); });
   }
 
-  createAccountForm(): void {
-    this.registerState$ = of({ dataState: DataState.LOADED, registerSuccess: false });
+  chooseAccountType(type: 'COMPANY' | 'INDIVIDUAL'): void {
+    this.accountType = type;
+    this.form.accountType = type;
+    this.currentStep = 1;
   }
 
-  private generatePlaceholderPassword(): string {
-    return `Pending-${crypto.randomUUID()}`;
+  nextStep(): void { if (this.currentStep < 5) this.currentStep++; }
+  prevStep(): void { if (this.currentStep > 1) this.currentStep--; }
+
+  submitRegistration(): void {
+    if (this.form.password !== this.form.confirmPassword) {
+      this.notification.onError('Passwords do not match');
+      return;
+    }
+    this.submitting = true;
+    this.userService.registerAccount$(this.form).subscribe({
+      next: () => { this.submitting = false; this.submitted = true; this.cdr.markForCheck(); },
+      error: (err) => { this.submitting = false; this.errorMessage = err; this.cdr.markForCheck(); }
+    });
   }
 
+  registerAnother(): void {
+    this.accountType = null; this.currentStep = 1; this.submitted = false;
+    this.form = { ...this.form }; // reset via the same defaults object shape as the constructor field above
+  }
 }
