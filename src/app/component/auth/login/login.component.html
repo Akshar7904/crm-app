@@ -142,7 +142,8 @@
           <div class="form-header">
             <div class="mfa-icon"><i class="bi bi-shield-lock"></i></div>
             <h2>Two-Factor Authentication</h2>
-            <p>Enter the 6-digit code from your <strong>authenticator app</strong></p>
+            <p *ngIf="state.mfaType !== 'EMAIL'">Enter the 6-digit code from your <strong>authenticator app</strong></p>
+            <p *ngIf="state.mfaType === 'EMAIL'">Enter the 6-digit code we emailed you</p>
           </div>
 
           <div *ngIf="state.dataState === DataState.ERROR" class="alert alert-danger" role="alert">
@@ -169,7 +170,8 @@
 
           <div class="form-footer">
             <p><a (click)="backToEmail()" class="back-link"><i class="bi bi-arrow-left me-1"></i>Back to Login</a></p>
-            <p class="resend-text">Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current code.</p>
+            <p class="resend-text" *ngIf="state.mfaType !== 'EMAIL'">Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current code.</p>
+            <p class="resend-text" *ngIf="state.mfaType === 'EMAIL'">Check your inbox — the code was just emailed to you.</p>
           </div>
         </ng-container>
 
