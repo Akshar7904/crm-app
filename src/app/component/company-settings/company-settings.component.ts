@@ -57,8 +57,8 @@ export class CompanySettingsComponent implements OnInit {
   save(form: NgForm): void {
     if (form.invalid) return;
     this.saving = true;
-    const { name, tagline, primaryColor, email, phone, address } = form.value;
-    this.companyService.updateMyBranding$({ name, tagline, primaryColor, email, phone, address }).subscribe({
+    const { name, tagline, primaryColor, email, phone, address, employeeIdPrefix } = form.value;
+    this.companyService.updateMyBranding$({ name, tagline, primaryColor, email, phone, address, employeeIdPrefix }).subscribe({
       next: res => {
         this.company = res?.data?.company ?? this.company;
         this.branding.clear(); // force reload so sidebar/theme updates

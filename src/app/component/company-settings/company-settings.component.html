@@ -83,6 +83,13 @@
                   <div class="form-text">Hex value e.g. <code>#375fa0</code></div>
                 </div>
 
+                <div class="col-md-4">
+                  <label class="form-label">Employee ID Prefix</label>
+                  <input class="form-control" name="employeeIdPrefix" [ngModel]="company?.employeeIdPrefix"
+                         placeholder="EMP" maxlength="20">
+                  <div class="form-text">Used as the prefix for new employee ID numbers, e.g. EMP0001. Changing this only affects employees added after the change.</div>
+                </div>
+
                 <div class="col-12"><hr class="my-0"></div>
 
                 <div class="col-md-6">
