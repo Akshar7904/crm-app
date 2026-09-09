@@ -49,7 +49,7 @@
             <div class="plan-cards">
               <div *ngFor="let plan of plans" class="plan-card" [class.plan-card--selected]="form.planKey === plan.planKey" (click)="form.planKey = plan.planKey">
                 <h3>{{ plan.name }}</h3>
-                <p class="plan-price">{{ plan.monthlyPrice !== null ? ('R' + plan.monthlyPrice + ' / per month') : 'Custom Pricing' }}</p>
+                <p class="plan-price">{{ plan.monthlyPrice != null ? ('R' + plan.monthlyPrice + ' / per month') : 'Custom Pricing' }}</p>
                 <p class="plan-desc">
                   <span *ngIf="plan.planKey === 'FREE'">For small businesses getting started</span>
                   <span *ngIf="plan.planKey === 'BUSINESS'">For growing businesses</span>
