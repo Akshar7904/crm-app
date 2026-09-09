@@ -171,7 +171,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * MFA verification (unchanged flow).
+   * MFA verification — branches to the email-code or TOTP endpoint depending
+   * on which method the login response indicated.
    */
   verifyCode(verifyCodeForm: NgForm): void {
     const verify$ = this.mfaTypeSubject.value === 'EMAIL'

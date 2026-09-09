@@ -3,7 +3,6 @@
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { NotificationService } from 'src/app/service/notification.service';
 import { UserService } from 'src/app/service/user.service';
 import { Plan, PlanService } from 'src/app/service/plan.service';
@@ -29,6 +28,7 @@ export class RegisterComponent implements OnInit {
   submitted = false;
   errorMessage: string | null = null;
   plans: Plan[] = [];
+  plansLoadError = false;
 
   form: any = {
     accountType: '', companyName: '', tradingName: '', companyRegistrationNumber: '',
@@ -54,23 +54,73 @@ export class RegisterComponent implements OnInit {
   constructor(
     private userService: UserService,
     private planService: PlanService,
-    private router: Router,
     private notification: NotificationService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.planService.getAll$().subscribe(plans => { this.plans = plans; this.cdr.markForCheck(); });
+    this.planService.getAll$().subscribe({
+      next: plans => { this.plans = plans; this.cdr.markForCheck(); },
+      error: () => { this.plansLoadError = true; this.cdr.markForCheck(); }
+    });
   }
 
   chooseAccountType(type: 'COMPANY' | 'INDIVIDUAL'): void {
+    this.errorMessage = null;
     this.accountType = type;
     this.form.accountType = type;
     this.currentStep = 1;
   }
 
-  nextStep(): void { if (this.currentStep < 5) this.currentStep++; }
-  prevStep(): void { if (this.currentStep > 1) this.currentStep--; }
+  // Non-blank check used by canProceed() below.
+  private isBlank(value: any): boolean {
+    return value === null || value === undefined || String(value).trim() === '';
+  }
+
+  // Per-step client-side validation: only the required fields for the
+  // CURRENT step (given the chosen accountType) must be non-blank before
+  // "Next" enables. Steps 4 (plan) and 5 (confirm) have no extra gating
+  // here — step 5's submit button already has its own required checks.
+  canProceed(): boolean {
+    if (!this.accountType) return false;
+    const f = this.form;
+    if (this.accountType === 'COMPANY') {
+      switch (this.currentStep) {
+        case 1: return !this.isBlank(f.companyName) && !this.isBlank(f.companyType) && !this.isBlank(f.industry);
+        case 2: return !this.isBlank(f.companyEmail) && !this.isBlank(f.country) && !this.isBlank(f.city)
+          && !this.isBlank(f.province) && !this.isBlank(f.address);
+        case 3: return !this.isBlank(f.firstName) && !this.isBlank(f.lastName) && !this.isBlank(f.email)
+          && !this.isBlank(f.mobile) && !this.isBlank(f.password) && !this.isBlank(f.confirmPassword)
+          && f.password === f.confirmPassword;
+        default: return true;
+      }
+    } else {
+      switch (this.currentStep) {
+        case 1: return !this.isBlank(f.firstName) && !this.isBlank(f.lastName) && !this.isBlank(f.idNumberOrPassport)
+          && !this.isBlank(f.countryOfResidence) && !this.isBlank(f.industry) && !this.isBlank(f.operatingAs);
+        case 2: return !this.isBlank(f.email) && !this.isBlank(f.mobile) && !this.isBlank(f.country)
+          && !this.isBlank(f.city) && !this.isBlank(f.province) && !this.isBlank(f.address);
+        case 3: return !this.isBlank(f.password) && !this.isBlank(f.confirmPassword) && f.password === f.confirmPassword;
+        default: return true;
+      }
+    }
+  }
+
+  nextStep(): void {
+    this.errorMessage = null;
+    if (this.currentStep < 5) this.currentStep++;
+  }
+
+  // On step 1, "Back" returns to the account-type chooser (there is no
+  // earlier wizard step to go back to).
+  prevStep(): void {
+    this.errorMessage = null;
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    } else {
+      this.accountType = null;
+    }
+  }
 
   submitRegistration(): void {
     if (this.form.password !== this.form.confirmPassword) {
@@ -82,10 +132,5 @@ export class RegisterComponent implements OnInit {
       next: () => { this.submitting = false; this.submitted = true; this.cdr.markForCheck(); },
       error: (err) => { this.submitting = false; this.errorMessage = err; this.cdr.markForCheck(); }
     });
-  }
-
-  registerAnother(): void {
-    this.accountType = null; this.currentStep = 1; this.submitted = false;
-    this.form = { ...this.form }; // reset via the same defaults object shape as the constructor field above
   }
 }

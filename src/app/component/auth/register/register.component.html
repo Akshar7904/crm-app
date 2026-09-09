@@ -23,6 +23,9 @@
               <span>I'm registering as an Individual</span>
             </button>
           </div>
+          <div class="form-footer">
+            <a routerLink="/login">Already have an account? Sign In</a>
+          </div>
         </ng-container>
 
         <!-- Wizard -->
@@ -46,6 +49,7 @@
 
           <!-- Step 4: Choose Your Plan (shared) -->
           <div *ngIf="currentStep === 4" class="plan-step">
+            <div *ngIf="plansLoadError" class="alert alert-danger">Unable to load plans, please refresh.</div>
             <div class="plan-cards">
               <div *ngFor="let plan of plans" class="plan-card" [class.plan-card--selected]="form.planKey === plan.planKey" (click)="form.planKey = plan.planKey">
                 <h3>{{ plan.name }}</h3>
@@ -80,8 +84,8 @@
           </div>
 
           <div class="wizard-nav">
-            <button type="button" class="btn-secondary" *ngIf="currentStep > 1" (click)="prevStep()">Back</button>
-            <button type="button" class="btn-register" *ngIf="currentStep < 5" (click)="nextStep()">Next</button>
+            <button type="button" class="btn-secondary" (click)="prevStep()">Back</button>
+            <button type="button" class="btn-register" *ngIf="currentStep < 5" [disabled]="!canProceed()" (click)="nextStep()">Next</button>
             <button type="button" class="btn-register" *ngIf="currentStep === 5"
                     [disabled]="submitting || !form.termsAccepted || !form.popiaAccepted || (accountType === 'INDIVIDUAL' && !form.accuracyConfirmed)"
                     (click)="submitRegistration()">
