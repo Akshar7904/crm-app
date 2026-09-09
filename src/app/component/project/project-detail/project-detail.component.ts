@@ -502,6 +502,47 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   // ── Financials ───────────────────────────────────────────────────────────
+  // Financials summary card — Project Value/Invoiced/Paid/Forecast Cost are
+  // Manager+ editable via a single edit-toggle form (editingFinancials),
+  // mirroring the same edit/save/cancel shape used elsewhere in this file
+  // (e.g. milestones, risks). Remaining Budget/Actual Cost/Outstanding/
+  // Forecast Profit/Margin are computed server-side and display-only.
+  editingFinancials = false;
+  finProjectValue: number | null = null;
+  finInvoiced: number | null = null;
+  finPaid: number | null = null;
+  finForecastCost: number | null = null;
+
+  startEditFinancials(): void {
+    if (!this.project) return;
+    this.editingFinancials = true;
+    this.finProjectValue = this.project.projectValue ?? null;
+    this.finInvoiced = this.project.invoiced ?? null;
+    this.finPaid = this.project.paid ?? null;
+    this.finForecastCost = this.project.forecastCost ?? null;
+  }
+
+  cancelEditFinancials(): void {
+    this.editingFinancials = false;
+  }
+
+  saveFinancials(): void {
+    if (!this.project) return;
+    this.projectService.updateFinancials(this.project.id, {
+      projectValue: this.finProjectValue ?? undefined,
+      invoiced: this.finInvoiced ?? undefined,
+      paid: this.finPaid ?? undefined,
+      forecastCost: this.finForecastCost ?? undefined
+    }).subscribe({
+      next: updated => {
+        this.project = { ...this.project!, ...updated };
+        this.editingFinancials = false;
+        this.notification.onDefault('Financials updated');
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to save financials')
+    });
+  }
+
   // One form serves both add and edit — editingTransactionId set means
   // saveTransaction() calls update instead of create. Reload the whole
   // project afterward so Overview's totalIncome/totalExpenses/profit (which

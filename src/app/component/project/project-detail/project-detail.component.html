@@ -426,6 +426,84 @@
 
   <!-- ══ FINANCIALS TAB ══ -->
   <div *ngIf="activeTab === 'financials'">
+    <div class="falcon-card mb-4">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-graph-up text-primary"></i><strong>Financials Summary</strong>
+        </div>
+        <button class="btn btn-sm btn-outline-primary" *ngIf="isManagerOrAbove && !editingFinancials" (click)="startEditFinancials()">
+          <i class="bi bi-pencil me-1"></i>Edit
+        </button>
+      </div>
+      <div class="card-body">
+        <div class="row g-3" *ngIf="!editingFinancials">
+          <div class="col-6 col-md-3">
+            <div class="info-label">Project Value</div>
+            <div class="info-value">{{ project.projectValue !== undefined && project.projectValue !== null ? ('R ' + (project.projectValue | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Budget</div>
+            <div class="info-value">R {{ (project.budget || 0) | number:'1.2-2' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Actual Cost</div>
+            <div class="info-value">R {{ (project.totalExpenses || 0) | number:'1.2-2' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Remaining Budget</div>
+            <div class="info-value">{{ project.remainingBudget !== undefined && project.remainingBudget !== null ? ('R ' + (project.remainingBudget | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Invoiced</div>
+            <div class="info-value">{{ project.invoiced !== undefined && project.invoiced !== null ? ('R ' + (project.invoiced | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Paid</div>
+            <div class="info-value">{{ project.paid !== undefined && project.paid !== null ? ('R ' + (project.paid | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Outstanding</div>
+            <div class="info-value">{{ project.outstanding !== undefined && project.outstanding !== null ? ('R ' + (project.outstanding | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Forecast Cost</div>
+            <div class="info-value">{{ project.forecastCost !== undefined && project.forecastCost !== null ? ('R ' + (project.forecastCost | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Forecast Profit</div>
+            <div class="info-value">{{ project.forecastProfit !== undefined && project.forecastProfit !== null ? ('R ' + (project.forecastProfit | number:'1.2-2')) : '—' }}</div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="info-label">Margin</div>
+            <div class="info-value">{{ project.margin !== undefined && project.margin !== null ? ((project.margin | number:'1.1-1') + '%') : '—' }}</div>
+          </div>
+        </div>
+
+        <div class="row g-3" *ngIf="editingFinancials">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Project Value</label>
+            <input type="number" class="form-control" [(ngModel)]="finProjectValue">
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Invoiced</label>
+            <input type="number" class="form-control" [(ngModel)]="finInvoiced">
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Paid</label>
+            <input type="number" class="form-control" [(ngModel)]="finPaid">
+          </div>
+          <div class="col-6 col-md-3">
+            <label class="form-label">Forecast Cost</label>
+            <input type="number" class="form-control" [(ngModel)]="finForecastCost">
+          </div>
+          <div class="col-12 d-flex gap-2 justify-content-end">
+            <button class="btn btn-outline-secondary" (click)="cancelEditFinancials()">Cancel</button>
+            <button class="btn btn-primary" (click)="saveFinancials()">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="falcon-card">
       <div class="table-card-header">
         <div class="d-flex align-items-center gap-2">
