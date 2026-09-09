@@ -54,6 +54,9 @@
     <button class="detail-tab" [class.active]="activeTab === 'financials'" (click)="activeTab = 'financials'">
       <i class="bi bi-cash-coin me-1"></i>Financials
     </button>
+    <button class="detail-tab" [class.active]="activeTab === 'risks'" (click)="activeTab = 'risks'">
+      <i class="bi bi-exclamation-triangle me-1"></i>Risks & Issues
+    </button>
   </div>
 
   <!-- ══ OVERVIEW TAB ══ -->
@@ -487,6 +490,102 @@
                   <button class="btn btn-sm btn-outline-danger ms-1" (click)="deleteTransactionRow(tx)" title="Delete this transaction">
                     <i class="bi bi-trash me-1"></i>Delete
                   </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RISKS & ISSUES TAB ══ -->
+  <div *ngIf="activeTab === 'risks'">
+    <div class="falcon-card">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-exclamation-triangle text-primary"></i><strong>Risks & Issues</strong>
+        </div>
+        <select class="form-select form-select-sm" style="max-width:160px" [(ngModel)]="riskTypeFilter">
+          <option value="ALL">All types</option>
+          <option value="RISK">Risk</option>
+          <option value="ISSUE">Issue</option>
+          <option value="DEPENDENCY">Dependency</option>
+          <option value="DECISION">Decision</option>
+        </select>
+      </div>
+      <div class="card-body">
+        <div class="d-flex gap-2 flex-wrap align-items-start mb-3" *ngIf="isManagerOrAbove">
+          <select class="form-select" style="max-width:130px" [(ngModel)]="riskType">
+            <option value="RISK">Risk</option>
+            <option value="ISSUE">Issue</option>
+            <option value="DEPENDENCY">Dependency</option>
+            <option value="DECISION">Decision</option>
+          </select>
+          <input type="text" class="form-control" placeholder="Description (required)" [(ngModel)]="riskDescription">
+          <select class="form-select" style="max-width:120px" [(ngModel)]="riskSeverity">
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+          </select>
+          <input type="text" class="form-control" placeholder="Owner" style="max-width:150px" [(ngModel)]="riskOwnerName">
+          <input type="date" class="form-control" style="max-width:160px" [(ngModel)]="riskDueDate">
+          <select class="form-select" style="max-width:140px" [(ngModel)]="riskStatus">
+            <option value="OPEN">Open</option>
+            <option value="MITIGATING">Mitigating</option>
+            <option value="RESOLVED">Resolved</option>
+            <option value="CLOSED">Closed</option>
+          </select>
+          <button class="btn btn-primary" (click)="saveRisk()" [disabled]="!riskDescription">
+            <i class="bi" [ngClass]="editingRiskId ? 'bi-check-lg' : 'bi-plus-lg'"></i>
+            {{ editingRiskId ? ' Save Changes' : ' Add Entry' }}
+          </button>
+          <button class="btn btn-outline-secondary" *ngIf="editingRiskId" (click)="cancelRiskEdit()">Cancel</button>
+        </div>
+
+        <div *ngIf="!filteredRisks.length" class="empty-state-cell py-5">
+          <i class="bi bi-exclamation-triangle d-block mb-2 fs-2 text-muted"></i>
+          <div class="text-muted">No risks, issues, dependencies, or decisions logged for this project</div>
+        </div>
+
+        <div class="table-responsive" *ngIf="filteredRisks.length">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Severity</th>
+                <th>Owner</th>
+                <th>Due</th>
+                <th>Status</th>
+                <th *ngIf="isManagerOrAbove">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let risk of filteredRisks">
+                <td><span class="badge-soft badge-soft-secondary">{{ risk.type }}</span></td>
+                <td>{{ risk.description }}</td>
+                <td>
+                  <span class="badge-soft"
+                        [ngClass]="{
+                          'badge-soft-danger': risk.severity === 'HIGH',
+                          'badge-soft-warning': risk.severity === 'MEDIUM',
+                          'badge-soft-secondary': risk.severity === 'LOW'
+                        }">{{ risk.severity }}</span>
+                </td>
+                <td>{{ risk.ownerName || '—' }}</td>
+                <td>{{ risk.dueDate || '—' }}</td>
+                <td>
+                  <span class="badge-soft"
+                        [ngClass]="{
+                          'badge-soft-primary': risk.status === 'OPEN',
+                          'badge-soft-warning': risk.status === 'MITIGATING',
+                          'badge-soft-success': risk.status === 'RESOLVED' || risk.status === 'CLOSED'
+                        }">{{ risk.status }}</span>
+                </td>
+                <td *ngIf="isManagerOrAbove">
+                  <button class="btn btn-sm btn-outline-secondary me-1" (click)="editRisk(risk)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteRisk(risk)"><i class="bi bi-trash"></i></button>
                 </td>
               </tr>
             </tbody>

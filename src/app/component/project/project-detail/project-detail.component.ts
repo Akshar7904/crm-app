@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { ProjectService } from '../services/project.service';
-import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus, ProjectMember } from '../models/project.model';
+import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus, ProjectMember, ProjectRiskIssue, RiskIssueType, RiskIssueSeverity, RiskIssueStatus } from '../models/project.model';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
 import { EmployeeService } from '../../../service/employee.service';
@@ -19,7 +19,7 @@ import { EmployeeService } from '../../../service/employee.service';
 })
 export class ProjectDetailComponent implements OnInit {
   project: Project | null = null;
-  activeTab: 'overview' | 'tasks' | 'milestones' | 'team' | 'financials' = 'overview';
+  activeTab: 'overview' | 'tasks' | 'milestones' | 'team' | 'financials' | 'risks' | 'documents' = 'overview';
   taskView: 'list' | 'kanban' = 'list';
   loading = false;
 
@@ -52,6 +52,20 @@ export class ProjectDetailComponent implements OnInit {
   // create, and the fields are pre-filled from the milestone being edited.
   editingMilestoneId: number | null = null;
   newMilestoneDescription = '';
+
+  // Risks & Issues — one combined table for Risk/Issue/Dependency/Decision
+  // entries, filterable by type. Same add/edit-in-one-form pattern as
+  // milestones: editingRiskId set means "Save" calls update instead of create.
+  risks: ProjectRiskIssue[] = [];
+  loadingRisks = false;
+  editingRiskId: number | null = null;
+  riskType: RiskIssueType = 'RISK';
+  riskDescription = '';
+  riskSeverity: RiskIssueSeverity = 'MEDIUM';
+  riskOwnerName = '';
+  riskDueDate: string | null = null;
+  riskStatus: RiskIssueStatus = 'OPEN';
+  riskTypeFilter: RiskIssueType | 'ALL' = 'ALL';
 
   // Team — staff/resources associated with the project as a whole (distinct
   // from per-task assignees). Add form: pick an employee + optional role label.
@@ -119,7 +133,7 @@ export class ProjectDetailComponent implements OnInit {
   load(id: number): void {
     this.loading = true;
     this.projectService.getById(id).subscribe({
-      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.members = p.members ?? []; this.loading = false; this.rebuildKanbanColumns(); },
+      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.members = p.members ?? []; this.loading = false; this.rebuildKanbanColumns(); this.loadRisks(); },
       error: () => { this.loading = false; }
     });
   }
@@ -529,6 +543,76 @@ export class ProjectDetailComponent implements OnInit {
     this.projectService.deleteTransaction(tx.id).subscribe({
       next: () => this.load(this.project!.id),
       error: e => this.notification.onError(e?.error?.message || 'Failed to delete transaction')
+    });
+  }
+
+  // ── Risks & Issues ───────────────────────────────────────────────────────
+  // One form serves both add and edit — editingRiskId set means saveRisk()
+  // calls update instead of create. Same shape as the milestone CRUD methods.
+  get filteredRisks(): ProjectRiskIssue[] {
+    return this.riskTypeFilter === 'ALL'
+      ? this.risks
+      : this.risks.filter(r => r.type === this.riskTypeFilter);
+  }
+
+  loadRisks(): void {
+    if (!this.project) return;
+    this.loadingRisks = true;
+    this.projectService.getRisks(this.project.id).subscribe({
+      next: risks => { this.risks = risks; this.loadingRisks = false; },
+      error: e => { this.notification.onError(e?.error?.message || 'Failed to load risks/issues'); this.loadingRisks = false; }
+    });
+  }
+
+  editRisk(risk: ProjectRiskIssue): void {
+    this.editingRiskId = risk.id;
+    this.riskType = risk.type;
+    this.riskDescription = risk.description;
+    this.riskSeverity = risk.severity;
+    this.riskOwnerName = risk.ownerName ?? '';
+    this.riskDueDate = risk.dueDate ?? null;
+    this.riskStatus = risk.status;
+  }
+
+  cancelRiskEdit(): void {
+    this.editingRiskId = null;
+    this.riskType = 'RISK';
+    this.riskDescription = '';
+    this.riskSeverity = 'MEDIUM';
+    this.riskOwnerName = '';
+    this.riskDueDate = null;
+    this.riskStatus = 'OPEN';
+  }
+
+  saveRisk(): void {
+    if (!this.project || !this.riskDescription.trim()) return;
+    const payload: Partial<ProjectRiskIssue> = {
+      type: this.riskType,
+      description: this.riskDescription,
+      severity: this.riskSeverity,
+      ownerName: this.riskOwnerName || undefined,
+      dueDate: this.riskDueDate || undefined,
+      status: this.riskStatus
+    };
+    const req$ = this.editingRiskId
+      ? this.projectService.updateRisk(this.project.id, this.editingRiskId, payload)
+      : this.projectService.createRisk(this.project.id, payload);
+    req$.subscribe({
+      next: () => {
+        this.notification.onDefault(this.editingRiskId ? 'Risk/Issue updated' : 'Risk/Issue added');
+        this.cancelRiskEdit();
+        this.loadRisks();
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to save risk/issue')
+    });
+  }
+
+  deleteRisk(risk: ProjectRiskIssue): void {
+    if (!this.project) return;
+    if (!confirm(`Delete this ${risk.type.toLowerCase()} entry?`)) return;
+    this.projectService.deleteRisk(this.project.id, risk.id).subscribe({
+      next: () => { this.notification.onDefault('Deleted'); this.loadRisks(); },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to delete risk/issue')
     });
   }
 }
