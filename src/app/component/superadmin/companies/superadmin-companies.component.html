@@ -39,6 +39,19 @@
         </div>
       </div>
     </div>
+    <div class="col-6 col-md-3">
+      <div class="falcon-card p-3 d-flex align-items-center gap-3">
+        <div class="stat-icon si-purple"><i class="bi bi-layers"></i></div>
+        <div>
+          <div class="stat-value plan-distribution-value">
+            <span title="Free">{{ planDistribution.FREE }}</span> /
+            <span title="Business">{{ planDistribution.BUSINESS }}</span> /
+            <span title="Enterprise">{{ planDistribution.ENTERPRISE }}</span>
+          </div>
+          <div class="stat-label">Free / Business / Enterprise</div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Company table -->
@@ -57,6 +70,7 @@
             <th>Logo</th>
             <th>Company</th>
             <th>Code</th>
+            <th>Plan</th>
             <th>Email</th>
             <th>Country</th>
             <th>Status</th>
@@ -77,6 +91,14 @@
               <div class="text-muted small">{{ c.legalName }}</div>
             </td>
             <td><span class="badge bg-secondary">{{ c.code }}</span></td>
+            <td>
+              <span class="badge-soft" [ngClass]="planBadgeClass(getPlanForCompany(c)?.planKey)">
+                {{ getPlanForCompany(c)?.name ?? '—' }}
+              </span>
+              <span class="badge-soft badge-soft-warning ms-1" *ngIf="c.planPendingQuote" title="Awaiting sales quote for Enterprise">
+                Awaiting Quote
+              </span>
+            </td>
             <td>{{ c.email ?? '—' }}</td>
             <td>{{ c.country ?? '—' }}</td>
             <td>
@@ -110,7 +132,7 @@
             </td>
           </tr>
           <tr *ngIf="companies.length === 0">
-            <td colspan="7" class="empty-state-cell">No companies found</td>
+            <td colspan="8" class="empty-state-cell">No companies found</td>
           </tr>
         </tbody>
       </table>
@@ -164,6 +186,16 @@
               <option value="CREDIT_CARD">Credit Card</option>
               <option value="OTHER">Other</option>
             </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Plan</label>
+            <select class="form-select" name="planId" [ngModel]="editCompany?.planId">
+              <option [ngValue]="null" disabled>Select plan…</option>
+              <option *ngFor="let p of plans" [ngValue]="p.id">{{ p.name }}</option>
+            </select>
+            <div class="form-text text-warning" *ngIf="editCompany?.planPendingQuote">
+              <i class="bi bi-exclamation-triangle me-1"></i>Awaiting a sales quote — assigning a plan clears this.
+            </div>
           </div>
           <div class="col-md-6">
             <label class="form-label">Email</label>

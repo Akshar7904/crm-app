@@ -8,6 +8,7 @@ import { SuperadminService } from '../superadmin.service';
 import { NotificationService } from '../../../service/notification.service';
 import { Key } from '../../../enum/key.enum';
 import { Router } from '@angular/router';
+import { PlanService, Plan } from '../../../service/plan.service';
 
 @Component({
   standalone: false,
@@ -22,6 +23,11 @@ export class SuperadminCompaniesComponent implements OnInit {
   totalActive = 0;
   loading = true;
   saving = false;
+
+  // Plan tiers
+  plans: Plan[] = [];
+  planMap: Record<number, Plan> = {};
+  planDistribution: Record<'FREE' | 'BUSINESS' | 'ENTERPRISE', number> = { FREE: 0, BUSINESS: 0, ENTERPRISE: 0 };
 
   // Company create/edit modal
   showCreateModal = false;
@@ -63,11 +69,24 @@ export class SuperadminCompaniesComponent implements OnInit {
   constructor(
     private superadminService: SuperadminService,
     private notification: NotificationService,
+    private planService: PlanService,
     private router: Router,
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void { this.loadCompanies(); }
+  ngOnInit(): void {
+    this.planService.getAll$().subscribe({
+      next: plans => {
+        this.plans = plans;
+        this.planMap = {};
+        for (const p of plans) this.planMap[p.id] = p;
+        this.computePlanDistribution();
+        this.cdr.markForCheck();
+      },
+      error: err => this.notification.onError(err)
+    });
+    this.loadCompanies();
+  }
 
   loadCompanies(): void {
     this.loading = true;
@@ -77,10 +96,34 @@ export class SuperadminCompaniesComponent implements OnInit {
         this.totalAll = res.data?.totalAll ?? 0;
         this.totalActive = res.data?.totalActive ?? 0;
         this.loading = false;
+        this.computePlanDistribution();
         this.cdr.markForCheck();
       },
       error: err => { this.notification.onError(err); this.loading = false; this.cdr.markForCheck(); }
     });
+  }
+
+  // ── Plan tiers ─────────────────────────────────────────────────
+  private computePlanDistribution(): void {
+    const dist: Record<'FREE' | 'BUSINESS' | 'ENTERPRISE', number> = { FREE: 0, BUSINESS: 0, ENTERPRISE: 0 };
+    for (const c of this.companies) {
+      const plan = this.planMap[c.planId];
+      if (plan) dist[plan.planKey]++;
+    }
+    this.planDistribution = dist;
+  }
+
+  getPlanForCompany(c: any): Plan | undefined {
+    return this.planMap[c.planId];
+  }
+
+  planBadgeClass(planKey: string | undefined): string {
+    switch (planKey) {
+      case 'ENTERPRISE': return 'badge-soft-success';
+      case 'BUSINESS': return 'badge-soft-primary';
+      case 'FREE': return 'badge-soft-secondary';
+      default: return 'badge-soft-secondary';
+    }
   }
 
   // ── Company CRUD ──────────────────────────────────────────────

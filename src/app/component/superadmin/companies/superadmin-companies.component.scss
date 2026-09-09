@@ -67,7 +67,10 @@
   &.si-blue    { background: rgba($primary, .12); color: $primary; }
   &.si-green   { background: rgba($success, .12); color: $success; }
   &.si-warning { background: rgba($warning, .12); color: darken($warning, 10%); }
+  &.si-purple  { background: rgba(#8e44ad, .12); color: #8e44ad; }
 }
+
+.plan-distribution-value { font-size: 1.1rem; font-weight: 700; }
 
 .info-note {
   background: rgba($primary, .06);
