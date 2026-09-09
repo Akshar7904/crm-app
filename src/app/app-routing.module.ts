@@ -12,7 +12,6 @@ import { ModuleAccessGuard } from './guard/module-access.guard';
 import { SuperadminGuard } from './guard/superadmin.guard';
 import { AttendanceListComponent } from "./component/attendance/attendance-list/attendance-list.component";
 import { MyAttendanceComponent } from "./component/attendance/my-attendance/my-attendance.component";
-import { WhatsAppAttendanceComponent } from "./component/attendance/whatsapp-attendance/whatsapp-attendance.component";
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
 
@@ -136,12 +135,6 @@ const routes: Routes = [
     component: MyAttendanceComponent,
     canActivate: [AuthenticationGuard, ModuleAccessGuard],
     data: { title: 'My Attendance', moduleKey: 'ATTENDANCE_TRACKING' }
-  },
-  {
-    path: 'attendance/whatsapp',
-    component: WhatsAppAttendanceComponent,
-    canActivate: [AuthenticationGuard, ModuleAccessGuard],
-    data: { title: 'WhatsApp Attendance', moduleKey: 'ATTENDANCE_TRACKING' }
   },
   {
     path: 'holidays',

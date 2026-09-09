@@ -29,7 +29,6 @@ import { AppComponent } from './app.component';
 import { AttendanceListComponent } from './component/attendance/attendance-list/attendance-list.component';
 import { EditAttendanceModalComponent } from './component/attendance/edit-attendance-modal/edit-attendance-modal.component';
 import { MyAttendanceComponent } from './component/attendance/my-attendance/my-attendance.component';
-import { WhatsAppAttendanceComponent } from './component/attendance/whatsapp-attendance/whatsapp-attendance.component';
 import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 
@@ -53,7 +52,6 @@ import { AppRoutingModule } from './app-routing.module';
     AttendanceListComponent,
     EditAttendanceModalComponent,
     MyAttendanceComponent,
-    WhatsAppAttendanceComponent,
     EmployeeLeaveComponent,
     AdminLeaveComponent,
   ],
