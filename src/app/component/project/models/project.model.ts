@@ -5,6 +5,13 @@ export type ProjectStatus = 'DRAFT' | 'ACTIVE' | 'ON_HOLD' | 'COMPLETED' | 'CANC
 export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
 export type MilestoneStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'READY_FOR_REVIEW' | 'COMPLETED';
+export type RiskIssueType = 'RISK' | 'ISSUE' | 'DEPENDENCY' | 'DECISION';
+export type RiskIssueSeverity = 'LOW' | 'MEDIUM' | 'HIGH';
+export type RiskIssueStatus = 'OPEN' | 'MITIGATING' | 'RESOLVED' | 'CLOSED';
+export type ProjectDocumentType =
+  | 'PROPOSAL_QUOTE' | 'CONTRACT_PO' | 'PROJECT_PLAN' | 'CUSTOMER_DOCUMENTS'
+  | 'DELIVERABLES' | 'MEETING_MINUTES' | 'REPORTS' | 'FINANCIAL_DOCUMENTS'
+  | 'SUPPORTING_DOCUMENTS' | 'FINAL_CLOSURE_DOCUMENTS' | 'OTHER';
 
 export interface TaskComment {
   id: number;
@@ -87,6 +94,35 @@ export interface ProjectMember {
   createdAt: string;
 }
 
+export interface ProjectRiskIssue {
+  id: number;
+  projectId: number;
+  type: RiskIssueType;
+  description: string;
+  severity: RiskIssueSeverity;
+  ownerId?: number;
+  ownerName?: string;
+  dueDate?: string;
+  status: RiskIssueStatus;
+  createdById?: number;
+  createdByName?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface ProjectDocument {
+  id: number;
+  projectId: number;
+  documentType: ProjectDocumentType;
+  fileName: string;
+  contentType?: string;
+  fileSize?: number;
+  description?: string;
+  uploadedByUserId?: number;
+  uploadedByName?: string;
+  uploadedAt?: string;
+}
+
 export interface Project {
   id: number;
   projectNumber: string;
@@ -101,6 +137,28 @@ export interface Project {
   totalIncome?: number;
   totalExpenses?: number;
   profit?: number;
+  projectValue?: number;
+  invoiced?: number;
+  paid?: number;
+  forecastCost?: number;
+  remainingBudget?: number;
+  outstanding?: number;
+  forecastProfit?: number;
+  margin?: number;
+  closureTasksComplete?: boolean;
+  closureDeliverablesComplete?: boolean;
+  closureCustomerSignoff?: boolean;
+  closureFinalInvoiceRaised?: boolean;
+  closureOutstandingPaymentsCaptured?: boolean;
+  closureDocumentsArchived?: boolean;
+  closureFinancialsFinalised?: boolean;
+  closureLessonsCaptured?: boolean;
+  closureApproved?: boolean;
+  closureItemsComplete?: number;
+  closureComplete?: boolean;
+  closedAt?: string;
+  closedById?: number;
+  closedByName?: string;
   ownerId?: number;
   ownerName?: string;
   createdById?: number;
@@ -112,6 +170,8 @@ export interface Project {
   milestones?: Milestone[];
   transactions?: ProjectTransaction[];
   members?: ProjectMember[];
+  risks?: ProjectRiskIssue[];
+  documents?: ProjectDocument[];
 }
 
 export interface ProjectPage {

@@ -6,7 +6,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Project, ProjectPage, ProjectStats, ProjectTask, TaskComment, ProjectTransaction, TaskStatus, Milestone, MilestoneStatus, ProjectMember } from '../models/project.model';
+import { Project, ProjectPage, ProjectStats, ProjectTask, TaskComment, ProjectTransaction, TaskStatus, Milestone, MilestoneStatus, ProjectMember, ProjectRiskIssue, ProjectDocument, ProjectDocumentType } from '../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -145,5 +145,62 @@ export class ProjectService {
 
   removeMember(projectId: number, memberId: number): Observable<void> {
     return this.http.delete<any>(`${this.base}/${projectId}/members/${memberId}`).pipe(map(() => undefined));
+  }
+
+  // ── Risks & Issues ────────────────────────────────────────────────────
+  getRisks(projectId: number): Observable<ProjectRiskIssue[]> {
+    return this.http.get<any>(`${this.base}/${projectId}/risks`)
+      .pipe(map(r => r.data.risks));
+  }
+
+  createRisk(projectId: number, risk: Partial<ProjectRiskIssue>): Observable<ProjectRiskIssue> {
+    return this.http.post<any>(`${this.base}/${projectId}/risks`, risk)
+      .pipe(map(r => r.data.risk));
+  }
+
+  updateRisk(projectId: number, riskId: number, risk: Partial<ProjectRiskIssue>): Observable<ProjectRiskIssue> {
+    return this.http.put<any>(`${this.base}/${projectId}/risks/${riskId}`, risk)
+      .pipe(map(r => r.data.risk));
+  }
+
+  deleteRisk(projectId: number, riskId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${projectId}/risks/${riskId}`)
+      .pipe(map(() => undefined));
+  }
+
+  // ── Financials ─────────────────────────────────────────────────────────
+  updateFinancials(projectId: number, financials: Partial<Project>): Observable<Project> {
+    return this.http.put<any>(`${this.base}/${projectId}/financials`, financials)
+      .pipe(map(r => r.data.project));
+  }
+
+  // ── Documents ──────────────────────────────────────────────────────────
+  uploadDocument(projectId: number, documentType: ProjectDocumentType, description: string | null, file: File): Observable<ProjectDocument> {
+    const formData = new FormData();
+    formData.append('documentType', documentType);
+    if (description) formData.append('description', description);
+    formData.append('file', file);
+    return this.http.post<any>(`${this.base}/${projectId}/documents`, formData)
+      .pipe(map(r => r.data.document));
+  }
+
+  downloadDocument(projectId: number, docId: number): Observable<Blob> {
+    return this.http.get(`${this.base}/${projectId}/documents/${docId}`, { responseType: 'blob' });
+  }
+
+  deleteDocument(projectId: number, docId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${projectId}/documents/${docId}`)
+      .pipe(map(() => undefined));
+  }
+
+  // ── Closure ────────────────────────────────────────────────────────────
+  updateClosure(projectId: number, closure: Partial<Project>): Observable<Project> {
+    return this.http.put<any>(`${this.base}/${projectId}/closure`, closure)
+      .pipe(map(r => r.data.project));
+  }
+
+  closeProject(projectId: number): Observable<Project> {
+    return this.http.post<any>(`${this.base}/${projectId}/closure/complete`, {})
+      .pipe(map(r => r.data.project));
   }
 }
