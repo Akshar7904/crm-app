@@ -113,7 +113,7 @@
                           [ngClass]="{
                             'badge-soft-success': invoice.status === 'PAID',
                             'badge-soft-primary': invoice.status === 'PENDING',
-                            'badge-soft-danger': invoice.status === 'CANCELED',
+                            'badge-soft-danger': invoice.status === 'CANCELLED',
                             'badge-soft-warning': invoice.status === 'OVERDUE'
                           }">
                       {{ invoice.status }}
@@ -136,6 +136,11 @@
                               (click)="sendInvoice(invoice, $event)"
                               title="Send Invoice">
                         <i class="bi bi-send"></i>
+                      </button>
+                      <button class="action-btn action-btn-danger"
+                              (click)="deleteInvoice(invoice, $event)"
+                              title="Delete Invoice">
+                        <i class="bi bi-trash"></i>
                       </button>
                     </div>
                   </td>

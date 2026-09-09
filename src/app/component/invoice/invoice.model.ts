@@ -21,6 +21,8 @@ export interface InvoiceModel {
     total: number;
     // Discount amount
     discount?: number;
+    // Set once the invoice has been emailed to the customer; null/absent means untouched
+    sentAt?: Date | string;
     // Extended fields for display
     customerId?: number;
     customerName?: string;

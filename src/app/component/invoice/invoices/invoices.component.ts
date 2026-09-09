@@ -134,4 +134,25 @@ export class InvoicesComponent implements OnInit {
         }
       });
   }
+
+  // Delete (or, for a touched invoice, soft-cancel) an invoice
+  deleteInvoice(invoice: any, event: Event): void {
+    event.stopPropagation();
+    if (!confirm(`Delete invoice #${invoice.invoiceNumber}? Invoices already sent or paid will be cancelled instead of removed.`)) {
+      return;
+    }
+    this.isLoadingSubject.next(true);
+    this.customerService.deleteInvoice$(invoice.id)
+      .subscribe({
+        next: (response) => {
+          this.notification.onSuccess(response.message || 'Invoice removed');
+          this.isLoadingSubject.next(false);
+          this.goToPage(this.currentPageSubject.value);
+        },
+        error: (error) => {
+          this.notification.onError(error);
+          this.isLoadingSubject.next(false);
+        }
+      });
+  }
 }

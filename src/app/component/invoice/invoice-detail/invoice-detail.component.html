@@ -38,6 +38,13 @@
               <button class="btn btn-outline-secondary btn-sm" (click)="printInvoice()">
                 <i class="bi bi-printer me-1"></i> Print
               </button>
+              <button class="btn btn-outline-secondary btn-sm"
+                      (click)="shareInvoice()"
+                      [disabled]="isSharing$ | async">
+                <span *ngIf="isSharing$ | async" class="spinner-border spinner-border-sm me-1"></span>
+                <i *ngIf="!(isSharing$ | async)" class="bi bi-share me-1"></i>
+                Share
+              </button>
               <button class="btn btn-success btn-sm"
                       *ngIf="state?.appData?.data?.invoice?.status !== 'PAID' && state?.appData?.data?.invoice?.status !== 'CANCELLED'"
                       (click)="openMarkPaidModal()">
@@ -45,6 +52,9 @@
               </button>
               <button class="btn btn-banner" (click)="exportAsPDF()">
                 <i class="bi bi-file-earmark-pdf me-1"></i> Export PDF
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteInvoice()">
+                <i class="bi bi-trash me-1"></i> Delete
               </button>
             </ng-container>
           </div>
@@ -91,7 +101,7 @@
                       <option value="PENDING">Pending</option>
                       <option value="PAID">Paid</option>
                       <option value="OVERDUE">Overdue</option>
-                      <option value="CANCELED">Cancelled</option>
+                      <option value="CANCELLED">Cancelled</option>
                     </select>
                   </div>
                   <div class="col-md-4">
@@ -350,7 +360,7 @@
                       [ngClass]="{
                         'badge-paid': state?.appData?.data?.invoice.status === 'PAID',
                         'badge-pending': state?.appData?.data?.invoice.status === 'PENDING',
-                        'badge-canceled': state?.appData?.data?.invoice.status === 'CANCELED',
+                        'badge-canceled': state?.appData?.data?.invoice.status === 'CANCELLED',
                         'badge-overdue': state?.appData?.data?.invoice.status === 'OVERDUE'
                       }">
                   {{ state?.appData?.data?.invoice.status }}

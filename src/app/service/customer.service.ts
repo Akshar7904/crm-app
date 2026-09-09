@@ -120,6 +120,14 @@ export class CustomerService {
                 );
     };
 
+    deleteInvoice$ = (invoiceId: number) => <Observable<CustomHttpResponse<UserModel>>>
+        this.http.delete<CustomHttpResponse<UserModel>>
+            (`${this.server}/customer/invoice/${invoiceId}`)
+            .pipe(
+                tap(console.log),
+                catchError(this.handleError)
+            );
+
     markInvoicePaid$ = (invoiceId: number, bankAccountId?: number) => {
         let url = `${this.server}/customer/invoice/${invoiceId}/mark-paid`;
         if (bankAccountId) url += `?bankAccountId=${bankAccountId}`;
