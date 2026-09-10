@@ -7,7 +7,7 @@ import { TenderService } from '../services/tender.service';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
-import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine, TenderBidDocument, TenderFollowUp } from '../models/tender.model';
+import { Tender, TenderTaskItem, TenderRequirement, TenderPricingLine, TenderBidDocument, TenderFollowUp, TenderChecklistItem, TenderJvPartner } from '../models/tender.model';
 
 export type TenderDetailTab = 'overview' | 'tasks' | 'requirements' | 'pricing' | 'documents' | 'submission' | 'postbid';
 
@@ -23,6 +23,9 @@ export class TenderDetailComponent implements OnInit {
   activeTab: TenderDetailTab = 'overview';
 
   employees: any[] = [];
+
+  checklistItems: TenderChecklistItem[] = [];
+  jvPartners: TenderJvPartner[] = [];
 
   // Role gating — mirrors project-detail.component.ts: only Manager+ may
   // mutate tender data (edit/add/finalise/go-no-go/delete); the backend
@@ -71,6 +74,8 @@ export class TenderDetailComponent implements OnInit {
         this.goNoGoOwnerName = t.goNoGoOwnerName ?? '';
         this.goNoGoReason = t.goNoGoReason ?? '';
         this.postBidForm = { outcome: t.outcome, outcomeReason: t.outcomeReason || '', lessonLearned: t.lessonLearned || '' };
+        this.checklistItems = t.checklistItems ?? [];
+        this.jvPartners = t.jvPartners ?? [];
         this.loading = false;
       },
       error: () => { this.loading = false; }
@@ -602,6 +607,50 @@ export class TenderDetailComponent implements OnInit {
 
   printSubmissionChecklist(): void {
     window.print();
+  }
+
+  get checklistGroups(): { sectionNumber: string; sectionTitle: string; items: TenderChecklistItem[] }[] {
+    const groups = new Map<string, { sectionNumber: string; sectionTitle: string; items: TenderChecklistItem[] }>();
+    for (const item of this.checklistItems) {
+      if (!groups.has(item.sectionNumber)) {
+        groups.set(item.sectionNumber, { sectionNumber: item.sectionNumber, sectionTitle: item.sectionTitle, items: [] });
+      }
+      groups.get(item.sectionNumber)!.items.push(item);
+    }
+    return Array.from(groups.values());
+  }
+
+  toggleChecklistItem(item: TenderChecklistItem): void {
+    if (!this.tender) return;
+    const newChecked = !item.checked;
+    this.tenderService.updateChecklistItem(this.tender.id, item.id, newChecked).subscribe({
+      next: updated => {
+        this.checklistItems = this.checklistItems.map(i => i.id === updated.id ? updated : i);
+      },
+      error: () => this.notification.onError('Failed to update checklist item.')
+    });
+  }
+
+  submitForm = { submissionMethod: '', submissionReference: '' };
+  submittingTender = false;
+  withdrawingTender = false;
+
+  submitTender(): void {
+    if (!this.tender || !this.submitForm.submissionMethod.trim()) return;
+    this.submittingTender = true;
+    this.tenderService.submitTender(this.tender.id, this.submitForm).subscribe({
+      next: t => { this.submittingTender = false; this.tender = { ...this.tender, ...t }; },
+      error: () => { this.submittingTender = false; this.notification.onError('Failed to submit tender.'); }
+    });
+  }
+
+  withdrawTender(): void {
+    if (!this.tender) return;
+    this.withdrawingTender = true;
+    this.tenderService.withdrawTender(this.tender.id).subscribe({
+      next: t => { this.withdrawingTender = false; this.tender = { ...this.tender, ...t }; },
+      error: () => { this.withdrawingTender = false; this.notification.onError('Failed to withdraw tender.'); }
+    });
   }
 
   // ── Post-bid ────────────────────────────────────────────────────────────

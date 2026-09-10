@@ -53,6 +53,12 @@
             <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
           </label>
         </div>
+        <div class="col-12" *ngIf="tender.isJvConsortium && jvPartners.length">
+          <small class="text-muted d-block mb-1">JV / Consortium Partners</small>
+          <div class="d-flex flex-wrap gap-2">
+            <span class="badge badge-soft-info" *ngFor="let p of jvPartners">{{ p.partnerName }}{{ p.role ? ' — ' + p.role : '' }}</span>
+          </div>
+        </div>
       </div>
 
       <div *ngIf="editingOverview" class="row g-3 mt-1">
@@ -367,6 +373,54 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3">
+      <strong>Final Submission Checklist</strong>
+      <div *ngFor="let group of checklistGroups" class="mt-3">
+        <h6 class="fw-semibold">{{ group.sectionNumber }}. {{ group.sectionTitle }}</h6>
+        <div class="form-check" *ngFor="let item of group.items">
+          <input class="form-check-input" type="checkbox" [checked]="item.checked" (change)="toggleChecklistItem(item)" [id]="'checklist-' + item.id">
+          <label class="form-check-label" [for]="'checklist-' + item.id">{{ item.itemText }}</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3" *ngIf="tender.status !== 'SUBMITTED' && tender.status !== 'WITHDRAWN'">
+      <strong>Submit or Withdraw</strong>
+      <div class="row g-2 mt-2">
+        <div class="col-md-6">
+          <label class="form-label">Submission Method</label>
+          <input class="form-control" [(ngModel)]="submitForm.submissionMethod" placeholder="e.g. eTender Portal">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reference</label>
+          <input class="form-control" [(ngModel)]="submitForm.submissionReference">
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success" (click)="submitTender()" [disabled]="submittingTender || !submitForm.submissionMethod.trim()">
+          {{ submittingTender ? 'Submitting…' : 'Submit' }}
+        </button>
+        <button class="btn btn-outline-danger" (click)="withdrawTender()" [disabled]="withdrawingTender">
+          {{ withdrawingTender ? 'Withdrawing…' : 'Withdrawn' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3" *ngIf="tender.status === 'SUBMITTED'">
+      <strong>Submitted Receipt</strong>
+      <div class="row g-2 mt-2">
+        <div class="col-6"><small class="text-muted d-block">Submitted</small>{{ tender.submittedAt | date:'d MMMM yyyy \'at\' HH:mm' }}</div>
+        <div class="col-6"><small class="text-muted d-block">Submitted by</small>{{ tender.submittedByName || '—' }}</div>
+        <div class="col-6"><small class="text-muted d-block">Method</small>{{ tender.submissionMethod || '—' }}</div>
+        <div class="col-6"><small class="text-muted d-block">Reference</small>{{ tender.submissionReference || '—' }}</div>
+        <div class="col-12"><small class="text-muted d-block">Proof of submission</small>{{ tender.proofOfSubmissionSaved ? '✓ Saved' : 'Not saved' }}</div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3" *ngIf="tender.status === 'WITHDRAWN'">
+      <span class="badge badge-soft-secondary">Withdrawn — this bid was not submitted</span>
     </div>
   </div>
 
