@@ -416,11 +416,7 @@ export class TenderDetailComponent implements OnInit {
   replacingBidDocumentId: number | null = null;
 
   private emptyBidDocumentForm() {
-    return { category: 'COVER_LETTER' as TenderBidDocument['category'], displayName: '', description: '' };
-  }
-
-  get bidDocumentDisplayNameRequired(): boolean {
-    return this.bidDocumentForm.category === 'OTHER';
+    return { category: '', displayName: '', description: '' };
   }
 
   openAddBidDocumentModal(): void {
@@ -447,7 +443,6 @@ export class TenderDetailComponent implements OnInit {
 
   submitBidDocument(): void {
     if (!this.tender) return;
-    if (this.bidDocumentDisplayNameRequired && !this.bidDocumentForm.displayName.trim()) return;
     this.savingBidDocument = true;
     if (this.bidDocumentModalMode === 'add') {
       if (!this.bidDocumentFile) { this.savingBidDocument = false; return; }

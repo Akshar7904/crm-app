@@ -561,19 +561,11 @@
       <div class="upload-modal-body">
         <div class="mb-3">
           <label class="form-label">Category</label>
-          <select class="form-select" [(ngModel)]="bidDocumentForm.category">
-            <option value="COVER_LETTER">Cover Letter</option>
-            <option value="PROPOSAL">Proposal</option>
-            <option value="SUPPORTING_SCHEDULE">Supporting Schedule</option>
-            <option value="OTHER">Other</option>
-          </select>
+          <input class="form-control" [(ngModel)]="bidDocumentForm.category" placeholder="e.g. Executive & Bid Response">
         </div>
         <div class="mb-3">
-          <label class="form-label">
-            Display Name <span class="text-danger" *ngIf="bidDocumentDisplayNameRequired">*</span>
-          </label>
-          <input class="form-control" [(ngModel)]="bidDocumentForm.displayName"
-                 [placeholder]="bidDocumentDisplayNameRequired ? 'Name this document' : 'Optional'">
+          <label class="form-label">Display Name</label>
+          <input class="form-control" [(ngModel)]="bidDocumentForm.displayName" placeholder="Optional">
         </div>
         <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="bidDocumentForm.description"></div>
         <div class="mb-3" *ngIf="bidDocumentModalMode === 'add'">
@@ -591,7 +583,7 @@
       <div class="upload-modal-footer">
         <button class="btn btn-outline-secondary" (click)="closeBidDocumentModal()" [disabled]="savingBidDocument">Cancel</button>
         <button class="btn btn-primary" (click)="submitBidDocument()"
-                [disabled]="savingBidDocument || (bidDocumentDisplayNameRequired && !bidDocumentForm.displayName.trim()) || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
+                [disabled]="savingBidDocument || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
           Save
         </button>
       </div>
