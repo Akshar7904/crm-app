@@ -136,6 +136,14 @@
         <input class="form-control" [(ngModel)]="newTender.tenderReference" placeholder="e.g. GT/GDID/118/2026" [disabled]="saving">
       </div>
       <div class="mb-3">
+        <label class="form-label fw-medium">Tender Type</label>
+        <input class="form-control" [(ngModel)]="newTender.tenderType" [disabled]="saving">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Tender Source</label>
+        <input class="form-control" [(ngModel)]="newTender.tenderSource" [disabled]="saving">
+      </div>
+      <div class="mb-3">
         <label class="form-label fw-medium">Closing Date</label>
         <input type="datetime-local" class="form-control" [(ngModel)]="newTender.closingDate" [disabled]="saving">
       </div>
@@ -152,6 +160,49 @@
           <option value="">Select…</option>
           <option *ngFor="let e of employees" [value]="e.id">{{ e.firstName }} {{ e.lastName }}</option>
         </select>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Clarification Required?</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" [(ngModel)]="newTender.clarificationRequired" [disabled]="saving">
+        </div>
+      </div>
+      <div *ngIf="newTender.clarificationRequired" class="row g-2 mb-3">
+        <div class="col-md-6">
+          <label class="form-label fw-medium">Clarification Date</label>
+          <input type="date" class="form-control" [(ngModel)]="newTender.clarificationDate" [disabled]="saving">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-medium">Clarification Time</label>
+          <input type="time" class="form-control" [(ngModel)]="newTender.clarificationTime" [disabled]="saving">
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-medium">Clarification Notes</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="newTender.clarificationNotes" [disabled]="saving"></textarea>
+        </div>
+        <div class="col-12">
+          <label class="form-label fw-medium">Clarification Upload</label>
+          <input type="file" class="form-control" (change)="onClarificationFileSelected($event)" [disabled]="saving">
+        </div>
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">Bidding Structure</label>
+        <input class="form-control" [(ngModel)]="newTender.biddingStructure" [disabled]="saving">
+      </div>
+      <div class="mb-3">
+        <label class="form-label fw-medium">JV / Consortium Bid?</label>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" [(ngModel)]="newTender.isJvConsortium" [disabled]="saving">
+        </div>
+      </div>
+      <div *ngIf="newTender.isJvConsortium" class="mb-3">
+        <label class="form-label fw-medium">Partners</label>
+        <div class="row g-2 mb-2" *ngFor="let p of newTender.jvPartners; let i = index">
+          <div class="col-5"><input class="form-control form-control-sm" placeholder="Partner Name" [(ngModel)]="p.partnerName" [disabled]="saving"></div>
+          <div class="col-5"><input class="form-control form-control-sm" placeholder="Role" [(ngModel)]="p.role" [disabled]="saving"></div>
+          <div class="col-2"><button type="button" class="btn btn-sm btn-outline-danger" (click)="removeJvPartnerRow(i)" [disabled]="saving"><i class="bi bi-trash"></i></button></div>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="addJvPartnerRow()" [disabled]="saving"><i class="bi bi-plus-lg me-1"></i>Add Partner</button>
       </div>
     </div>
     <div class="upload-modal-footer">

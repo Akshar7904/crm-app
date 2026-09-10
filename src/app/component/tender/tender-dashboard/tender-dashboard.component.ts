@@ -69,8 +69,32 @@ export class TenderDashboardComponent implements OnInit {
     this.router.navigate(['/tenders', id]);
   }
 
+  clarificationFile: File | null = null;
+
   private emptyNewTender() {
-    return { title: '', issuingOrganisation: '', tenderReference: '', closingDate: '', bidLeadId: null as number | null, bidLeadName: '', goNoGoOwnerId: null as number | null, goNoGoOwnerName: '' };
+    return {
+      title: '', issuingOrganisation: '', tenderReference: '', closingDate: '', bidLeadId: null as number | null, bidLeadName: '', goNoGoOwnerId: null as number | null, goNoGoOwnerName: '',
+      tenderType: '',
+      tenderSource: '',
+      clarificationRequired: false,
+      clarificationDate: '',
+      clarificationTime: '',
+      clarificationNotes: '',
+      biddingStructure: '',
+      isJvConsortium: false,
+      jvPartners: [] as { partnerName: string; role: string }[],
+    };
+  }
+
+  addJvPartnerRow(): void {
+    this.newTender.jvPartners.push({ partnerName: '', role: '' });
+  }
+  removeJvPartnerRow(index: number): void {
+    this.newTender.jvPartners.splice(index, 1);
+  }
+  onClarificationFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.clarificationFile = input.files && input.files.length ? input.files[0] : null;
   }
 
   openAddModal(): void {
@@ -111,6 +135,12 @@ export class TenderDashboardComponent implements OnInit {
         this.saving = false;
         this.showAddModal = false;
         this.notification.onDefault('Tender created.');
+        if (this.newTender.clarificationRequired && this.clarificationFile) {
+          this.tenderService.uploadClarificationAttachment(t.id, this.clarificationFile).subscribe({
+            next: () => {},
+            error: () => this.notification.onError('Tender created, but the clarification attachment failed to upload.')
+          });
+        }
         this.router.navigate(['/tenders', t.id]);
       },
       error: () => {
