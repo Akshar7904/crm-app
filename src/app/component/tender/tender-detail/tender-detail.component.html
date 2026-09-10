@@ -53,11 +53,36 @@
             <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
           </label>
         </div>
-        <div class="col-12" *ngIf="tender.isJvConsortium && jvPartners.length">
-          <small class="text-muted d-block mb-1">JV / Consortium Partners</small>
-          <div class="d-flex flex-wrap gap-2">
-            <span class="badge badge-soft-info" *ngFor="let p of jvPartners">{{ p.partnerName }}{{ p.role ? ' — ' + p.role : '' }}</span>
+        <div class="col-md-4"><small class="text-muted d-block">Tender Type</small>{{ tender.tenderType || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Tender Source</small>{{ tender.tenderSource || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Bidding Structure</small>{{ tender.biddingStructure || '—' }}</div>
+        <div class="col-md-4" *ngIf="tender.clarificationRequired">
+          <small class="text-muted d-block">Clarification</small>
+          {{ tender.clarificationDate ? (tender.clarificationDate | date:'d MMM yyyy') : '—' }}{{ tender.clarificationTime ? (' ' + tender.clarificationTime) : '' }}
+          <div class="small text-muted" *ngIf="tender.clarificationNotes">{{ tender.clarificationNotes }}</div>
+        </div>
+        <div class="col-12" *ngIf="tender.isJvConsortium">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted d-block">JV / Consortium Partners</small>
+            <button class="btn btn-sm btn-outline-secondary" *ngIf="isManagerOrAbove" (click)="openAddJvPartnerModal()"><i class="bi bi-plus-lg me-1"></i>Add Partner</button>
           </div>
+          <div class="text-muted small" *ngIf="!jvPartners.length">No partners added yet</div>
+          <ul class="list-group list-group-flush" *ngIf="jvPartners.length">
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0" *ngFor="let p of jvPartners">
+              <span>{{ p.partnerName }}{{ p.role ? ' — ' + p.role : '' }}</span>
+              <div class="d-flex gap-2" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingJvPartnerId !== p.id; else confirmDeleteJvPartnerTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditJvPartnerModal(p)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteJvPartner(p)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeleteJvPartnerTpl>
+                  <span class="me-2 small text-muted">Delete?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteJvPartner(p)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteJvPartner()">Cancel</button>
+                </ng-template>
+              </div>
+            </li>
+          </ul>
         </div>
       </div>
 
@@ -74,6 +99,20 @@
             <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === overviewForm.bidLeadId">{{ e.firstName }} {{ e.lastName }}</option>
           </select>
         </div>
+        <div class="col-md-6"><label class="form-label">Tender Type</label><input class="form-control" [(ngModel)]="overviewForm.tenderType"></div>
+        <div class="col-md-6"><label class="form-label">Tender Source</label><input class="form-control" [(ngModel)]="overviewForm.tenderSource"></div>
+        <div class="col-md-6"><label class="form-label">Bidding Structure</label><input class="form-control" [(ngModel)]="overviewForm.biddingStructure"></div>
+        <div class="col-md-6">
+          <label class="form-label">Clarification Required?</label>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="overviewForm.clarificationRequired">
+          </div>
+        </div>
+        <ng-container *ngIf="overviewForm.clarificationRequired">
+          <div class="col-md-4"><label class="form-label">Clarification Date</label><input type="date" class="form-control" [(ngModel)]="overviewForm.clarificationDate"></div>
+          <div class="col-md-4"><label class="form-label">Clarification Time</label><input type="time" class="form-control" [(ngModel)]="overviewForm.clarificationTime"></div>
+          <div class="col-md-4"><label class="form-label">Clarification Notes</label><textarea class="form-control" rows="1" [(ngModel)]="overviewForm.clarificationNotes"></textarea></div>
+        </ng-container>
         <div class="col-12 d-flex gap-2">
           <button class="btn btn-primary btn-sm" (click)="saveOverview()" [disabled]="savingOverview">Save</button>
           <button class="btn btn-outline-secondary btn-sm" (click)="cancelEditOverview()" [disabled]="savingOverview">Cancel</button>
@@ -272,7 +311,7 @@
           </button>
           <button class="btn btn-sm btn-outline-primary ms-2" (click)="exportResponseDocuments()" [disabled]="exportingResponseDocuments">
             <span *ngIf="exportingResponseDocuments"><span class="spinner-border spinner-border-sm me-1"></span>Exporting…</span>
-            <span *ngIf="!exportingResponseDocuments"><i class="bi bi-download me-1"></i>Export Complete Tender Bid</span>
+            <span *ngIf="!exportingResponseDocuments"><i class="bi bi-download me-1"></i>Download All Documents (ZIP)</span>
           </button>
         </div>
       </div>
@@ -659,6 +698,25 @@
       <div class="upload-modal-footer">
         <button class="btn btn-outline-secondary" (click)="closeFollowUpModal()" [disabled]="savingFollowUp">Cancel</button>
         <button class="btn btn-primary" (click)="submitFollowUp()" [disabled]="!followUpForm.description.trim() || savingFollowUp">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit JV Partner Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showJvPartnerModal" (click)="closeJvPartnerModal()"></div>
+  <div class="upload-modal" *ngIf="showJvPartnerModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingJvPartnerId ? 'Edit' : 'Add' }} Partner</h6>
+        <button class="btn-close" (click)="closeJvPartnerModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Partner Name</label><input class="form-control" [(ngModel)]="jvPartnerForm.partnerName"></div>
+        <div class="mb-3"><label class="form-label">Role</label><input class="form-control" [(ngModel)]="jvPartnerForm.role" placeholder="Optional"></div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeJvPartnerModal()" [disabled]="savingJvPartner">Cancel</button>
+        <button class="btn btn-primary" (click)="submitJvPartner()" [disabled]="!jvPartnerForm.partnerName.trim() || savingJvPartner">Save</button>
       </div>
     </div>
   </div>

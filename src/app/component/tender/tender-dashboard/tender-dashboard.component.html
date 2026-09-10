@@ -79,7 +79,8 @@
                     'badge-soft-warning': t.status === 'DECISION_REQUIRED',
                     'badge-soft-info': t.status === 'IN_PROGRESS' || t.status === 'FINAL_REVIEW',
                     'badge-soft-primary': t.status === 'SUBMITTED',
-                    'badge-soft-success': t.status === 'CLOSED'
+                    'badge-soft-success': t.status === 'CLOSED',
+                    'badge-soft-danger': t.status === 'WITHDRAWN'
                   }">{{ t.status }}</span>
           </td>
           <td>{{ t.progressPercent || 0 }}%</td>

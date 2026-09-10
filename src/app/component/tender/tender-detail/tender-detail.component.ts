@@ -92,7 +92,10 @@ export class TenderDetailComponent implements OnInit {
 
   // ── Overview edit ──────────────────────────────────────────────────────
   private emptyOverviewForm() {
-    return { title: '', issuingOrganisation: '', tenderReference: '', estimatedValue: null as number | null, closingDate: '', bidLeadId: null as number | null, bidLeadName: '' };
+    return {
+      title: '', issuingOrganisation: '', tenderReference: '', estimatedValue: null as number | null, closingDate: '', bidLeadId: null as number | null, bidLeadName: '',
+      tenderType: '', tenderSource: '', biddingStructure: '', clarificationRequired: false, clarificationDate: '', clarificationTime: '', clarificationNotes: ''
+    };
   }
 
   startEditOverview(): void {
@@ -104,7 +107,14 @@ export class TenderDetailComponent implements OnInit {
       estimatedValue: this.tender.estimatedValue ?? null,
       closingDate: this.tender.closingDate || '',
       bidLeadId: this.tender.bidLeadId ?? null,
-      bidLeadName: this.tender.bidLeadName || ''
+      bidLeadName: this.tender.bidLeadName || '',
+      tenderType: this.tender.tenderType || '',
+      tenderSource: this.tender.tenderSource || '',
+      biddingStructure: this.tender.biddingStructure || '',
+      clarificationRequired: !!this.tender.clarificationRequired,
+      clarificationDate: this.tender.clarificationDate || '',
+      clarificationTime: this.tender.clarificationTime || '',
+      clarificationNotes: this.tender.clarificationNotes || ''
     };
     this.editingOverview = true;
   }
@@ -129,7 +139,14 @@ export class TenderDetailComponent implements OnInit {
       estimatedValue: this.overviewForm.estimatedValue ?? undefined,
       closingDate: this.overviewForm.closingDate || undefined,
       bidLeadId: this.overviewForm.bidLeadId ?? undefined,
-      bidLeadName: this.overviewForm.bidLeadName || undefined
+      bidLeadName: this.overviewForm.bidLeadName || undefined,
+      tenderType: this.overviewForm.tenderType || undefined,
+      tenderSource: this.overviewForm.tenderSource || undefined,
+      biddingStructure: this.overviewForm.biddingStructure || undefined,
+      clarificationRequired: this.overviewForm.clarificationRequired,
+      clarificationDate: this.overviewForm.clarificationRequired ? (this.overviewForm.clarificationDate || undefined) : undefined,
+      clarificationTime: this.overviewForm.clarificationRequired ? (this.overviewForm.clarificationTime || undefined) : undefined,
+      clarificationNotes: this.overviewForm.clarificationRequired ? (this.overviewForm.clarificationNotes || undefined) : undefined
     }).subscribe({
       next: t => {
         this.tender = { ...this.tender, ...t };
@@ -174,6 +191,62 @@ export class TenderDetailComponent implements OnInit {
         setTimeout(() => URL.revokeObjectURL(url), 10000);
       },
       error: () => this.notification.onError('Failed to download attachment.')
+    });
+  }
+
+  // ── JV Partners ────────────────────────────────────────────────────────
+  showJvPartnerModal = false;
+  editingJvPartnerId: number | null = null;
+  jvPartnerForm = this.emptyJvPartnerForm();
+  savingJvPartner = false;
+
+  private emptyJvPartnerForm() {
+    return { partnerName: '', role: '' };
+  }
+
+  openAddJvPartnerModal(): void {
+    this.jvPartnerForm = this.emptyJvPartnerForm();
+    this.editingJvPartnerId = null;
+    this.showJvPartnerModal = true;
+  }
+
+  openEditJvPartnerModal(partner: TenderJvPartner): void {
+    this.jvPartnerForm = { partnerName: partner.partnerName, role: partner.role || '' };
+    this.editingJvPartnerId = partner.id;
+    this.showJvPartnerModal = true;
+  }
+
+  closeJvPartnerModal(): void { this.showJvPartnerModal = false; }
+
+  submitJvPartner(): void {
+    if (!this.tender || !this.jvPartnerForm.partnerName.trim()) return;
+    this.savingJvPartner = true;
+    const body = { partnerName: this.jvPartnerForm.partnerName, role: this.jvPartnerForm.role || undefined };
+    const req = this.editingJvPartnerId
+      ? this.tenderService.updateJvPartner(this.tender.id, this.editingJvPartnerId, body)
+      : this.tenderService.createJvPartner(this.tender.id, body);
+    req.subscribe({
+      next: () => { this.savingJvPartner = false; this.showJvPartnerModal = false; this.reload(); this.notification.onDefault('Partner saved.'); },
+      error: () => { this.savingJvPartner = false; this.notification.onError('Failed to save partner.'); }
+    });
+  }
+
+  // Delete confirm state
+  deletingJvPartnerId: number | null = null;
+
+  confirmDeleteJvPartner(partner: TenderJvPartner): void {
+    this.deletingJvPartnerId = partner.id;
+  }
+
+  cancelDeleteJvPartner(): void {
+    this.deletingJvPartnerId = null;
+  }
+
+  executeDeleteJvPartner(partner: TenderJvPartner): void {
+    if (!this.tender) return;
+    this.tenderService.deleteJvPartner(this.tender.id, partner.id).subscribe({
+      next: () => { this.deletingJvPartnerId = null; this.reload(); this.notification.onDefault('Partner removed.'); },
+      error: () => { this.deletingJvPartnerId = null; this.notification.onError('Failed to delete partner.'); }
     });
   }
 
