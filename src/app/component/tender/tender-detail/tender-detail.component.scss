@@ -102,3 +102,10 @@
     cursor: pointer;
   }
 }
+
+// ── Published document link color ────────────────────────────────────────────
+
+.published-doc-link {
+  color: var(--bs-body-color);
+  &:hover { color: var(--bs-primary); }
+}

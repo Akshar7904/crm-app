@@ -47,7 +47,7 @@
         <div class="col-md-4">
           <small class="text-muted d-block">Published Tender Document</small>
           <span *ngIf="!tender.attachmentFileName">No document uploaded</span>
-          <button *ngIf="tender.attachmentFileName" class="btn btn-sm btn-link p-0" (click)="downloadAttachment()">{{ tender.attachmentFileName }}</button>
+          <button *ngIf="tender.attachmentFileName" class="btn btn-sm btn-link p-0 published-doc-link" (click)="downloadAttachment()">{{ tender.attachmentFileName }}</button>
           <label class="btn btn-sm btn-outline-secondary ms-2 mb-0" *ngIf="isManagerOrAbove">
             {{ tender.attachmentFileName ? 'Replace' : 'Upload' }}
             <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
@@ -106,11 +106,12 @@
       </div>
       <div class="table-responsive">
         <table class="table table-hover mb-0">
-          <thead><tr><th>Task</th><th>Allocated To</th><th>Due Date</th><th>Status</th><th></th></tr></thead>
+          <thead><tr><th>Task</th><th>Allocated Date</th><th>Allocated To</th><th>Due Date</th><th>Status</th><th></th></tr></thead>
           <tbody>
             <tr *ngIf="!tender.tasks?.length"><td colspan="5" class="empty-state-cell">No tasks yet</td></tr>
             <tr *ngFor="let t of tender.tasks">
               <td>{{ t.description }}</td>
+              <td>{{ t.createdAt ? (t.createdAt | date:'d MMM yyyy') : '—' }}</td>
               <td>{{ t.allocatedToName || '—' }}</td>
               <td>{{ t.dueDate ? (t.dueDate | date:'d MMM yyyy') : '—' }}</td>
               <td>
@@ -191,16 +192,17 @@
       <div class="table-responsive">
         <table class="table table-hover mb-0">
           <thead>
-            <tr><th>Item</th><th>Qty</th><th>Supplier</th><th>Unit Cost</th><th>Total Cost</th><th>Profit %</th><th>Profit</th><th>Sell excl. VAT</th><th>VAT</th><th>Total incl. VAT</th><th></th></tr>
+            <tr><th>Item</th><th>Qty</th><th>Supplier</th><th>Unit Cost</th><th>Total Cost Ex VAT</th><th>Total Cost (Incl VAT)</th><th>Profit %</th><th>Profit</th><th>Sell excl. VAT</th><th>VAT</th><th>Total incl. VAT</th><th></th></tr>
           </thead>
           <tbody>
-            <tr *ngIf="!tender.pricingLines?.length"><td colspan="11" class="empty-state-cell">No pricing lines yet</td></tr>
+            <tr *ngIf="!tender.pricingLines?.length"><td colspan="12" class="empty-state-cell">No pricing lines yet</td></tr>
             <tr *ngFor="let l of tender.pricingLines">
               <td><div class="fw-semibold">{{ l.itemName }}</div><small class="text-muted">{{ l.description }}</small></td>
               <td>{{ l.quantity }}</td>
               <td>{{ l.supplierName || '—' }}<br><small class="text-muted">{{ l.supplierReference }}</small></td>
               <td>R {{ l.unitCost | number:'1.2-2' }}</td>
               <td>R {{ (l.totalCost || 0) | number:'1.2-2' }}</td>
+              <td>R {{ (l.totalCostInclVat || 0) | number:'1.2-2' }}</td>
               <td>{{ l.profitMarkupPercent }}%</td>
               <td>R {{ (l.profitAmount || 0) | number:'1.2-2' }}</td>
               <td>R {{ (l.sellExclVat || 0) | number:'1.2-2' }}</td>
@@ -239,7 +241,7 @@
           <div class="d-flex justify-content-between align-items-start">
             <strong>Final Bid Price</strong>
             <button class="btn btn-sm btn-success" *ngIf="isManagerOrAbove" (click)="finalisePricing()" [disabled]="finalisingPricing || tender.pricingFinalised">
-              {{ tender.pricingFinalised ? 'Finalised' : 'Finalise Bid Price' }}
+              {{ tender.pricingFinalised ? 'Finalised' : 'Finalise Pricing' }}
             </button>
           </div>
           <div class="row g-2 mt-1">
