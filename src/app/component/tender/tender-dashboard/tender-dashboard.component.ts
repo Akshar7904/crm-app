@@ -129,7 +129,16 @@ export class TenderDashboardComponent implements OnInit {
       bidLeadId: this.newTender.bidLeadId || undefined,
       bidLeadName: this.newTender.bidLeadName || undefined,
       goNoGoOwnerId: this.newTender.goNoGoOwnerId || undefined,
-      goNoGoOwnerName: this.newTender.goNoGoOwnerName || undefined
+      goNoGoOwnerName: this.newTender.goNoGoOwnerName || undefined,
+      tenderType: this.newTender.tenderType || undefined,
+      tenderSource: this.newTender.tenderSource || undefined,
+      clarificationRequired: this.newTender.clarificationRequired,
+      clarificationDate: this.newTender.clarificationRequired ? (this.newTender.clarificationDate || undefined) : undefined,
+      clarificationTime: this.newTender.clarificationRequired ? (this.newTender.clarificationTime || undefined) : undefined,
+      clarificationNotes: this.newTender.clarificationRequired ? (this.newTender.clarificationNotes || undefined) : undefined,
+      biddingStructure: this.newTender.biddingStructure || undefined,
+      isJvConsortium: this.newTender.isJvConsortium,
+      jvPartners: this.newTender.isJvConsortium ? this.newTender.jvPartners.filter(p => p.partnerName.trim()) as any : undefined
     }).subscribe({
       next: t => {
         this.saving = false;
