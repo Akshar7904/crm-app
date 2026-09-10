@@ -519,6 +519,45 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
+  get responseDocumentGroups(): { category: string; docs: any[] }[] {
+    const docs = this.tender?.bidDocuments ?? [];
+    const groups = new Map<string, any[]>();
+    for (const d of docs) {
+      const key = (d.category && d.category.trim()) ? d.category : 'Uncategorised';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(d);
+    }
+    return Array.from(groups.entries()).map(([category, docs]) => ({ category, docs }));
+  }
+
+  finalisingResponseDocuments = false;
+  finaliseResponseDocuments(): void {
+    if (!this.tender) return;
+    this.finalisingResponseDocuments = true;
+    this.tenderService.finaliseResponseDocuments(this.tender.id).subscribe({
+      next: t => { this.finalisingResponseDocuments = false; this.tender = { ...this.tender, ...t }; },
+      error: () => { this.finalisingResponseDocuments = false; this.notification.onError('Failed to finalise response documents.'); }
+    });
+  }
+
+  exportingResponseDocuments = false;
+  exportResponseDocuments(): void {
+    if (!this.tender) return;
+    this.exportingResponseDocuments = true;
+    this.tenderService.exportResponseDocuments(this.tender.id).subscribe({
+      next: blob => {
+        this.exportingResponseDocuments = false;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `tender-response-documents-${this.tender!.tenderReference || this.tender!.id}.zip`;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10000);
+      },
+      error: () => { this.exportingResponseDocuments = false; this.notification.onError('Failed to export response documents.'); }
+    });
+  }
+
   // ── Submission ─────────────────────────────────────────────────────────
   savingSubmissionChecks = false;
   exportingBid = false;
