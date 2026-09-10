@@ -57,6 +57,9 @@
     <button class="detail-tab" [class.active]="activeTab === 'risks'" (click)="activeTab = 'risks'">
       <i class="bi bi-exclamation-triangle me-1"></i>Risks & Issues
     </button>
+    <button class="detail-tab" [class.active]="activeTab === 'documents'" (click)="activeTab = 'documents'">
+      <i class="bi bi-folder me-1"></i>Documents
+    </button>
   </div>
 
   <!-- ══ OVERVIEW TAB ══ -->
@@ -669,6 +672,78 @@
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DOCUMENTS TAB ══ -->
+  <div *ngIf="activeTab === 'documents'">
+    <div class="falcon-card mb-4" *ngIf="isManagerOrAbove">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-upload text-primary"></i><strong>Upload Document</strong>
+        </div>
+      </div>
+      <div class="card-body d-flex gap-2 flex-wrap align-items-start">
+        <select class="form-select" style="max-width:220px" [(ngModel)]="uploadDocType">
+          <option value="PROPOSAL_QUOTE">Proposal / Quote</option>
+          <option value="CONTRACT_PO">Contract / PO</option>
+          <option value="PROJECT_PLAN">Project Plan</option>
+          <option value="CUSTOMER_DOCUMENTS">Customer Documents</option>
+          <option value="DELIVERABLES">Deliverables</option>
+          <option value="MEETING_MINUTES">Meeting Minutes</option>
+          <option value="REPORTS">Reports</option>
+          <option value="FINANCIAL_DOCUMENTS">Financial Documents</option>
+          <option value="SUPPORTING_DOCUMENTS">Supporting Documents</option>
+          <option value="FINAL_CLOSURE_DOCUMENTS">Final / Closure Documents</option>
+          <option value="OTHER">Other</option>
+        </select>
+        <input type="text" class="form-control" placeholder="Description (optional)" style="max-width:220px" [(ngModel)]="uploadDocDescription">
+        <input type="file" class="form-control" style="max-width:260px" (change)="onDocFileSelected($event)">
+        <button class="btn btn-primary" (click)="uploadDocument()" [disabled]="!selectedDocFile">
+          <i class="bi bi-upload me-1"></i>Upload
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="!documentsByType.length" class="falcon-card">
+      <div class="empty-state-cell py-5">
+        <i class="bi bi-folder d-block mb-2 fs-2 text-muted"></i>
+        <div class="text-muted">No documents uploaded for this project yet</div>
+      </div>
+    </div>
+
+    <div class="falcon-card mb-3" *ngFor="let group of documentsByType">
+      <div class="table-card-header">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-folder2 text-primary"></i><strong>{{ group.label }}</strong>
+        </div>
+        <span class="text-muted small">{{ group.docs.length }} file(s)</span>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>Size</th>
+              <th>Uploaded By</th>
+              <th>Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let doc of group.docs">
+              <td>{{ doc.fileName }}</td>
+              <td>{{ doc.fileSize ? (doc.fileSize / 1024 | number:'1.0-0') + ' KB' : '—' }}</td>
+              <td>{{ doc.uploadedByName || '—' }}</td>
+              <td>{{ doc.uploadedAt | date:'dd MMM yyyy' }}</td>
+              <td>
+                <button class="btn btn-sm btn-outline-primary me-1" (click)="downloadDocument(doc)"><i class="bi bi-download"></i></button>
+                <button class="btn btn-sm btn-outline-danger" *ngIf="isAdminOrAbove" (click)="deleteDocument(doc)"><i class="bi bi-trash"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

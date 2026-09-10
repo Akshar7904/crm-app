@@ -6,7 +6,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { ProjectService } from '../services/project.service';
-import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus, ProjectMember, ProjectRiskIssue, RiskIssueType, RiskIssueSeverity, RiskIssueStatus } from '../models/project.model';
+import { Project, ProjectTask, TaskStatus, TaskPriority, TaskComment, ProjectTransaction, Milestone, MilestoneAttachment, MilestoneStatus, ProjectMember, ProjectRiskIssue, RiskIssueType, RiskIssueSeverity, RiskIssueStatus, ProjectDocument, ProjectDocumentType } from '../models/project.model';
 import { NotificationService } from '../../../service/notification.service';
 import { UserService } from '../../../service/user.service';
 import { EmployeeService } from '../../../service/employee.service';
@@ -66,6 +66,27 @@ export class ProjectDetailComponent implements OnInit {
   riskDueDate: string | null = null;
   riskStatus: RiskIssueStatus = 'OPEN';
   riskTypeFilter: RiskIssueType | 'ALL' = 'ALL';
+
+  // Documents — grouped by the 10 curated categories + Other. Manager+ can
+  // upload; only Admin+ can delete, matching the milestone attachment gate.
+  documents: ProjectDocument[] = [];
+  uploadDocType: ProjectDocumentType = 'OTHER';
+  uploadDocDescription = '';
+  selectedDocFile: File | null = null;
+
+  readonly documentTypeLabels: Record<ProjectDocumentType, string> = {
+    PROPOSAL_QUOTE: 'Proposal / Quote',
+    CONTRACT_PO: 'Contract / PO',
+    PROJECT_PLAN: 'Project Plan',
+    CUSTOMER_DOCUMENTS: 'Customer Documents',
+    DELIVERABLES: 'Deliverables',
+    MEETING_MINUTES: 'Meeting Minutes',
+    REPORTS: 'Reports',
+    FINANCIAL_DOCUMENTS: 'Financial Documents',
+    SUPPORTING_DOCUMENTS: 'Supporting Documents',
+    FINAL_CLOSURE_DOCUMENTS: 'Final / Closure Documents',
+    OTHER: 'Other'
+  };
 
   // Team — staff/resources associated with the project as a whole (distinct
   // from per-task assignees). Add form: pick an employee + optional role label.
@@ -133,7 +154,7 @@ export class ProjectDetailComponent implements OnInit {
   load(id: number): void {
     this.loading = true;
     this.projectService.getById(id).subscribe({
-      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.members = p.members ?? []; this.loading = false; this.rebuildKanbanColumns(); this.loadRisks(); },
+      next: (p) => { this.project = p; this.milestones = p.milestones ?? []; this.members = p.members ?? []; this.loading = false; this.rebuildKanbanColumns(); this.loadRisks(); this.loadDocuments(); },
       error: () => { this.loading = false; }
     });
   }
@@ -654,6 +675,72 @@ export class ProjectDetailComponent implements OnInit {
     this.projectService.deleteRisk(this.project.id, risk.id).subscribe({
       next: () => { this.notification.onDefault('Deleted'); this.loadRisks(); },
       error: e => this.notification.onError(e?.error?.message || 'Failed to delete risk/issue')
+    });
+  }
+
+  // ── Documents ────────────────────────────────────────────────────────────
+  // `documents` rides along on the main project GET response (like `risks`
+  // used to before it got its own endpoint), so loadDocuments() just reads
+  // this.project.documents rather than issuing a separate HTTP call.
+  get documentsByType(): { type: ProjectDocumentType; label: string; docs: ProjectDocument[] }[] {
+    return (Object.keys(this.documentTypeLabels) as ProjectDocumentType[])
+      .map(type => ({
+        type,
+        label: this.documentTypeLabels[type],
+        docs: this.documents.filter(d => d.documentType === type)
+      }))
+      .filter(group => group.docs.length > 0);
+  }
+
+  loadDocuments(): void {
+    this.documents = this.project?.documents ?? [];
+  }
+
+  onDocFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.selectedDocFile = input.files?.length ? input.files[0] : null;
+  }
+
+  uploadDocument(): void {
+    if (!this.project || !this.selectedDocFile) return;
+    this.projectService.uploadDocument(this.project.id, this.uploadDocType, this.uploadDocDescription || null, this.selectedDocFile)
+      .subscribe({
+        next: doc => {
+          this.documents = [...this.documents, doc];
+          this.selectedDocFile = null;
+          this.uploadDocDescription = '';
+          this.notification.onDefault('Document uploaded');
+        },
+        error: e => this.notification.onError(e?.error?.message || 'Failed to upload document')
+      });
+  }
+
+  downloadDocument(doc: ProjectDocument): void {
+    if (!this.project) return;
+    this.projectService.downloadDocument(this.project.id, doc.id).subscribe({
+      next: blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = doc.fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to download document')
+    });
+  }
+
+  deleteDocument(doc: ProjectDocument): void {
+    if (!this.project) return;
+    if (!confirm(`Delete "${doc.fileName}"?`)) return;
+    this.projectService.deleteDocument(this.project.id, doc.id).subscribe({
+      next: () => {
+        this.documents = this.documents.filter(d => d.id !== doc.id);
+        this.notification.onDefault('Document deleted');
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to delete document')
     });
   }
 }
