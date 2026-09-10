@@ -57,7 +57,6 @@ export class ProjectDetailComponent implements OnInit {
   // entries, filterable by type. Same add/edit-in-one-form pattern as
   // milestones: editingRiskId set means "Save" calls update instead of create.
   risks: ProjectRiskIssue[] = [];
-  loadingRisks = false;
   editingRiskId: number | null = null;
   riskType: RiskIssueType = 'RISK';
   riskDescription = '';
@@ -547,6 +546,14 @@ export class ProjectDetailComponent implements OnInit {
     this.editingFinancials = false;
   }
 
+  // Reload the whole project after saving rather than spread-merging the
+  // partial response: ProjectDto is @JsonInclude(NON_NULL), so a cleared
+  // field (e.g. Project Value set back to empty) is OMITTED from the JSON
+  // entirely rather than sent as null, and a spread merge can't delete keys
+  // that are absent from the source — this.project would keep the stale
+  // pre-clear value (and any value computed from it, like Forecast Profit/
+  // Margin). Matches the same reload-after-mutation pattern already used by
+  // saveTransaction/deleteTransactionRow above for this exact reason.
   saveFinancials(): void {
     if (!this.project) return;
     this.projectService.updateFinancials(this.project.id, {
@@ -555,10 +562,10 @@ export class ProjectDetailComponent implements OnInit {
       paid: this.finPaid ?? undefined,
       forecastCost: this.finForecastCost ?? undefined
     }).subscribe({
-      next: updated => {
-        this.project = { ...this.project!, ...updated };
+      next: () => {
         this.editingFinancials = false;
         this.notification.onDefault('Financials updated');
+        this.load(this.project!.id);
       },
       error: e => this.notification.onError(e?.error?.message || 'Failed to save financials')
     });
@@ -617,13 +624,11 @@ export class ProjectDetailComponent implements OnInit {
       : this.risks.filter(r => r.type === this.riskTypeFilter);
   }
 
+  // `risks` rides along on the main project GET response (same as
+  // `documents`), so this just reads this.project.risks rather than issuing
+  // a separate HTTP call.
   loadRisks(): void {
-    if (!this.project) return;
-    this.loadingRisks = true;
-    this.projectService.getRisks(this.project.id).subscribe({
-      next: risks => { this.risks = risks; this.loadingRisks = false; },
-      error: e => { this.notification.onError(e?.error?.message || 'Failed to load risks/issues'); this.loadingRisks = false; }
-    });
+    this.risks = this.project?.risks ?? [];
   }
 
   editRisk(risk: ProjectRiskIssue): void {
@@ -660,10 +665,13 @@ export class ProjectDetailComponent implements OnInit {
       ? this.projectService.updateRisk(this.project.id, this.editingRiskId, payload)
       : this.projectService.createRisk(this.project.id, payload);
     req$.subscribe({
-      next: () => {
+      next: (risk) => {
+        this.risks = this.editingRiskId
+          ? this.risks.map(r => r.id === risk.id ? risk : r)
+          : [...this.risks, risk];
+        if (this.project) this.project.risks = this.risks;
         this.notification.onDefault(this.editingRiskId ? 'Risk/Issue updated' : 'Risk/Issue added');
         this.cancelRiskEdit();
-        this.loadRisks();
       },
       error: e => this.notification.onError(e?.error?.message || 'Failed to save risk/issue')
     });
@@ -673,15 +681,19 @@ export class ProjectDetailComponent implements OnInit {
     if (!this.project) return;
     if (!confirm(`Delete this ${risk.type.toLowerCase()} entry?`)) return;
     this.projectService.deleteRisk(this.project.id, risk.id).subscribe({
-      next: () => { this.notification.onDefault('Deleted'); this.loadRisks(); },
+      next: () => {
+        this.risks = this.risks.filter(r => r.id !== risk.id);
+        if (this.project) this.project.risks = this.risks;
+        this.notification.onDefault('Deleted');
+      },
       error: e => this.notification.onError(e?.error?.message || 'Failed to delete risk/issue')
     });
   }
 
   // ── Documents ────────────────────────────────────────────────────────────
-  // `documents` rides along on the main project GET response (like `risks`
-  // used to before it got its own endpoint), so loadDocuments() just reads
-  // this.project.documents rather than issuing a separate HTTP call.
+  // `documents` rides along on the main project GET response (same as
+  // `risks`, above), so loadDocuments() just reads this.project.documents
+  // rather than issuing a separate HTTP call.
   get documentsByType(): { type: ProjectDocumentType; label: string; docs: ProjectDocument[] }[] {
     return (Object.keys(this.documentTypeLabels) as ProjectDocumentType[])
       .map(type => ({
@@ -782,7 +794,14 @@ export class ProjectDetailComponent implements OnInit {
     const current = this.getClosureValue(key);
     this.projectService.updateClosure(this.project.id, { [key]: !current } as any).subscribe({
       next: updated => { this.project = { ...this.project!, ...updated }; },
-      error: e => this.notification.onError(e?.error?.message || 'Failed to update closure item')
+      error: e => {
+        this.notification.onError(e?.error?.message || 'Failed to update closure item');
+        // this.project is otherwise unchanged on failure, so Angular sees no
+        // delta and never re-syncs the checkbox's rendered `checked` state
+        // back to getClosureValue(key) — it stays visually checked/unchecked
+        // even though nothing was saved. Force a re-render by reassigning.
+        this.project = { ...this.project! };
+      }
     });
   }
 
