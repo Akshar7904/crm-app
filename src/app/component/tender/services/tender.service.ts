@@ -8,7 +8,8 @@ import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import {
   Tender, TenderPage, TenderTaskItem, TenderRequirement, TenderPricingLine,
-  TenderBidDocument, TenderFollowUp, TenderDashboardStats, TenderReport
+  TenderBidDocument, TenderFollowUp, TenderDashboardStats, TenderReport,
+  TenderJvPartner, TenderChecklistItem
 } from '../models/tender.model';
 
 @Injectable({ providedIn: 'root' })
@@ -148,6 +149,54 @@ export class TenderService {
   }
   deleteFollowUp(tenderId: number, followUpId: number): Observable<void> {
     return this.http.delete<any>(`${this.base}/${tenderId}/follow-ups/${followUpId}`).pipe(map(() => undefined));
+  }
+
+  // ── JV Partners ────────────────────────────────────────────────────────
+  getJvPartners(tenderId: number): Observable<TenderJvPartner[]> {
+    return this.http.get<any>(`${this.base}/${tenderId}/jv-partners`).pipe(map(r => r.data.jvPartners));
+  }
+  createJvPartner(tenderId: number, partner: Partial<TenderJvPartner>): Observable<TenderJvPartner> {
+    return this.http.post<any>(`${this.base}/${tenderId}/jv-partners`, partner).pipe(map(r => r.data.jvPartner));
+  }
+  updateJvPartner(tenderId: number, partnerId: number, partner: Partial<TenderJvPartner>): Observable<TenderJvPartner> {
+    return this.http.put<any>(`${this.base}/${tenderId}/jv-partners/${partnerId}`, partner).pipe(map(r => r.data.jvPartner));
+  }
+  deleteJvPartner(tenderId: number, partnerId: number): Observable<void> {
+    return this.http.delete<any>(`${this.base}/${tenderId}/jv-partners/${partnerId}`).pipe(map(() => undefined));
+  }
+
+  // ── Checklist Items ────────────────────────────────────────────────────
+  getChecklistItems(tenderId: number): Observable<TenderChecklistItem[]> {
+    return this.http.get<any>(`${this.base}/${tenderId}/checklist-items`).pipe(map(r => r.data.checklistItems));
+  }
+  updateChecklistItem(tenderId: number, itemId: number, checked: boolean): Observable<TenderChecklistItem> {
+    return this.http.put<any>(`${this.base}/${tenderId}/checklist-items/${itemId}`, { checked }).pipe(map(r => r.data.checklistItem));
+  }
+
+  // ── Submit / Withdraw ──────────────────────────────────────────────────
+  submitTender(tenderId: number, body: { submissionMethod: string; submissionReference?: string }): Observable<Tender> {
+    return this.http.post<any>(`${this.base}/${tenderId}/submit`, body).pipe(map(r => r.data.tender));
+  }
+  withdrawTender(tenderId: number): Observable<Tender> {
+    return this.http.post<any>(`${this.base}/${tenderId}/withdraw`, {}).pipe(map(r => r.data.tender));
+  }
+
+  // ── Response Documents finalise + export ───────────────────────────────
+  finaliseResponseDocuments(tenderId: number): Observable<Tender> {
+    return this.http.put<any>(`${this.base}/${tenderId}/response-documents/finalise`, {}).pipe(map(r => r.data.tender));
+  }
+  exportResponseDocuments(tenderId: number): Observable<Blob> {
+    return this.http.get(`${this.base}/${tenderId}/response-documents/export`, { responseType: 'blob' });
+  }
+
+  // ── Clarification attachment ───────────────────────────────────────────
+  uploadClarificationAttachment(tenderId: number, file: File): Observable<Tender> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.http.post<any>(`${this.base}/${tenderId}/clarification-attachment`, form).pipe(map(r => r.data.tender));
+  }
+  downloadClarificationAttachment(tenderId: number): Observable<Blob> {
+    return this.http.get(`${this.base}/${tenderId}/clarification-attachment`, { responseType: 'blob' });
   }
 
   // ── Dashboard & Reporting ──────────────────────────────────────────────

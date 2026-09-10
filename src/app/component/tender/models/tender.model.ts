@@ -1,14 +1,13 @@
 // Copyright (c) 2026 Zwelithini Ngomane (cypriel17@gmail.com). All rights reserved.
 // Enterprize360 HR & Payroll Management System
 
-export type TenderStatus = 'NEW' | 'DECISION_REQUIRED' | 'IN_PROGRESS' | 'FINAL_REVIEW' | 'SUBMITTED' | 'CLOSED';
+export type TenderStatus = 'NEW' | 'DECISION_REQUIRED' | 'IN_PROGRESS' | 'FINAL_REVIEW' | 'SUBMITTED' | 'CLOSED' | 'WITHDRAWN';
 export type TenderGoNoGoDecision = 'PENDING' | 'GO' | 'NO_GO';
 export type TenderOutcome = 'PENDING' | 'WON' | 'LOST' | 'CANCELLED';
 export type TenderOutcomeReason = 'PRICE' | 'TECHNICAL_SCORE' | 'REFERENCES' | 'COMPLIANCE' | 'OTHER';
 export type TenderTaskStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETE' | 'OVERDUE';
 export type TenderRequirementType = 'MANDATORY' | 'FUNCTIONALITY' | 'TECHNICAL' | 'COMMERCIAL';
 export type TenderRequirementStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'AT_RISK' | 'COMPLETE';
-export type TenderBidDocumentCategory = 'COVER_LETTER' | 'PROPOSAL' | 'SUPPORTING_SCHEDULE' | 'OTHER';
 export type TenderFollowUpStatus = 'OPEN' | 'DONE';
 
 export interface TenderTaskItem {
@@ -51,6 +50,7 @@ export interface TenderPricingLine {
   sellExclVat?: number;
   vatAmount?: number;
   totalInclVat?: number;
+  totalCostInclVat?: number;
   createdAt: string;
   updatedAt?: string;
 }
@@ -58,7 +58,7 @@ export interface TenderPricingLine {
 export interface TenderBidDocument {
   id: number;
   tenderId: number;
-  category: TenderBidDocumentCategory;
+  category: string;
   displayName?: string;
   description?: string;
   fileName?: string;
@@ -75,6 +75,27 @@ export interface TenderFollowUp {
   dueDate?: string;
   status: TenderFollowUpStatus;
   createdAt: string;
+  updatedAt?: string;
+}
+
+export interface TenderJvPartner {
+  id: number;
+  tenderId: number;
+  partnerName: string;
+  role?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface TenderChecklistItem {
+  id: number;
+  tenderId: number;
+  sectionNumber: string;
+  sectionTitle: string;
+  itemText: string;
+  sortOrder: number;
+  checked: boolean;
+  createdAt?: string;
   updatedAt?: string;
 }
 
@@ -112,11 +133,28 @@ export interface Tender {
   finalSellExclVat?: number;
   finalVatAmount?: number;
   finalTotalInclVat?: number;
+  tenderType?: string;
+  tenderSource?: string;
+  clarificationRequired?: boolean;
+  clarificationDate?: string;
+  clarificationTime?: string;
+  clarificationNotes?: string;
+  clarificationAttachmentFileName?: string;
+  clarificationAttachmentContentType?: string;
+  biddingStructure?: string;
+  isJvConsortium?: boolean;
+  responseDocumentsFinalised?: boolean;
+  submissionMethod?: string;
+  submissionReference?: string;
+  submittedAt?: string;
+  submittedByName?: string;
   tasks?: TenderTaskItem[];
   requirements?: TenderRequirement[];
   pricingLines?: TenderPricingLine[];
   bidDocuments?: TenderBidDocument[];
   followUps?: TenderFollowUp[];
+  jvPartners?: TenderJvPartner[];
+  checklistItems?: TenderChecklistItem[];
 }
 
 export interface TenderPage {
