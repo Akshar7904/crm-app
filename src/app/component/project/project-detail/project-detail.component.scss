@@ -467,3 +467,53 @@
   border-top: 1px solid var(--border-color);
   background: var(--bg-card);
 }
+
+// ── Closure modal ────────────────────────────────────────────────────────────
+.closure-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  animation: attachmentViewerFadeIn 0.2s ease;
+}
+
+.closure-modal-panel {
+  background: var(--bg-card);
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.closure-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.closure-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.closure-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}

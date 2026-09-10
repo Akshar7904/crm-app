@@ -743,4 +743,58 @@ export class ProjectDetailComponent implements OnInit {
       error: e => this.notification.onError(e?.error?.message || 'Failed to delete document')
     });
   }
+
+  // ── Closure ──────────────────────────────────────────────────────────────
+  // Nine independently-toggled checklist items; each toggle saves immediately
+  // via updateClosure. Close Project (confirmCloseProject) is only enabled
+  // once every item is checked (project.closureComplete, computed server-side).
+  showClosureModal = false;
+
+  readonly closureChecklist: { key: keyof Project; label: string }[] = [
+    { key: 'closureTasksComplete', label: 'All tasks completed' },
+    { key: 'closureDeliverablesComplete', label: 'All deliverables completed' },
+    { key: 'closureCustomerSignoff', label: 'Customer sign-off received' },
+    { key: 'closureFinalInvoiceRaised', label: 'Final invoice raised' },
+    { key: 'closureOutstandingPaymentsCaptured', label: 'Outstanding payments captured' },
+    { key: 'closureDocumentsArchived', label: 'Documents archived' },
+    { key: 'closureFinancialsFinalised', label: 'Project financials finalised' },
+    { key: 'closureLessonsCaptured', label: 'Lessons learned captured' },
+    { key: 'closureApproved', label: 'Project closure approved' }
+  ];
+
+  openClosureModal(): void {
+    this.showClosureModal = true;
+  }
+
+  closeClosureModal(): void {
+    this.showClosureModal = false;
+  }
+
+  // Dynamic-key lookup for the template — avoids Angular's strict template
+  // type-checking tripping over `project[item.key]` bracket indexing on a
+  // `Project | null`-typed field with a `keyof Project` key.
+  getClosureValue(key: string): boolean {
+    return !!(this.project as any)?.[key];
+  }
+
+  toggleClosureItem(key: string): void {
+    if (!this.project) return;
+    const current = this.getClosureValue(key);
+    this.projectService.updateClosure(this.project.id, { [key]: !current } as any).subscribe({
+      next: updated => { this.project = { ...this.project!, ...updated }; },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to update closure item')
+    });
+  }
+
+  confirmCloseProject(): void {
+    if (!this.project) return;
+    this.projectService.closeProject(this.project.id).subscribe({
+      next: updated => {
+        this.project = { ...this.project!, ...updated };
+        this.showClosureModal = false;
+        this.notification.onDefault('Project closed');
+      },
+      error: e => this.notification.onError(e?.error?.message || 'Failed to close project')
+    });
+  }
 }

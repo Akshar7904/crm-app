@@ -22,6 +22,12 @@
   </p>
 
   <div class="banner-actions" *ngIf="project">
+    <span class="badge-soft badge-soft-success" *ngIf="project.status === 'COMPLETED'">
+      <i class="bi bi-check-circle me-1"></i>Closed {{ project.closedAt | date:'dd MMM yyyy' }}
+    </span>
+    <button class="btn btn-outline-danger btn-sm" *ngIf="isManagerOrAbove && (project.status === 'ACTIVE' || project.status === 'ON_HOLD')" (click)="openClosureModal()">
+      <i class="bi bi-flag me-1"></i>Close Project
+    </button>
     <button class="btn btn-outline-light btn-sm" (click)="editProject()">
       <i class="bi bi-pencil me-1"></i>Edit
     </button>
@@ -848,6 +854,30 @@
       <button class="btn btn-outline-secondary" (click)="closeTaskEdit()">Cancel</button>
       <button class="btn btn-primary" (click)="saveTaskEdit()" [disabled]="!editTaskTitle.trim()">
         <i class="bi bi-check-lg me-1"></i>Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CLOSURE MODAL ══ -->
+<div class="closure-modal-overlay" *ngIf="showClosureModal" (click)="closeClosureModal()">
+  <div class="closure-modal-panel" (click)="$event.stopPropagation()">
+    <div class="closure-modal-header">
+      <strong><i class="bi bi-flag me-2"></i>Close Project</strong>
+      <button type="button" class="btn-close" (click)="closeClosureModal()"></button>
+    </div>
+    <div class="closure-modal-body">
+      <p class="text-muted small mb-3">All items must be checked before this project can be closed.</p>
+      <div class="closure-item d-flex align-items-center gap-2 mb-2" *ngFor="let item of closureChecklist">
+        <input type="checkbox" class="form-check-input" [checked]="getClosureValue(item.key)" (change)="toggleClosureItem(item.key)">
+        <span>{{ item.label }}</span>
+      </div>
+      <div class="text-muted small mt-3">{{ project?.closureItemsComplete || 0 }} of 9 items checked</div>
+    </div>
+    <div class="closure-modal-footer">
+      <button type="button" class="btn btn-outline-secondary" (click)="closeClosureModal()">Cancel</button>
+      <button type="button" class="btn btn-danger" [disabled]="!project?.closureComplete" (click)="confirmCloseProject()">
+        <i class="bi bi-flag me-1"></i>Close Project
       </button>
     </div>
   </div>
