@@ -593,6 +593,19 @@ thead {
   }
 }
 
+// Hover affordance for genuinely click-interactive cards only — mirrors the
+// existing (unused) card-gradient mixin's hover treatment exactly, so the
+// motion language is consistent with anywhere else hover-lift is used.
+.card-hoverable {
+  cursor: pointer;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-lg;
+  }
+}
+
 // ==================== FORM FIELD STATES ====================
 // Overrides Bootstrap's default :focus/:disabled treatment with the app's
 // own token-driven states (focus/filled/error/disabled/loading). See

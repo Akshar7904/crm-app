@@ -10,21 +10,21 @@
   <!-- Summary Cards -->
   <div class="row g-3 mb-4">
     <div class="col-md-4">
-      <div class="falcon-card p-3 text-center expiry-card expiry-critical"
+      <div class="falcon-card card-hoverable p-3 text-center expiry-card expiry-critical"
            [class.active]="activeWindow === 30" (click)="activeWindow = 30">
         <div class="expiry-count">{{ expiring30.length }}</div>
         <div class="expiry-label">Expiring in 30 days</div>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="falcon-card p-3 text-center expiry-card expiry-warn"
+      <div class="falcon-card card-hoverable p-3 text-center expiry-card expiry-warn"
            [class.active]="activeWindow === 60" (click)="activeWindow = 60">
         <div class="expiry-count">{{ expiring60.length }}</div>
         <div class="expiry-label">Expiring in 31–60 days</div>
       </div>
     </div>
     <div class="col-md-4">
-      <div class="falcon-card p-3 text-center expiry-card expiry-info"
+      <div class="falcon-card card-hoverable p-3 text-center expiry-card expiry-info"
            [class.active]="activeWindow === 90" (click)="activeWindow = 90">
         <div class="expiry-count">{{ expiring90.length }}</div>
         <div class="expiry-label">Expiring in 61–90 days</div>
