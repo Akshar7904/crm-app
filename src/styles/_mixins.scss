@@ -130,7 +130,8 @@
   font-size: $input-font-size;
   border: $border-width solid $input-border-color;
   border-radius: $input-border-radius;
-  transition: border-color $transition-base, box-shadow $transition-base;
+  background-color: $white;
+  transition: border-color $transition-base, box-shadow $transition-base, background-color $transition-base;
 
   &:focus {
     outline: none;
@@ -138,8 +139,34 @@
     box-shadow: $input-focus-shadow;
   }
 
+  // Filled: has a non-empty value but isn't focused — a subtle background shift
+  // so a completed field reads differently from an empty one at a glance.
+  &:not(:placeholder-shown):not(:focus) {
+    background-color: $bg-input;
+  }
+
   &.is-invalid {
     border-color: $danger;
+    background-color: $white;
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15);
+    }
+  }
+
+  &:disabled,
+  &[readonly] {
+    background-color: $bg-disabled;
+    border-color: $border-light;
+    color: $text-light;
+    cursor: not-allowed;
+    opacity: 1; // override Bootstrap's default opacity-only disabled treatment — too subtle to read as "disabled" at a glance
+  }
+
+  &.is-loading {
+    background-image: none; // reserved hook: a loading/pending state (e.g. async uniqueness check) toggles this class from the component
+    border-color: $input-border-color;
+    padding-right: calc(#{$input-padding-x} + 20px);
   }
 }
 

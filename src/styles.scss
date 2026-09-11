@@ -593,6 +593,46 @@ thead {
   }
 }
 
+// ==================== FORM FIELD STATES ====================
+// Overrides Bootstrap's default :focus/:disabled treatment with the app's
+// own token-driven states (focus/filled/error/disabled/loading). See
+// _mixins.scss's `form-control` mixin for the underlying rules.
+.form-control,
+.form-select {
+  @include form-control;
+}
+
+.form-check-input {
+  &:focus {
+    border-color: $input-focus-border-color;
+    box-shadow: $input-focus-shadow;
+  }
+
+  &:disabled {
+    opacity: 1;
+    background-color: $bg-disabled;
+    border-color: $border-light;
+  }
+}
+
+// Standardized inline validation-message markup. Usage:
+//   <input class="form-control" [class.is-invalid]="field.invalid && field.touched">
+//   <div class="form-error" *ngIf="field.invalid && field.touched">This field is required.</div>
+.form-error {
+  color: $danger;
+  font-size: $font-size-sm;
+  margin-top: $spacing-xs;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: "\f335"; // bootstrap-icons exclamation-circle glyph (already loaded globally per angular.json)
+    font-family: "bootstrap-icons";
+    font-size: 0.85em;
+  }
+}
+
 // Soft status badges (Falcon style)
 .badge-soft {
   display: inline-flex;

@@ -36,9 +36,14 @@
               <label for="email">Email Address</label>
               <div class="input-wrapper">
                 <i class="bi bi-envelope"></i>
-                <input ngModel type="email" name="email" id="email" class="form-control"
+                <input #email="ngModelControl" ngModel type="email" name="email" id="email" class="form-control"
                   placeholder="Enter your email" required
-                  [disabled]="state.dataState === DataState.LOADING">
+                  [disabled]="state.dataState === DataState.LOADING"
+                  [class.is-invalid]="email.invalid && email.touched">
+              </div>
+              <div class="form-error" *ngIf="email.invalid && email.touched">
+                <span *ngIf="email.errors?.['required']">This field is required.</span>
+                <span *ngIf="email.errors?.['email']">Please enter a valid email address.</span>
               </div>
             </div>
 
@@ -111,9 +116,13 @@
               <label for="password">Password</label>
               <div class="input-wrapper">
                 <i class="bi bi-lock"></i>
-                <input ngModel type="password" name="password" id="password" class="form-control"
+                <input #password="ngModelControl" ngModel type="password" name="password" id="password" class="form-control"
                   placeholder="Enter your password" required
-                  [disabled]="state.dataState === DataState.LOADING">
+                  [disabled]="state.dataState === DataState.LOADING"
+                  [class.is-invalid]="password.invalid && password.touched">
+              </div>
+              <div class="form-error" *ngIf="password.invalid && password.touched">
+                <span *ngIf="password.errors?.['required']">This field is required.</span>
               </div>
             </div>
 
