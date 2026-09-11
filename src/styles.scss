@@ -601,6 +601,7 @@ thead {
   transition: transform $transition-base, box-shadow $transition-base;
 
   &:hover {
+    animation: none;
     transform: translateY(-5px);
     box-shadow: $shadow-lg;
   }
