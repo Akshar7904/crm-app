@@ -160,7 +160,7 @@
               <td>{{ t.allocatedToName || '—' }}</td>
               <td>{{ t.dueDate ? (t.dueDate | date:'d MMM yyyy') : '—' }}</td>
               <td>
-                <span class="badge" [ngClass]="{
+                <span class="badge-soft" [ngClass]="{
                   'badge-soft-secondary': t.status === 'NOT_STARTED',
                   'badge-soft-info': t.status === 'IN_PROGRESS',
                   'badge-soft-success': t.status === 'COMPLETE',
@@ -198,11 +198,11 @@
           <tbody>
             <tr *ngIf="!tender.requirements?.length"><td colspan="5" class="empty-state-cell">No requirements yet</td></tr>
             <tr *ngFor="let r of tender.requirements">
-              <td><span class="badge badge-soft-secondary">{{ r.type }}</span></td>
+              <td><span class="badge-soft badge-soft-secondary">{{ r.type }}</span></td>
               <td>{{ r.description }}</td>
               <td>{{ r.ownerName || '—' }}</td>
               <td>
-                <span class="badge" [ngClass]="{
+                <span class="badge-soft" [ngClass]="{
                   'badge-soft-secondary': r.status === 'NOT_STARTED',
                   'badge-soft-info': r.status === 'IN_PROGRESS',
                   'badge-soft-warning': r.status === 'AT_RISK',
@@ -328,7 +328,7 @@
             <tbody>
               <tr *ngFor="let d of group.docs">
                 <td class="fw-semibold">{{ d.displayName || d.fileName }}</td>
-                <td><span class="badge badge-soft-secondary">{{ d.category }}</span></td>
+                <td><span class="badge-soft badge-soft-secondary">{{ d.category }}</span></td>
                 <td>{{ d.description || '—' }}</td>
                 <td>v{{ d.version }}</td>
                 <td>{{ d.updatedAt ? (d.updatedAt | date:'d MMM yyyy') : (d.createdAt | date:'d MMM yyyy') }}</td>
@@ -368,7 +368,7 @@
           <ul class="list-unstyled mt-2 mb-0">
             <li *ngFor="let c of submissionReadinessChecks" class="d-flex justify-content-between py-1 border-bottom">
               <span>{{ c.label }}</span>
-              <span class="badge" [ngClass]="c.ready ? 'badge-soft-success' : 'badge-soft-secondary'">{{ c.ready ? 'Ready' : 'Outstanding' }}</span>
+              <span class="badge-soft" [ngClass]="c.ready ? 'badge-soft-success' : 'badge-soft-secondary'">{{ c.ready ? 'Ready' : 'Outstanding' }}</span>
             </li>
           </ul>
         </div>
@@ -459,7 +459,7 @@
     </div>
 
     <div class="falcon-card p-3 mt-3" *ngIf="tender.status === 'WITHDRAWN'">
-      <span class="badge badge-soft-secondary">Withdrawn — this bid was not submitted</span>
+      <span class="badge-soft badge-soft-secondary">Withdrawn — this bid was not submitted</span>
     </div>
   </div>
 

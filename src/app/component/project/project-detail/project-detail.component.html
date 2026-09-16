@@ -5,7 +5,7 @@
   </button>
   <div class="d-flex align-items-center gap-3 mt-2">
     <div class="banner-title">{{ project?.name || 'Project Detail' }}</div>
-    <span *ngIf="project?.status" class="badge badge-lg"
+    <span *ngIf="project?.status" class="badge-soft badge-lg"
           [ngClass]="{
             'badge-soft-secondary': project?.status === 'DRAFT',
             'badge-soft-success': project?.status === 'ACTIVE',
@@ -201,7 +201,7 @@
               <div class="task-main">
                 <div class="d-flex align-items-center gap-2">
                   <span class="fw-semibold">{{ task.title }}</span>
-                  <span class="badge"
+                  <span class="badge-soft"
                         [ngClass]="{
                           'badge-soft-secondary': task.priority === 'LOW',
                           'badge-soft-warning': task.priority === 'MEDIUM',
@@ -262,7 +262,7 @@
               <div class="kanban-card" *ngFor="let task of column.tasks" cdkDrag>
                 <div class="kanban-card-placeholder" *cdkDragPlaceholder></div>
                 <div class="fw-semibold">{{ task.title }}</div>
-                <span class="badge mt-1"
+                <span class="badge-soft mt-1"
                       [ngClass]="{
                         'badge-soft-secondary': task.priority === 'LOW',
                         'badge-soft-warning': task.priority === 'MEDIUM',
@@ -326,14 +326,14 @@
           <div class="d-flex align-items-center justify-content-between">
             <div>
               <span class="fw-semibold">{{ milestone.name }}</span>
-              <span class="badge ms-2"
+              <span class="badge-soft ms-2"
                     [ngClass]="{
                       'badge-soft-secondary': milestone.status === 'NOT_STARTED',
                       'badge-soft-info': milestone.status === 'IN_PROGRESS',
                       'badge-soft-warning': milestone.status === 'READY_FOR_REVIEW',
                       'badge-soft-success': milestone.status === 'COMPLETED'
                     }">{{ milestone.status.replace('_', ' ') }}</span>
-              <span class="badge badge-soft-danger ms-1" *ngIf="milestone.overdue">Overdue</span>
+              <span class="badge-soft badge-soft-danger ms-1" *ngIf="milestone.overdue">Overdue</span>
               <span class="text-muted small ms-2" *ngIf="milestone.dependsOnMilestoneName">
                 <i class="bi bi-link-45deg"></i> depends on: {{ milestone.dependsOnMilestoneName }}
               </span>
@@ -422,7 +422,7 @@
         <div class="member-row d-flex align-items-center justify-content-between" *ngFor="let member of members">
           <div>
             <span class="fw-semibold">{{ member.employeeName }}</span>
-            <span class="badge badge-soft-secondary ms-2" *ngIf="member.roleLabel">{{ member.roleLabel }}</span>
+            <span class="badge-soft badge-soft-secondary ms-2" *ngIf="member.roleLabel">{{ member.roleLabel }}</span>
             <span class="text-muted small ms-2" *ngIf="member.addedByName">Added by {{ member.addedByName }}</span>
           </div>
           <button class="btn btn-sm btn-outline-danger" *ngIf="isManagerOrAbove" (click)="removeMember(member)" title="Remove from project team">
@@ -562,7 +562,7 @@
               <tr *ngFor="let tx of project.transactions">
                 <td>{{ tx.date | date:'dd MMM yyyy' }}</td>
                 <td>
-                  <span class="badge" [ngClass]="tx.type === 'INCOME' ? 'badge-soft-success' : 'badge-soft-danger'">
+                  <span class="badge-soft" [ngClass]="tx.type === 'INCOME' ? 'badge-soft-success' : 'badge-soft-danger'">
                     {{ tx.type }}
                   </span>
                 </td>
