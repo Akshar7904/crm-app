@@ -59,7 +59,7 @@
     </div>
     <div class="pdf-frame-wrap">
       <div *ngIf="viewerLoading" class="pdf-loading">
-        <div class="spinner-border text-primary"></div>
+        <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
         <div class="mt-2 text-muted small">Loading document…</div>
       </div>
       <iframe *ngIf="!viewerLoading && viewerUrl" [src]="viewerUrl" class="pdf-frame" title="Policy Document"></iframe>

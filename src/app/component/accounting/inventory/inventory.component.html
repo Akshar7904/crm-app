@@ -147,7 +147,7 @@
     <!-- Movements Tab -->
     <div *ngIf="activeTab === 'movements'">
       <div *ngIf="movementsLoading" class="p-4 text-center text-muted">
-        <div class="spinner-border spinner-border-sm me-2"></div> Loading...
+        <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
       </div>
       <div *ngIf="!movementsLoading && movements.length === 0" class="p-4 text-center text-muted">
         <i class="bi bi-arrow-left-right fs-2 d-block mb-2"></i>No movements recorded yet.

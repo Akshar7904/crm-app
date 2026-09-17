@@ -3,7 +3,7 @@
 
     <!-- Loading State (first load only — refreshes update the page in place) -->
     <div *ngIf="state.dataState === DataState.LOADING" class="dash-loading-state">
-      <div class="spinner-border text-primary" role="status"></div>
+      <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
       <p>Loading your dashboard…</p>
     </div>
 
