@@ -675,7 +675,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       stats: this.dashboardService.getAdminDashboardStats().pipe(catchError(() => of(null))),
       holidays: this.holidayService.getUpcomingHolidays$(10).pipe(catchError(() => of(null))),
       attendance: this.attendanceService.getAttendanceByDateRange(startDate, endDate).pipe(catchError(() => of(null))),
-      leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC').pipe(catchError(() => of(null))),
+      // force:true — the dashboard always wants fresh data; without it, a
+      // repeat visit hits LeaveService's cache guard, which returns EMPTY
+      // (completes without emitting), and forkJoin then never emits at all
+      // since every source must emit at least once — silently stalling the
+      // whole dashboard load on every visit after the first.
+      leaves: this.leaveService.getAllLeaves(0, 200, 'startDate', 'DESC', true).pipe(catchError(() => of(null))),
       announcements: this.announcementService.getAnnouncements$(0, 5).pipe(catchError(() => of(null))),
       financial: this.expensesService.getSummary(now.getFullYear(), now.getMonth() + 1).pipe(catchError(() => of(null))),
       internSchoolDays: this.internAttendanceService.getByDateRange(startDate, endDate).pipe(catchError(() => of([])))
