@@ -19,7 +19,7 @@
   display: flex; align-items: center;
 
   &.pay-section-earnings   { color: #27ae60; border-color: rgba(39,174,96,0.3); }
-  &.pay-section-deductions { color: #dc3545; border-color: rgba(220,53,69,0.2); }
+  &.pay-section-deductions { color: $danger; border-color: rgba(220,53,69,0.2); }
   &.pay-section-tax        { color: #b38600; border-color: rgba(241,196,15,0.3); }
   &.pay-section-summary    { color: #375fa0; border-color: rgba(55,95,160,0.3); }
   &.pay-section-attendance { color: #2980b9; border-color: rgba(52,152,219,0.2); }

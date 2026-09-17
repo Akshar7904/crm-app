@@ -35,13 +35,13 @@
 // ─── Status Badges
 .badge-soft-pending   { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(255,193,7,0.15);  color: #d68910; }
 .badge-soft-approved  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,0.12);  color: #27ae60; }
-.badge-soft-rejected  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1);   color: #dc3545; }
+.badge-soft-rejected  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1);   color: $danger; }
 .badge-soft-paid      { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(52,152,219,0.12); color: #2980b9; }
 .badge-soft-cancelled { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,0.1); color: #6c757d; }
 
 // ─── Action Buttons (extends global action-btn-group)
 .action-btn-edit   { background: rgba(255,193,7,0.1);   color: #d68910; &:hover { background: rgba(255,193,7,0.22); } }
-.action-btn-cancel { background: rgba(220,53,69,0.1);   color: #dc3545; &:hover { background: rgba(220,53,69,0.2);  } }
+.action-btn-cancel { background: rgba(220,53,69,0.1);   color: $danger; &:hover { background: rgba(220,53,69,0.2);  } }
 
 // ─── Loading / Error
 .ec-loading {
@@ -51,7 +51,7 @@
 
 .ec-error {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 60px 24px; color: #dc3545; text-align: center;
+  padding: 60px 24px; color: $danger; text-align: center;
   i { font-size: 2.5rem; margin-bottom: 12px; }
   p { font-size: 0.9rem; margin: 0; }
 }

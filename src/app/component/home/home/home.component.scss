@@ -209,7 +209,7 @@
   align-items: center;
   justify-content: center;
   height: 220px;
-  color: var(--text-light, #cbd5e1);
+  color: var(--text-light, $gray-300);
   i { font-size: 2.25rem; margin-bottom: $spacing-sm; opacity: 0.5; }
   p { margin: 0; font-size: 0.8rem; text-align: center; }
 
@@ -589,7 +589,7 @@
   font-weight: $font-weight-medium;
 
   &.clocked-in  { background: rgba($success, 0.2); color: #a8f0ba; }
-  &.clocked-out { background: rgba($white, 0.15);  color: #e2e8f0; }
+  &.clocked-out { background: rgba($white, 0.15);  color: $gray-200; }
   &.working-status {
     margin-left: 8px;
     background: rgba($white, 0.15);

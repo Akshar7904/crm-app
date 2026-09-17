@@ -54,7 +54,7 @@
   &.net-negative { background: rgba(220, 53, 69, 0.06); border-color: rgba(220, 53, 69, 0.3); }
 }
 .net-position-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted, #888); margin-bottom: 6px; }
-.net-position-value { font-size: 2rem; font-weight: 700; .net-positive & { color: #28a745; } .net-negative & { color: #dc3545; } }
+.net-position-value { font-size: 2rem; font-weight: 700; .net-positive & { color: $success; } .net-negative & { color: $danger; } }
 .net-position-formula { font-size: 0.72rem; color: var(--text-muted, #999); margin-top: 4px; }
 
 .btn-save { width: 100%; border-radius: 8px; font-weight: 600; padding: 10px; }
@@ -63,6 +63,6 @@
 .history-empty { text-align: center; padding: 30px 0; color: var(--text-muted, #aaa); i { font-size: 2rem; display: block; margin-bottom: 8px; } }
 .history-item { padding: 12px 14px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; border: 1px solid var(--border-color, #eee); transition: all 0.2s; &:hover { background: var(--bg-hover, #f8f9fa); } &.history-selected { border-color: var(--primary, #375fa0); background: rgba(55, 95, 160, 0.05); } }
 .history-year { font-size: 1rem; font-weight: 700; color: var(--text-primary, #333); }
-.history-net { font-size: 0.9rem; font-weight: 600; &.positive { color: #28a745; } &.negative { color: #dc3545; } }
+.history-net { font-size: 0.9rem; font-weight: 600; &.positive { color: $success; } &.negative { color: $danger; } }
 .history-cash { font-size: 0.72rem; color: var(--text-muted, #888); margin-top: 2px; }
 .alert-sm { font-size: 0.82rem; padding: 8px 12px; border-radius: 8px; margin-bottom: 16px; }

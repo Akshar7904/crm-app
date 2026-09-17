@@ -32,7 +32,7 @@
 }
 
 .att-kpi-present .att-kpi-icon { background: rgba(39,174,96,0.12);  color: #27ae60; }
-.att-kpi-absent  .att-kpi-icon { background: rgba(220,53,69,0.1);   color: #dc3545; }
+.att-kpi-absent  .att-kpi-icon { background: rgba(220,53,69,0.1);   color: $danger; }
 .att-kpi-half    .att-kpi-icon { background: rgba(241,196,15,0.15); color: #b38600; }
 .att-kpi-leave   .att-kpi-icon { background: rgba(55,95,160,0.1);   color: #375fa0; }
 
@@ -160,7 +160,7 @@
 }
 
 .att-dot-present,    .att-icon-present    { background: rgba(39,174,96,0.15);  color: #27ae60; }
-.att-dot-absent,     .att-icon-absent     { background: rgba(220,53,69,0.12);  color: #dc3545; }
+.att-dot-absent,     .att-icon-absent     { background: rgba(220,53,69,0.12);  color: $danger; }
 .att-dot-half-day,   .att-icon-half-day   { background: rgba(241,196,15,0.18); color: #b38600; }
 .att-dot-late,       .att-icon-late       { background: rgba(255,128,0,0.12);  color: #e67e22; }
 .att-dot-early,      .att-icon-early      { background: rgba(155,89,182,0.12); color: #8e44ad; }
@@ -256,7 +256,7 @@ table tbody tr:hover { background: var(--bg-hover, #fafafa); }
   h5 { color: var(--text-secondary, #666); margin-bottom: 8px; }
   p  { font-size: 0.85rem; max-width: 380px; margin: 0 auto 16px; }
 }
-.att-error i { color: #dc3545; opacity: 0.5; }
+.att-error i { color: $danger; opacity: 0.5; }
 .att-loading { text-align: center; padding: 60px; color: var(--text-muted, #888); font-size: 0.9rem; }
 
 // ─── Modal

@@ -481,7 +481,7 @@ section {
     &:hover { color: $primary; text-decoration: underline; }
   }
 
-  span { color: #e2e8f0; font-size: .7rem; }
+  span { color: $gray-200; font-size: .7rem; }
 }
 
 // Very Small Screens

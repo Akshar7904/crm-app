@@ -78,7 +78,7 @@
   &-it         { background: rgba(52,152,219,0.12);color: #2980b9; }
   &-finance    { background: rgba(241,196,15,0.15);color: #b38600; }
   &-operations { background: rgba(155,89,182,0.12);color: #8e44ad; }
-  &-urgent     { background: rgba(220,53,69,0.1);  color: #dc3545; }
+  &-urgent     { background: rgba(220,53,69,0.1);  color: $danger; }
 }
 
 // ─── Status Badges
@@ -96,7 +96,7 @@
   &.action-btn-edit   { background: rgba(55,95,160,0.1);  color: #375fa0; &:hover { background: rgba(55,95,160,0.2); } }
   &.action-btn-pin    { background: rgba(241,196,15,0.12); color: #b38600; &:hover { background: rgba(241,196,15,0.22); } }
   &.action-btn-toggle { background: rgba(52,152,219,0.1);  color: #2980b9; &:hover { background: rgba(52,152,219,0.2); } }
-  &.action-btn-delete { background: rgba(220,53,69,0.08);  color: #dc3545; &:hover { background: rgba(220,53,69,0.18); } }
+  &.action-btn-delete { background: rgba(220,53,69,0.08);  color: $danger; &:hover { background: rgba(220,53,69,0.18); } }
 }
 
 // ─── Empty / Error / Loading
@@ -107,7 +107,7 @@
   h5 { color: var(--text-secondary, #666); margin-bottom: 8px; }
   p  { font-size: 0.85rem; max-width: 380px; margin: 0 auto 16px; }
 }
-.ann-error i { color: #dc3545; opacity: 0.5; }
+.ann-error i { color: $danger; opacity: 0.5; }
 .ann-loading { text-align: center; padding: 60px; color: var(--text-muted, #888); font-size: 0.9rem; }
 
 // ─── Modal
