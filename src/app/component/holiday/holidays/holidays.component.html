@@ -6,7 +6,7 @@
       <h1 class="banner-title"><i class="bi bi-calendar-event"></i> Holidays</h1>
       <p class="banner-subtitle">Manage public and company holidays</p>
     </div>
-    <div class="banner-actions">
+    <div class="banner-actions" *ngIf="isAdmin">
       <button class="btn-banner" (click)="addNewHoliday()">
         <i class="bi bi-plus-circle"></i> Add Holiday
       </button>
@@ -91,7 +91,7 @@
                   </span>
                 </td>
                 <td class="text-center" (click)="$event.stopPropagation()">
-                  <div class="action-btn-group">
+                  <div class="action-btn-group" *ngIf="isAdmin">
                     <button type="button" class="action-btn action-btn-edit"
                             (click)="selectHoliday(holiday)" title="Edit">
                       <i class="bi bi-pencil-square"></i>

@@ -87,6 +87,12 @@
             </select>
           </div>
 
+          <div class="col-md-6">
+            <label class="form-label">ID / Passport Number</label>
+            <input type="text" class="form-control" formControlName="idNumber"
+                   placeholder="e.g. 9001015800083">
+          </div>
+
         </div>
       </div>
     </div>
@@ -190,17 +196,11 @@
 
           <div class="col-md-6">
             <label class="form-label">Bank Name</label>
-            <select class="form-select" formControlName="bankName">
-              <option value="">Select Bank</option>
-              <option value="ABSA">ABSA</option>
-              <option value="FNB">First National Bank (FNB)</option>
-              <option value="Standard Bank">Standard Bank</option>
-              <option value="Nedbank">Nedbank</option>
-              <option value="Capitec">Capitec Bank</option>
-              <option value="Discovery Bank">Discovery Bank</option>
-              <option value="TymeBank">TymeBank</option>
-              <option value="African Bank">African Bank</option>
-            </select>
+            <input type="text" class="form-control" formControlName="bankName"
+                   list="bankNameOptionsNew" placeholder="Search or select a bank" autocomplete="off">
+            <datalist id="bankNameOptionsNew">
+              <option *ngFor="let bank of bankOptions" [value]="bank"></option>
+            </datalist>
           </div>
 
           <div class="col-md-6">
@@ -220,7 +220,7 @@
 
           <div class="col-md-4">
             <label class="form-label">Account Number</label>
-            <input type="text" class="form-control" formControlName="accountNumber"
+            <input type="text" class="form-control" formControlName="bankAccountNumber"
                    placeholder="e.g. 1234567890">
           </div>
 

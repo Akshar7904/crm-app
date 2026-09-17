@@ -12,6 +12,7 @@ import { State } from 'src/app/interface/state';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { NgForm } from '@angular/forms';
+import { BANK_OPTIONS } from '../employee.model';
 import { EmployeeForm } from '../employee.model';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { UserService } from 'src/app/service/user.service';
@@ -44,6 +45,7 @@ export class EmployeeDetailComponent implements OnInit {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoadingSubject.asObservable();
   readonly DataState = DataState;
+  bankOptions = BANK_OPTIONS;
   private readonly EMPLOYEE_ID: string = 'id';
 
   // Flags for different modes
@@ -336,6 +338,7 @@ export class EmployeeDetailComponent implements OnInit {
       // Emergency contact
       emergencyContactName: employeeForm.value.emergencyContactName || null,
       emergencyContactPhone: employeeForm.value.emergencyContactPhone || null,
+      idNumber: employeeForm.value.idNumber || currentEmployee.idNumber || null,
       bio: employeeForm.value.bio || null,
       // Banking info
       bankName: employeeForm.value.bankName || currentEmployee.bankName || null,
@@ -403,6 +406,7 @@ export class EmployeeDetailComponent implements OnInit {
       postalCode: employeeForm.value.postalCode || currentEmployee.postalCode || null,
       emergencyContactName: employeeForm.value.emergencyContactName || currentEmployee.emergencyContactName || null,
       emergencyContactPhone: employeeForm.value.emergencyContactPhone || currentEmployee.emergencyContactPhone || null,
+      idNumber: employeeForm.value.idNumber || currentEmployee.idNumber || null,
       bio: employeeForm.value.bio || currentEmployee.bio || null
     };
 

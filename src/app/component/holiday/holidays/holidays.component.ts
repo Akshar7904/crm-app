@@ -37,6 +37,9 @@ export class HolidaysComponent implements OnInit {
   currentPage$ = this.currentPageSubject.asObservable();
   private searchTermSubject = new BehaviorSubject<string>('');
   searchTerm$ = this.searchTermSubject.asObservable();
+  // Create/update/delete are ADMIN/SYSADMIN-only on the backend — hide Add
+  // Holiday for other roles instead of letting them submit and hit a 403.
+  isAdmin = false;
 
   // Cache for optimization
   private lastHolidays: Holiday[] = [];
@@ -45,7 +48,15 @@ export class HolidaysComponent implements OnInit {
     private holidayService: HolidayService,
     private router: Router,
     private notificationService: NotificationService
-  ) { }
+  ) {
+    try {
+      const stored = localStorage.getItem('user');
+      const role = stored ? JSON.parse(stored)?.roleName : null;
+      this.isAdmin = role === 'ROLE_ADMIN' || role === 'ROLE_SYSADMIN';
+    } catch {
+      this.isAdmin = false;
+    }
+  }
 
   ngOnInit(): void {
     this.loadHolidays(0);

@@ -26,6 +26,10 @@ export class HolidayDetailComponent implements OnInit {
   isEditing = false;
   readonly DataState = DataState;
   minDate: string;
+  // Create/update/delete are ADMIN/SYSADMIN-only on the backend — hide the
+  // Edit/Delete actions for other roles instead of letting them submit and
+  // hit a 403.
+  isAdmin = false;
 
   constructor(
     private fb: FormBuilder,
@@ -37,6 +41,14 @@ export class HolidayDetailComponent implements OnInit {
     // Set minimum date to today
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0];
+
+    try {
+      const stored = localStorage.getItem('user');
+      const role = stored ? JSON.parse(stored)?.roleName : null;
+      this.isAdmin = role === 'ROLE_ADMIN' || role === 'ROLE_SYSADMIN';
+    } catch {
+      this.isAdmin = false;
+    }
   }
 
   ngOnInit(): void {

@@ -224,6 +224,10 @@
                           <span class="info-label">Postal Code</span>
                           <span class="info-value">{{ state?.appData?.data?.employee.postalCode || 'N/A' }}</span>
                         </div>
+                        <div class="info-row">
+                          <span class="info-label">ID / Passport Number</span>
+                          <span class="info-value">{{ state?.appData?.data?.employee.idNumber || 'N/A' }}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -300,8 +304,9 @@
                       <div class="row g-3">
                         <div class="col-md-4">
                           <label class="form-label">Employee ID</label>
-                          <input type="text" class="form-control" name="employeeId"
-                                 [(ngModel)]="state.appData.data.employee.employeeId" placeholder="e.g., LKC0001" />
+                          <input type="text" class="form-control" name="employeeId" readonly disabled
+                                 [(ngModel)]="state.appData.data.employee.employeeId" [ngModelOptions]="{standalone: true}" />
+                          <small class="text-muted">Auto-assigned at creation — the Kiosk clock-in relies on this exact format, so it can't be edited here.</small>
                         </div>
                         <div class="col-md-4">
                           <label class="form-label">Status</label>
@@ -395,6 +400,11 @@
                             <option value="OTHER">Other</option>
                           </select>
                         </div>
+                        <div class="col-md-6">
+                          <label class="form-label">ID / Passport Number</label>
+                          <input type="text" class="form-control" name="idNumber"
+                                 [(ngModel)]="state.appData.data.employee.idNumber" />
+                        </div>
                       </div>
                     </div>
 
@@ -471,17 +481,12 @@
                       <div class="row g-3">
                         <div class="col-md-6">
                           <label class="form-label">Bank Name</label>
-                          <select class="form-select" name="bankName" [(ngModel)]="state.appData.data.employee.bankName">
-                            <option value="">Select Bank</option>
-                            <option value="ABSA">ABSA</option>
-                            <option value="FNB">First National Bank (FNB)</option>
-                            <option value="Standard Bank">Standard Bank</option>
-                            <option value="Nedbank">Nedbank</option>
-                            <option value="Capitec">Capitec Bank</option>
-                            <option value="Discovery Bank">Discovery Bank</option>
-                            <option value="TymeBank">TymeBank</option>
-                            <option value="African Bank">African Bank</option>
-                          </select>
+                          <input type="text" class="form-control" name="bankName"
+                                 [(ngModel)]="state.appData.data.employee.bankName"
+                                 list="bankNameOptionsEdit" placeholder="Search or select a bank" autocomplete="off">
+                          <datalist id="bankNameOptionsEdit">
+                            <option *ngFor="let bank of bankOptions" [value]="bank"></option>
+                          </datalist>
                         </div>
                         <div class="col-md-6">
                           <label class="form-label">Account Holder Name</label>

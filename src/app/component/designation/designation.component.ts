@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { DesignationService } from '../../service/designation.service';
-import { Designation, DesignationForm, DesignationLevel } from './designation.model';
+import { Designation, DesignationForm, DesignationLevel, DESIGNATION_LEVEL_LABELS, COLORED_DESIGNATION_LEVELS } from './designation.model';
 import { DesignationState } from '../../interface/designation-state';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -35,6 +35,7 @@ export class DesignationsComponent implements OnInit, OnDestroy {
 
   // Designation levels for dropdown
   designationLevels = Object.values(DesignationLevel);
+  readonly coloredDesignationLevels = COLORED_DESIGNATION_LEVELS;
 
   // Pagination
   currentPage = 0;
@@ -375,7 +376,7 @@ export class DesignationsComponent implements OnInit, OnDestroy {
    */
   formatLevel(level: string): string {
     if (!level) return 'N/A';
-    return level.charAt(0) + level.slice(1).toLowerCase();
+    return DESIGNATION_LEVEL_LABELS[level] || (level.charAt(0) + level.slice(1).toLowerCase());
   }
 
   /**
