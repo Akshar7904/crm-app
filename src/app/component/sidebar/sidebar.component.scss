@@ -90,6 +90,63 @@
 }
 
 // ========================================
+// MARKETPLACE 360
+// ========================================
+.sidebar-marketplace-card {
+  margin: 0 8px 8px;
+  flex-shrink: 0;
+}
+
+.marketplace-chip-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.marketplace-icon {
+  @include flex-center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1rem;
+    color: $primary;
+  }
+}
+
+.marketplace-name {
+  flex: 1;
+  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary, $gray-900);
+  @include truncate;
+}
+
+.marketplace-soon-badge {
+  font-size: 0.6rem;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  background: rgba($warning, 0.15);
+  color: $warning-dark;
+  flex-shrink: 0;
+}
+
+// ========================================
 // MENU SECTION LABEL
 // ========================================
 .menu-section-label {

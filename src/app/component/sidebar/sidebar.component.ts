@@ -904,6 +904,10 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     this.router.navigate(['/login']);
   }
 
+  onMarketplaceClick(): void {
+    this.notification.onInfo('Marketplace 360 — coming soon!');
+  }
+
   trackById(index: number, item: any): number { return item?.id ?? index; }
   trackByIndex(index: number): number { return index; }
 }
