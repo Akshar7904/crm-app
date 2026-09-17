@@ -518,7 +518,7 @@ thead {
   box-shadow: var(--card-shadow, $shadow);
   overflow: hidden;
   margin-bottom: $spacing-md;
-  animation: fadeInUp 0.4s ease forwards;
+  animation: fadeInUp 0.4s ease;
 
   .falcon-card-header {
     display: flex;
@@ -552,7 +552,7 @@ thead {
   border-radius: $border-radius-xl;
   box-shadow: var(--card-shadow, $shadow);
   overflow: hidden;
-  animation: fadeInUp 0.4s ease forwards;
+  animation: fadeInUp 0.4s ease;
 
   .table {
     margin: 0;
@@ -601,7 +601,6 @@ thead {
   transition: transform $transition-base, box-shadow $transition-base;
 
   &:hover {
-    animation: none;
     transform: translateY(-5px);
     box-shadow: $shadow-lg;
   }
@@ -641,7 +640,7 @@ thead {
   gap: 4px;
 
   &::before {
-    content: "\f335"; // bootstrap-icons exclamation-circle glyph (already loaded globally per angular.json)
+    content: "\f335"; // bootstrap-icons exclamation-diamond glyph (already loaded globally per angular.json)
     font-family: "bootstrap-icons";
     font-size: 0.85em;
   }
