@@ -12,6 +12,17 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 })
 export class DemoComponent {
 
+  // ── Mobile nav ──────────────────────────────────────────────────────────
+  mobileMenuOpen = false;
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
+
   // ── Contact / Demo Request Modal ─────────────────────────────────────────
   showContactModal = false;
   contactSubmitting = false;

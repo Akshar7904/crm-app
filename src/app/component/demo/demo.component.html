@@ -16,8 +16,27 @@
         <span class="lp-nav-divider"></span>
         <a routerLink="/login" class="lp-btn-signin"><i class="bi bi-person-circle"></i> Sign In</a>
       </nav>
+
+      <button type="button" class="lp-hamburger" [class.active]="mobileMenuOpen"
+              (click)="toggleMobileMenu()" [attr.aria-expanded]="mobileMenuOpen" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+
+    <!-- Mobile dropdown menu -->
+    <div class="lp-mobile-menu" [class.open]="mobileMenuOpen">
+      <a href="#about" (click)="closeMobileMenu()">About</a>
+      <a href="#modules" (click)="closeMobileMenu()">Modules</a>
+      <a href="#features" (click)="closeMobileMenu()">Features</a>
+      <a href="javascript:void(0)" class="lp-btn-demo" (click)="closeMobileMenu(); openContactModal('Demo Request')">
+        <i class="bi bi-calendar-event"></i> Request a Demo
+      </a>
+      <a routerLink="/login" class="lp-btn-signin" (click)="closeMobileMenu()">
+        <i class="bi bi-person-circle"></i> Sign In
+      </a>
     </div>
   </header>
+  <div class="lp-mobile-overlay" *ngIf="mobileMenuOpen" (click)="closeMobileMenu()"></div>
 
   <!-- ══ HERO ═════════════════════════════════════════════════════ -->
   <section class="lp-hero">

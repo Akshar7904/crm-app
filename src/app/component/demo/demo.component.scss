@@ -53,6 +53,84 @@ $secondary:      #4ea41b;   // vivid green, sampled from the logo icon
 }
 .lp-nav-divider { width: 1px; height: 22px; background: #E5E7EB; }
 
+// ── Mobile hamburger toggle (hidden on desktop, see Responsive block) ────
+.lp-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  span {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #111827;
+    border-radius: 2px;
+    transition: all .3s ease;
+  }
+
+  &.active {
+    span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    span:nth-child(2) { opacity: 0; }
+    span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  }
+}
+
+// ── Mobile dropdown menu (hidden on desktop, see Responsive block) ───────
+.lp-mobile-menu {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 24px;
+  background: #FFFFFF;
+  border-bottom: 1px solid transparent;
+  transition: max-height .3s ease, padding .3s ease, border-color .3s ease;
+
+  a {
+    font-size: .92rem;
+    font-weight: 500;
+    color: #6B7280;
+    padding: 12px 4px;
+    border-bottom: 1px solid #E5E7EB;
+    &:hover { color: #111827; }
+  }
+
+  .lp-btn-demo, .lp-btn-signin {
+    justify-content: center;
+    margin-top: 10px;
+    border-bottom: none;
+  }
+  .lp-btn-signin { margin-top: 8px; margin-bottom: 14px; }
+
+  &.open {
+    max-height: 420px;
+    padding: 8px 24px 4px;
+    border-bottom-color: #E5E7EB;
+  }
+}
+
+.lp-mobile-overlay {
+  display: none;
+
+  @media (max-width: 991px) {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, .25);
+    z-index: 998;
+  }
+}
+
 .lp-btn-demo {
   display: inline-flex; align-items: center; gap: 6px;
   background: #{$primary}; color: #FFFFFF !important;
@@ -638,11 +716,20 @@ $secondary:      #4ea41b;   // vivid green, sampled from the logo icon
 
 /* ── Responsive ──────────────────────────────────────────────────── */
 @media (max-width: 991px) {
-  .lp-nav a:not(.lp-btn-signin):not(.lp-btn-demo) { display: none; }
-  .lp-nav-divider { display: none; }
-  .lp-btn-demo, .lp-btn-signin { padding: 7px 12px; font-size: .78rem; white-space: nowrap; }
+  // Desktop inline nav is replaced entirely by the hamburger + dropdown
+  // menu below — previously the nav links just vanished with no way to
+  // reach About/Modules/Features on mobile at all.
+  .lp-nav { display: none; }
+  .lp-hamburger { display: flex; }
+  .lp-mobile-menu { display: flex; }
   .lp-logo img { height: 56px; }
   .lp-hero__visual { display: none !important; }
+  // The blurred glass backdrop exists only to sit under the sharp photo
+  // panel above; with that panel hidden on tablet there's nothing for the
+  // tint to fade into, so the raw blur was showing through unmasked as a
+  // dark smudge on the right side. Drop both and let the plain .lp-hero
+  // background (#eef6fb) show instead.
+  .hero-glass-photo, .hero-glass-tint { display: none !important; }
   .lp-hero__text { text-align: center; }
   .lp-hero__desc { margin: 0 auto 28px; }
   .lp-hero__stats { justify-content: center; }
