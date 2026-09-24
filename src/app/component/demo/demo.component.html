@@ -10,16 +10,58 @@
         <a href="#about">About</a>
         <a href="#modules">Modules</a>
         <a href="#features">Features</a>
-        <a routerLink="/login" class="lp-btn-signin">Sign In</a>
+        <a href="javascript:void(0)" class="lp-btn-demo" (click)="openContactModal('Demo Request')">
+          <i class="bi bi-calendar-event"></i> Request a Demo
+        </a>
+        <span class="lp-nav-divider"></span>
+        <a routerLink="/login" class="lp-btn-signin"><i class="bi bi-person-circle"></i> Sign In</a>
       </nav>
     </div>
   </header>
 
   <!-- ══ HERO ═════════════════════════════════════════════════════ -->
   <section class="lp-hero">
-    <div class="lp-hero__inner">
 
-      <!-- Left: headline -->
+    <!-- Blurred full-bleed photo + frosted glass tint, so the left panel
+         reads as glass over the image instead of a flat unrelated colour -->
+    <div class="hero-glass-photo" aria-hidden="true"></div>
+    <div class="hero-glass-tint" aria-hidden="true"></div>
+
+    <!-- Bottom-left decorative wave (page-corner accent, independent of the photo) -->
+    <svg class="hero-corner-wave" viewBox="0 0 500 300" preserveAspectRatio="none" aria-hidden="true">
+      <!-- Three offset copies of the same diagonal sweep — starts high on the
+           left, curves steeply down toward the bottom-right and tapers to a
+           point, so each color peeks out from behind the next: thin green
+           sliver at the back/top, cyan ribbon in the middle, blue mass in front. -->
+      <path d="M0,50 C150,95 300,230 500,300 L0,300 Z" fill="#7ec24a"/>
+      <path d="M0,105 C150,150 300,265 500,300 L0,300 Z" fill="#2fb0c4"/>
+      <path d="M0,165 C150,205 300,285 500,300 L0,300 Z" fill="#0f7fc4"/>
+    </svg>
+
+    <!-- Right: full-bleed photo panel -->
+    <div class="lp-hero__visual">
+      <img src="assets/background-landing.jpg" alt="Enterprise360 team collaborating in the office" class="hero-visual-photo">
+
+      <svg class="hero-visual-swoosh" viewBox="0 0 420 460" aria-hidden="true">
+        <defs>
+          <linearGradient id="heroSwooshGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0778ba"></stop>
+            <stop offset="100%" stop-color="#4ea41b"></stop>
+          </linearGradient>
+        </defs>
+        <path d="M20,420 C110,400 150,320 110,260 C70,200 30,190 50,120 C70,50 160,30 230,55"
+              fill="none" stroke="url(#heroSwooshGradient)" stroke-width="20" stroke-linecap="round" opacity="0.9"/>
+      </svg>
+
+      <div class="hero-badge hero-badge--core"><span>360°</span></div>
+      <div class="hero-badge hero-badge--people"><i class="bi bi-people-fill"></i></div>
+      <div class="hero-badge hero-badge--doc"><i class="bi bi-file-earmark-text-fill"></i></div>
+      <div class="hero-badge hero-badge--chart"><i class="bi bi-bar-chart-fill"></i></div>
+      <div class="hero-badge hero-badge--gear"><i class="bi bi-gear-fill"></i></div>
+    </div>
+
+    <!-- Left: headline, constrained to the same container width as the header -->
+    <div class="lp-hero__container">
       <div class="lp-hero__text">
         <div class="hero-eyebrow">Enterprise360 &nbsp;·&nbsp; Business Operating Platform</div>
         <h1 class="lp-hero__title">
@@ -30,10 +72,6 @@
           manage their operations, people, customers, processes, documents
           and business performance.
         </p>
-        <div class="lp-hero__actions">
-          <a href="javascript:void(0)" class="btn-hero-primary" (click)="openContactModal('Demo Request')">Request a Demo</a>
-          <a routerLink="/login" class="btn-hero-ghost">Sign In</a>
-        </div>
         <div class="lp-hero__stats">
           <div class="stat-item"><strong>15+</strong><span>Modules</span></div>
           <div class="stat-item"><strong>360°</strong><span>Business Coverage</span></div>
@@ -47,37 +85,15 @@
           </div>
         </div>
       </div>
-
-      <!-- Right: card grid -->
-      <div class="lp-hero__cards">
-        <div class="hero-card hero-card--emerald">
-          <div class="hero-card__badge"><i class="bi bi-shield-check"></i> Secure by Design</div>
-          <div class="hero-card__body">Role-based access and audit trails<br>keep every payroll run accountable.</div>
-        </div>
-        <div class="hero-card hero-card--teal">
-          <div class="hero-card__label">Attendance</div>
-          <div class="hero-card__body">Real-time clock-in tracking<br>across every branch.</div>
-        </div>
-        <div class="hero-card hero-card--white">
-          <div class="hero-card__label">This Month's Payroll</div>
-          <div class="hero-card__amount">R 428,600 <span>processed</span></div>
-          <div class="hero-card__bars">
-            <span style="height:35%"></span>
-            <span style="height:60%"></span>
-            <span style="height:80%"></span>
-            <span style="height:100%"></span>
-          </div>
-        </div>
-      </div>
-
     </div>
+
   </section>
 
   <!-- ══ MODULE GRID (shuffling) ═══════════════════════════════════ -->
   <section class="lp-modules-section" id="modules">
     <div class="marquee-header">
       <h2 class="lp-section-title">One Business. <span>One Platform.</span> One View.</h2>
-      <p class="lp-section-sub">Click any module to learn more.</p>
+      <p class="lp-section-sub">Hover any module to learn more.</p>
     </div>
     <div class="module-marquee">
       <div class="module-track">
@@ -86,8 +102,10 @@
           class="module-tile"
           [style.--mc]="mod.color"
           [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
+          (mouseenter)="openModule(mod)"
+          (mouseleave)="scheduleCloseModule()"
           (click)="openModule(mod)">
-          <i class="bi module-tile__icon" [ngClass]="mod.icon"></i>
+          <span class="module-tile__icon" [innerHTML]="getIconHtml(mod)"></span>
           <div class="module-tile__name">{{ mod.name }}</div>
           <div class="module-tile__tag">{{ mod.tag }}</div>
         </div>
@@ -97,8 +115,10 @@
           aria-hidden="true"
           [style.--mc]="mod.color"
           [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
+          (mouseenter)="openModule(mod)"
+          (mouseleave)="scheduleCloseModule()"
           (click)="openModule(mod)">
-          <i class="bi module-tile__icon" [ngClass]="mod.icon"></i>
+          <span class="module-tile__icon" [innerHTML]="getIconHtml(mod)"></span>
           <div class="module-tile__name">{{ mod.name }}</div>
           <div class="module-tile__tag">{{ mod.tag }}</div>
         </div>
@@ -200,41 +220,26 @@
   </section>
 
   <!-- ══ WHY CHOOSE Enterprize360 (scroll-driven) ═══════════════════ -->
-  <section class="lp-why" id="features" #whySection>
-    <div class="lp-why__sticky">
-      <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
-        <div class="row mb-5">
-          <div class="col-12 text-center">
-            <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>Enterprise360</span>?</h2>
-            <p style="color:rgba(255,255,255,.5);font-size:.95rem;">Built differently — for businesses that need more than a spreadsheet. Scroll to explore.</p>
-          </div>
+  <section class="lp-why" id="features">
+    <div class="container-fluid px-4 px-lg-5" style="max-width:1240px;margin:0 auto;">
+      <div class="row mb-5">
+        <div class="col-12 text-center">
+          <h2 class="lp-section-title" style="color:#fff;">Why Choose <span>Enterprise360</span>?</h2>
+          <p style="color:rgba(255,255,255,.6);font-size:.95rem;">Built differently — for businesses that need more than a spreadsheet.</p>
         </div>
-        <div class="row g-4 align-items-start">
-          <div class="col-lg-3">
-            <div class="why-tabs">
-              <button *ngFor="let tab of whyTabs; let i = index"
-                      class="why-tab"
-                      [class.active]="activeWhyTab === i"
-                      (click)="setWhyTab(i)">
-                {{ tab.label }}
-              </button>
-              <div class="why-progress">
-                <span *ngFor="let tab of whyTabs; let i = index" [class.active]="activeWhyTab === i"></span>
-              </div>
-            </div>
+      </div>
+      <div class="why-grid">
+        <div class="why-card" *ngFor="let card of whyCards">
+          <div class="why-card__icon" [style.background]="card.color + '26'" [style.color]="card.color">
+            <span [innerHTML]="getIconHtml(card)"></span>
           </div>
-          <div class="col-lg-9">
-            <div class="why-content-box">
-              <div class="why-icon"><i class="bi" [class]="whyTabs[activeWhyTab].icon"></i></div>
-              <h3>{{ whyTabs[activeWhyTab].title }}</h3>
-              <p>{{ whyTabs[activeWhyTab].desc }}</p>
-              <ul class="lp-feature-list">
-                <li *ngFor="let f of whyTabs[activeWhyTab].features">
-                  <i class="bi bi-check-circle-fill"></i> {{ f }}
-                </li>
-              </ul>
-            </div>
-          </div>
+          <h3 class="why-card__title">{{ card.title }}</h3>
+          <p class="why-card__desc">{{ card.desc }}</p>
+          <ul class="why-card__features">
+            <li *ngFor="let f of card.features">
+              <i class="bi bi-check-circle-fill" [style.color]="card.color"></i> {{ f }}
+            </li>
+          </ul>
         </div>
       </div>
     </div>
@@ -326,11 +331,12 @@
 </div>
 
 <!-- ══ MODULE DETAIL MODAL ══════════════════════════════════════ -->
-<div class="mod-modal-backdrop" *ngIf="selectedModule" (click)="closeModule()">
+<div class="mod-modal-backdrop" *ngIf="selectedModule" (click)="closeModule()"
+     (mouseenter)="cancelCloseModule()" (mouseleave)="scheduleCloseModule()">
   <div class="mod-modal" (click)="$event.stopPropagation()">
     <button class="mod-modal-close" (click)="closeModule()"><i class="bi bi-x-lg"></i></button>
-    <div class="mod-modal-icon" [style.background]="selectedModule.color + '22'">
-      <i class="bi" [ngClass]="selectedModule.icon" [style.color]="selectedModule.color"></i>
+    <div class="mod-modal-icon" [style.background]="selectedModule.color + '22'" [style.color]="selectedModule.color">
+      <span [innerHTML]="getIconHtml(selectedModule)"></span>
     </div>
     <div class="mod-modal-tag" [style.background]="selectedModule.color + '22'" [style.color]="selectedModule.color">
       {{ selectedModule.tag }}
