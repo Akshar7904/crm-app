@@ -22,28 +22,11 @@ section {
   padding: 0;
 }
 
-// Full-screen backdrop hosting the centered auth card (shared shell in
-// styles/_auth-card.scss provides .auth-card/.auth-card__* /.auth-shell-copy)
-.login-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  min-height: 100vh;
-  width: 100vw;
-  padding: 40px 20px;
-  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: auto;
-  z-index: 9999;
-}
-
-.company-brand-logo { max-height: 64px; }
+// .login-container is now the right-hand form panel, a flex child of the
+// split-screen .auth-shell (shared shell in styles/_auth-card.scss
+// provides .auth-shell/.auth-visual/.auth-form-panel/.auth-card/.auth-card__*
+// /.auth-shell-copy) — no positioning of its own beyond what .auth-form-panel
+// already sets.
 
 // Login Form Wrapper
 .login-form-wrapper {
@@ -364,70 +347,8 @@ section {
 // RESPONSIVE DESIGN
 // ========================================
 
-// Tablet and Below
-@include respond-to('lg') {
-  .login-container {
-    flex-direction: column;
-    position: relative;
-    overflow-y: auto;
-  }
-
-  .login-branding {
-    flex: 0 0 auto;
-    width: 100%;
-    min-width: unset;
-    padding: 40px 30px;
-    min-height: auto;
-  }
-
-  .login-form-container {
-    flex: 0 0 auto;
-    width: 100%;
-    padding: 40px 30px;
-  }
-
-  .brand-logo {
-    height: 90px;
-  }
-
-  .brand-title {
-    font-size: $font-size-3xl;
-  }
-
-  .brand-features {
-    display: none;
-  }
-
-  .branding-footer {
-    position: relative;
-    bottom: auto;
-    margin-top: 20px;
-  }
-}
-
 // Mobile
 @include respond-to('sm') {
-  .login-branding {
-    padding: 30px 20px;
-  }
-
-  .brand-logo {
-    height: 70px;
-  }
-
-  .brand-title {
-    font-size: 1.75rem;
-  }
-
-  .brand-tagline {
-    font-size: $font-size-sm;
-    margin-bottom: 20px;
-  }
-
-  .login-form-container {
-    padding: 30px 20px;
-  }
-
   .login-form-wrapper {
     max-width: 100%;
   }
@@ -486,18 +407,6 @@ section {
 
 // Very Small Screens
 @include respond-to('xs') {
-  .login-branding {
-    padding: 25px 15px;
-  }
-
-  .brand-title {
-    font-size: $font-size-2xl;
-  }
-
-  .login-form-container {
-    padding: 25px 15px;
-  }
-
   .form-header h2 {
     font-size: 1.35rem;
   }
