@@ -1,35 +1,6 @@
 <section *ngIf="(loginState$ | async) as state" [ngSwitch]="state.dataState">
 
-  <div class="auth-shell">
-
-    <!-- Left: photo panel -->
-    <div class="auth-visual">
-      <img src="assets/auth-login-bg.jpg" alt="" class="auth-visual__photo">
-      <div class="auth-visual__overlay"></div>
-      <svg class="auth-visual__wave" viewBox="0 0 500 300" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0,50 C150,95 300,230 500,300 L0,300 Z" fill="#7ec24a"/>
-        <path d="M0,105 C150,150 300,265 500,300 L0,300 Z" fill="#2fb0c4"/>
-        <path d="M0,165 C150,205 300,285 500,300 L0,300 Z" fill="#0f7fc4"/>
-      </svg>
-      <div class="auth-visual__content">
-        <a routerLink="/" class="auth-visual__logo">
-          <img src="assets/enterprise360-logo-transparent.png" alt="Enterprise360">
-        </a>
-        <div class="auth-visual__text">
-          <h1>Run the Business,<span>Not the Admin</span></h1>
-          <p>Enterprise360 gives growing businesses one connected workspace to manage their operations, people, customers, processes, documents and business performance.</p>
-        </div>
-        <div class="auth-visual__badges">
-          <div class="auth-badge"><i class="bi bi-cloud-check-fill"></i><span>Cloud hosted</span></div>
-          <div class="auth-badge"><i class="bi bi-grid-3x3-gap-fill"></i><span>15+ Modules</span></div>
-          <div class="auth-badge"><i class="bi bi-arrow-repeat"></i><span>360° Coverage</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right: form panel -->
-    <div class="login-container auth-form-panel">
-    <span class="auth-form-panel__tagline">Smarter Operations. Stronger Business.</span>
+  <div class="login-container">
     <div class="auth-card">
       <div class="auth-card__glow"></div>
       <div class="auth-card__inner">
@@ -217,7 +188,6 @@
       </div>
     </div>
     <p class="auth-shell-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
-    </div>
   </div>
 
 </section>

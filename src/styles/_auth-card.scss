@@ -1,166 +1,20 @@
 // ========================================
-// Shared split-screen auth shell
+// Shared centered auth-card shell
 // Used by login / register / resetpassword
-// Left: full-bleed photo panel with overlay, headline copy and trust
-// badges. Right: scrollable white form panel, centered content column.
 // ========================================
 
-.auth-shell {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  min-height: 100vh;
-  background: $white;
-  overflow: hidden;
-
-  @include respond-to('lg') {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    position: relative;
-    min-height: 100vh;
-    min-height: 100dvh;
-  }
-}
-
-// ── Left: photo panel ──────────────────────────────────────────
-.auth-visual {
-  position: relative;
-  flex: 0 0 44%;
-  max-width: 640px;
-  overflow: hidden;
-
-  @include respond-to('lg') { display: none; }
-}
-
-.auth-visual__photo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.auth-visual__overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(195deg, rgba(7, 24, 48, .38) 0%, rgba(5, 16, 34, .86) 100%);
-}
-
-.auth-visual__content {
-  position: relative;
-  z-index: 2;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 40px 48px 64px;
-  color: $white;
-}
-
-.auth-visual__logo {
-  display: inline-flex;
-  img { height: 42px; width: auto; object-fit: contain; }
-}
-
-.auth-visual__text {
-  h1 {
-    font-size: 2.15rem;
-    font-weight: 700;
-    line-height: 1.12;
-    letter-spacing: -0.01em;
-    margin-bottom: 14px;
-    span { display: block; color: #6ee7a0; }
-  }
-  p {
-    font-size: .92rem;
-    line-height: 1.65;
-    color: rgba(255, 255, 255, .78);
-    max-width: 380px;
-    margin: 0;
-  }
-}
-
-.auth-visual__badges {
-  display: flex;
-  gap: 22px;
-  position: relative;
-  z-index: 2;
-}
-
-.auth-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-
-  i {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, .14);
-    border: 1px solid rgba(255, 255, 255, .22);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-  }
-  span {
-    font-size: .74rem;
-    font-weight: 600;
-    color: rgba(255, 255, 255, .85);
-  }
-}
-
-// Same 3-layer stacked wave used on the public landing page, for brand
-// consistency between the marketing site and the app shell.
-.auth-visual__wave {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 62%;
-  max-width: 420px;
-  height: 220px;
-  z-index: 1;
-  pointer-events: none;
-}
-
-// ── Right: form panel ──────────────────────────────────────────
-.auth-form-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  overflow-y: auto;
-  padding: 0 24px;
-  background: $white;
-
-  @include respond-to('lg') {
-    overflow-y: visible;
-    padding: 40px 20px;
-  }
-}
-
-.auth-form-panel__tagline {
-  position: absolute;
-  top: 28px;
-  right: 32px;
-  font-size: .74rem;
-  color: $gray-400;
-  letter-spacing: .01em;
-
-  @include respond-to('lg') { display: none; }
-}
-
-// Flat, minimal card — no glow/blur, just a centered content column.
-// Colors stay CRM's own ($primary / --orion-primary, tenant-overridable).
+// Flat, minimal shell — no glow/blur, a plain border like a simple sign-in
+// card rather than a marketing surface. Colors stay CRM's own ($primary /
+// --orion-primary, tenant-overridable), just presented more quietly.
 .auth-card {
   width: 100%;
-  max-width: 420px;
-  margin: auto;
-  padding: 56px 0;
+  max-width: 440px;
+  background: $white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  border: 1px solid $gray-200;
   position: relative;
+  overflow: hidden;
 }
 
 .auth-card__glow {
@@ -169,6 +23,7 @@
 
 .auth-card__inner {
   position: relative;
+  padding: 36px 32px;
 }
 
 .auth-card__brand {
@@ -204,8 +59,8 @@
 }
 
 .auth-shell-copy {
-  color: $gray-400;
+  color: $gray-500;
   font-size: $font-size-xs;
   text-align: center;
-  margin: 24px 0 0;
+  margin: 0;
 }
