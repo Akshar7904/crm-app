@@ -45,7 +45,7 @@
   </div>
 
   <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary"></div>
+    <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
   </div>
 
   <div *ngIf="!loading && !templates.length" class="empty-state-cell py-5">

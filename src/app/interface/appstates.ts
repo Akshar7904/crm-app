@@ -25,6 +25,7 @@ export interface LoginState {
   message?: string;
   isUsingMfa?: boolean;
   phone?: string;
+  mfaType?: 'TOTP' | 'EMAIL';
   step?: 'email' | 'company' | 'password' | 'mfa';
   companies?: Company[];
   selectedCompany?: Company;

@@ -177,6 +177,7 @@
                 <ng-container *ngIf="inv.status"> ({{ inv.status }})</ng-container>
               </option>
             </select>
+            <!-- Deliberate exception: inline select-populating indicator, not a page/section load — skeleton doesn't fit this shape -->
             <span *ngIf="loadingInvoices" class="spinner-border spinner-border-sm select-spinner"></span>
           </div>
           <div class="form-text text-muted" *ngIf="creditNoteForm.get('customerId')?.value && !loadingInvoices && customerInvoices.length === 0">

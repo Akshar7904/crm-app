@@ -59,8 +59,6 @@
   &.si-warning { background: rgba($warning, .12); color: darken($warning, 10%); }
 }
 
-.clickable { cursor: pointer; transition: transform .12s, box-shadow .12s; }
-.clickable:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,.1); }
 .filter-active { outline: 2px solid $primary; }
 
 // ── Quick filter chips ─────────────────────────────────────────────

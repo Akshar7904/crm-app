@@ -4,12 +4,12 @@
 // ========================================
 
 // ==================== PRIMARY COLORS ====================
-// Enterprize360 brand colors — user-specified "cold blue" palette.
-$primary-dark: #163172;
-$primary: #1e56a0;
-$primary-medium: #1a4589;
-$primary-light: #d6e4f0;
-$primary-darker: #0d1d47;
+// Enterprize360 brand colors — navy/teal/yellow/orange palette.
+$primary-dark: #0a2c54;
+$primary: #124076;
+$primary-medium: #1a5490;
+$primary-light: #c9d9e8;
+$primary-darker: #071b33;
 
 // Primary gradient (main brand gradient)
 $gradient-primary: linear-gradient(135deg, $primary-dark 0%, $primary-medium 100%);
@@ -17,14 +17,22 @@ $gradient-primary-hover: linear-gradient(135deg, $primary-medium 0%, $primary 10
 $gradient-primary-dark: linear-gradient(135deg, $primary-dark 0%, $primary 50%, $primary-darker 100%);
 
 // ==================== SECONDARY COLORS ====================
-// Same palette, lighter tones used as the secondary accent.
-$secondary-dark: #163172;
-$secondary: #1e56a0;
-$secondary-light: #d6e4f0;
+// Teal/sage accent — used for the sidebar background.
+$secondary-dark: #5f7d60;
+$secondary: #7f9f80;
+$secondary-light: #d3e0d4;
 
 // Secondary gradient (accent gradient)
 $gradient-secondary: linear-gradient(135deg, $secondary-dark 0%, $secondary 100%);
 $gradient-secondary-hover: linear-gradient(135deg, $primary-medium 0%, $primary-light 100%);
+
+// Page banner gradient — teal, matches the sidebar background.
+$gradient-banner: linear-gradient(135deg, $secondary-dark 0%, $secondary 60%, $secondary-light 100%);
+
+// ==================== ACCENT COLORS ====================
+// Warm highlights from the brand palette (badges, callouts, illustrative accents).
+$accent-yellow: #f9e897;
+$accent-orange: #ffc374;
 
 // ==================== SEMANTIC COLORS ====================
 // Success

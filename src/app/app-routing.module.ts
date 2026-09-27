@@ -12,7 +12,6 @@ import { ModuleAccessGuard } from './guard/module-access.guard';
 import { SuperadminGuard } from './guard/superadmin.guard';
 import { AttendanceListComponent } from "./component/attendance/attendance-list/attendance-list.component";
 import { MyAttendanceComponent } from "./component/attendance/my-attendance/my-attendance.component";
-import { WhatsAppAttendanceComponent } from "./component/attendance/whatsapp-attendance/whatsapp-attendance.component";
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
 
@@ -28,7 +27,7 @@ const routes: Routes = [
     path: '',
     loadChildren: () => import('./component/demo/demo.module').then(m => m.DemoModule),
     pathMatch: 'full',
-    data: { title: 'Enterprize360 — HR & Payroll Platform' }
+    data: { title: 'Enterprise360 — Enterprise Management Platform' }
   },
 
   // =============================================
@@ -138,12 +137,6 @@ const routes: Routes = [
     data: { title: 'My Attendance', moduleKey: 'ATTENDANCE_TRACKING' }
   },
   {
-    path: 'attendance/whatsapp',
-    component: WhatsAppAttendanceComponent,
-    canActivate: [AuthenticationGuard, ModuleAccessGuard],
-    data: { title: 'WhatsApp Attendance', moduleKey: 'ATTENDANCE_TRACKING' }
-  },
-  {
     path: 'holidays',
     loadChildren: () => import('./component/holiday/holiday.module').then(m => m.HolidayModule),
     canActivate: [AuthenticationGuard, ModuleAccessGuard],
@@ -221,6 +214,26 @@ const routes: Routes = [
   },
 
   // =============================================
+  // PROJECT MANAGEMENT
+  // =============================================
+  {
+    path: 'projects',
+    loadChildren: () => import('./component/project/project.module').then(m => m.ProjectModule),
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Project Management', moduleKey: 'PROJECT_MANAGEMENT' }
+  },
+
+  // =============================================
+  // TENDER MANAGEMENT
+  // =============================================
+  {
+    path: 'tenders',
+    loadChildren: () => import('./component/tender/tender.module').then(m => m.TenderModule),
+    canActivate: [AuthenticationGuard, ModuleAccessGuard],
+    data: { title: 'Tender Management', moduleKey: 'TENDER_MANAGEMENT' }
+  },
+
+  // =============================================
   // ASSET MANAGEMENT
   // =============================================
   {
@@ -257,7 +270,7 @@ const routes: Routes = [
     path: 'policy',
     component: CompanyPolicyComponent,
     canActivate: [AuthenticationGuard],
-    data: { title: 'Company Policy' }
+    data: { title: 'Company Documents' }
   },
   {
     path: 'documentation',

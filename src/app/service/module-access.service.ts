@@ -18,7 +18,10 @@ export type ModuleKey =
   | 'ATTENDANCE_TRACKING'
   | 'INVOICE_CUSTOMER'
   | 'BUDGET_MANAGEMENT'
-  | 'INTERN_ATTENDANCE';
+  | 'INTERN_ATTENDANCE'
+  | 'CONTRACT_MANAGEMENT'
+  | 'PROJECT_MANAGEMENT'
+  | 'TENDER_MANAGEMENT';
 
 @Injectable()
 export class ModuleAccessService {
@@ -49,8 +52,14 @@ export class ModuleAccessService {
           }),
           map(() => void 0 as void),
           catchError(() => {
-            // On error, fail open — don't block the user
-            this.loaded = true;
+            // On error, fail open — don't block the user. Previously this
+            // set `loaded = true` with an empty enabledModules Set, but
+            // isEnabled() treats loaded===true as authoritative, so any
+            // transient failure here (a timing race right after login, a
+            // network blip) permanently hid every module-gated menu item
+            // for the rest of the session — the opposite of "fail open".
+            // Leaving `loaded` false keeps isEnabled() returning true
+            // (fail-open) and lets the next loadIfNeeded() call retry.
             this.pending$ = null;
             return of(void 0 as void);
           }),

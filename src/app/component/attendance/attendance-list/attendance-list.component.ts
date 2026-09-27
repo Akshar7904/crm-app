@@ -80,7 +80,7 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
       debounceTime(1500),
       takeUntil(this.destroy$)
     ).subscribe(() => {
-      this.loadWeekAttendance();
+      this.loadWeekAttendance(true);
     });
 
     this.attendanceService.subscribeToLiveAttendance().pipe(
@@ -172,10 +172,10 @@ export class AttendanceListComponent implements OnInit, OnDestroy {
 
   // ─── Data Loading
 
-  loadWeekAttendance(): void {
+  loadWeekAttendance(force: boolean = false): void {
     this.calculateWeekDays();
     this.loadHolidaysForWeek();
-    this.attendanceService.getMonthlyAttendance(this.selectedYear, this.selectedMonth)
+    this.attendanceService.getMonthlyAttendance(this.selectedYear, this.selectedMonth, force)
       .pipe(
         takeUntil(this.destroy$),
         catchError(error => {

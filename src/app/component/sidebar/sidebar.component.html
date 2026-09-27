@@ -12,7 +12,7 @@
            class="logo-image company-logo"
            (error)="onLogoError()">
       <ng-template #platformLogo>
-        <img src="../../../assets/logo_icon.png" alt="Enterprize360" class="logo-image">
+        <img src="../../../assets/enterprise360-icon.png" alt="Enterprise360" class="logo-image">
       </ng-template>
     </a>
     <div *ngIf="!collapsed && branding.branding?.tagline" class="sidebar-tagline">
@@ -20,11 +20,30 @@
     </div>
   </div>
 
+  <!-- Company Chip -->
+  <div class="sidebar-company-chip" *ngIf="!collapsed && (companyName || branding.branding?.name)">
+    <span class="company-chip-label">Your Company</span>
+    <div class="company-chip-box">
+      <span class="company-chip-dot"></span>
+      <span class="company-chip-name">{{ branding.branding?.name || companyName }}</span>
+    </div>
+  </div>
+
+  <!-- Marketplace 360 -->
+  <div class="sidebar-marketplace-card" *ngIf="!collapsed" (click)="onMarketplaceClick()">
+    <div class="marketplace-chip-box">
+      <span class="marketplace-icon"><i class="bi bi-shop"></i></span>
+      <span class="marketplace-name">Marketplace 360</span>
+      <span class="marketplace-soon-badge">Coming Soon</span>
+    </div>
+  </div>
+
   <!-- Menu Floating Card -->
   <div class="sidebar-menu-card">
     <nav class="sidebar-menu">
+      <div class="menu-section-label" *ngIf="!collapsed">Main</div>
       <ul class="menu-list">
-        <li *ngFor="let item of filteredMenuItems" class="menu-item-wrapper">
+        <li *ngFor="let item of filteredMenuItems; trackBy: trackById" class="menu-item-wrapper">
 
           <!-- Parent Menu Item -->
           <a class="menu-item"
@@ -49,7 +68,7 @@
 
           <!-- Submenu -->
           <ul class="submenu" *ngIf="item.children" [class.show]="item.expanded">
-            <li *ngFor="let child of item.children" class="submenu-item-wrapper">
+            <li *ngFor="let child of item.children; trackBy: trackById" class="submenu-item-wrapper">
               <a class="submenu-item"
                  [class.active]="isActive(child.route)"
                  (click)="onChildClick($event, child)"
@@ -72,12 +91,13 @@
 
   <!-- Footer Floating Card -->
   <div class="sidebar-footer-card">
+    <div class="menu-section-label" *ngIf="!collapsed">Other</div>
     <a class="menu-item"
        routerLink="/policy"
        routerLinkActive="active"
-       [attr.title]="collapsed ? 'Company Policy' : null">
+       [attr.title]="collapsed ? 'Company Documents' : null">
       <span class="menu-icon"><i class="bi bi-file-earmark-text"></i></span>
-      <span class="menu-label">Company Policy</span>
+      <span class="menu-label">Company Documents</span>
     </a>
     <a class="menu-item"
        routerLink="/documentation"
@@ -85,6 +105,13 @@
        [attr.title]="collapsed ? 'System User Guide' : null">
       <span class="menu-icon"><i class="bi bi-book"></i></span>
       <span class="menu-label">System User Guide</span>
+    </a>
+    <a class="menu-item"
+       [routerLink]="['/profile']"
+       [queryParams]="{tab: 'theme'}"
+       [attr.title]="collapsed ? 'My Theme' : null">
+      <span class="menu-icon"><i class="bi bi-palette2"></i></span>
+      <span class="menu-label">My Theme</span>
     </a>
     <a class="logout-btn" (click)="onLogout()" [attr.title]="collapsed ? 'Logout' : null">
       <span class="menu-icon">

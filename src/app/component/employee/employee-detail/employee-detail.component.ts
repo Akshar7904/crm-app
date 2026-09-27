@@ -12,6 +12,7 @@ import { State } from 'src/app/interface/state';
 import { EmployeeService } from '../../../service/employee.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { NgForm } from '@angular/forms';
+import { BANK_OPTIONS } from '../employee.model';
 import { EmployeeForm } from '../employee.model';
 import { HttpClient, HttpEvent, HttpEventType } from '@angular/common/http';
 import { UserService } from 'src/app/service/user.service';
@@ -44,6 +45,7 @@ export class EmployeeDetailComponent implements OnInit {
   private isLoadingSubject = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoadingSubject.asObservable();
   readonly DataState = DataState;
+  bankOptions = BANK_OPTIONS;
   private readonly EMPLOYEE_ID: string = 'id';
 
   // Flags for different modes
@@ -66,6 +68,7 @@ export class EmployeeDetailComponent implements OnInit {
 
   // Password reset (admin)
   isResettingPassword: boolean = false;
+  resetPasswordResult: { email: string; temporaryPassword: string; emailSent: boolean } | null = null;
 
   setTab(tab: 'overview' | 'edit' | 'documents' | 'security'): void {
     this.activeTab = tab;
@@ -335,6 +338,7 @@ export class EmployeeDetailComponent implements OnInit {
       // Emergency contact
       emergencyContactName: employeeForm.value.emergencyContactName || null,
       emergencyContactPhone: employeeForm.value.emergencyContactPhone || null,
+      idNumber: employeeForm.value.idNumber || currentEmployee.idNumber || null,
       bio: employeeForm.value.bio || null,
       // Banking info
       bankName: employeeForm.value.bankName || currentEmployee.bankName || null,
@@ -402,6 +406,7 @@ export class EmployeeDetailComponent implements OnInit {
       postalCode: employeeForm.value.postalCode || currentEmployee.postalCode || null,
       emergencyContactName: employeeForm.value.emergencyContactName || currentEmployee.emergencyContactName || null,
       emergencyContactPhone: employeeForm.value.emergencyContactPhone || currentEmployee.emergencyContactPhone || null,
+      idNumber: employeeForm.value.idNumber || currentEmployee.idNumber || null,
       bio: employeeForm.value.bio || currentEmployee.bio || null
     };
 
@@ -493,17 +498,24 @@ export class EmployeeDetailComponent implements OnInit {
   // ========== PASSWORD RESET ==========
 
   submitResetPassword(): void {
-    const employeeId = this.dataSubject.value?.data?.employee?.id;
+    const employee = this.dataSubject.value?.data?.employee;
+    const employeeId = employee?.id;
     if (!employeeId) return;
 
     if (!confirm('Reset this employee\'s password? A temporary password will be sent to their email address.')) return;
 
     this.isResettingPassword = true;
+    this.resetPasswordResult = null;
     this.cdr.markForCheck();
 
     this.http.put<any>(`${this.SERVER_URL}/employee/${employeeId}/reset-password`, {}).subscribe({
       next: (res) => {
         this.isResettingPassword = false;
+        this.resetPasswordResult = {
+          email: employee?.email,
+          temporaryPassword: res?.data?.temporaryPassword,
+          emailSent: !!res?.data?.emailSent
+        };
         this.notification.onSuccess(res?.message || 'Password reset. Temporary password sent to employee\'s email.');
         this.cdr.markForCheck();
       },
@@ -513,6 +525,16 @@ export class EmployeeDetailComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  closeResetPasswordResult(): void {
+    this.resetPasswordResult = null;
+  }
+
+  copyToClipboard(text: string): void {
+    if (!text) return;
+    navigator.clipboard.writeText(text).then(() =>
+      this.notification.onDefault('Copied to clipboard'));
   }
 
   // ========== POLICY ACKNOWLEDGEMENT ==========

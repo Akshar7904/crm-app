@@ -6,7 +6,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { EmployeeService } from '../../../service/employee.service';
-import { EmployeeForm, Designation, Department } from '../employee.model';
+import { EmployeeForm, Designation, Department, BANK_OPTIONS } from '../employee.model';
 import { NotificationService } from 'src/app/service/notification.service';
 
 @Component({
@@ -26,6 +26,7 @@ export class NewemployeeComponent implements OnInit {
   genders = ['MALE', 'FEMALE', 'OTHER'];
   designations: Designation[] = [];
   departments: Department[] = [];
+  bankOptions = BANK_OPTIONS;
 
   // Loading states
   loadingDesignations: boolean = false;
@@ -52,6 +53,7 @@ export class NewemployeeComponent implements OnInit {
       phone: [''],
       dateOfBirth: [''],
       gender: [''],
+      idNumber: [''],
       hireDate: ['', Validators.required],
       departmentId: [''],
       designationId: ['', Validators.required], // NOW REQUIRED
@@ -66,6 +68,10 @@ export class NewemployeeComponent implements OnInit {
       emergencyContactName: [''],
       emergencyContactPhone: [''],
       bio: [''],
+      bankName: [''],
+      bankAccountNumber: [''],
+      accountHolderName: [''],
+      branchCode: [''],
       accountType: ['']
     });
   }
@@ -153,7 +159,7 @@ export class NewemployeeComponent implements OnInit {
 
         // Navigate to employees list after 2 seconds
         setTimeout(() => {
-          this.router.navigate(['/employees']);
+          this.router.navigate(['/employee']);
         }, 2000);
       },
       error: (error) => {
@@ -169,7 +175,7 @@ export class NewemployeeComponent implements OnInit {
    */
   onCancel(): void {
     if (confirm('Are you sure you want to cancel? All changes will be lost.')) {
-      this.router.navigate(['/employees']);
+      this.router.navigate(['/employee']);
     }
   }
 

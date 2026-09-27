@@ -11,7 +11,7 @@
   min-height: 540px;
   display: flex;
   flex-direction: column;
-  background: #ffffff;
+  background: $white;
   border-radius: 8px;
   position: relative;
   overflow: visible; // allow day-popup to render outside calendar-layout bounds
@@ -370,8 +370,8 @@
 }
 
 .event-badge-small.event-attendance {
-  background: #d4edda;
-  color: #155724;
+  background: $success-light;
+  color: $success-dark;
 }
 
 .event-badge-small.event-intern-school {
@@ -592,18 +592,18 @@
 }
 
 .status-working {
-  background: #d4edda;
-  color: #155724;
+  background: $success-light;
+  color: $success-dark;
 }
 
 .status-break {
-  background: #fff3cd;
-  color: #856404;
+  background: $warning-light;
+  color: $warning-dark;
 }
 
 .status-lunch {
-  background: #d1ecf1;
-  color: #0c5460;
+  background: $info-light;
+  color: $info-dark;
 }
 
 .status-out {
@@ -612,13 +612,13 @@
 }
 
 .leave-approved {
-  background: #d4edda;
-  color: #155724;
+  background: $success-light;
+  color: $success-dark;
 }
 
 .leave-pending {
-  background: #fff3cd;
-  color: #856404;
+  background: $warning-light;
+  color: $warning-dark;
 }
 
 .popup-type-badge.event-public-holiday {
@@ -642,8 +642,8 @@
 }
 
 .popup-type-badge.event-attendance {
-  background: #d4edda;
-  color: #155724;
+  background: $success-light;
+  color: $success-dark;
 }
 
 .popup-type-badge.event-intern-school {
@@ -790,4 +790,50 @@
   .sidebar-event-item { padding: 8px; }
 
   .calendar-legend { display: none; }
+}
+
+/* ========================================
+   COMPACT MODE — small calendar card, no sidebar/legend
+   ======================================== */
+.ms-calendar.compact {
+  min-height: 0;
+
+  .calendar-header {
+    padding: 12px 14px;
+  }
+
+  .month-year {
+    font-size: 0.95rem;
+  }
+
+  .today-btn {
+    padding: 3px 8px;
+    font-size: 0.72rem;
+  }
+
+  .calendar-layout {
+    min-height: 0;
+  }
+
+  .calendar-grid {
+    min-height: 0;
+  }
+
+  .day-cell {
+    min-height: 34px;
+    padding: 2px;
+  }
+
+  .weekday-cell {
+    font-size: 0.68rem;
+    padding: 6px 0;
+  }
+
+  .day-number {
+    font-size: 0.75rem;
+  }
+
+  .calendar-legend {
+    display: none;
+  }
 }

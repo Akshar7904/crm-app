@@ -2,6 +2,33 @@
 // Enterprize360 HR & Payroll Management System
 // Unauthorised copying, distribution or modification is strictly prohibited.
 
+// Bank options for the (searchable) Bank Name field on Add/Edit Employee.
+// bankName is stored as free text, so this is a suggestion list, not an enum.
+export const BANK_OPTIONS: string[] = [
+  'Absa Bank',
+  'Access Bank',
+  'African Bank',
+  'Albaraka Bank',
+  'Bank Zero',
+  'Bidvest Bank',
+  'Capitec Bank',
+  'Discovery Bank',
+  'eNL Mutual Bank',
+  'Finbond Mutual Bank',
+  'First National Bank (FNB)',
+  'GBS Mutual Bank',
+  'HBZ Bank',
+  'Investec Bank',
+  'Nedbank',
+  'Old Mutual Bank | OM Bank',
+  'Postbank',
+  'Rand Merchant Bank (RMB)',
+  'Sasfin Bank',
+  'Standard Bank',
+  'TymeBank',
+  'Other'
+];
+
 export interface Employee {
   id?: number;
   employeeId?: string;
@@ -27,6 +54,7 @@ export interface Employee {
   postalCode?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
+  idNumber?: string;
   imageUrl?: string;
   bio?: string;
   managerName?: string;
@@ -92,6 +120,7 @@ export interface EmployeeForm {
   postalCode?: string;
   emergencyContactName?: string;
   emergencyContactPhone?: string;
+  idNumber?: string;
   bio?: string;
   userId?: number;
   // Banking info

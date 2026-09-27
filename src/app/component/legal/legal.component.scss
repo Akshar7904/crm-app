@@ -16,7 +16,7 @@
 
 .legal-header {
   background: #fff;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid $gray-200;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -98,7 +98,7 @@
   flex-shrink: 0;
   background: #fff;
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid $gray-200;
   padding: 20px 0 16px;
   position: sticky;
   top: 80px;
@@ -174,7 +174,7 @@
 .legal-doc {
   background: #fff;
   border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid $gray-200;
   padding: 40px 48px;
 
   @media (max-width: 768px) {
@@ -299,7 +299,7 @@
 
 .contact-block {
   background: #f7fafc;
-  border: 1px solid #e2e8f0;
+  border: 1px solid $gray-200;
   border-radius: 8px;
   padding: 16px 20px;
   margin-top: 10px;
@@ -329,12 +329,12 @@
     text-transform: uppercase;
     letter-spacing: .04em;
     color: #718096;
-    border: 1px solid #e2e8f0;
+    border: 1px solid $gray-200;
   }
 
   tbody td {
     padding: 10px 14px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid $gray-200;
     color: #4a5568;
     line-height: 1.6;
     vertical-align: top;
@@ -357,7 +357,7 @@
   gap: 14px;
   align-items: flex-start;
   background: #f7fafc;
-  border: 1px solid #e2e8f0;
+  border: 1px solid $gray-200;
   border-radius: 8px;
   padding: 16px;
 
@@ -387,7 +387,7 @@
 
 .legal-footer {
   background: #fff;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid $gray-200;
   padding: 18px 24px;
   text-align: center;
   font-size: .78rem;

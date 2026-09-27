@@ -55,7 +55,7 @@
   font-size: 0.73rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
 
   &.pay-col-earnings   { background: rgba(39,174,96,0.08);  color: #27ae60; }
-  &.pay-col-deductions { background: rgba(220,53,69,0.07);  color: #dc3545; }
+  &.pay-col-deductions { background: rgba(220,53,69,0.07);  color: $danger; }
 }
 
 .pay-slip-rows { padding: 0 16px; }
@@ -95,7 +95,7 @@
 .badge-soft-draft      { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,0.1); color: #6c757d; }
 .badge-soft-processed  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(52,152,219,0.12); color: #2980b9; }
 .badge-soft-paid       { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,0.12); color: #27ae60; }
-.badge-soft-cancelled  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1); color: #dc3545; }
+.badge-soft-cancelled  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1); color: $danger; }
 
 // ─── Action buttons
 .action-btn-group { display: flex; align-items: center; gap: 4px; }

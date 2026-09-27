@@ -67,7 +67,7 @@
 }
 
 .bg-warning {
-  background-color: #ffc107 !important;
+  background-color: $warning !important;
   color: #000 !important;
 }
 
@@ -163,13 +163,13 @@ textarea.form-control {
 }
 
 .btn-outline-danger {
-  color: #dc3545;
-  border-color: #dc3545;
+  color: $danger;
+  border-color: $danger;
 }
 
 .btn-outline-danger:hover:not(:disabled) {
-  background-color: #dc3545;
-  border-color: #dc3545;
+  background-color: $danger;
+  border-color: $danger;
   color: #fff;
 }
 
@@ -286,7 +286,7 @@ small.text-muted {
   display: block;
   margin-top: 0.25rem;
   font-size: 0.875rem;
-  color: #dc3545;
+  color: $danger;
 }
 
 .form-text {
@@ -305,7 +305,7 @@ small.text-muted {
 
 /* Text Colors */
 .text-danger {
-  color: #dc3545 !important;
+  color: $danger !important;
 }
 
 .text-muted {

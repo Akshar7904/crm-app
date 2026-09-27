@@ -157,8 +157,8 @@
 
 // Soft colour helpers (local)
 .bg-primary-soft  { background: rgba($primary, 0.12); }
-.bg-success-soft  { background: rgba(#28a745, 0.12); }
-.bg-danger-soft   { background: rgba(#dc3545, 0.12); }
-.bg-warning-soft  { background: rgba(#ffc107, 0.12); }
-.bg-info-soft     { background: rgba(#17a2b8, 0.12); }
+.bg-success-soft  { background: rgba($success, 0.12); }
+.bg-danger-soft   { background: rgba($danger, 0.12); }
+.bg-warning-soft  { background: rgba($warning, 0.12); }
+.bg-info-soft     { background: rgba($info, 0.12); }
 .badge-soft-secondary { background: rgba(#6c757d, 0.12); color: #6c757d; }

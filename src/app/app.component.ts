@@ -9,6 +9,7 @@ import { map, catchError, filter, takeUntil, take } from 'rxjs/operators';
 import { UserModel } from './component/profile/user.model';
 import { UserService } from './service/user.service';
 import { ThemeService } from './service/theme.service';
+import { LayoutPreferenceService, LayoutMode } from './service/layout-preference.service';
 
 @Component({
   standalone: false,
@@ -32,12 +33,16 @@ export class AppComponent implements OnInit, OnDestroy {
   sidebarOpen: boolean = false; // For mobile overlay
   isMobile: boolean = false;
 
+  layoutMode$: Observable<LayoutMode>;
+
   constructor(
     private userService: UserService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private layoutPreference: LayoutPreferenceService
   ) {
     this.checkScreenSize();
+    this.layoutMode$ = this.layoutPreference.mode$;
   }
 
   @HostListener('window:resize')

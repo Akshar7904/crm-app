@@ -160,7 +160,7 @@
 
 .badge-soft-success  { background: rgba(25,135,84,0.12);  color: #198754; }
 .badge-soft-warning  { background: rgba(255,193,7,0.15);  color: #cc9800; }
-.badge-soft-danger   { background: rgba(220,53,69,0.12);  color: #dc3545; }
+.badge-soft-danger   { background: rgba(220,53,69,0.12);  color: $danger; }
 .badge-soft-secondary{ background: rgba(108,117,125,0.12);color: #6c757d; }
 
 // ─── Action buttons ─────────────────────────────────────────────────────────────

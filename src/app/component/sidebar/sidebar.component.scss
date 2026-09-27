@@ -46,25 +46,136 @@
   text-overflow: ellipsis;
 }
 
+// ========================================
+// COMPANY CHIP
+// ========================================
+.sidebar-company-chip {
+  margin: 0 8px 8px;
+  flex-shrink: 0;
+}
+
+.company-chip-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: $font-weight-semibold;
+  color: var(--sidebar-text, rgba(255, 255, 255, 0.85));
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 4px 4px;
+}
+
+.company-chip-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-lg;
+}
+
+.company-chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $success;
+  flex-shrink: 0;
+}
+
+.company-chip-name {
+  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary, $gray-900);
+  @include truncate;
+}
+
+// ========================================
+// MARKETPLACE 360
+// ========================================
+.sidebar-marketplace-card {
+  margin: 0 8px 8px;
+  flex-shrink: 0;
+}
+
+.marketplace-chip-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-card, $white);
+  border: 1px solid var(--border-color, $gray-200);
+  border-radius: $border-radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.marketplace-icon {
+  @include flex-center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+
+  i {
+    font-size: 1rem;
+    color: $primary;
+  }
+}
+
+.marketplace-name {
+  flex: 1;
+  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary, $gray-900);
+  @include truncate;
+}
+
+.marketplace-soon-badge {
+  font-size: 0.6rem;
+  font-weight: $font-weight-semibold;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  background: rgba($warning, 0.15);
+  color: $warning-dark;
+  flex-shrink: 0;
+}
+
+// ========================================
+// MENU SECTION LABEL
+// ========================================
+.menu-section-label {
+  font-size: 0.65rem;
+  font-weight: $font-weight-semibold;
+  color: var(--sidebar-text, rgba(255, 255, 255, 0.85));
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 6px 12px 4px;
+}
+
+// The menu and footer sit directly on the sidebar's own background (teal),
+// unlike the logo/company chip which stay on white "plates" — so their text
+// and icon colors (set to light tones for the teal bg) stay readable here.
 .sidebar-menu-card {
   margin: 0 8px;
   flex: 1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  background: var(--bg-card, $white);
-  border: 1px solid var(--border-color, $gray-200);
-  border-radius: $border-radius-xl;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 .sidebar-footer-card {
   margin: 6px 8px 10px;
   padding: $spacing-sm 10px;
-  background: var(--bg-card, $white);
-  border: 1px solid var(--border-color, $gray-200);
-  border-radius: $border-radius-xl;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-top: 1px solid var(--sidebar-footer-border, rgba(255, 255, 255, 0.18));
   flex-shrink: 0;
 }
 
@@ -234,7 +345,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 8px 12px 8px 46px;
+  padding: 8px 12px 8px 34px;
   border-radius: $border-radius-md;
   color: var(--sidebar-text, $gray-600);
   text-decoration: none;
@@ -243,33 +354,15 @@
   font-size: 0.8rem;
   position: relative;
 
-  &::before {
-    content: '';
-    position: absolute;
-    left: 26px;
-    top: 50%;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--sidebar-scrollbar, $gray-300);
-    transform: translateY(-50%);
-    transition: all $transition-base;
-  }
-
   &:hover {
     background: var(--sidebar-hover, rgba($primary, 0.12));
     color: var(--sidebar-text-hover, $primary);
-    &::before { background: var(--sidebar-text-hover, $primary); }
   }
 
   &.active {
     color: var(--sidebar-text-active, $primary);
     font-weight: $font-weight-medium;
-    background: var(--sidebar-active-bg, rgba($primary, 0.06));
-    &::before {
-      background: var(--sidebar-active-border, $primary);
-      box-shadow: 0 0 6px rgba($primary, 0.3);
-    }
+    background: var(--sidebar-active-bg, rgba($primary, 0.1));
   }
 
   .menu-icon { width: 18px; height: 18px; i { font-size: 0.9rem; } }

@@ -79,6 +79,10 @@
            aria-selected="false" role="tab">
           <i class="bi bi-bank"></i> Banking Info
         </a>
+        <a class="up-nav-link nav-link" id="theme" data-bs-toggle="pill" data-bs-target="#theme-tab"
+           aria-selected="false" role="tab">
+          <i class="bi bi-palette2"></i> Theme
+        </a>
 
         <div class="up-nav-section">Security</div>
         <a class="up-nav-link nav-link" id="password" data-bs-toggle="pill" data-bs-target="#password-tab"
@@ -584,6 +588,101 @@
         </form>
       </div>
 
+      <!-- ═══ Theme Tab ═══ -->
+      <div class="tab-pane fade" id="theme-tab" role="tabpanel" aria-labelledby="theme">
+        <div class="profile-section-header mb-4">
+          <div>
+            <h5>My Theme</h5>
+            <p class="text-muted mb-0">Personalize colors for just your own view. Leave a field blank to use your company's default.</p>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Sidebar Background</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('sidebarBg')" class="small" *ngIf="personalTheme.sidebarBg">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.sidebarBg || companyDefault('sidebarBg')"
+                   (change)="onBgChange('sidebarBg', 'sidebarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Sidebar Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('sidebarText')" class="small" *ngIf="personalTheme.sidebarText">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.sidebarText || companyDefault('sidebarText')"
+                   (change)="onTextChange('sidebarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Top Navbar Background</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('navbarBg')" class="small" *ngIf="personalTheme.navbarBg">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.navbarBg || companyDefault('navbarBg')"
+                   (change)="onBgChange('navbarBg', 'navbarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Top Navbar Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('navbarText')" class="small" *ngIf="personalTheme.navbarText">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.navbarText || companyDefault('navbarText')"
+                   (change)="onTextChange('navbarText', $any($event.target).value)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label d-flex justify-content-between">
+              <span>Content Background</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('contentBg')" class="small" *ngIf="personalTheme.contentBg">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.contentBg || companyDefault('contentBg')"
+                   (change)="onBgChange('contentBg', 'contentText', $any($event.target).value)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label d-flex justify-content-between">
+              <span>Body Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('contentText')" class="small" *ngIf="personalTheme.contentText">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.contentText || companyDefault('contentText')"
+                   (change)="onTextChange('contentText', $any($event.target).value)">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label d-flex justify-content-between">
+              <span>Title Text</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('titleText')" class="small" *ngIf="personalTheme.titleText">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.titleText || companyDefault('titleText')"
+                   (change)="onTextChange('titleText', $any($event.target).value)">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label d-flex justify-content-between">
+              <span>Accent Color</span>
+              <a href="javascript:void(0)" (click)="clearPersonalField('accentColor')" class="small" *ngIf="personalTheme.accentColor">Use company default</a>
+            </label>
+            <input type="color" class="form-control form-control-color w-100"
+                   [value]="personalTheme.accentColor || companyDefault('accentColor')"
+                   (change)="onTextChange('accentColor', $any($event.target).value)">
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <button type="button" class="btn btn-outline-secondary" (click)="resetMyTheme()" [disabled]="savingTheme">
+            Reset to Company Default
+          </button>
+          <button type="button" class="btn btn-primary" (click)="saveMyTheme()" [disabled]="savingTheme">
+            <span *ngIf="savingTheme" class="spinner-border spinner-border-sm me-1"></span>
+            {{ savingTheme ? 'Saving…' : 'Save My Theme' }}
+          </button>
+        </div>
+      </div>
+
       <!-- ═══ Password Tab ═══ -->
       <div class="tab-pane fade" id="password-tab" role="tabpanel" aria-labelledby="password">
         <div class="profile-section-header mb-4">
@@ -799,19 +898,24 @@
                   <i class="bi bi-shield-lock-fill"></i>
                 </div>
                 <div class="up-security-info flex-grow-1">
-                  <strong>Multi-Factor Authentication (TOTP)</strong>
+                  <strong>Multi-Factor Authentication</strong>
                   <span *ngIf="state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-on ms-2">Enabled</span>
                   <span *ngIf="!state?.appData?.data?.user?.usingMfa" class="badge-soft-mfa-off ms-2">Disabled</span>
-                  <p class="text-muted small mb-0 mt-1">Use an authenticator app (Google Authenticator, Authy) for sign-in verification</p>
+                  <p class="text-muted small mb-0 mt-1">Choose one of two ways to verify sign-in: an authenticator app (Google Authenticator, Authy), or a one-time code emailed to you at login</p>
                 </div>
 
-                <!-- Enable button (not set up yet) -->
-                <button *ngIf="!state?.appData?.data?.user?.usingMfa && !mfaSetupMode"
-                        (click)="setupMfa()" [disabled]="(isLoading$ | async)"
-                        class="btn btn-sm btn-primary">
-                  <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
-                  <i class="bi bi-qr-code me-1"></i> Set Up MFA
-                </button>
+                <!-- Enable buttons (not set up yet) — two mutually exclusive options -->
+                <div *ngIf="!state?.appData?.data?.user?.usingMfa && !mfaSetupMode && !mfaEmailMode" class="d-flex gap-2">
+                  <button (click)="setupMfa()" [disabled]="(isLoading$ | async)"
+                          class="btn btn-sm btn-primary">
+                    <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                    <i class="bi bi-qr-code me-1"></i> Set Up Authenticator App
+                  </button>
+                  <button (click)="mfaEmailMode = true" [disabled]="(isLoading$ | async)"
+                          class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-envelope-check me-1"></i> Use Email Code Instead
+                  </button>
+                </div>
 
                 <!-- Disable button (MFA active) -->
                 <button *ngIf="state?.appData?.data?.user?.usingMfa && !mfaDisableMode"
@@ -819,6 +923,26 @@
                         class="btn btn-sm btn-outline-danger">
                   <i class="bi bi-shield-x me-1"></i> Disable MFA
                 </button>
+              </div>
+
+              <!-- Email Code Confirmation Panel -->
+              <div *ngIf="mfaEmailMode" class="mfa-setup-panel w-100">
+                <div class="mfa-setup-body">
+                  <p class="mfa-setup-step">
+                    <i class="bi bi-envelope-check me-2"></i>
+                    Instead of scanning a QR code, we'll email a one-time verification code to your registered email address every time you log in.
+                  </p>
+                  <p class="mfa-setup-step text-muted small">
+                    You'll receive a 6-digit code by email each time you sign in.
+                  </p>
+                  <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-primary" (click)="enableEmailMfa()" [disabled]="(isLoading$ | async)">
+                      <span *ngIf="(isLoading$ | async)" class="spinner-border spinner-border-sm me-1"></span>
+                      Confirm — Use Email Code
+                    </button>
+                    <button class="btn btn-outline-secondary" (click)="cancelMfaSetup()" [disabled]="(isLoading$ | async)">Cancel</button>
+                  </div>
+                </div>
               </div>
 
               <!-- QR Code Setup Panel -->

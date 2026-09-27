@@ -21,6 +21,7 @@ import { AuthModule } from './component/auth/auth.module';
 // Feature Modules (some lazy-loaded, some not)
 import { HomeModule } from './component/home/home.module';
 import { NavBarModule } from './component/navbar/navbar.module';
+import { TopnavModule } from './component/topnav/topnav.module';
 // REMOVE EmployeeModule from here - it's lazy loaded
 
 // Components declared here (not in lazy-loaded modules)
@@ -28,7 +29,6 @@ import { AppComponent } from './app.component';
 import { AttendanceListComponent } from './component/attendance/attendance-list/attendance-list.component';
 import { EditAttendanceModalComponent } from './component/attendance/edit-attendance-modal/edit-attendance-modal.component';
 import { MyAttendanceComponent } from './component/attendance/my-attendance/my-attendance.component';
-import { WhatsAppAttendanceComponent } from './component/attendance/whatsapp-attendance/whatsapp-attendance.component';
 import { EmployeeLeaveComponent } from "./component/leave/employee-leave/employee-leave.component";
 import { AdminLeaveComponent } from "./component/leave/admin-leave/admin-leave.component";
 
@@ -52,7 +52,6 @@ import { AppRoutingModule } from './app-routing.module';
     AttendanceListComponent,
     EditAttendanceModalComponent,
     MyAttendanceComponent,
-    WhatsAppAttendanceComponent,
     EmployeeLeaveComponent,
     AdminLeaveComponent,
   ],
@@ -73,6 +72,7 @@ import { AppRoutingModule } from './app-routing.module';
 
     // Feature Modules
     NavBarModule,
+    TopnavModule,
     HomeModule,
 
     // MUST BE LAST - App Routing

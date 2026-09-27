@@ -73,7 +73,7 @@
                 <div class="col-md-8">
                   <label class="form-label">Tagline</label>
                   <input class="form-control" name="tagline" [ngModel]="company?.tagline"
-                         placeholder="e.g. HR &amp; Payroll Made Simple" maxlength="255">
+                         placeholder="e.g. Enterprise Management Made Simple" maxlength="255">
                   <div class="form-text">Shown on the login page and sidebar.</div>
                 </div>
                 <div class="col-md-4">
@@ -81,6 +81,13 @@
                   <input class="form-control" name="primaryColor" [ngModel]="company?.primaryColor || '#375fa0'"
                          placeholder="#375fa0" maxlength="20">
                   <div class="form-text">Hex value e.g. <code>#375fa0</code></div>
+                </div>
+
+                <div class="col-md-4">
+                  <label class="form-label">Employee ID Prefix</label>
+                  <input class="form-control" name="employeeIdPrefix" [ngModel]="company?.employeeIdPrefix"
+                         placeholder="EMP" maxlength="20">
+                  <div class="form-text">Used as the prefix for new employee ID numbers, e.g. EMP0001. Changing this only affects employees added after the change.</div>
                 </div>
 
                 <div class="col-12"><hr class="my-0"></div>
@@ -111,6 +118,112 @@
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        <!-- ── Theme Card ────────────────────────────────────────── -->
+        <div class="falcon-card mt-3">
+          <div class="falcon-card-header">
+            <span class="falcon-card-title"><i class="bi bi-palette2 me-2"></i>Theme</span>
+            <small class="text-muted">Applies to everyone at your company by default</small>
+          </div>
+          <div class="falcon-card-body">
+
+            <div class="theme-preview mb-4">
+              <div class="theme-preview-sidebar" [style.background]="theme.sidebarBg || '#7f9f80'">
+                <span [style.color]="theme.sidebarText || '#ffffff'">Sidebar</span>
+              </div>
+              <div class="theme-preview-main">
+                <div class="theme-preview-navbar" [style.background]="theme.navbarBg || '#ffffff'">
+                  <span [style.color]="theme.navbarText || '#1a1a1a'">Top Navbar</span>
+                </div>
+                <div class="theme-preview-content" [style.background]="theme.contentBg || '#f4f6f9'">
+                  <div [style.color]="theme.titleText || '#0a2c54'" class="fw-bold">Page Title</div>
+                  <div [style.color]="theme.contentText || '#1a1a1a'">Body text</div>
+                  <span class="theme-preview-pill" [style.background]="theme.accentColor || '#124076'">Active</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Sidebar Background</label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.sidebarBg || '#7f9f80'"
+                       (change)="onBgChange('sidebarBg', 'sidebarText', $any($event.target).value)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label d-flex justify-content-between">
+                  <span>Sidebar Text</span>
+                  <a href="javascript:void(0)" (click)="toggleAdvanced('sidebarText')" class="small">
+                    {{ advanced.sidebarText ? 'Use guided' : 'Advanced' }}
+                  </a>
+                </label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.sidebarText || '#ffffff'" [disabled]="!advanced.sidebarText"
+                       (change)="onTextChange('sidebarText', $any($event.target).value)">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Top Navbar Background</label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.navbarBg || '#ffffff'"
+                       (change)="onBgChange('navbarBg', 'navbarText', $any($event.target).value)">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label d-flex justify-content-between">
+                  <span>Top Navbar Text</span>
+                  <a href="javascript:void(0)" (click)="toggleAdvanced('navbarText')" class="small">
+                    {{ advanced.navbarText ? 'Use guided' : 'Advanced' }}
+                  </a>
+                </label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.navbarText || '#1a1a1a'" [disabled]="!advanced.navbarText"
+                       (change)="onTextChange('navbarText', $any($event.target).value)">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Content Background</label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.contentBg || '#f4f6f9'"
+                       (change)="onBgChange('contentBg', 'contentText', $any($event.target).value)">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label d-flex justify-content-between">
+                  <span>Body Text</span>
+                  <a href="javascript:void(0)" (click)="toggleAdvanced('contentText')" class="small">
+                    {{ advanced.contentText ? 'Use guided' : 'Advanced' }}
+                  </a>
+                </label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.contentText || '#1a1a1a'" [disabled]="!advanced.contentText"
+                       (change)="onTextChange('contentText', $any($event.target).value)">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Title Text</label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.titleText || '#0a2c54'"
+                       (change)="onTextChange('titleText', $any($event.target).value)">
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Accent Color</label>
+                <input type="color" class="form-control form-control-color w-100"
+                       [value]="theme.accentColor || '#124076'"
+                       (change)="onTextChange('accentColor', $any($event.target).value)">
+                <div class="form-text">Active nav items, buttons, links.</div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+              <button type="button" class="btn btn-outline-secondary" (click)="resetTheme()" [disabled]="savingTheme">
+                Reset to Platform Default
+              </button>
+              <button type="button" class="btn btn-primary" (click)="saveTheme()" [disabled]="savingTheme">
+                <span *ngIf="savingTheme" class="spinner-border spinner-border-sm me-1"></span>
+                {{ savingTheme ? 'Saving…' : 'Save Theme' }}
+              </button>
+            </div>
           </div>
         </div>
 

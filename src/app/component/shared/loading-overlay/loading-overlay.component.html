@@ -3,7 +3,7 @@
     <div class="loading-ring-wrap">
       <div class="loading-ring"></div>
       <div class="loading-ring loading-ring--delay"></div>
-      <img src="assets/logo_icon.png" alt="Loading…" class="loading-logo">
+      <img [src]="logoSrc$ | async" (error)="onLogoError($event)" alt="Loading…" class="loading-logo">
     </div>
     <p class="loading-text">Please wait…</p>
   </div>

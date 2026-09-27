@@ -136,7 +136,7 @@
         </div>
 
         <div *ngIf="selectedAccount && loadingTx" class="p-4 text-center">
-          <div class="spinner-border spinner-border-sm" style="color:var(--primary-500)"></div>
+          <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
         </div>
 
         <div *ngIf="selectedAccount && !loadingTx" class="table-responsive">

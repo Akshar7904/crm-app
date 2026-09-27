@@ -175,13 +175,6 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           route: '/attendance/my'
         },
         {
-          label: 'WhatsApp Attendance',
-          icon: 'bi-whatsapp',
-          route: '/attendance/whatsapp',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          excludeRoles: ['ROLE_USER']
-        },
-        {
           label: 'Holidays',
           icon: 'bi-calendar-week',
           route: '/holidays'
@@ -294,20 +287,6 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           moduleKey: 'INVOICE_CUSTOMER'
         },
         {
-          label: 'Clients',
-          icon: 'bi-people',
-          route: '/customers',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          moduleKey: 'INVOICE_CUSTOMER'
-        },
-        {
-          label: 'Add Client',
-          icon: 'bi-person-plus-fill',
-          route: '/customers/new',
-          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
-          moduleKey: 'INVOICE_CUSTOMER'
-        },
-        {
           label: 'Products & Services',
           icon: 'bi-box-seam',
           route: '/accounting/products',
@@ -362,6 +341,30 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           route: '/accounting/reports',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
           moduleKey: 'BUSINESS_EXPENSES'
+        }
+      ]
+    },
+    {
+      label: 'Customer Management',
+      icon: 'bi-people',
+      expanded: false,
+      requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+      excludeRoles: ['ROLE_USER'],
+      moduleKey: 'INVOICE_CUSTOMER',
+      children: [
+        {
+          label: 'All Clients',
+          icon: 'bi-people-fill',
+          route: '/customers',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
+        },
+        {
+          label: 'Add Client',
+          icon: 'bi-person-plus-fill',
+          route: '/customers/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN'],
+          moduleKey: 'INVOICE_CUSTOMER'
         }
       ]
     },
@@ -471,6 +474,51 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
           label: 'Templates',
           icon: 'bi-layout-text-window-reverse',
           route: '/contracts/templates',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        }
+      ]
+    },
+    {
+      label: 'Projects',
+      icon: 'bi-kanban',
+      expanded: false,
+      moduleKey: 'PROJECT_MANAGEMENT',
+      children: [
+        {
+          label: 'All Projects',
+          icon: 'bi-kanban',
+          route: '/projects',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'New Project',
+          icon: 'bi-plus-circle',
+          route: '/projects/new',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'My Tasks',
+          icon: 'bi-check2-square',
+          route: '/projects/my-tasks'
+        }
+      ]
+    },
+    {
+      label: 'Tenders',
+      icon: 'bi-file-earmark-text',
+      expanded: false,
+      moduleKey: 'TENDER_MANAGEMENT',
+      children: [
+        {
+          label: 'All Tenders',
+          icon: 'bi-file-earmark-text',
+          route: '/tenders',
+          requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
+        },
+        {
+          label: 'Reporting',
+          icon: 'bi-bar-chart-line',
+          route: '/tenders/reporting',
           requiredRoles: ['ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_SYSADMIN', 'ROLE_SUPERADMIN']
         }
       ]
@@ -800,15 +848,16 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
   staticFallbackLogo: string | null = null;
 
   /** Map of company name keywords to static logo assets */
-  private readonly COMPANY_LOGO_MAP: { keywords: string[]; asset: string }[] = [
-    { keywords: ['lkcentrix', 'lkc'],     asset: 'assets/lkcentrix_logo.png'     },
-  ];
+  private readonly COMPANY_LOGO_MAP: { keywords: string[]; asset: string }[] = [];
 
   get companyLogoUrl(): string | null {
     const companyId = this.user?.companyId;
     if (!companyId) return null;
     if (this.staticFallbackLogo) return this.staticFallbackLogo;
     if (this.companyLogoFailed) return null;
+    // Prefer BrandingService's URL — it's cache-busted with the company's
+    // updatedAt so a freshly re-uploaded logo actually shows up.
+    if (this.branding.branding?.id === companyId) return this.branding.branding.logoUrl;
     return `${environment.apiUrl}/api/v1/companies/${companyId}/logo`;
   }
 
@@ -854,4 +903,11 @@ export class SidebarComponent implements OnInit, OnDestroy, OnChanges {
     this.notification.onDefault('You\'ve been successfully logged out');
     this.router.navigate(['/login']);
   }
+
+  onMarketplaceClick(): void {
+    this.notification.onInfo('Marketplace 360 — coming soon!');
+  }
+
+  trackById(index: number, item: any): number { return item?.id ?? index; }
+  trackByIndex(index: number): number { return index; }
 }

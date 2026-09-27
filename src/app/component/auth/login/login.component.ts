@@ -30,6 +30,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   private emailSubject    = new BehaviorSubject<string | null>(null);
   private companySubject  = new BehaviorSubject<Company | null>(null);
   private companiesSubject = new BehaviorSubject<Company[]>([]);
+  private mfaTypeSubject  = new BehaviorSubject<'TOTP' | 'EMAIL'>('TOTP');
 
   constructor(
     private router: Router,
@@ -128,10 +129,13 @@ export class LoginComponent implements OnInit, OnDestroy {
             this.notification.onDefault(response.message);
             this.phoneSubject.next(response.data.user.phone);
             const phone = response.data.user.phone;
+            const mfaType: 'TOTP' | 'EMAIL' = (response.data as any).mfaType === 'EMAIL' ? 'EMAIL' : 'TOTP';
+            this.mfaTypeSubject.next(mfaType);
             return {
               dataState: DataState.LOADED,
               step: 'mfa' as const,
               isUsingMfa: true,
+              mfaType,
               loginSuccess: false,
               selectedCompany: company ?? undefined,
               phone: phone ? phone.substring(phone.length - 4) : ''
@@ -167,11 +171,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * MFA verification (unchanged flow).
+   * MFA verification — branches to the email-code or TOTP endpoint depending
+   * on which method the login response indicated.
    */
   verifyCode(verifyCodeForm: NgForm): void {
-    this.loginState$ = this.userService
-      .verifyTotpLogin$(this.emailSubject.value!, verifyCodeForm.value.code)
+    const verify$ = this.mfaTypeSubject.value === 'EMAIL'
+      ? this.userService.verifyCode$(this.emailSubject.value!, verifyCodeForm.value.code)
+      : this.userService.verifyTotpLogin$(this.emailSubject.value!, verifyCodeForm.value.code);
+    this.loginState$ = verify$
       .pipe(
         map(response => {
           this.notification.onDefault(response.message);
@@ -188,6 +195,7 @@ export class LoginComponent implements OnInit, OnDestroy {
           dataState: DataState.LOADING,
           step: 'mfa' as const,
           isUsingMfa: true,
+          mfaType: this.mfaTypeSubject.value,
           loginSuccess: false,
           phone: this.phoneSubject.value?.substring(this.phoneSubject.value.length - 4) ?? ''
         }),
@@ -197,6 +205,7 @@ export class LoginComponent implements OnInit, OnDestroy {
             dataState: DataState.ERROR,
             step: 'mfa' as const,
             isUsingMfa: true,
+            mfaType: this.mfaTypeSubject.value,
             loginSuccess: false,
             error,
             phone: this.phoneSubject.value?.substring(this.phoneSubject.value.length - 4) ?? ''

@@ -4,7 +4,7 @@
 
 import { environment } from '@env/environment';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, BehaviorSubject, map, startWith, catchError, of } from 'rxjs';
 import { DataState } from 'src/app/enum/datastate.enum';
 import { EventType } from 'src/app/enum/event-type.enum';
@@ -17,6 +17,7 @@ import { KioskService } from '../../kiosk/kiosk.service';
 import { NgForm } from '@angular/forms';
 import { UserModel } from '../user.model';
 import { HttpEvent, HttpEventType } from '@angular/common/http';
+import { ThemeTokens, suggestTextColor, BrandingService, DEFAULT_THEME } from 'src/app/service/branding.service';
 
 /**
  * User Component - Self-Service Profile Management
@@ -71,9 +72,14 @@ export class UserComponent implements OnInit {
   private showLogsSubject = new BehaviorSubject<boolean>(false);
   showLogs$ = this.showLogsSubject.asObservable();
 
+  // Theme personalization
+  personalTheme: ThemeTokens = {};
+  savingTheme = false;
+
   // MFA setup state
   mfaSetupMode = false;
   mfaDisableMode = false;
+  mfaEmailMode = false;
   savingKioskPin = false;
   mfaSetupData: { secret: string; qrCodeDataUri: string; issuer: string; email: string } | null = null;
   mfaCode = '';
@@ -113,10 +119,12 @@ export class UserComponent implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private userService: UserService,
     private employeeService: EmployeeService,
     private notification: NotificationService,
     private kioskService: KioskService,
+    private branding: BrandingService,
     private cdr: ChangeDetectorRef
   ) { }
 
@@ -125,6 +133,13 @@ export class UserComponent implements OnInit {
     this.loadProfile();
     this.loadDropdownData();
     this.loadMyDocuments();
+    this.personalTheme = { ...this.branding.personalTheme };
+
+    // Deep-link support: /profile?tab=theme opens straight on a given pill tab.
+    const tab = this.route.snapshot.queryParamMap.get('tab');
+    if (tab) {
+      setTimeout(() => document.getElementById(tab)?.click());
+    }
   }
 
   /**
@@ -534,9 +549,36 @@ export class UserComponent implements OnInit {
     });
   }
 
+  /**
+   * Enable "Email code at login" MFA — toggles usingMfa directly via the existing
+   * PATCH /user/togglemfa endpoint, WITHOUT going through the TOTP QR-code setup flow.
+   * This is the mutually-exclusive alternative to the authenticator-app setup above:
+   * with no TOTP secret configured, the backend's login flow falls back to emailing a
+   * one-time code instead of prompting for an authenticator code.
+   */
+  enableEmailMfa(): void {
+    this.isLoadingSubject.next(true);
+    this.userService.toggleMfa$().subscribe({
+      next: (response) => {
+        this.dataSubject.next(response);
+        this.profileState$ = of({ dataState: DataState.LOADED, appData: response });
+        this.mfaEmailMode = false;
+        this.isLoadingSubject.next(false);
+        this.notification.onSuccess(response.message || 'Email code at login enabled successfully');
+        this.cdr.markForCheck();
+      },
+      error: (error: string) => {
+        this.isLoadingSubject.next(false);
+        this.notification.onError(error || 'Failed to enable email code at login');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   cancelMfaSetup(): void {
     this.mfaSetupMode = false;
     this.mfaDisableMode = false;
+    this.mfaEmailMode = false;
     this.mfaSetupData = null;
     this.mfaCode = '';
     this.cdr.markForCheck();
@@ -832,6 +874,43 @@ export class UserComponent implements OnInit {
         this.savingKioskPin = false;
         this.cdr.markForCheck();
       }
+    });
+  }
+
+  onBgChange(bgKey: keyof ThemeTokens, textKey: keyof ThemeTokens, value: string): void {
+    this.personalTheme = { ...this.personalTheme, [bgKey]: value, [textKey]: suggestTextColor(value) };
+    this.cdr.markForCheck();
+  }
+
+  onTextChange(textKey: keyof ThemeTokens, value: string): void {
+    this.personalTheme = { ...this.personalTheme, [textKey]: value };
+    this.cdr.markForCheck();
+  }
+
+  companyDefault(key: keyof ThemeTokens): string {
+    return (this.branding.branding?.theme?.[key] as string) || DEFAULT_THEME[key];
+  }
+
+  clearPersonalField(key: keyof ThemeTokens): void {
+    const updated = { ...this.personalTheme };
+    delete updated[key];
+    this.personalTheme = updated;
+    this.cdr.markForCheck();
+  }
+
+  saveMyTheme(): void {
+    this.savingTheme = true;
+    this.branding.setPersonalTheme(this.personalTheme).subscribe({
+      next: () => { this.savingTheme = false; this.notification.onDefault('Your theme has been saved'); this.cdr.markForCheck(); },
+      error: err => { this.notification.onError(err); this.savingTheme = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  resetMyTheme(): void {
+    this.savingTheme = true;
+    this.branding.clearPersonalTheme().subscribe({
+      next: () => { this.personalTheme = {}; this.savingTheme = false; this.notification.onDefault('Reset to company default'); this.cdr.markForCheck(); },
+      error: err => { this.notification.onError(err); this.savingTheme = false; this.cdr.markForCheck(); }
     });
   }
 }

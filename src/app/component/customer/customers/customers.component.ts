@@ -119,4 +119,24 @@ export class CustomersComponent implements OnInit {
     }
     return name.charAt(0).toUpperCase();
   }
+
+  formatAccountType(type: string): string {
+    const map: Record<string, string> = {
+      POST_PAID: 'Post Paid', SUBSCRIPTION: 'Subscription', PRE_PAID: 'Pre-Paid',
+      COD: 'COD', CREDIT_CARD: 'Credit Card', OTHER: 'Other'
+    };
+    return map[type] ?? type ?? '—';
+  }
+
+  formatProvince(province: string): string {
+    const map: Record<string, string> = {
+      EASTERN_CAPE: 'Eastern Cape', FREE_STATE: 'Free State', GAUTENG: 'Gauteng',
+      KWAZULU_NATAL: 'KwaZulu-Natal', LIMPOPO: 'Limpopo', MPUMALANGA: 'Mpumalanga',
+      NORTHERN_CAPE: 'Northern Cape', NORTH_WEST: 'North West', WESTERN_CAPE: 'Western Cape'
+    };
+    return map[province] ?? province ?? '';
+  }
+
+  trackById(index: number, item: any): number { return item?.id ?? index; }
+  trackByIndex(index: number): number { return index; }
 }

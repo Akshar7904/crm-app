@@ -22,6 +22,8 @@ export interface PolicyType {
   label: string;
 }
 
+const QUICK_PICK_TYPES = ['COMPANY_DOCUMENT', 'COMPLIANCE_DOCUMENT', 'FINANCIAL_DOCUMENT', 'LEGAL_DOCUMENT', 'CONTRACT_DOCUMENT', 'OTHER'];
+
 @Component({
   standalone: false,
   selector: 'app-company-policy',
@@ -37,6 +39,8 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   policies: PolicyMeta[] = [];
   policyTypes: PolicyType[] = [];
+  policyTypesError = false;
+  searchQuery = '';
 
   // Viewer state
   viewingPolicy: PolicyMeta | null = null;
@@ -51,6 +55,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
   uploadLabel     = '';
   selectedFile: File | null = null;
   uploading       = false;
+  replacingPolicyId: number | null = null;
 
   // Delete confirm state
   deletingId: number | null = null;
@@ -89,9 +94,15 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
   }
 
   loadPolicyTypes(): void {
+    this.policyTypesError = false;
     this.http.get<any>(`${this.api}/companies/${this.companyId}/policies/types`).subscribe({
       next: res => {
         this.policyTypes = res.data?.types ?? [];
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.policyTypesError = true;
+        this.notification.onError('Failed to load document types. Please refresh the page to try again.');
         this.cdr.markForCheck();
       }
     });
@@ -131,7 +142,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
       error: () => {
         this.viewerLoading = false;
         this.viewingPolicy = null;
-        this.notification.onError('Failed to load policy document.');
+        this.notification.onError('Failed to load document.');
         this.cdr.markForCheck();
       }
     });
@@ -157,7 +168,7 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
         // Revoke after a short delay to allow the download to start
         setTimeout(() => URL.revokeObjectURL(blobUrl), 10000);
       },
-      error: () => this.notification.onError('Failed to download policy.')
+      error: () => this.notification.onError('Failed to download document.')
     });
   }
 
@@ -170,20 +181,22 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   // ── Upload modal ────────────────────────────────────────────────────────────
 
-  openUploadModal(type = '', label = ''): void {
+  openUploadModal(type = '', label = '', policyId: number | null = null): void {
     this.uploadType      = type;
     this.uploadLabel     = label;
+    this.replacingPolicyId = policyId;
     this.selectedFile    = null;
     this.showUploadModal = true;
     this.cdr.markForCheck();
   }
 
   openReplaceModal(policy: PolicyMeta): void {
-    this.openUploadModal(policy.policyType, policy.displayName);
+    this.openUploadModal(policy.policyType, policy.displayName, policy.id);
   }
 
   closeUploadModal(): void {
     this.showUploadModal = false;
+    this.replacingPolicyId = null;
     this.cdr.markForCheck();
   }
 
@@ -201,21 +214,26 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   submitUpload(): void {
     if (!this.selectedFile || !this.uploadType || !this.companyId) return;
+    if (this.isOtherSelected && !this.uploadLabel.trim()) return;
     this.uploading = true;
     const form = new FormData();
     form.append('file', this.selectedFile);
     form.append('policyType', this.uploadType);
     form.append('displayName', this.uploadLabel);
+    if (this.replacingPolicyId != null) {
+      form.append('policyId', String(this.replacingPolicyId));
+    }
     this.http.post<any>(`${this.api}/companies/${this.companyId}/policies`, form).subscribe({
       next: () => {
         this.uploading       = false;
         this.showUploadModal = false;
-        this.notification.onDefault('Policy uploaded successfully.');
+        this.replacingPolicyId = null;
+        this.notification.onDefault('Document uploaded successfully.');
         this.loadPolicies();
       },
       error: () => {
         this.uploading = false;
-        this.notification.onError('Failed to upload policy.');
+        this.notification.onError('Failed to upload document.');
         this.cdr.markForCheck();
       }
     });
@@ -237,12 +255,12 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
     this.http.delete<any>(`${this.api}/companies/${this.companyId}/policies/${policy.id}`).subscribe({
       next: () => {
         this.deletingId = null;
-        this.notification.onDefault('Policy removed.');
+        this.notification.onDefault('Document removed.');
         this.loadPolicies();
       },
       error: () => {
         this.deletingId = null;
-        this.notification.onError('Failed to remove policy.');
+        this.notification.onError('Failed to remove document.');
         this.cdr.markForCheck();
       }
     });
@@ -254,5 +272,25 @@ export class CompanyPolicyComponent implements OnInit, OnDestroy {
 
   get uploadedTypes(): Set<string> {
     return new Set(this.policies.map(p => p.policyType));
+  }
+
+  get filteredDocuments(): PolicyMeta[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    if (!q) return this.policies;
+    return this.policies.filter(p =>
+      (p.displayName ?? '').toLowerCase().includes(q) ||
+      (p.fileName ?? '').toLowerCase().includes(q) ||
+      this.labelFor(p.policyType).toLowerCase().includes(q)
+    );
+  }
+
+  get quickPickTypes(): PolicyType[] {
+    return QUICK_PICK_TYPES
+      .map(v => this.policyTypes.find(t => t.value === v))
+      .filter((t): t is PolicyType => !!t);
+  }
+
+  get isOtherSelected(): boolean {
+    return this.uploadType === 'OTHER';
   }
 }

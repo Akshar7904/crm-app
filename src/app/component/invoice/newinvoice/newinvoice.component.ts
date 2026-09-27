@@ -188,8 +188,12 @@ export class NewinvoiceComponent implements OnInit {
         map(response => {
           this.notification.onSuccess(response.message || 'Invoice created successfully');
           this.isLoadingSubject.next(false);
-          // Reset form
-          this.resetForm();
+          const created = (response.data as any)?.invoice;
+          if (created?.id) {
+            this.router.navigate(['/invoices', created.id, created.invoiceNumber]);
+          } else {
+            this.goToInvoices();
+          }
           return { dataState: DataState.LOADED, appData: this.dataSubject.value };
         }),
         startWith({ dataState: DataState.LOADED, appData: this.dataSubject.value }),

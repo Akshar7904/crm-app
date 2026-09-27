@@ -33,6 +33,10 @@ export class UserService {
     this.http.post<CustomHttpResponse<Profile>>(`${this.server}/user/register`, user)
       .pipe(catchError(this.handleError));
 
+  registerAccount$ = (form: any) => <Observable<CustomHttpResponse<any>>>
+    this.http.post<CustomHttpResponse<any>>(`${this.server}/auth/register`, form)
+      .pipe(catchError(this.handleError));
+
   requestPasswordReset$ = (email: string) => <Observable<CustomHttpResponse<Profile>>>
     this.http.get<CustomHttpResponse<Profile>>(`${this.server}/user/resetpassword/${email}`)
       .pipe(catchError(this.handleError));

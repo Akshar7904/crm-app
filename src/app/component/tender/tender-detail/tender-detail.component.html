@@ -1,0 +1,723 @@
+<div *ngIf="loading" class="text-center py-5">
+  <div class="skeleton-box" style="height:24px;width:60%;margin:auto"></div>
+</div>
+
+<ng-container *ngIf="!loading && tender">
+  <div class="page-banner">
+    <div class="banner-title">{{ tender.title }}</div>
+    <p class="banner-subtitle">{{ tender.tenderReference }} · {{ tender.issuingOrganisation || '—' }}</p>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-3">
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'overview'" (click)="setTab('overview')">Overview</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'tasks'" (click)="setTab('tasks')">Tasks</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'requirements'" (click)="setTab('requirements')">Requirements</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'pricing'" (click)="setTab('pricing')">Pricing</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'documents'" (click)="setTab('documents')">Response Documents</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'submission'" (click)="setTab('submission')">Submission</button></li>
+    <li class="nav-item"><button class="nav-link" [class.active]="activeTab === 'postbid'" (click)="setTab('postbid')">Post-bid</button></li>
+  </ul>
+
+  <!-- Overview -->
+  <div *ngIf="activeTab === 'overview'">
+    <div class="row g-3 mb-3">
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ tender.progressPercent || 0 }}%</div><div class="stat-label">Progress</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ tender.goNoGoDecision }}</div><div class="stat-label">Go/No-Go</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ (tender.tasks?.length || 0) }}</div><div class="stat-label">Tasks</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ (tender.requirements?.length || 0) }}</div><div class="stat-label">Requirements</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ (tender.bidDocuments?.length || 0) }}</div><div class="stat-label">Response Documents</div></div></div>
+      <div class="col-6 col-md-2"><div class="falcon-card p-2 text-center"><div class="stat-value">{{ tender.pricingFinalised ? 'Final' : 'Draft' }}</div><div class="stat-label">Pricing</div></div></div>
+    </div>
+
+    <div class="falcon-card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-start">
+        <strong>Tender Summary</strong>
+        <button class="btn btn-sm btn-outline-secondary" (click)="startEditOverview()" *ngIf="!editingOverview && isManagerOrAbove">
+          <i class="bi bi-pencil me-1"></i>Edit
+        </button>
+      </div>
+
+      <div *ngIf="!editingOverview" class="row g-3 mt-1">
+        <div class="col-md-4"><small class="text-muted d-block">Issuing Organisation</small>{{ tender.issuingOrganisation || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Tender Reference</small>{{ tender.tenderReference || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Estimated Value</small>R {{ (tender.estimatedValue || 0) | number:'1.0-0' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Closing Date</small>{{ tender.closingDate ? (tender.closingDate | date:'d MMM yyyy, HH:mm') : '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Bid Lead</small>{{ tender.bidLeadName || '—' }}</div>
+        <div class="col-md-4">
+          <small class="text-muted d-block">Published Tender Document</small>
+          <span *ngIf="!tender.attachmentFileName">No document uploaded</span>
+          <button *ngIf="tender.attachmentFileName" class="btn btn-sm btn-link p-0 published-doc-link" (click)="downloadAttachment()">{{ tender.attachmentFileName }}</button>
+          <label class="btn btn-sm btn-outline-secondary ms-2 mb-0" *ngIf="isManagerOrAbove">
+            {{ tender.attachmentFileName ? 'Replace' : 'Upload' }}
+            <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
+          </label>
+        </div>
+        <div class="col-md-4"><small class="text-muted d-block">Tender Type</small>{{ tender.tenderType || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Tender Source</small>{{ tender.tenderSource || '—' }}</div>
+        <div class="col-md-4"><small class="text-muted d-block">Bidding Structure</small>{{ tender.biddingStructure || '—' }}</div>
+        <div class="col-md-4" *ngIf="tender.clarificationRequired">
+          <small class="text-muted d-block">Clarification</small>
+          {{ tender.clarificationDate ? (tender.clarificationDate | date:'d MMM yyyy') : '—' }}{{ tender.clarificationTime ? (' ' + tender.clarificationTime) : '' }}
+          <div class="small text-muted" *ngIf="tender.clarificationNotes">{{ tender.clarificationNotes }}</div>
+        </div>
+        <div class="col-12" *ngIf="tender.isJvConsortium">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <small class="text-muted d-block">JV / Consortium Partners</small>
+            <button class="btn btn-sm btn-outline-secondary" *ngIf="isManagerOrAbove" (click)="openAddJvPartnerModal()"><i class="bi bi-plus-lg me-1"></i>Add Partner</button>
+          </div>
+          <div class="text-muted small" *ngIf="!jvPartners.length">No partners added yet</div>
+          <ul class="list-group list-group-flush" *ngIf="jvPartners.length">
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0" *ngFor="let p of jvPartners">
+              <span>{{ p.partnerName }}{{ p.role ? ' — ' + p.role : '' }}</span>
+              <div class="d-flex gap-2" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingJvPartnerId !== p.id; else confirmDeleteJvPartnerTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditJvPartnerModal(p)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteJvPartner(p)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeleteJvPartnerTpl>
+                  <span class="me-2 small text-muted">Delete?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteJvPartner(p)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteJvPartner()">Cancel</button>
+                </ng-template>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div *ngIf="editingOverview" class="row g-3 mt-1">
+        <div class="col-md-6"><label class="form-label">Title</label><input class="form-control" [(ngModel)]="overviewForm.title"></div>
+        <div class="col-md-6"><label class="form-label">Issuing Organisation</label><input class="form-control" [(ngModel)]="overviewForm.issuingOrganisation"></div>
+        <div class="col-md-6"><label class="form-label">Tender Reference</label><input class="form-control" [(ngModel)]="overviewForm.tenderReference"></div>
+        <div class="col-md-6"><label class="form-label">Estimated Value</label><input type="number" class="form-control" [(ngModel)]="overviewForm.estimatedValue"></div>
+        <div class="col-md-6"><label class="form-label">Closing Date</label><input type="datetime-local" class="form-control" [(ngModel)]="overviewForm.closingDate"></div>
+        <div class="col-md-6">
+          <label class="form-label">Bid Lead</label>
+          <select class="form-select" (change)="onOverviewBidLeadChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === overviewForm.bidLeadId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="col-md-6"><label class="form-label">Tender Type</label><input class="form-control" [(ngModel)]="overviewForm.tenderType"></div>
+        <div class="col-md-6"><label class="form-label">Tender Source</label><input class="form-control" [(ngModel)]="overviewForm.tenderSource"></div>
+        <div class="col-md-6"><label class="form-label">Bidding Structure</label><input class="form-control" [(ngModel)]="overviewForm.biddingStructure"></div>
+        <div class="col-md-6">
+          <label class="form-label">Clarification Required?</label>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" [(ngModel)]="overviewForm.clarificationRequired">
+          </div>
+        </div>
+        <ng-container *ngIf="overviewForm.clarificationRequired">
+          <div class="col-md-4"><label class="form-label">Clarification Date</label><input type="date" class="form-control" [(ngModel)]="overviewForm.clarificationDate"></div>
+          <div class="col-md-4"><label class="form-label">Clarification Time</label><input type="time" class="form-control" [(ngModel)]="overviewForm.clarificationTime"></div>
+          <div class="col-md-4"><label class="form-label">Clarification Notes</label><textarea class="form-control" rows="1" [(ngModel)]="overviewForm.clarificationNotes"></textarea></div>
+        </ng-container>
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-primary btn-sm" (click)="saveOverview()" [disabled]="savingOverview">Save</button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="cancelEditOverview()" [disabled]="savingOverview">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3">
+      <strong>Go/No-Go Decision</strong>
+      <div class="row g-3 mt-1">
+        <div class="col-md-4">
+          <label class="form-label">Allocated To</label>
+          <select class="form-select" (change)="onGoNoGoOwnerChange($any($event.target).value)" [disabled]="!isManagerOrAbove">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === goNoGoOwnerId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label">Decision Reason</label>
+          <textarea class="form-control" rows="2" [(ngModel)]="goNoGoReason" [disabled]="!isManagerOrAbove"></textarea>
+        </div>
+        <div class="col-12 d-flex gap-2" *ngIf="isManagerOrAbove">
+          <button class="btn btn-success btn-sm" (click)="submitGoNoGo('GO')" [disabled]="savingGoNoGo">Go</button>
+          <button class="btn btn-outline-danger btn-sm" (click)="submitGoNoGo('NO_GO')" [disabled]="savingGoNoGo">No-Go</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tasks -->
+  <div *ngIf="activeTab === 'tasks'">
+    <div class="table-card">
+      <div class="table-card-header">
+        <strong>Tasks</strong>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddTaskModal()"><i class="bi bi-plus-lg me-1"></i>Add Task</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Task</th><th>Allocated Date</th><th>Allocated To</th><th>Due Date</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngIf="!tender.tasks?.length"><td colspan="6" class="empty-state-cell">No tasks yet</td></tr>
+            <tr *ngFor="let t of tender.tasks">
+              <td>{{ t.description }}</td>
+              <td>{{ t.createdAt ? (t.createdAt | date:'d MMM yyyy') : '—' }}</td>
+              <td>{{ t.allocatedToName || '—' }}</td>
+              <td>{{ t.dueDate ? (t.dueDate | date:'d MMM yyyy') : '—' }}</td>
+              <td>
+                <span class="badge-soft" [ngClass]="{
+                  'badge-soft-secondary': t.status === 'NOT_STARTED',
+                  'badge-soft-info': t.status === 'IN_PROGRESS',
+                  'badge-soft-success': t.status === 'COMPLETE',
+                  'badge-soft-danger': t.status === 'OVERDUE'
+                }">{{ t.status }}</span>
+              </td>
+              <td class="text-end" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingTaskId !== t.id; else confirmDeleteTaskTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditTaskModal(t)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteTask(t)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeleteTaskTpl>
+                  <span class="me-2 small text-muted">Delete this task?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteTask(t)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteTask()">Cancel</button>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Requirements -->
+  <div *ngIf="activeTab === 'requirements'">
+    <div class="table-card">
+      <div class="table-card-header">
+        <strong>Requirements</strong>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddRequirementModal()"><i class="bi bi-plus-lg me-1"></i>Add Requirement</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead><tr><th>Type</th><th>Requirement</th><th>Owner</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <tr *ngIf="!tender.requirements?.length"><td colspan="5" class="empty-state-cell">No requirements yet</td></tr>
+            <tr *ngFor="let r of tender.requirements">
+              <td><span class="badge-soft badge-soft-secondary">{{ r.type }}</span></td>
+              <td>{{ r.description }}</td>
+              <td>{{ r.ownerName || '—' }}</td>
+              <td>
+                <span class="badge-soft" [ngClass]="{
+                  'badge-soft-secondary': r.status === 'NOT_STARTED',
+                  'badge-soft-info': r.status === 'IN_PROGRESS',
+                  'badge-soft-warning': r.status === 'AT_RISK',
+                  'badge-soft-success': r.status === 'COMPLETE'
+                }">{{ r.status }}</span>
+              </td>
+              <td class="text-end" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingRequirementId !== r.id; else confirmDeleteRequirementTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditRequirementModal(r)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteRequirement(r)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeleteRequirementTpl>
+                  <span class="me-2 small text-muted">Delete this requirement?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteRequirement(r)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteRequirement()">Cancel</button>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing -->
+  <div *ngIf="activeTab === 'pricing'">
+    <div class="table-card mb-3">
+      <div class="table-card-header">
+        <strong>Costing</strong>
+        <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddPricingLineModal()"><i class="bi bi-plus-lg me-1"></i>Add Product or Service</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>Item</th><th>Qty</th><th>Supplier</th><th>Unit Cost</th><th>Total Cost Ex VAT</th><th>Total Cost (Incl VAT)</th><th>Profit %</th><th>Profit</th><th>Sell excl. VAT</th><th>VAT</th><th>Total incl. VAT</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="!tender.pricingLines?.length"><td colspan="12" class="empty-state-cell">No pricing lines yet</td></tr>
+            <tr *ngFor="let l of tender.pricingLines">
+              <td><div class="fw-semibold">{{ l.itemName }}</div><small class="text-muted">{{ l.description }}</small></td>
+              <td>{{ l.quantity }}</td>
+              <td>{{ l.supplierName || '—' }}<br><small class="text-muted">{{ l.supplierReference }}</small></td>
+              <td>R {{ l.unitCost | number:'1.2-2' }}</td>
+              <td>R {{ (l.totalCost || 0) | number:'1.2-2' }}</td>
+              <td>R {{ (l.totalCostInclVat || 0) | number:'1.2-2' }}</td>
+              <td>{{ l.profitMarkupPercent }}%</td>
+              <td>R {{ (l.profitAmount || 0) | number:'1.2-2' }}</td>
+              <td>R {{ (l.sellExclVat || 0) | number:'1.2-2' }}</td>
+              <td>R {{ (l.vatAmount || 0) | number:'1.2-2' }}</td>
+              <td class="fw-semibold">R {{ (l.totalInclVat || 0) | number:'1.2-2' }}</td>
+              <td class="text-end" *ngIf="isManagerOrAbove">
+                <ng-container *ngIf="deletingPricingLineId !== l.id; else confirmDeletePricingLineTpl">
+                  <button class="btn btn-sm btn-outline-secondary" (click)="openEditPricingLineModal(l)"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="confirmDeletePricingLine(l)"><i class="bi bi-trash"></i></button>
+                </ng-container>
+                <ng-template #confirmDeletePricingLineTpl>
+                  <span class="me-2 small text-muted">Delete this line?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeletePricingLine(l)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeletePricingLine()">Cancel</button>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <strong>How This Price Was Built</strong>
+          <div class="row g-2 mt-1">
+            <div class="col-6"><small class="text-muted d-block">Supplier Cost (excl. VAT)</small>R {{ (tender.supplierCostExclVat || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">Expected Profit</small>R {{ (tender.expectedProfit || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">Average Markup</small>{{ tender.averageMarkupPercent != null ? (tender.averageMarkupPercent | number:'1.1-1') + '%' : '—' }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <div class="d-flex justify-content-between align-items-start">
+            <strong>Final Bid Price</strong>
+            <button class="btn btn-sm btn-success" *ngIf="isManagerOrAbove" (click)="finalisePricing()" [disabled]="finalisingPricing || tender.pricingFinalised">
+              {{ tender.pricingFinalised ? 'Finalised' : 'Finalise Pricing' }}
+            </button>
+          </div>
+          <div class="row g-2 mt-1">
+            <div class="col-6"><small class="text-muted d-block">Selling (excl. VAT)</small>R {{ (tender.finalSellExclVat || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">VAT</small>R {{ (tender.finalVatAmount || 0) | number:'1.2-2' }}</div>
+            <div class="col-12"><small class="text-muted d-block">Total (incl. VAT)</small><span class="fs-5 fw-bold">R {{ (tender.finalTotalInclVat || 0) | number:'1.2-2' }}</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Response Documents -->
+  <div *ngIf="activeTab === 'documents'">
+    <div class="table-card">
+      <div class="table-card-header">
+        <strong>Response Documents</strong>
+        <div class="d-flex align-items-center">
+          <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddBidDocumentModal()"><i class="bi bi-plus-lg me-1"></i>Add Document</button>
+          <button class="btn btn-sm btn-success ms-2" *ngIf="isManagerOrAbove" (click)="finaliseResponseDocuments()" [disabled]="finalisingResponseDocuments || tender.responseDocumentsFinalised">
+            {{ tender.responseDocumentsFinalised ? 'Finalised' : 'Finalise Response Documents' }}
+          </button>
+          <button class="btn btn-sm btn-outline-primary ms-2" (click)="exportResponseDocuments()" [disabled]="exportingResponseDocuments">
+            <span *ngIf="exportingResponseDocuments"><span class="spinner-border spinner-border-sm me-1"></span>Exporting…</span>
+            <span *ngIf="!exportingResponseDocuments"><i class="bi bi-download me-1"></i>Download All Documents (ZIP)</span>
+          </button>
+        </div>
+      </div>
+      <div class="table-responsive" *ngIf="!tender.bidDocuments?.length">
+        <table class="table table-hover mb-0">
+          <tbody><tr><td class="empty-state-cell">No response documents yet</td></tr></tbody>
+        </table>
+      </div>
+      <div *ngFor="let group of responseDocumentGroups">
+        <div class="px-3 pt-3 pb-1 fw-semibold small text-uppercase text-muted">{{ group.category }}</div>
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead><tr><th>Document</th><th>Category</th><th>Description</th><th>Version</th><th>Updated</th><th></th></tr></thead>
+            <tbody>
+              <tr *ngFor="let d of group.docs">
+                <td class="fw-semibold">{{ d.displayName || d.fileName }}</td>
+                <td><span class="badge-soft badge-soft-secondary">{{ d.category }}</span></td>
+                <td>{{ d.description || '—' }}</td>
+                <td>v{{ d.version }}</td>
+                <td>{{ d.updatedAt ? (d.updatedAt | date:'d MMM yyyy') : (d.createdAt | date:'d MMM yyyy') }}</td>
+                <td class="text-end">
+                  <ng-container *ngIf="deletingBidDocumentId !== d.id; else confirmDeleteBidDocumentTpl">
+                    <button class="btn btn-sm btn-outline-primary" (click)="viewBidDocument(d)" title="View"><i class="bi bi-eye"></i></button>
+                    <button class="btn btn-sm btn-outline-secondary" (click)="downloadBidDocumentFile(d)" title="Download"><i class="bi bi-download"></i></button>
+                    <ng-container *ngIf="isManagerOrAbove">
+                      <button class="btn btn-sm btn-outline-secondary" (click)="openEditBidDocumentModal(d)" title="Edit"><i class="bi bi-pencil"></i></button>
+                      <label class="btn btn-sm btn-outline-secondary mb-0" title="Replace">
+                        <i class="bi bi-arrow-repeat"></i>
+                        <input type="file" hidden (change)="onReplaceFileSelected(d, $event)" [disabled]="replacingBidDocumentId === d.id">
+                      </label>
+                      <button class="btn btn-sm btn-outline-danger" (click)="confirmDeleteBidDocument(d)" title="Delete"><i class="bi bi-trash"></i></button>
+                    </ng-container>
+                  </ng-container>
+                  <ng-template #confirmDeleteBidDocumentTpl>
+                    <span class="me-2 small text-muted">Delete this document?</span>
+                    <button class="btn btn-sm btn-danger" (click)="executeDeleteBidDocument(d)">Delete</button>
+                    <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteBidDocument()">Cancel</button>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submission -->
+  <div *ngIf="activeTab === 'submission'">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="falcon-card p-3 mb-3">
+          <strong>Submission Readiness</strong>
+          <ul class="list-unstyled mt-2 mb-0">
+            <li *ngFor="let c of submissionReadinessChecks" class="d-flex justify-content-between py-1 border-bottom">
+              <span>{{ c.label }}</span>
+              <span class="badge-soft" [ngClass]="c.ready ? 'badge-soft-success' : 'badge-soft-secondary'">{{ c.ready ? 'Ready' : 'Outstanding' }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="falcon-card p-3">
+          <strong>Final Submission Checks</strong>
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="checkbox" id="check1" [checked]="tender.execSignOffRecorded" (change)="toggleSubmissionCheck('execSignOffRecorded')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check1">Executive sign-off recorded</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="check2" [checked]="tender.fileNamesAndOrderChecked" (change)="toggleSubmissionCheck('fileNamesAndOrderChecked')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check2">File names and page order checked</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="check3" [checked]="tender.portalUploadTestCompleted" (change)="toggleSubmissionCheck('portalUploadTestCompleted')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check3">Portal upload test completed</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="check4" [checked]="tender.proofOfSubmissionSaved" (change)="toggleSubmissionCheck('proofOfSubmissionSaved')" [disabled]="savingSubmissionChecks">
+            <label class="form-check-label" for="check4">Proof of submission saved</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <strong>Export Tender Bid</strong>
+          <div class="row g-2 mt-1 mb-3">
+            <div class="col-6"><small class="text-muted d-block">Readiness</small>{{ tender.progressPercent || 0 }}%</div>
+            <div class="col-6"><small class="text-muted d-block">Final Bid Price</small>R {{ (tender.finalTotalInclVat || 0) | number:'1.2-2' }}</div>
+            <div class="col-6"><small class="text-muted d-block">Response Documents</small>{{ tender.bidDocuments?.length || 0 }}</div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary btn-sm" (click)="exportBid()" [disabled]="exportingBid">
+              <i class="bi bi-download me-1"></i>Export Complete Tender Bid
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" (click)="printSubmissionChecklist()">
+              <i class="bi bi-printer me-1"></i>Print Submission Checklist
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3">
+      <strong>Final Submission Checklist</strong>
+      <div *ngFor="let group of checklistGroups" class="mt-3">
+        <h6 class="fw-semibold">{{ group.sectionNumber }}. {{ group.sectionTitle }}</h6>
+        <div class="form-check" *ngFor="let item of group.items">
+          <input class="form-check-input" type="checkbox" [checked]="item.checked" (change)="toggleChecklistItem(item)" [id]="'checklist-' + item.id">
+          <label class="form-check-label" [for]="'checklist-' + item.id">{{ item.itemText }}</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3" *ngIf="tender.status !== 'SUBMITTED' && tender.status !== 'WITHDRAWN'">
+      <strong>Submit or Withdraw</strong>
+      <div class="row g-2 mt-2">
+        <div class="col-md-6">
+          <label class="form-label">Submission Method</label>
+          <input class="form-control" [(ngModel)]="submitForm.submissionMethod" placeholder="e.g. eTender Portal">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reference</label>
+          <input class="form-control" [(ngModel)]="submitForm.submissionReference">
+        </div>
+      </div>
+      <div class="d-flex gap-2 mt-3">
+        <button class="btn btn-success" (click)="submitTender()" [disabled]="submittingTender || !submitForm.submissionMethod.trim()">
+          {{ submittingTender ? 'Submitting…' : 'Submit' }}
+        </button>
+        <button class="btn btn-outline-danger" (click)="withdrawTender()" [disabled]="withdrawingTender">
+          {{ withdrawingTender ? 'Withdrawing…' : 'Withdrawn' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3" *ngIf="tender.status === 'SUBMITTED'">
+      <strong>Submitted Receipt</strong>
+      <div class="row g-2 mt-2">
+        <div class="col-6"><small class="text-muted d-block">Submitted</small>{{ tender.submittedAt | date:'d MMMM yyyy \'at\' HH:mm' }}</div>
+        <div class="col-6"><small class="text-muted d-block">Submitted by</small>{{ tender.submittedByName || '—' }}</div>
+        <div class="col-6"><small class="text-muted d-block">Method</small>{{ tender.submissionMethod || '—' }}</div>
+        <div class="col-6"><small class="text-muted d-block">Reference</small>{{ tender.submissionReference || '—' }}</div>
+        <div class="col-12"><small class="text-muted d-block">Proof of submission</small>{{ tender.proofOfSubmissionSaved ? '✓ Saved' : 'Not saved' }}</div>
+      </div>
+    </div>
+
+    <div class="falcon-card p-3 mt-3" *ngIf="tender.status === 'WITHDRAWN'">
+      <span class="badge-soft badge-soft-secondary">Withdrawn — this bid was not submitted</span>
+    </div>
+  </div>
+
+  <!-- Post-bid -->
+  <div *ngIf="activeTab === 'postbid'">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="table-card">
+          <div class="table-card-header">
+            <strong>Post-bid Follow-ups</strong>
+            <button class="btn btn-sm btn-primary" *ngIf="isManagerOrAbove" (click)="openAddFollowUpModal()"><i class="bi bi-plus-lg me-1"></i>Add Follow-up</button>
+          </div>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item text-muted" *ngIf="!tender.followUps?.length">No follow-ups yet</li>
+            <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let f of tender.followUps">
+              <div>
+                <div [class.text-decoration-line-through]="f.status === 'DONE'">{{ f.description }}</div>
+                <small class="text-muted" *ngIf="f.dueDate">Due {{ f.dueDate | date:'d MMM yyyy' }}</small>
+              </div>
+              <div class="d-flex gap-2" *ngIf="deletingFollowUpId !== f.id; else confirmDeleteFollowUpTpl">
+                <button class="btn btn-sm" [ngClass]="f.status === 'DONE' ? 'btn-outline-secondary' : 'btn-outline-success'" (click)="toggleFollowUpStatus(f)">
+                  {{ f.status === 'DONE' ? 'Reopen' : 'Mark Done' }}
+                </button>
+                <button class="btn btn-sm btn-outline-danger" *ngIf="isManagerOrAbove" (click)="confirmDeleteFollowUp(f)"><i class="bi bi-trash"></i></button>
+              </div>
+              <ng-template #confirmDeleteFollowUpTpl>
+                <div class="d-flex gap-2 align-items-center">
+                  <span class="small text-muted">Delete?</span>
+                  <button class="btn btn-sm btn-danger" (click)="executeDeleteFollowUp(f)">Delete</button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="cancelDeleteFollowUp()">Cancel</button>
+                </div>
+              </ng-template>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="falcon-card p-3">
+          <strong>Outcome and Lessons</strong>
+          <div class="mb-3 mt-2">
+            <label class="form-label">Tender Outcome</label>
+            <select class="form-select" [(ngModel)]="postBidForm.outcome">
+              <option value="PENDING">Pending</option>
+              <option value="WON">Won</option>
+              <option value="LOST">Lost</option>
+              <option value="CANCELLED">Cancelled</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Primary Reason</label>
+            <select class="form-select" [(ngModel)]="postBidForm.outcomeReason">
+              <option value="">—</option>
+              <option value="PRICE">Price</option>
+              <option value="TECHNICAL_SCORE">Technical score</option>
+              <option value="REFERENCES">References</option>
+              <option value="COMPLIANCE">Compliance</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Lesson Learned</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="postBidForm.lessonLearned"></textarea>
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="submitPostBid()" [disabled]="savingPostBid">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Task Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showTaskModal" (click)="closeTaskModal()"></div>
+  <div class="upload-modal" *ngIf="showTaskModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingTaskId ? 'Edit Task' : 'Add Task' }}</h6>
+        <button class="btn-close" (click)="closeTaskModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Task</label><input class="form-control" [(ngModel)]="taskForm.description"></div>
+        <div class="mb-3">
+          <label class="form-label">Allocated To</label>
+          <select class="form-select" (change)="onTaskAllocatedToChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === taskForm.allocatedToId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" class="form-control" [(ngModel)]="taskForm.dueDate"></div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="taskForm.status">
+            <option value="NOT_STARTED">Not started</option>
+            <option value="IN_PROGRESS">In progress</option>
+            <option value="COMPLETE">Complete</option>
+            <option value="OVERDUE">Overdue</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeTaskModal()" [disabled]="savingTask">Cancel</button>
+        <button class="btn btn-primary" (click)="submitTask()" [disabled]="!taskForm.description.trim() || savingTask">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Requirement Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showRequirementModal" (click)="closeRequirementModal()"></div>
+  <div class="upload-modal" *ngIf="showRequirementModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingRequirementId ? 'Edit Requirement' : 'Add Requirement' }}</h6>
+        <button class="btn-close" (click)="closeRequirementModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3">
+          <label class="form-label">Type</label>
+          <select class="form-select" [(ngModel)]="requirementForm.type">
+            <option value="MANDATORY">Mandatory</option>
+            <option value="FUNCTIONALITY">Functionality</option>
+            <option value="TECHNICAL">Technical</option>
+            <option value="COMMERCIAL">Commercial</option>
+          </select>
+        </div>
+        <div class="mb-3"><label class="form-label">Requirement</label><input class="form-control" [(ngModel)]="requirementForm.description"></div>
+        <div class="mb-3">
+          <label class="form-label">Owner</label>
+          <select class="form-select" (change)="onRequirementOwnerChange($any($event.target).value)">
+            <option value="">Select…</option>
+            <option *ngFor="let e of employees" [value]="e.id" [selected]="e.id === requirementForm.ownerId">{{ e.firstName }} {{ e.lastName }}</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="requirementForm.status">
+            <option value="NOT_STARTED">Not started</option>
+            <option value="IN_PROGRESS">In progress</option>
+            <option value="AT_RISK">At risk</option>
+            <option value="COMPLETE">Complete</option>
+          </select>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeRequirementModal()" [disabled]="savingRequirement">Cancel</button>
+        <button class="btn btn-primary" (click)="submitRequirement()" [disabled]="!requirementForm.description.trim() || savingRequirement">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Pricing Line Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showPricingLineModal" (click)="closePricingLineModal()"></div>
+  <div class="upload-modal" *ngIf="showPricingLineModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingPricingLineId ? 'Edit Line' : 'Add Product or Service' }}</h6>
+        <button class="btn-close" (click)="closePricingLineModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Product / Service Name</label><input class="form-control" [(ngModel)]="pricingLineForm.itemName"></div>
+        <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="pricingLineForm.description"></div>
+        <div class="row g-2 mb-3">
+          <div class="col-6"><label class="form-label">Quantity</label><input type="number" class="form-control" [(ngModel)]="pricingLineForm.quantity"></div>
+          <div class="col-6"><label class="form-label">Unit Cost (excl. VAT)</label><input type="number" class="form-control" [(ngModel)]="pricingLineForm.unitCost"></div>
+        </div>
+        <div class="mb-3"><label class="form-label">Supplier</label><input class="form-control" [(ngModel)]="pricingLineForm.supplierName"></div>
+        <div class="mb-3"><label class="form-label">Supplier Quote / Reference</label><input class="form-control" [(ngModel)]="pricingLineForm.supplierReference"></div>
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <label class="form-label">VAT Rate</label>
+            <select class="form-select" [(ngModel)]="pricingLineForm.vatRate">
+              <option [ngValue]="15">15%</option>
+              <option [ngValue]="0">0% (VAT exempt)</option>
+            </select>
+          </div>
+          <div class="col-6"><label class="form-label">Profit Markup %</label><input type="number" class="form-control" [(ngModel)]="pricingLineForm.profitMarkupPercent"></div>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closePricingLineModal()" [disabled]="savingPricingLine">Cancel</button>
+        <button class="btn btn-primary" (click)="submitPricingLine()" [disabled]="!pricingLineForm.itemName.trim() || savingPricingLine">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Bid Document Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showBidDocumentModal" (click)="closeBidDocumentModal()"></div>
+  <div class="upload-modal" *ngIf="showBidDocumentModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ bidDocumentModalMode === 'add' ? 'Add Document' : 'Edit Document' }}</h6>
+        <button class="btn-close" (click)="closeBidDocumentModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <input class="form-control" [(ngModel)]="bidDocumentForm.category" placeholder="e.g. Executive & Bid Response">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Display Name</label>
+          <input class="form-control" [(ngModel)]="bidDocumentForm.displayName" placeholder="Optional">
+        </div>
+        <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="bidDocumentForm.description"></div>
+        <div class="mb-3" *ngIf="bidDocumentModalMode === 'add'">
+          <label class="form-label">File</label>
+          <div class="file-drop-zone" [class.has-file]="bidDocumentFile">
+            <i class="bi bi-file-earmark fs-2" [class.text-danger]="bidDocumentFile" [class.text-muted]="!bidDocumentFile"></i>
+            <div class="mt-2 small">
+              <span *ngIf="bidDocumentFile">{{ bidDocumentFile.name }}</span>
+              <span *ngIf="!bidDocumentFile">Click to select a file</span>
+            </div>
+            <input type="file" (change)="onBidDocumentFileSelected($event)">
+          </div>
+        </div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeBidDocumentModal()" [disabled]="savingBidDocument">Cancel</button>
+        <button class="btn btn-primary" (click)="submitBidDocument()"
+                [disabled]="savingBidDocument || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Follow-up Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showFollowUpModal" (click)="closeFollowUpModal()"></div>
+  <div class="upload-modal" *ngIf="showFollowUpModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">Add Follow-up</h6>
+        <button class="btn-close" (click)="closeFollowUpModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Description</label><input class="form-control" [(ngModel)]="followUpForm.description"></div>
+        <div class="mb-3"><label class="form-label">Due Date</label><input type="date" class="form-control" [(ngModel)]="followUpForm.dueDate"></div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeFollowUpModal()" [disabled]="savingFollowUp">Cancel</button>
+        <button class="btn btn-primary" (click)="submitFollowUp()" [disabled]="!followUpForm.description.trim() || savingFollowUp">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit JV Partner Modal -->
+  <div class="modal-backdrop-custom" *ngIf="showJvPartnerModal" (click)="closeJvPartnerModal()"></div>
+  <div class="upload-modal" *ngIf="showJvPartnerModal">
+    <div class="upload-modal-content">
+      <div class="upload-modal-header">
+        <h6 class="mb-0 fw-semibold">{{ editingJvPartnerId ? 'Edit' : 'Add' }} Partner</h6>
+        <button class="btn-close" (click)="closeJvPartnerModal()"></button>
+      </div>
+      <div class="upload-modal-body">
+        <div class="mb-3"><label class="form-label">Partner Name</label><input class="form-control" [(ngModel)]="jvPartnerForm.partnerName"></div>
+        <div class="mb-3"><label class="form-label">Role</label><input class="form-control" [(ngModel)]="jvPartnerForm.role" placeholder="Optional"></div>
+      </div>
+      <div class="upload-modal-footer">
+        <button class="btn btn-outline-secondary" (click)="closeJvPartnerModal()" [disabled]="savingJvPartner">Cancel</button>
+        <button class="btn btn-primary" (click)="submitJvPartner()" [disabled]="!jvPartnerForm.partnerName.trim() || savingJvPartner">Save</button>
+      </div>
+    </div>
+  </div>
+</ng-container>

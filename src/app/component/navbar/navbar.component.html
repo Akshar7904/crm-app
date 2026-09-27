@@ -14,7 +14,7 @@
     <div class="navbar-left">
       <!-- Mobile logo — shown on phones only, replaces hamburger -->
       <a routerLink="/home" class="mobile-nav-logo">
-        <img src="assets/logo_icon.png" alt="Enterprize360" class="mobile-nav-logo-img">
+        <img src="assets/enterprise360-icon.png" alt="Enterprise360" class="mobile-nav-logo-img">
       </a>
       <!-- Hamburger — shown on tablet only (768–992px range) -->
       <button
@@ -68,7 +68,7 @@
             <span class="user-name">
               {{ user?.firstName }} {{ user?.lastName }}
             </span>
-            <span class="user-role">{{ user?.roleName || 'Employee' }}</span>
+            <span class="user-role">{{ getUserRoleName() || 'Employee' }}</span>
           </div>
 
           <i class="bi bi-chevron-down dropdown-arrow d-none d-lg-block"></i>
@@ -104,6 +104,26 @@
               <i class="bi bi-person-circle"></i>
               My Profile
             </a>
+          </li>
+          <li>
+            <a class="dropdown-item" [routerLink]="['/profile']" [queryParams]="{tab: 'theme'}">
+              <i class="bi bi-palette2"></i>
+              My Theme
+            </a>
+          </li>
+
+          <li><hr class="dropdown-divider" /></li>
+
+          <li class="dropdown-section-label">Layout</li>
+          <li class="layout-switcher">
+            <button type="button" class="layout-switch-btn" [class.active]="(layoutMode$ | async) === 'sidebar'" (click)="setLayoutMode('sidebar')">
+              <i class="bi bi-layout-sidebar"></i>
+              Sidebar
+            </button>
+            <button type="button" class="layout-switch-btn" [class.active]="(layoutMode$ | async) === 'topnav'" (click)="setLayoutMode('topnav')">
+              <i class="bi bi-menu-up"></i>
+              Top Nav
+            </button>
           </li>
 
           <li><hr class="dropdown-divider" /></li>

@@ -1,18 +1,31 @@
 <section *ngIf="(loginState$ | async) as state" [ngSwitch]="state.dataState">
 
-  <div class="login-container">
-    <div class="auth-card">
-      <div class="auth-card__glow"></div>
-      <div class="auth-card__inner">
+  <div class="e360-login-shell">
+    <div class="e360-login-card">
 
-        <div class="auth-card__brand">
-          <div class="auth-card__logo-box">
+      <!-- Left: static Enterprise360 brand panel -->
+      <div class="e360-login-panel">
+        <div class="e360-login-panel__blob" aria-hidden="true"></div>
+        <div class="e360-login-panel__content">
+          <img src="assets/enterprise360-logo-transparent.png" alt="Enterprise360" class="e360-login-panel__logo">
+          <div class="e360-login-panel__copy">
+            <h3>Run the Business,<span>Not the Admin</span></h3>
+            <p>One connected workspace for your people, payroll, projects and more — sign in to pick up where you left off.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: form zone (existing step flow, unchanged logic) -->
+      <div class="e360-login-form-zone">
+
+        <div class="e360-login-brand-mini">
+          <div class="e360-login-logo-box">
             <ng-container *ngIf="branding.branding as b; else defaultLogo">
-              <img [src]="b.logoUrl" [alt]="b.name" class="auth-card__logo"
+              <img [src]="b.logoUrl" [alt]="b.name" class="e360-login-logo"
                    (error)="$any($event.target).style.display='none'">
             </ng-container>
             <ng-template #defaultLogo>
-              <img src="assets/logo_icon.png" alt="Enterprize360" class="auth-card__logo">
+              <img src="assets/enterprise360-icon.png" alt="Enterprise360" class="e360-login-logo">
             </ng-template>
           </div>
         </div>
@@ -35,9 +48,14 @@
               <label for="email">Email Address</label>
               <div class="input-wrapper">
                 <i class="bi bi-envelope"></i>
-                <input ngModel type="email" name="email" id="email" class="form-control"
+                <input #email="ngModel" ngModel type="email" name="email" id="email" class="form-control"
                   placeholder="Enter your email" required
-                  [disabled]="state.dataState === DataState.LOADING">
+                  [disabled]="state.dataState === DataState.LOADING"
+                  [class.is-invalid]="email.invalid && email.touched">
+              </div>
+              <div class="form-error" *ngIf="email.invalid && email.touched">
+                <span *ngIf="email.errors?.['required']">This field is required.</span>
+                <span *ngIf="email.errors?.['email']">Please enter a valid email address.</span>
               </div>
             </div>
 
@@ -110,9 +128,13 @@
               <label for="password">Password</label>
               <div class="input-wrapper">
                 <i class="bi bi-lock"></i>
-                <input ngModel type="password" name="password" id="password" class="form-control"
+                <input #password="ngModel" ngModel type="password" name="password" id="password" class="form-control"
                   placeholder="Enter your password" required
-                  [disabled]="state.dataState === DataState.LOADING">
+                  [disabled]="state.dataState === DataState.LOADING"
+                  [class.is-invalid]="password.invalid && password.touched">
+              </div>
+              <div class="form-error" *ngIf="password.invalid && password.touched">
+                <span *ngIf="password.errors?.['required']">This field is required.</span>
               </div>
             </div>
 
@@ -141,7 +163,8 @@
           <div class="form-header">
             <div class="mfa-icon"><i class="bi bi-shield-lock"></i></div>
             <h2>Two-Factor Authentication</h2>
-            <p>Enter the 6-digit code from your <strong>authenticator app</strong></p>
+            <p *ngIf="state.mfaType !== 'EMAIL'">Enter the 6-digit code from your <strong>authenticator app</strong></p>
+            <p *ngIf="state.mfaType === 'EMAIL'">Enter the 6-digit code we emailed you</p>
           </div>
 
           <div *ngIf="state.dataState === DataState.ERROR" class="alert alert-danger" role="alert">
@@ -168,14 +191,15 @@
 
           <div class="form-footer">
             <p><a (click)="backToEmail()" class="back-link"><i class="bi bi-arrow-left me-1"></i>Back to Login</a></p>
-            <p class="resend-text">Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current code.</p>
+            <p class="resend-text" *ngIf="state.mfaType !== 'EMAIL'">Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current code.</p>
+            <p class="resend-text" *ngIf="state.mfaType === 'EMAIL'">Check your inbox — the code was just emailed to you.</p>
           </div>
         </ng-container>
 
         </div>
       </div>
     </div>
-    <p class="auth-shell-copy">&copy; 2026 Enterprize360 by Silver Spectrum Solutions (PTY) LTD</p>
+    <p class="e360-login-footer-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 
 </section>

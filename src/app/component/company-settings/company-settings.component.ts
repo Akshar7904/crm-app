@@ -5,7 +5,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CompanyService } from 'src/app/service/company.service';
-import { BrandingService } from 'src/app/service/branding.service';
+import { BrandingService, ThemeTokens, suggestTextColor } from 'src/app/service/branding.service';
 import { NotificationService } from 'src/app/service/notification.service';
 import { environment } from '@env/environment';
 
@@ -27,6 +27,11 @@ export class CompanySettingsComponent implements OnInit {
   selectedLogoFile: File | null = null;
   uploadingLogo = false;
 
+  // Theme
+  theme: ThemeTokens = {};
+  advanced: { [K in keyof ThemeTokens]?: boolean } = {};
+  savingTheme = false;
+
   constructor(
     private companyService: CompanyService,
     public branding: BrandingService,
@@ -41,6 +46,7 @@ export class CompanySettingsComponent implements OnInit {
     this.companyService.getMyCompany$().subscribe({
       next: res => {
         this.company = res?.data?.company ?? null;
+        this.theme = this.parseThemeJson(this.company?.themeJson);
         this.loading = false;
         this.cdr.markForCheck();
       },
@@ -51,8 +57,8 @@ export class CompanySettingsComponent implements OnInit {
   save(form: NgForm): void {
     if (form.invalid) return;
     this.saving = true;
-    const { name, tagline, primaryColor, email, phone, address } = form.value;
-    this.companyService.updateMyBranding$({ name, tagline, primaryColor, email, phone, address }).subscribe({
+    const { name, tagline, primaryColor, email, phone, address, employeeIdPrefix } = form.value;
+    this.companyService.updateMyBranding$({ name, tagline, primaryColor, email, phone, address, employeeIdPrefix }).subscribe({
       next: res => {
         this.company = res?.data?.company ?? this.company;
         this.branding.clear(); // force reload so sidebar/theme updates
@@ -94,6 +100,54 @@ export class CompanySettingsComponent implements OnInit {
   }
 
   get logoUrl(): string | null {
-    return this.company?.id ? `${environment.apiUrl}/api/v1/companies/${this.company.id}/logo` : null;
+    if (!this.company?.id) return null;
+    // Cache-bust with updatedAt — the logo endpoint has a 24h Cache-Control
+    // and a fixed URL, so without this a re-uploaded logo won't show until
+    // the browser cache expires.
+    const v = this.company.updatedAt ? new Date(this.company.updatedAt).getTime() : '';
+    return `${environment.apiUrl}/api/v1/companies/${this.company.id}/logo?v=${v}`;
+  }
+
+  private parseThemeJson(raw: string | null | undefined): ThemeTokens {
+    if (!raw) return {};
+    try { return JSON.parse(raw); } catch { return {}; }
+  }
+
+  onBgChange(bgKey: keyof ThemeTokens, textKey: keyof ThemeTokens, value: string): void {
+    this.theme = { ...this.theme, [bgKey]: value };
+    if (!this.advanced[textKey]) {
+      this.theme = { ...this.theme, [textKey]: suggestTextColor(value) };
+    }
+    this.cdr.markForCheck();
+  }
+
+  onTextChange(textKey: keyof ThemeTokens, value: string): void {
+    this.theme = { ...this.theme, [textKey]: value };
+    this.cdr.markForCheck();
+  }
+
+  toggleAdvanced(textKey: keyof ThemeTokens): void {
+    this.advanced[textKey] = !this.advanced[textKey];
+    this.cdr.markForCheck();
+  }
+
+  saveTheme(): void {
+    this.savingTheme = true;
+    this.companyService.updateMyBranding$({ theme: JSON.stringify(this.theme) }).subscribe({
+      next: () => {
+        this.savingTheme = false;
+        this.notification.onDefault('Theme saved');
+        this.branding.clear();
+        this.branding.load().subscribe();
+        this.cdr.markForCheck();
+      },
+      error: err => { this.notification.onError(err); this.savingTheme = false; this.cdr.markForCheck(); }
+    });
+  }
+
+  resetTheme(): void {
+    if (!confirm('Reset the company theme to the platform default for everyone at your company?')) return;
+    this.theme = {};
+    this.saveTheme();
   }
 }

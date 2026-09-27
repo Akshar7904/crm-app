@@ -1,0 +1,519 @@
+@import '../../../../styles/variables';
+
+.table-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-md;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-wrap: wrap;
+}
+
+// ── Tab Nav ───────────────────────────────────────────────────────────────
+.detail-tab-nav {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.detail-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 16px;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  border-radius: 0;
+  transition: color 0.15s;
+
+  &:hover { color: var(--text-primary); }
+
+  &.active {
+    color: $primary;
+    border-bottom-color: $primary;
+    font-weight: 600;
+  }
+}
+
+.tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: var(--bg-hover);
+  color: var(--text-muted);
+  border-radius: 9px;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.filter-tab {
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &.active {
+    background: $primary;
+    color: #fff;
+    border-color: $primary;
+  }
+
+  &:hover:not(.active) {
+    background: var(--bg-hover);
+  }
+}
+
+// ── Info grid ─────────────────────────────────────────────────────────────
+.info-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+}
+
+.info-value {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+// ── Summary Sidebar ───────────────────────────────────────────────────────
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.85rem;
+
+  &:last-child { border-bottom: none; }
+}
+
+.summary-label { color: var(--text-muted); }
+.summary-value { font-weight: 500; text-align: right; }
+
+// ── Tasks ─────────────────────────────────────────────────────────────────
+.task-group-header {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin: 10px 0 6px;
+}
+
+.task-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child { border-bottom: none; }
+
+  .task-main { flex: 1; min-width: 200px; }
+
+  .task-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.task-comments {
+  flex-basis: 100%;
+  width: 100%;
+  background: var(--bg-hover);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.comment-item {
+  font-size: 0.82rem;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child { border-bottom: none; }
+}
+
+// ── Kanban ────────────────────────────────────────────────────────────────
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.kanban-column {
+  background: var(--bg-hover);
+  border-radius: 10px;
+  padding: 10px;
+  min-width: 220px;
+}
+
+.kanban-column-header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kanban-column-body {
+  min-height: 40px; // keeps an empty column a valid, visible drop target
+}
+
+.kanban-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  font-size: 0.85rem;
+  cursor: grab;
+
+  &.cdk-drag-preview {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    cursor: grabbing;
+  }
+
+  &.cdk-drag-animating {
+    transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+.kanban-card-placeholder {
+  background: var(--bg-hover);
+  border: 2px dashed var(--border-color);
+  border-radius: 8px;
+  min-height: 54px;
+  margin-bottom: 8px;
+}
+
+.kanban-column-body.cdk-drop-list-dragging .kanban-card:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.badge-lg { font-size: 0.9rem; padding: 6px 12px; }
+
+// ── Milestones ────────────────────────────────────────────────────────────
+.milestone-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 12px;
+}
+
+.member-row {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+.progress {
+  background: var(--bg-hover);
+  border-radius: 4px;
+  overflow: hidden;
+
+  .progress-bar {
+    background: var(--bs-primary, #0d6efd);
+    transition: width 300ms ease;
+  }
+}
+
+// ── Attachment viewer (in-app preview) ──────────────────────────────────────
+// Mirrors employee-detail.component.scss's .doc-viewer-* pattern.
+.attachment-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  animation: attachmentViewerFadeIn 0.2s ease;
+}
+
+.attachment-viewer-panel {
+  background: var(--bg-card);
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 960px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.attachment-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.attachment-viewer-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.attachment-viewer-icon {
+  font-size: 1.3rem;
+  color: $primary;
+  flex-shrink: 0;
+}
+
+.attachment-viewer-name {
+  font-weight: $font-weight-semibold;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
+}
+
+.attachment-viewer-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.attachment-viewer-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: $border-radius;
+  font-size: 0.8rem;
+  font-weight: $font-weight-semibold;
+  border: 1px solid var(--border-color);
+  background: var(--table-header-bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all $transition-base;
+
+  &:hover { background: rgba($primary, 0.08); border-color: rgba($primary, 0.3); color: $primary; }
+
+  &.attachment-viewer-btn-download {
+    background: rgba($primary, 0.08);
+    border-color: rgba($primary, 0.25);
+    color: $primary;
+
+    &:hover { background: $primary; color: #fff; }
+  }
+}
+
+.attachment-viewer-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: $border-radius;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all $transition-base;
+
+  &:hover { background: rgba($danger, 0.1); border-color: rgba($danger, 0.3); color: $danger; }
+}
+
+.attachment-viewer-body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--bg-main);
+}
+
+.attachment-viewer-iframe {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  border: none;
+  display: block;
+}
+
+.attachment-viewer-image-wrap {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  background: repeating-conic-gradient(var(--border-light) 0% 25%, transparent 0% 50%) 0 0 / 20px 20px;
+}
+
+.attachment-viewer-image {
+  max-width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: $border-radius-lg;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.attachment-viewer-unsupported {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  padding: $spacing-xl * 2;
+  text-align: center;
+  color: var(--text-muted);
+
+  i { font-size: 4rem; color: rgba($primary, 0.3); margin-bottom: $spacing-lg; }
+  p { font-size: 1rem; color: var(--text-secondary); margin-bottom: 6px; }
+}
+
+@keyframes attachmentViewerFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+// ── Task edit modal ─────────────────────────────────────────────────────────
+.task-edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  animation: attachmentViewerFadeIn 0.2s ease;
+}
+
+.task-edit-panel {
+  background: var(--bg-card);
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.task-edit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.task-edit-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.task-edit-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+// ── Closure modal ────────────────────────────────────────────────────────────
+.closure-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1060;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  animation: attachmentViewerFadeIn 0.2s ease;
+}
+
+.closure-modal-panel {
+  background: var(--bg-card);
+  border-radius: $border-radius-xl;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.closure-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+.closure-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.closure-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+}

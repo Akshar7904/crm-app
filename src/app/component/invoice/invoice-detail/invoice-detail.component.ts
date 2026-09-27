@@ -36,6 +36,8 @@ export class InvoiceDetailComponent implements OnInit {
   isLoading$ = this.isLoadingSubject.asObservable();
   private isSendingSubject = new BehaviorSubject<boolean>(false);
   isSending$ = this.isSendingSubject.asObservable();
+  private isSharingSubject = new BehaviorSubject<boolean>(false);
+  isSharing$ = this.isSharingSubject.asObservable();
   readonly DataState = DataState;
 
   // Edit mode
@@ -451,6 +453,86 @@ export class InvoiceDetailComponent implements OnInit {
 
   printInvoice(): void {
     window.print();
+  }
+
+  // Hand the invoice PDF to the OS share sheet where supported, otherwise download it
+  shareInvoice(): void {
+    const element = document.getElementById('invoice');
+    if (!element) return;
+    const invoiceNumber = this.dataSubject.value?.data['invoice']?.invoiceNumber || 'invoice';
+    const filename = `invoice-${invoiceNumber}.pdf`;
+
+    this.isSharingSubject.next(true);
+    this.cdr.markForCheck();
+
+    html2canvas(element, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false })
+      .then(canvas => {
+        const doc = new pdf('p', 'mm', 'a4');
+        const margin = 10;
+        const pageWidth  = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const printableW = pageWidth  - margin * 2;
+        const printableH = pageHeight - margin * 2;
+        const pxPerMm    = canvas.width / printableW;
+        const pageHeightPx = printableH * pxPerMm;
+        let yOffset = 0;
+
+        while (yOffset < canvas.height) {
+          const sliceH = Math.min(pageHeightPx, canvas.height - yOffset);
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width  = canvas.width;
+          sliceCanvas.height = sliceH;
+          const ctx = sliceCanvas.getContext('2d')!;
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+          ctx.drawImage(canvas, 0, yOffset, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+          if (yOffset > 0) doc.addPage();
+          doc.addImage(sliceCanvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, margin, printableW, sliceH / pxPerMm);
+          yOffset += pageHeightPx;
+        }
+
+        const pdfBlob: Blob = doc.output('blob');
+        const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+        const nav = navigator as any;
+
+        if (nav.canShare && nav.canShare({ files: [file] })) {
+          nav.share({ files: [file], title: filename, text: `Invoice ${invoiceNumber}` })
+            .catch(() => { /* user cancelled the share sheet — not an error */ })
+            .finally(() => { this.isSharingSubject.next(false); this.cdr.markForCheck(); });
+        } else {
+          doc.save(filename);
+          this.isSharingSubject.next(false);
+          this.cdr.markForCheck();
+        }
+      })
+      .catch(() => {
+        this.notification.onError('Failed to generate PDF for sharing');
+        this.isSharingSubject.next(false);
+        this.cdr.markForCheck();
+      });
+  }
+
+  // Delete an untouched invoice outright; a sent/paid invoice is cancelled instead
+  deleteInvoice(): void {
+    const invoice = this.dataSubject.value?.data?.['invoice'];
+    if (!invoice?.id) return;
+    if (!confirm(`Delete invoice #${invoice.invoiceNumber}? Invoices already sent or paid will be cancelled instead of removed.`)) {
+      return;
+    }
+    this.isLoadingSubject.next(true);
+    this.customerService.deleteInvoice$(invoice.id)
+      .subscribe({
+        next: (response) => {
+          this.notification.onSuccess(response.message || 'Invoice removed');
+          this.isLoadingSubject.next(false);
+          this.router.navigate(['/invoices']);
+        },
+        error: (error) => {
+          this.notification.onError(error);
+          this.isLoadingSubject.next(false);
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   // Format currency for display

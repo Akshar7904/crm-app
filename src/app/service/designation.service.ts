@@ -5,7 +5,7 @@
 import { environment } from '@env/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, EMPTY } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Designation, DesignationForm } from '../component/designation/designation.model';
 import { DesignationState } from '../interface/designation-state';
@@ -31,6 +31,8 @@ export class DesignationService {
 
   public designationState$ = this.designationStateSubject.asObservable();
 
+  private loadedKeys = new Set<string>();
+
   constructor(private http: HttpClient) {}
 
   /**
@@ -53,7 +55,11 @@ export class DesignationService {
   /**
    * Get all designations with pagination
    */
-  getDesignations(page: number = 0, size: number = 10): Observable<any> {
+  getDesignations(page: number = 0, size: number = 10, force: boolean = false): Observable<any> {
+    const cacheKey = `list:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setState({ loading: true, error: null });
 
     const params = new HttpParams()
@@ -72,6 +78,7 @@ export class DesignationService {
           loading: false,
           error: null
         });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         this.setState({ loading: false, error: error.error?.message || 'Failed to load designations' });
@@ -119,7 +126,11 @@ export class DesignationService {
   /**
    * Search designations
    */
-  searchDesignations(searchTerm: string, page: number = 0, size: number = 10): Observable<any> {
+  searchDesignations(searchTerm: string, page: number = 0, size: number = 10, force: boolean = false): Observable<any> {
+    const cacheKey = `search:${searchTerm}:${page}:${size}`;
+    if (!force && this.loadedKeys.has(cacheKey)) {
+      return EMPTY;
+    }
     this.setState({ loading: true, error: null });
 
     const params = new HttpParams()
@@ -139,6 +150,7 @@ export class DesignationService {
           loading: false,
           error: null
         });
+        this.loadedKeys.add(cacheKey);
       }),
       catchError(error => {
         this.setState({ loading: false, error: error.error?.message || 'Failed to search designations' });
@@ -155,6 +167,7 @@ export class DesignationService {
 
     return this.http.post<any>(this.apiUrl, form).pipe(
       tap(response => {
+        this.loadedKeys.clear();
         this.setState({ loading: false });
       }),
       catchError(error => {
@@ -172,6 +185,7 @@ export class DesignationService {
 
     return this.http.put<any>(`${this.apiUrl}/${id}`, form).pipe(
       tap(response => {
+        this.loadedKeys.clear();
         this.setState({ loading: false });
       }),
       catchError(error => {
@@ -189,6 +203,7 @@ export class DesignationService {
 
     return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
       tap(response => {
+        this.loadedKeys.clear();
         // Remove from local state
         const updatedDesignations = this.state.designations.filter(desig => desig.id !== id);
         this.setState({

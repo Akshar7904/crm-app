@@ -30,7 +30,7 @@
 .badge-soft-draft      { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(108,117,125,0.1); color: #6c757d; }
 .badge-soft-processed  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(52,152,219,0.12); color: #2980b9; }
 .badge-soft-paid       { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(39,174,96,0.12); color: #27ae60; }
-.badge-soft-cancelled  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1); color: #dc3545; }
+.badge-soft-cancelled  { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(220,53,69,0.1); color: $danger; }
 .badge-soft-approved   { display: inline-flex; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; background: rgba(241,196,15,0.15); color: #b38600; }
 
 // ─── Action Buttons
@@ -48,7 +48,7 @@
   &.action-btn-pay      { background: rgba(241,196,15,0.12); color: #b38600; &:hover { background: rgba(241,196,15,0.22); } }
   &.action-btn-download { background: rgba(39,174,96,0.1);   color: #27ae60; &:hover { background: rgba(39,174,96,0.2); } }
   &.action-btn-calc     { background: rgba(155,89,182,0.1);  color: #8e44ad; &:hover { background: rgba(155,89,182,0.2); } }
-  &.action-btn-cancel   { background: rgba(220,53,69,0.08);  color: #dc3545; &:hover { background: rgba(220,53,69,0.18); } }
+  &.action-btn-cancel   { background: rgba(220,53,69,0.08);  color: $danger; &:hover { background: rgba(220,53,69,0.18); } }
 
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
@@ -63,8 +63,8 @@
 }
 .pay-error {
   text-align: center; padding: 60px 24px; color: var(--text-muted, #aaa);
-  i { font-size: 3rem; display: block; margin-bottom: 16px; color: #dc3545; opacity: 0.5; }
-  h5 { color: #dc3545; margin-bottom: 8px; }
+  i { font-size: 3rem; display: block; margin-bottom: 16px; color: $danger; opacity: 0.5; }
+  h5 { color: $danger; margin-bottom: 8px; }
   p  { font-size: 0.85rem; }
 }
 .pay-loading { text-align: center; padding: 60px; color: var(--text-muted, #888); font-size: 0.9rem; margin: 0 24px; }
