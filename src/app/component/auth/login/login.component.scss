@@ -1,19 +1,29 @@
 // ========================================
-// LOGIN PAGE - Centered Card
-// Enterprize360 Payroll System
+// LOGIN PAGE — split brand-panel card
+// Styled after the IMPALA project's sign-in card (rounded panel, diagonal
+// gradient blob, pill inputs/button) but adapted for Enterprise360's own
+// colors and its real 3-step + MFA flow (IMPALA's card is a 2-way toggle
+// between sign-in/report-issue forms — this page is a forward wizard, so
+// the left panel stays static brand content instead of sliding/toggling).
 // ========================================
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
-@import '../../../../styles/auth-card';
 
-// Host element - ensure full width
+// Enterprise360 platform-brand colors for the static left panel — distinct
+// from the tenant-brand CSS vars (--orion-primary etc.) used on the right,
+// since the panel is a "powered by Enterprise360" surface shown the same
+// way regardless of which company's tenant is signing in. Matches the
+// palette used on the public landing page (demo.component.scss).
+$e360-navy:  #063a5c;
+$e360-blue:  #0778ba;
+$e360-green: #4ea41b;
+
 :host {
   display: block;
   width: 100%;
   min-height: 100vh;
 }
 
-// Section wrapper - full screen
 section {
   display: block;
   width: 100%;
@@ -22,44 +32,167 @@ section {
   padding: 0;
 }
 
-// Full-screen backdrop hosting the centered auth card (shared shell in
-// styles/_auth-card.scss provides .auth-card/.auth-card__* /.auth-shell-copy)
-.login-container {
+.e360-login-shell {
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  min-height: 100vh;
-  width: 100vw;
   padding: 40px 20px;
-  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: auto;
-  z-index: 9999;
+  background: $gray-50;
 }
 
-.company-brand-logo { max-height: 64px; }
+.e360-login-card {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  min-height: 600px;
+  background: $white;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(6, 58, 92, .18);
+  overflow: hidden;
+  display: flex;
+
+  @include respond-to('lg') {
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+// ── Left: static brand panel ────────────────────────────────────────────
+.e360-login-panel {
+  position: relative;
+  flex: 0 0 42%;
+  overflow: hidden;
+  background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
+
+  @include respond-to('lg') {
+    flex: 0 0 auto;
+    padding: 36px 24px 30px;
+  }
+}
+
+.e360-login-panel__blob {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .16), transparent 45%),
+    radial-gradient(circle at 82% 88%, rgba(255, 255, 255, .12), transparent 50%);
+  pointer-events: none;
+}
+
+.e360-login-panel__content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 40px;
+  color: $white;
+
+  @include respond-to('lg') {
+    height: auto;
+    padding: 0;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.e360-login-panel__logo {
+  height: 46px;
+  width: auto;
+  align-self: flex-start;
+  background: $white;
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+
+  @include respond-to('lg') { align-self: center; }
+}
+
+.e360-login-panel__copy {
+  h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    span { display: block; color: #bdf3c9; }
+  }
+
+  p {
+    font-size: .9rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, .82);
+    max-width: 320px;
+
+    @include respond-to('lg') { max-width: 100%; }
+  }
+}
+
+// ── Right: form zone ─────────────────────────────────────────────────────
+.e360-login-form-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 56px;
+
+  @include respond-to('lg') { padding: 36px 24px; }
+  @include respond-to('sm') { padding: 30px 18px; }
+}
+
+.e360-login-brand-mini {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.e360-login-logo-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid $gray-200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $white;
+}
+
+.e360-login-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.e360-login-footer-copy {
+  color: $gray-400;
+  font-size: $font-size-xs;
+  text-align: center;
+  margin: 0;
+}
 
 // Login Form Wrapper
 .login-form-wrapper {
   width: 100%;
+  max-width: 380px;
 }
 
 // Form Header
 .form-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 
   h2 {
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-semibold;
+    font-size: 1.65rem;
+    font-weight: 700;
     color: $gray-900;
-    margin-bottom: $spacing-sm;
+    margin-bottom: 6px;
   }
 
   p {
@@ -73,7 +206,7 @@ section {
 .mfa-icon {
   width: 70px;
   height: 70px;
-  background: $gradient-primary;
+  background: var(--orion-primary);
   border-radius: 50%;
   @include flex-center;
   margin: 0 auto 20px;
@@ -105,7 +238,7 @@ section {
 
 // Form Group
 .form-group {
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 
   label {
     display: block;
@@ -116,36 +249,36 @@ section {
   }
 }
 
-// Input Wrapper with Icon
+// Input Wrapper — pill-shaped, IMPALA-style
 .input-wrapper {
   position: relative;
 
   i {
     position: absolute;
-    left: 16px;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
     color: $gray-400;
     font-size: $font-size-lg;
     transition: color $transition-base;
+    z-index: 1;
   }
 
   .form-control {
-    padding: 14px 16px 14px 48px;
+    height: 52px;
+    padding: 0 16px 0 46px;
     font-size: $font-size-sm;
-    border: $border-width-md solid $gray-200;
-    border-radius: $border-radius-lg;
-    transition: all $transition-base;
+    border: none;
+    border-radius: 52px;
     background: $gray-50;
+    transition: background $transition-base, box-shadow $transition-base;
 
     &:focus {
-      border-color: $primary;
-      box-shadow: 0 0 0 4px rgba($primary, 0.1);
       background: $white;
+      box-shadow: 0 0 0 2px var(--orion-primary);
       outline: none;
     }
 
-    &:focus + i,
     &::placeholder {
       color: $gray-400;
     }
@@ -157,7 +290,7 @@ section {
   }
 
   &:focus-within i {
-    color: $primary;
+    color: var(--orion-primary);
   }
 }
 
@@ -167,62 +300,50 @@ section {
   font-size: $font-size-2xl !important;
   letter-spacing: 8px;
   font-weight: $font-weight-semibold;
+  padding-left: 16px !important;
 }
 
 // Form Options
 .form-options {
   @include flex-between;
-  margin-bottom: 25px;
-}
-
-.remember-me {
-  display: flex;
-  align-items: center;
-  gap: $spacing-sm;
-  cursor: pointer;
-  font-size: $font-size-sm;
-  color: $gray-600;
-
-  input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: $primary;
-    cursor: pointer;
-  }
+  margin-bottom: 22px;
 }
 
 .forgot-link {
-  color: $primary;
+  color: var(--orion-primary);
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   text-decoration: none;
-  transition: color $transition-base;
+  transition: opacity $transition-base;
 
   &:hover {
-    color: $primary-light;
+    opacity: .75;
     text-decoration: underline;
   }
 }
 
-// Login Button
+// Login Button — pill, uppercase, IMPALA-style
 .btn-login {
   width: 100%;
-  padding: 14px 24px;
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
+  height: 50px;
+  padding: 0 24px;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
   color: $white;
   background: var(--orion-primary);
   border: none;
-  border-radius: $border-radius-lg;
+  border-radius: 50px;
   cursor: pointer;
   transition: all $transition-slow;
   @include flex-center;
+  gap: 8px;
 
   &:hover:not(:disabled) {
-    background: var(--orion-primary);
-    filter: brightness(0.9);
+    filter: brightness(0.92);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
   }
 
   &:active:not(:disabled) {
@@ -240,7 +361,7 @@ section {
 // Form Footer
 .form-footer {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 26px;
 
   p {
     color: $gray-500;
@@ -249,13 +370,13 @@ section {
   }
 
   a {
-    color: $primary;
+    color: var(--orion-primary);
     font-weight: $font-weight-semibold;
     text-decoration: none;
-    transition: color $transition-base;
+    transition: opacity $transition-base;
 
     &:hover {
-      color: $primary-light;
+      opacity: .75;
       text-decoration: underline;
     }
   }
@@ -272,7 +393,7 @@ section {
   font-size: $font-size-sm;
 }
 
-// ── Company Picker ──────────────────────────────────────────
+// ── Company Picker ───────────────────────────────────────────────────────
 .company-list {
   display: flex;
   flex-direction: column;
@@ -284,18 +405,18 @@ section {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 18px;
+  padding: 14px 18px;
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  background: var(--bg-card);
+  border-radius: 16px;
+  background: $gray-50;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
   width: 100%;
   text-align: left;
 
   &:hover {
-    border-color: $primary;
-    box-shadow: 0 2px 8px rgba($primary, 0.15);
+    border-color: var(--orion-primary);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .08);
     transform: translateY(-1px);
   }
 
@@ -304,14 +425,14 @@ section {
   .company-card-icon {
     width: 40px;
     height: 40px;
-    border-radius: 8px;
-    background: rgba($primary, 0.1);
+    border-radius: 10px;
+    background: $white;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
-    i { color: $primary; font-size: 18px; }
+    i { color: var(--orion-primary); font-size: 18px; }
 
     .company-logo {
       width: 36px;
@@ -346,126 +467,21 @@ section {
   }
 }
 
-// ── Selected company badge shown above password step ────────
+// ── Selected company badge shown above password step ────────────────────
 .selected-company-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 5px 12px;
-  background: rgba($primary, 0.1);
-  color: $primary;
+  background: rgba(0, 0, 0, .04);
+  color: var(--orion-primary);
   border-radius: 20px;
   font-size: $font-size-sm;
   font-weight: 500;
   margin-bottom: 10px;
 }
 
-// ========================================
-// RESPONSIVE DESIGN
-// ========================================
-
-// Tablet and Below
-@include respond-to('lg') {
-  .login-container {
-    flex-direction: column;
-    position: relative;
-    overflow-y: auto;
-  }
-
-  .login-branding {
-    flex: 0 0 auto;
-    width: 100%;
-    min-width: unset;
-    padding: 40px 30px;
-    min-height: auto;
-  }
-
-  .login-form-container {
-    flex: 0 0 auto;
-    width: 100%;
-    padding: 40px 30px;
-  }
-
-  .brand-logo {
-    height: 90px;
-  }
-
-  .brand-title {
-    font-size: $font-size-3xl;
-  }
-
-  .brand-features {
-    display: none;
-  }
-
-  .branding-footer {
-    position: relative;
-    bottom: auto;
-    margin-top: 20px;
-  }
-}
-
-// Mobile
-@include respond-to('sm') {
-  .login-branding {
-    padding: 30px 20px;
-  }
-
-  .brand-logo {
-    height: 70px;
-  }
-
-  .brand-title {
-    font-size: 1.75rem;
-  }
-
-  .brand-tagline {
-    font-size: $font-size-sm;
-    margin-bottom: 20px;
-  }
-
-  .login-form-container {
-    padding: 30px 20px;
-  }
-
-  .login-form-wrapper {
-    max-width: 100%;
-  }
-
-  .form-header h2 {
-    font-size: $font-size-2xl;
-  }
-
-  .input-wrapper .form-control {
-    padding: 12px 14px 12px 44px;
-  }
-
-  .btn-login {
-    padding: 12px 20px;
-  }
-
-  .form-options {
-    flex-direction: column;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .mfa-icon {
-    width: 60px;
-    height: 60px;
-
-    i {
-      font-size: 24px;
-    }
-  }
-
-  .code-input {
-    letter-spacing: 5px;
-    font-size: $font-size-xl !important;
-  }
-}
-
-// Legal footer links at bottom of the right panel
+// Legal footer links
 .login-legal-footer {
   display: flex;
   justify-content: center;
@@ -478,27 +494,40 @@ section {
     font-size: .73rem;
     color: #a0aec0;
     text-decoration: none;
-    &:hover { color: $primary; text-decoration: underline; }
+    &:hover { color: var(--orion-primary); text-decoration: underline; }
   }
 
   span { color: $gray-200; font-size: .7rem; }
 }
 
-// Very Small Screens
-@include respond-to('xs') {
-  .login-branding {
-    padding: 25px 15px;
-  }
+// ========================================
+// RESPONSIVE DESIGN
+// ========================================
 
-  .brand-title {
-    font-size: $font-size-2xl;
-  }
-
-  .login-form-container {
-    padding: 25px 15px;
-  }
-
+@include respond-to('sm') {
   .form-header h2 {
-    font-size: 1.35rem;
+    font-size: 1.4rem;
+  }
+
+  .input-wrapper .form-control {
+    padding-left: 42px;
+  }
+
+  .form-options {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .mfa-icon {
+    width: 60px;
+    height: 60px;
+
+    i { font-size: 24px; }
+  }
+
+  .code-input {
+    letter-spacing: 5px;
+    font-size: $font-size-xl !important;
   }
 }

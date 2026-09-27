@@ -1,21 +1,33 @@
 <section *ngIf="(loginState$ | async) as state" [ngSwitch]="state.dataState">
 
-  <div class="login-container">
-    <div class="auth-card">
-      <div class="auth-card__glow"></div>
-      <div class="auth-card__inner">
+  <div class="e360-login-shell">
+    <div class="e360-login-card">
 
-        <div class="auth-card__brand">
-          <div class="auth-card__logo-box">
+      <!-- Left: static Enterprise360 brand panel -->
+      <div class="e360-login-panel">
+        <div class="e360-login-panel__blob" aria-hidden="true"></div>
+        <div class="e360-login-panel__content">
+          <img src="assets/enterprise360-logo-transparent.png" alt="Enterprise360" class="e360-login-panel__logo">
+          <div class="e360-login-panel__copy">
+            <h3>Run the Business,<span>Not the Admin</span></h3>
+            <p>One connected workspace for your people, payroll, projects and more — sign in to pick up where you left off.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: form zone (existing step flow, unchanged logic) -->
+      <div class="e360-login-form-zone">
+
+        <div class="e360-login-brand-mini">
+          <div class="e360-login-logo-box">
             <ng-container *ngIf="branding.branding as b; else defaultLogo">
-              <img [src]="b.logoUrl" [alt]="b.name" class="auth-card__logo"
+              <img [src]="b.logoUrl" [alt]="b.name" class="e360-login-logo"
                    (error)="$any($event.target).style.display='none'">
             </ng-container>
             <ng-template #defaultLogo>
-              <img src="assets/enterprise360-icon.png" alt="Enterprise360" class="auth-card__logo">
+              <img src="assets/enterprise360-icon.png" alt="Enterprise360" class="e360-login-logo">
             </ng-template>
           </div>
-          <span class="auth-card__eyebrow">Sign in</span>
         </div>
 
         <div class="login-form-wrapper">
@@ -187,7 +199,7 @@
         </div>
       </div>
     </div>
-    <p class="auth-shell-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
+    <p class="e360-login-footer-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
 
 </section>

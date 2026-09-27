@@ -69,26 +69,12 @@ export class DemoComponent {
 
   // ── Module Grid ──────────────────────────────────────────────────────────
   selectedModule: any = null;
-  private closeModuleTimer: ReturnType<typeof setTimeout> | null = null;
 
   openModule(mod: any): void {
-    this.cancelCloseModule();
     this.selectedModule = mod;
   }
   closeModule(): void {
-    this.cancelCloseModule();
     this.selectedModule = null;
-  }
-  /** Give the pointer a moment to travel from the tile to the popup before closing, so hovering across the gap doesn't snap it shut. */
-  scheduleCloseModule(): void {
-    this.cancelCloseModule();
-    this.closeModuleTimer = setTimeout(() => { this.selectedModule = null; }, 250);
-  }
-  cancelCloseModule(): void {
-    if (this.closeModuleTimer) {
-      clearTimeout(this.closeModuleTimer);
-      this.closeModuleTimer = null;
-    }
   }
 
   trackByModuleName(_index: number, mod: any): string { return mod.name; }

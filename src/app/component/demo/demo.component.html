@@ -112,7 +112,7 @@
   <section class="lp-modules-section" id="modules">
     <div class="marquee-header">
       <h2 class="lp-section-title">One Business. <span>One Platform.</span> One View.</h2>
-      <p class="lp-section-sub">Hover any module to learn more.</p>
+      <p class="lp-section-sub">Click any module to learn more.</p>
     </div>
     <div class="module-marquee">
       <div class="module-track">
@@ -121,8 +121,6 @@
           class="module-tile"
           [style.--mc]="mod.color"
           [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
-          (mouseenter)="openModule(mod)"
-          (mouseleave)="scheduleCloseModule()"
           (click)="openModule(mod)">
           <span class="module-tile__icon" [innerHTML]="getIconHtml(mod)"></span>
           <div class="module-tile__name">{{ mod.name }}</div>
@@ -134,8 +132,6 @@
           aria-hidden="true"
           [style.--mc]="mod.color"
           [style.background]="'linear-gradient(150deg, ' + mod.color + ' 0%, ' + mod.color + 'cc 100%)'"
-          (mouseenter)="openModule(mod)"
-          (mouseleave)="scheduleCloseModule()"
           (click)="openModule(mod)">
           <span class="module-tile__icon" [innerHTML]="getIconHtml(mod)"></span>
           <div class="module-tile__name">{{ mod.name }}</div>
@@ -350,8 +346,7 @@
 </div>
 
 <!-- ══ MODULE DETAIL MODAL ══════════════════════════════════════ -->
-<div class="mod-modal-backdrop" *ngIf="selectedModule" (click)="closeModule()"
-     (mouseenter)="cancelCloseModule()" (mouseleave)="scheduleCloseModule()">
+<div class="mod-modal-backdrop" *ngIf="selectedModule" (click)="closeModule()">
   <div class="mod-modal" (click)="$event.stopPropagation()">
     <button class="mod-modal-close" (click)="closeModule()"><i class="bi bi-x-lg"></i></button>
     <div class="mod-modal-icon" [style.background]="selectedModule.color + '22'" [style.color]="selectedModule.color">

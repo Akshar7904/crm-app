@@ -56,6 +56,14 @@
   border-radius: 12px;
   width: 100%;
   max-width: 480px;
+  // Constrain to the viewport and let the body (below) scroll internally —
+  // without this, the Add Tender form (10+ fields plus conditional JV/
+  // clarification sections) simply overflowed past the screen edge with
+  // no way to reach the Save button on anything shorter than a large
+  // desktop viewport.
+  max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 20px 60px rgba(0,0,0,.25);
   overflow: hidden;
 }
@@ -66,10 +74,14 @@
   justify-content: space-between;
   padding: 16px 20px;
   border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
 .upload-modal-body {
   padding: 20px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .upload-modal-footer {
@@ -79,4 +91,5 @@
   padding: 14px 20px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-subtle);
+  flex-shrink: 0;
 }
