@@ -44,8 +44,8 @@ section {
 .e360-register-card {
   position: relative;
   width: 100%;
-  max-width: 1020px;
-  min-height: 600px;
+  max-width: 900px;
+  min-height: 560px;
   background: $white;
   border-radius: 24px;
   box-shadow: 0 25px 60px rgba(6, 58, 92, .18);
@@ -114,16 +114,16 @@ section {
 
 .e360-register-panel__copy {
   h3 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     line-height: 1.25;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     span { display: block; color: #bdf3c9; }
   }
 
   p {
-    font-size: .9rem;
-    line-height: 1.65;
+    font-size: .8rem;
+    line-height: 1.6;
     color: rgba(255, 255, 255, .82);
     max-width: 300px;
 
@@ -137,24 +137,24 @@ section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 44px 48px;
+  padding: 32px 44px;
   overflow-y: auto;
   max-height: 100vh;
 
-  @include respond-to('lg') { padding: 36px 24px; max-height: none; }
-  @include respond-to('sm') { padding: 30px 18px; }
+  @include respond-to('lg') { padding: 30px 22px; max-height: none; }
+  @include respond-to('sm') { padding: 24px 18px; }
 }
 
 .e360-register-brand-mini {
   display: flex;
   justify-content: center;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .e360-register-logo-box {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   border: 1px solid $gray-200;
   display: flex;
   align-items: center;
@@ -163,8 +163,8 @@ section {
 }
 
 .e360-register-logo {
-  width: 36px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   object-fit: contain;
 }
 
@@ -184,32 +184,32 @@ section {
 // Form Header
 .form-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 18px;
 
   h2 {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     color: $gray-900;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
   p {
     color: $text-muted;
-    font-size: .85rem;
+    font-size: .78rem;
     margin: 0;
   }
 }
 
 // Success Header
 .success-header {
-  margin-bottom: 25px;
+  margin-bottom: 16px;
 }
 
 .success-icon {
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 
   i {
-    font-size: 70px;
+    font-size: 52px;
     color: #10b981;
   }
 }
@@ -235,24 +235,24 @@ section {
 
 // Form Group — pill-shaped inputs, IMPALA-style
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 
   label {
     display: block;
-    font-size: .85rem;
+    font-size: .78rem;
     font-weight: $font-weight-semibold;
     color: $gray-700;
-    margin-bottom: $spacing-sm;
+    margin-bottom: 4px;
   }
 }
 
 .form-control,
 .form-select {
-  height: 50px;
-  padding: 0 18px;
-  font-size: .9rem;
+  height: 40px;
+  padding: 0 14px;
+  font-size: .82rem;
   border: none;
-  border-radius: 50px;
+  border-radius: 40px;
   background: $gray-50;
   transition: background $transition-base, box-shadow $transition-base;
 
@@ -275,9 +275,9 @@ section {
 // Register Button — pill, uppercase, IMPALA-style
 .btn-register {
   width: 100%;
-  height: 50px;
-  padding: 0 24px;
-  font-size: .82rem;
+  height: 42px;
+  padding: 0 20px;
+  font-size: .76rem;
   font-weight: 700 !important;
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -314,11 +314,11 @@ section {
 // Form Footer
 .form-footer {
   text-align: center;
-  margin-top: 26px;
+  margin-top: 16px;
 
   p {
     color: $gray-500;
-    font-size: .85rem;
+    font-size: .78rem;
     margin: 0;
   }
 
@@ -349,27 +349,27 @@ section {
 .account-type-choice {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 10px;
 }
 
 .account-type-card {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
-  padding: 18px 22px;
+  padding: 13px 16px;
   background: $gray-50;
   border: none;
-  border-radius: 16px;
+  border-radius: 14px;
   cursor: pointer;
   text-align: left;
   transition: all $transition-base;
-  font-size: .95rem;
+  font-size: .85rem;
   font-weight: $font-weight-semibold;
   color: $gray-900;
 
   i {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     color: var(--orion-primary);
     flex-shrink: 0;
   }
@@ -387,20 +387,20 @@ section {
 .plan-cards {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 10px;
 }
 
 .plan-card {
-  padding: 18px 22px;
+  padding: 13px 16px;
   background: $gray-50;
   border: 2px solid transparent;
-  border-radius: 16px;
+  border-radius: 14px;
   cursor: pointer;
   transition: all $transition-base;
 
   h3 {
-    margin: 0 0 6px;
-    font-size: 1.02rem;
+    margin: 0 0 4px;
+    font-size: .92rem;
     font-weight: $font-weight-bold;
     color: $gray-900;
   }
@@ -420,12 +420,13 @@ section {
   margin: 0 0 4px;
   font-weight: $font-weight-semibold;
   color: var(--orion-primary);
+  font-size: .82rem;
 }
 
 .plan-desc {
   margin: 0;
   color: $text-muted;
-  font-size: .85rem;
+  font-size: .76rem;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -434,22 +435,22 @@ section {
 .confirm-step {
   display: flex;
   flex-direction: column;
-  gap: $spacing-md;
+  gap: 10px;
 }
 
 .form-check {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
 
   .form-check-input {
-    margin-top: 4px;
+    margin-top: 3px;
     flex-shrink: 0;
   }
 
   .form-check-label {
     color: $gray-700;
-    font-size: .88rem;
+    font-size: .78rem;
   }
 }
 
@@ -458,8 +459,8 @@ section {
 // ─────────────────────────────────────────────────────────────────────────
 .wizard-nav {
   display: flex;
-  gap: $spacing-md;
-  margin-top: 26px;
+  gap: 10px;
+  margin-top: 18px;
 
   .btn-register {
     margin-top: 0;
@@ -468,9 +469,9 @@ section {
 
 .btn-secondary {
   flex: 0 0 auto;
-  padding: 0 24px;
-  height: 50px;
-  font-size: .82rem;
+  padding: 0 20px;
+  height: 42px;
+  font-size: .76rem;
   font-weight: 700;
   letter-spacing: .04em;
   text-transform: uppercase;

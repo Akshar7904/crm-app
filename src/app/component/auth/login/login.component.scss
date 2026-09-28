@@ -47,8 +47,8 @@ section {
 .e360-login-card {
   position: relative;
   width: 100%;
-  max-width: 960px;
-  min-height: 600px;
+  max-width: 800px;
+  min-height: 440px;
   background: $white;
   border-radius: 24px;
   box-shadow: 0 25px 60px rgba(6, 58, 92, .18);
@@ -117,16 +117,16 @@ section {
 
 .e360-login-panel__copy {
   h3 {
-    font-size: 1.6rem;
+    font-size: 1.35rem;
     font-weight: 700;
     line-height: 1.25;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     span { display: block; color: #bdf3c9; }
   }
 
   p {
-    font-size: .9rem;
-    line-height: 1.65;
+    font-size: .82rem;
+    line-height: 1.6;
     color: rgba(255, 255, 255, .82);
     max-width: 320px;
 
@@ -141,22 +141,22 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px 56px;
+  padding: 36px 48px;
 
-  @include respond-to('lg') { padding: 36px 24px; }
-  @include respond-to('sm') { padding: 30px 18px; }
+  @include respond-to('lg') { padding: 32px 24px; }
+  @include respond-to('sm') { padding: 26px 18px; }
 }
 
 .e360-login-brand-mini {
   display: flex;
   justify-content: center;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .e360-login-logo-box {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
   border: 1px solid $gray-200;
   display: flex;
   align-items: center;
@@ -165,8 +165,8 @@ section {
 }
 
 .e360-login-logo {
-  width: 36px;
-  height: 36px;
+  width: 28px;
+  height: 28px;
   object-fit: contain;
 }
 
@@ -180,39 +180,39 @@ section {
 // Login Form Wrapper
 .login-form-wrapper {
   width: 100%;
-  max-width: 380px;
+  max-width: 320px;
 }
 
 // Form Header
 .form-header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 
   h2 {
-    font-size: 1.65rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: $gray-900;
-    margin-bottom: 6px;
+    margin-bottom: 4px;
   }
 
   p {
     color: $text-muted;
-    font-size: $font-size-sm;
+    font-size: .78rem;
     margin: 0;
   }
 }
 
 // MFA Icon
 .mfa-icon {
-  width: 70px;
-  height: 70px;
+  width: 52px;
+  height: 52px;
   background: var(--orion-primary);
   border-radius: 50%;
   @include flex-center;
-  margin: 0 auto 20px;
+  margin: 0 auto 14px;
 
   i {
-    font-size: 28px;
+    font-size: 20px;
     color: $white;
   }
 }
@@ -238,14 +238,14 @@ section {
 
 // Form Group
 .form-group {
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 
   label {
     display: block;
-    font-size: $font-size-sm;
+    font-size: .78rem;
     font-weight: $font-weight-semibold;
     color: $gray-700;
-    margin-bottom: $spacing-sm;
+    margin-bottom: 4px;
   }
 }
 
@@ -255,21 +255,21 @@ section {
 
   i {
     position: absolute;
-    left: 20px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     color: $gray-400;
-    font-size: $font-size-lg;
+    font-size: .95rem;
     transition: color $transition-base;
     z-index: 1;
   }
 
   .form-control {
-    height: 52px;
-    padding: 0 16px 0 46px;
-    font-size: $font-size-sm;
+    height: 42px;
+    padding: 0 14px 0 38px;
+    font-size: .85rem;
     border: none;
-    border-radius: 52px;
+    border-radius: 42px;
     background: $gray-50;
     transition: background $transition-base, box-shadow $transition-base;
 
@@ -297,21 +297,21 @@ section {
 // Code Input
 .code-input {
   text-align: center;
-  font-size: $font-size-2xl !important;
-  letter-spacing: 8px;
+  font-size: 1.3rem !important;
+  letter-spacing: 6px;
   font-weight: $font-weight-semibold;
-  padding-left: 16px !important;
+  padding-left: 14px !important;
 }
 
 // Form Options
 .form-options {
   @include flex-between;
-  margin-bottom: 22px;
+  margin-bottom: 16px;
 }
 
 .forgot-link {
   color: var(--orion-primary);
-  font-size: $font-size-sm;
+  font-size: .78rem;
   font-weight: $font-weight-medium;
   text-decoration: none;
   transition: opacity $transition-base;
@@ -325,9 +325,9 @@ section {
 // Login Button — pill, uppercase, IMPALA-style
 .btn-login {
   width: 100%;
-  height: 50px;
-  padding: 0 24px;
-  font-size: .82rem;
+  height: 42px;
+  padding: 0 20px;
+  font-size: .76rem;
   font-weight: 700;
   letter-spacing: .04em;
   text-transform: uppercase;
@@ -361,11 +361,11 @@ section {
 // Form Footer
 .form-footer {
   text-align: center;
-  margin-top: 26px;
+  margin-top: 18px;
 
   p {
     color: $gray-500;
-    font-size: $font-size-sm;
+    font-size: .78rem;
     margin: 0;
   }
 
@@ -389,25 +389,25 @@ section {
 }
 
 .resend-text {
-  margin-top: 15px;
-  font-size: $font-size-sm;
+  margin-top: 12px;
+  font-size: .78rem;
 }
 
 // ── Company Picker ───────────────────────────────────────────────────────
 .company-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 20px 0;
+  gap: 8px;
+  margin: 14px 0;
 }
 
 .company-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
+  gap: 12px;
+  padding: 10px 14px;
   border: 1px solid var(--border-color);
-  border-radius: 16px;
+  border-radius: 14px;
   background: $gray-50;
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
@@ -423,20 +423,20 @@ section {
   &:active { transform: translateY(0); }
 
   .company-card-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     background: $white;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 
-    i { color: var(--orion-primary); font-size: 18px; }
+    i { color: var(--orion-primary); font-size: 16px; }
 
     .company-logo {
-      width: 36px;
-      height: 36px;
+      width: 30px;
+      height: 30px;
       object-fit: contain;
       border-radius: 6px;
     }
@@ -448,13 +448,13 @@ section {
     flex-direction: column;
 
     .company-name {
-      font-size: $font-size-base;
+      font-size: .85rem;
       font-weight: 600;
       color: var(--text-primary);
     }
 
     .company-code {
-      font-size: $font-size-xs;
+      font-size: .7rem;
       color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -463,7 +463,7 @@ section {
 
   > .bi-chevron-right {
     color: var(--text-muted);
-    font-size: 14px;
+    font-size: 13px;
   }
 }
 
@@ -472,13 +472,13 @@ section {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 4px 10px;
   background: rgba(0, 0, 0, .04);
   color: var(--orion-primary);
   border-radius: 20px;
-  font-size: $font-size-sm;
+  font-size: .74rem;
   font-weight: 500;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 // Legal footer links
