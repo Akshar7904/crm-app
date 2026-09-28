@@ -51,39 +51,52 @@
         <ng-container *ngIf="accountType && !submitted">
           <div class="form-header">
             <h2>Register — {{ accountType === 'COMPANY' ? 'Company' : 'Individual' }}</h2>
-            <p>Step {{ currentStep }} of 5</p>
+            <p>Step {{ currentStep }} of 2</p>
           </div>
 
           <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
 
-          <!-- Company path steps 1-3: see Task 10. Individual path steps 1-3: see Task 11. -->
-          <div [ngSwitch]="accountType">
-            <ng-container *ngSwitchCase="'COMPANY'">
-              <ng-container [ngTemplateOutlet]="companySteps"></ng-container>
-            </ng-container>
-            <ng-container *ngSwitchCase="'INDIVIDUAL'">
-              <ng-container [ngTemplateOutlet]="individualSteps"></ng-container>
-            </ng-container>
-          </div>
-
-          <!-- Step 4: Choose Your Plan (shared) -->
-          <div *ngIf="currentStep === 4" class="plan-step">
-            <div *ngIf="plansLoadError" class="alert alert-danger">Unable to load plans, please refresh.</div>
-            <div class="plan-cards">
-              <div *ngFor="let plan of plans" class="plan-card" [class.plan-card--selected]="form.planKey === plan.planKey" (click)="form.planKey = plan.planKey">
-                <h3>{{ plan.name }}</h3>
-                <p class="plan-price">{{ plan.monthlyPrice != null ? ('R' + plan.monthlyPrice + ' / per month') : 'Custom Pricing' }}</p>
-                <p class="plan-desc">
-                  <span *ngIf="plan.planKey === 'FREE'">For small businesses getting started</span>
-                  <span *ngIf="plan.planKey === 'BUSINESS'">For growing businesses</span>
-                  <span *ngIf="plan.planKey === 'ENTERPRISE'">For larger organisations and complex requirements</span>
-                </p>
+          <!-- Step 1: essential account details -->
+          <div *ngIf="currentStep === 1">
+            <div class="form-group" *ngIf="accountType === 'COMPANY'">
+              <label>Company Name</label>
+              <input type="text" class="form-control" [(ngModel)]="form.companyName" name="companyName" required>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" class="form-control" [(ngModel)]="form.firstName" name="firstName" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Surname</label>
+                  <input type="text" class="form-control" [(ngModel)]="form.lastName" name="lastName" required>
+                </div>
               </div>
             </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" class="form-control" [(ngModel)]="form.email" name="email" required>
+            </div>
+            <div class="form-group">
+              <label>Mobile</label>
+              <input type="tel" class="form-control" [(ngModel)]="form.mobile" name="mobile" required>
+            </div>
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required minlength="8">
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPassword" required>
+            </div>
+            <p class="text-muted small">You'll be able to add company details, address and more from your profile once you're signed in.</p>
           </div>
 
-          <!-- Step 5: Confirm (shared, with one Individual-only checkbox) -->
-          <div *ngIf="currentStep === 5" class="confirm-step">
+          <!-- Step 2: Confirm -->
+          <div *ngIf="currentStep === 2" class="confirm-step">
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="terms" [(ngModel)]="form.termsAccepted" name="termsAccepted">
               <label class="form-check-label" for="terms">I agree to the Terms and Conditions</label>
@@ -91,10 +104,6 @@
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="popia" [(ngModel)]="form.popiaAccepted" name="popiaAccepted">
               <label class="form-check-label" for="popia">I acknowledge the Privacy Policy and POPIA Notice</label>
-            </div>
-            <div class="form-check" *ngIf="accountType === 'INDIVIDUAL'">
-              <input type="checkbox" class="form-check-input" id="accuracy" [(ngModel)]="form.accuracyConfirmed" name="accuracyConfirmed">
-              <label class="form-check-label" for="accuracy">I confirm that the information provided is accurate</label>
             </div>
             <div class="form-check">
               <input type="checkbox" class="form-check-input" id="marketing" [(ngModel)]="form.marketingOptIn" name="marketingOptIn">
@@ -104,17 +113,17 @@
 
           <div class="wizard-nav">
             <button type="button" class="btn-secondary" (click)="prevStep()">Back</button>
-            <button type="button" class="btn-register" *ngIf="currentStep < 5" [disabled]="!canProceed()" (click)="nextStep()">Next</button>
-            <button type="button" class="btn-register" *ngIf="currentStep === 5"
-                    [disabled]="submitting || !form.termsAccepted || !form.popiaAccepted || (accountType === 'INDIVIDUAL' && !form.accuracyConfirmed)"
+            <button type="button" class="btn-register" *ngIf="currentStep < 2" [disabled]="!canProceed()" (click)="nextStep()">Next</button>
+            <button type="button" class="btn-register" *ngIf="currentStep === 2"
+                    [disabled]="submitting || !form.termsAccepted || !form.popiaAccepted"
                     (click)="submitRegistration()">
               <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
-              {{ submitting ? 'Registering...' : 'Register My Business' }}
+              {{ submitting ? 'Registering...' : 'Create Account' }}
             </button>
           </div>
         </ng-container>
 
-        <!-- Check your email (Task 12 fills this in fully) -->
+        <!-- Check your email -->
         <ng-container *ngIf="submitted">
           <div class="form-header success-header">
             <div class="success-icon pending-icon"><i class="bi bi-envelope-check"></i></div>
@@ -135,236 +144,3 @@
   <p class="e360-register-footer-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
 
 </section>
-
-<ng-template #companySteps>
-  <!-- Step 1: Create Your Company -->
-  <div *ngIf="currentStep === 1">
-    <div class="form-group">
-      <label>Registered Company Name</label>
-      <input type="text" class="form-control" [(ngModel)]="form.companyName" name="companyName" required>
-    </div>
-    <div class="form-group">
-      <label>Trading Name</label>
-      <input type="text" class="form-control" [(ngModel)]="form.tradingName" name="tradingName">
-    </div>
-    <div class="form-group">
-      <label>Company Registration Number</label>
-      <input type="text" class="form-control" [(ngModel)]="form.companyRegistrationNumber" name="companyRegistrationNumber">
-    </div>
-    <div class="form-group">
-      <label>Company Type</label>
-      <select class="form-control" [(ngModel)]="form.companyType" name="companyType" required>
-        <option value="" disabled selected>Select company type</option>
-        <option *ngFor="let t of COMPANY_TYPES" [value]="t">{{ t }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Industry / Sector</label>
-      <select class="form-control" [(ngModel)]="form.industry" name="industry" required>
-        <option value="" disabled selected>Select industry</option>
-        <option *ngFor="let i of INDUSTRIES" [value]="i">{{ i }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Number of Employees</label>
-      <input type="number" class="form-control" [(ngModel)]="form.numberOfEmployees" name="numberOfEmployees" min="0">
-    </div>
-    <div class="form-group">
-      <label>Estimated number of Customers</label>
-      <input type="number" class="form-control" [(ngModel)]="form.estimatedCustomers" name="estimatedCustomers" min="0">
-    </div>
-  </div>
-
-  <!-- Step 2: Company Details -->
-  <div *ngIf="currentStep === 2">
-    <div class="form-check">
-      <input type="checkbox" class="form-check-input" id="vatReg" [(ngModel)]="form.vatRegistered" name="vatRegistered">
-      <label class="form-check-label" for="vatReg">VAT registered</label>
-    </div>
-    <div class="form-group" *ngIf="form.vatRegistered">
-      <label>VAT Number</label>
-      <input type="text" class="form-control" [(ngModel)]="form.vatNumber" name="vatNumber">
-    </div>
-    <div class="form-group">
-      <label>Company Email</label>
-      <input type="email" class="form-control" [(ngModel)]="form.companyEmail" name="companyEmail" required>
-    </div>
-    <div class="form-group">
-      <label>Website</label>
-      <input type="text" class="form-control" [(ngModel)]="form.website" name="website">
-    </div>
-    <div class="form-group">
-      <label>Country</label>
-      <input type="text" class="form-control" [(ngModel)]="form.country" name="country" required>
-    </div>
-    <div class="form-group">
-      <label>City</label>
-      <input type="text" class="form-control" [(ngModel)]="form.city" name="city" required>
-    </div>
-    <div class="form-group">
-      <label>Province</label>
-      <select class="form-control" [(ngModel)]="form.province" name="province" required>
-        <option value="" disabled selected>Select province</option>
-        <option *ngFor="let p of PROVINCES" [value]="p">{{ p }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Address</label>
-      <input type="text" class="form-control" [(ngModel)]="form.address" name="address" required>
-    </div>
-    <div class="form-group">
-      <label>Postal Code</label>
-      <input type="text" class="form-control" [(ngModel)]="form.postalCode" name="postalCode">
-    </div>
-  </div>
-
-  <!-- Step 3: Your Account -->
-  <div *ngIf="currentStep === 3">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" class="form-control" [(ngModel)]="form.firstName" name="firstName" required>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="form-group">
-          <label>Surname</label>
-          <input type="text" class="form-control" [(ngModel)]="form.lastName" name="lastName" required>
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>Position</label>
-      <input type="text" class="form-control" [(ngModel)]="form.position" name="position">
-    </div>
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" class="form-control" [(ngModel)]="form.email" name="email" required>
-    </div>
-    <div class="form-group">
-      <label>Mobile</label>
-      <input type="tel" class="form-control" [(ngModel)]="form.mobile" name="mobile" required>
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required minlength="8">
-    </div>
-    <div class="form-group">
-      <label>Confirm Password</label>
-      <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPassword" required>
-    </div>
-    <p class="text-muted small">Note: you will be the Company Administrator.</p>
-  </div>
-</ng-template>
-
-<ng-template #individualSteps>
-  <!-- Step 1: About You -->
-  <div *ngIf="currentStep === 1">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="form-group">
-          <label>Name</label>
-          <input type="text" class="form-control" [(ngModel)]="form.firstName" name="firstNameInd" required>
-        </div>
-      </div>
-      <div class="col-md-6">
-        <div class="form-group">
-          <label>Surname</label>
-          <input type="text" class="form-control" [(ngModel)]="form.lastName" name="lastNameInd" required>
-        </div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label>ID Number / Passport</label>
-      <input type="text" class="form-control" [(ngModel)]="form.idNumberOrPassport" name="idNumberOrPassport" required>
-    </div>
-    <div class="form-group">
-      <label>Country of Residence</label>
-      <input type="text" class="form-control" [(ngModel)]="form.countryOfResidence" name="countryOfResidence" required>
-    </div>
-    <div class="form-group">
-      <label>Occupation / Profession</label>
-      <input type="text" class="form-control" [(ngModel)]="form.occupation" name="occupation">
-    </div>
-    <div class="form-group">
-      <label>Industry / Sector</label>
-      <select class="form-control" [(ngModel)]="form.industry" name="industryInd" required>
-        <option value="" disabled selected>Select industry</option>
-        <option *ngFor="let i of INDUSTRIES" [value]="i">{{ i }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Are you operating as a:</label>
-      <select class="form-control" [(ngModel)]="form.operatingAs" name="operatingAs" required>
-        <option value="" disabled selected>Select</option>
-        <option *ngFor="let o of OPERATING_AS_OPTIONS" [value]="o">{{ o }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Number of Employees</label>
-      <input type="number" class="form-control" [(ngModel)]="form.numberOfEmployees" name="numberOfEmployeesInd" min="0">
-    </div>
-    <div class="form-group">
-      <label>Estimated number of Customers</label>
-      <input type="number" class="form-control" [(ngModel)]="form.estimatedCustomers" name="estimatedCustomersInd" min="0">
-    </div>
-  </div>
-
-  <!-- Step 2: Contact Details -->
-  <div *ngIf="currentStep === 2">
-    <div class="form-group">
-      <label>Email Address</label>
-      <input type="email" class="form-control" [(ngModel)]="form.email" name="emailInd" required>
-    </div>
-    <div class="form-group">
-      <label>Mobile Number</label>
-      <input type="tel" class="form-control" [(ngModel)]="form.mobile" name="mobileInd" required>
-    </div>
-    <div class="form-group">
-      <label>Alternative Contact Number (optional)</label>
-      <input type="tel" class="form-control" [(ngModel)]="form.alternativeContactNumber" name="alternativeContactNumber">
-    </div>
-    <div class="form-group">
-      <label>Country</label>
-      <input type="text" class="form-control" [(ngModel)]="form.country" name="countryInd" required>
-    </div>
-    <div class="form-group">
-      <label>City</label>
-      <input type="text" class="form-control" [(ngModel)]="form.city" name="cityInd" required>
-    </div>
-    <div class="form-group">
-      <label>Province</label>
-      <select class="form-control" [(ngModel)]="form.province" name="provinceInd" required>
-        <option value="" disabled selected>Select province</option>
-        <option *ngFor="let p of PROVINCES" [value]="p">{{ p }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Address</label>
-      <input type="text" class="form-control" [(ngModel)]="form.address" name="addressInd" required>
-    </div>
-    <div class="form-group">
-      <label>Postal Code</label>
-      <input type="text" class="form-control" [(ngModel)]="form.postalCode" name="postalCodeInd">
-    </div>
-  </div>
-
-  <!-- Step 3: Create Your Account -->
-  <div *ngIf="currentStep === 3">
-    <div class="form-group">
-      <label>Email / Username</label>
-      <input type="email" class="form-control" [value]="form.email" disabled>
-      <small class="text-muted">A verification email will be sent to confirm this address.</small>
-    </div>
-    <div class="form-group">
-      <label>Password</label>
-      <input type="password" class="form-control" [(ngModel)]="form.password" name="passwordInd" required minlength="8">
-    </div>
-    <div class="form-group">
-      <label>Confirm Password</label>
-      <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPasswordInd" required>
-    </div>
-    <p class="text-muted small">Note: you will be the Company Administrator.</p>
-  </div>
-</ng-template>

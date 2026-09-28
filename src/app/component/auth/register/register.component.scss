@@ -382,55 +382,7 @@ section {
 }
 
 // ─────────────────────────────────────────────────────────────────────────
-// Wizard — Step 4: plan picker
-// ─────────────────────────────────────────────────────────────────────────
-.plan-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.plan-card {
-  padding: 13px 16px;
-  background: $gray-50;
-  border: 2px solid transparent;
-  border-radius: 14px;
-  cursor: pointer;
-  transition: all $transition-base;
-
-  h3 {
-    margin: 0 0 4px;
-    font-size: .92rem;
-    font-weight: $font-weight-bold;
-    color: $gray-900;
-  }
-
-  &:hover {
-    background: $white;
-  }
-
-  &--selected {
-    border-color: var(--orion-primary);
-    background: $white;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, .04);
-  }
-}
-
-.plan-price {
-  margin: 0 0 4px;
-  font-weight: $font-weight-semibold;
-  color: var(--orion-primary);
-  font-size: .82rem;
-}
-
-.plan-desc {
-  margin: 0;
-  color: $text-muted;
-  font-size: .76rem;
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Wizard — Step 5: confirm checkboxes
+// Wizard — Step 2: confirm checkboxes
 // ─────────────────────────────────────────────────────────────────────────
 .confirm-step {
   display: flex;
