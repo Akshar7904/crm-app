@@ -1,16 +1,26 @@
-// Register Component - SCSS
+// ========================================
+// REGISTER PAGE — split brand-panel card
+// Same treatment as login.component.scss (IMPALA-inspired sign-in card,
+// adapted with Enterprise360's own colors) — self-contained, does not use
+// the shared styles/_auth-card.scss so login/register/resetpassword can
+// each evolve independently.
+// ========================================
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
-@import '../../../../styles/auth-card';
 
-// Host element
+// Enterprise360 platform-brand colors for the static left panel — distinct
+// from the tenant-brand CSS vars (--orion-primary etc.) used on the right.
+// Matches the palette used on the public landing page and login page.
+$e360-navy:  #063a5c;
+$e360-blue:  #0778ba;
+$e360-green: #4ea41b;
+
 :host {
   display: block;
   width: 100%;
   min-height: 100vh;
 }
 
-// Section wrapper
 section {
   display: block;
   width: 100%;
@@ -19,46 +29,173 @@ section {
   padding: 0;
 }
 
-// Full-screen backdrop hosting the centered auth card (shared shell in
-// styles/_auth-card.scss provides .auth-card/.auth-card__*/.auth-shell-copy)
-.register-container {
+.e360-register-shell {
+  min-height: 100vh;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 20px;
-  min-height: 100vh;
-  width: 100vw;
   padding: 40px 20px;
-  background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: auto;
-  z-index: 9999;
+  background: $gray-50;
 }
 
+.e360-register-card {
+  position: relative;
+  width: 100%;
+  max-width: 1020px;
+  min-height: 600px;
+  background: $white;
+  border-radius: 24px;
+  box-shadow: 0 25px 60px rgba(6, 58, 92, .18);
+  overflow: hidden;
+  display: flex;
+
+  @include respond-to('lg') {
+    flex-direction: column;
+    min-height: 0;
+  }
+}
+
+// ── Left: static brand panel ────────────────────────────────────────────
+.e360-register-panel {
+  position: relative;
+  flex: 0 0 38%;
+  overflow: hidden;
+  background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
+
+  @include respond-to('lg') {
+    flex: 0 0 auto;
+    padding: 36px 24px 30px;
+  }
+}
+
+.e360-register-panel__blob {
+  position: absolute;
+  inset: -20%;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255, 255, 255, .16), transparent 45%),
+    radial-gradient(circle at 82% 88%, rgba(255, 255, 255, .12), transparent 50%);
+  pointer-events: none;
+}
+
+.e360-register-panel__content {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 40px;
+  color: $white;
+
+  @include respond-to('lg') {
+    height: auto;
+    padding: 0;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+  }
+}
+
+.e360-register-panel__logo {
+  height: 46px;
+  width: auto;
+  align-self: flex-start;
+  background: $white;
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
+
+  @include respond-to('lg') { align-self: center; }
+}
+
+.e360-register-panel__copy {
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    span { display: block; color: #bdf3c9; }
+  }
+
+  p {
+    font-size: .9rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, .82);
+    max-width: 300px;
+
+    @include respond-to('lg') { max-width: 100%; }
+  }
+}
+
+// ── Right: form zone ─────────────────────────────────────────────────────
+.e360-register-form-zone {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 44px 48px;
+  overflow-y: auto;
+  max-height: 100vh;
+
+  @include respond-to('lg') { padding: 36px 24px; max-height: none; }
+  @include respond-to('sm') { padding: 30px 18px; }
+}
+
+.e360-register-brand-mini {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+
+.e360-register-logo-box {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  border: 1px solid $gray-200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $white;
+}
+
+.e360-register-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.e360-register-footer-copy {
+  color: $gray-400;
+  font-size: $font-size-xs;
+  text-align: center;
+  margin: 0;
+}
+
+// Register Form Wrapper
 .register-form-wrapper {
   width: 100%;
+  max-width: 440px;
 }
 
 // Form Header
 .form-header {
   text-align: center;
-  margin-bottom: 35px;
+  margin-bottom: 28px;
 
   h2 {
-    font-size: 1.75rem;
-    font-weight: $font-weight-bold;
+    font-size: 1.5rem;
+    font-weight: 700;
     color: $gray-900;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
   }
 
   p {
     color: $text-muted;
-    font-size: 0.95rem;
+    font-size: .85rem;
     margin: 0;
   }
 }
@@ -96,87 +233,69 @@ section {
   margin-left: auto;
 }
 
-// Form Group
+// Form Group — pill-shaped inputs, IMPALA-style
 .form-group {
-  margin-bottom: 22px;
+  margin-bottom: 18px;
 
   label {
     display: block;
-    font-size: 0.9rem;
+    font-size: .85rem;
     font-weight: $font-weight-semibold;
     color: $gray-700;
     margin-bottom: $spacing-sm;
   }
 }
 
-// Input Wrapper with Icon
-.input-wrapper {
-  position: relative;
+.form-control,
+.form-select {
+  height: 50px;
+  padding: 0 18px;
+  font-size: .9rem;
+  border: none;
+  border-radius: 50px;
+  background: $gray-50;
+  transition: background $transition-base, box-shadow $transition-base;
 
-  i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+  &:focus {
+    background: $white;
+    box-shadow: 0 0 0 2px var(--orion-primary);
+    outline: none;
+  }
+
+  &::placeholder {
     color: $gray-400;
-    font-size: 1.1rem;
-    transition: color $transition-base;
   }
 
-  .form-control {
-    padding: 14px 16px 14px 48px;
-    font-size: 0.95rem;
-    border: $border-width-md solid $gray-200;
-    border-radius: $border-radius-lg;
-    transition: all $transition-base;
-    background: $gray-50;
-
-    &:focus {
-      border-color: $primary;
-      box-shadow: 0 0 0 4px rgba($primary, 0.1);
-      background: $white;
-      outline: none;
-    }
-
-    &:focus + i {
-      color: $primary;
-    }
-
-    &::placeholder {
-      color: $gray-400;
-    }
-
-    &:disabled {
-      background: $bg-disabled;
-      cursor: not-allowed;
-    }
-  }
-
-  &:focus-within i {
-    color: $primary;
+  &:disabled {
+    background: $bg-disabled;
+    cursor: not-allowed;
   }
 }
 
-// Register Button
+// Register Button — pill, uppercase, IMPALA-style
 .btn-register {
   width: 100%;
-  padding: 14px 24px;
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
+  height: 50px;
+  padding: 0 24px;
+  font-size: .82rem;
+  font-weight: 700 !important;
+  letter-spacing: .04em;
+  text-transform: uppercase;
   color: $white !important;
-  background: $gradient-primary;
+  background: var(--orion-primary);
   border: none;
-  border-radius: $border-radius-lg;
+  border-radius: 50px;
   cursor: pointer;
   transition: all $transition-slow;
   @include flex-center;
+  gap: 8px;
   text-decoration: none;
   margin-top: 10px;
 
   &:hover:not(:disabled) {
-    background: $gradient-primary-hover;
+    filter: brightness(0.92);
     transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba($primary, 0.3);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .18);
     color: $white !important;
   }
 
@@ -195,22 +314,22 @@ section {
 // Form Footer
 .form-footer {
   text-align: center;
-  margin-top: 30px;
+  margin-top: 26px;
 
   p {
     color: $gray-500;
-    font-size: 0.95rem;
+    font-size: .85rem;
     margin: 0;
   }
 
   a {
-    color: $primary;
+    color: var(--orion-primary);
     font-weight: $font-weight-semibold;
     text-decoration: none;
-    transition: color $transition-base;
+    transition: opacity $transition-base;
 
     &:hover {
-      color: $primary-light;
+      opacity: .75;
       text-decoration: underline;
     }
   }
@@ -238,27 +357,26 @@ section {
   align-items: center;
   gap: 16px;
   width: 100%;
-  padding: 20px 22px;
+  padding: 18px 22px;
   background: $gray-50;
-  border: $border-width-md solid $gray-200;
-  border-radius: $border-radius-lg;
+  border: none;
+  border-radius: 16px;
   cursor: pointer;
   text-align: left;
   transition: all $transition-base;
-  font-size: 1rem;
+  font-size: .95rem;
   font-weight: $font-weight-semibold;
   color: $gray-900;
 
   i {
-    font-size: 1.6rem;
-    color: $primary;
+    font-size: 1.5rem;
+    color: var(--orion-primary);
     flex-shrink: 0;
   }
 
   &:hover {
-    border-color: $primary;
     background: $white;
-    box-shadow: 0 4px 14px rgba($primary, 0.12);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .1);
     transform: translateY(-2px);
   }
 }
@@ -273,42 +391,41 @@ section {
 }
 
 .plan-card {
-  padding: 20px 22px;
+  padding: 18px 22px;
   background: $gray-50;
-  border: $border-width-md solid $gray-200;
-  border-radius: $border-radius-lg;
+  border: 2px solid transparent;
+  border-radius: 16px;
   cursor: pointer;
   transition: all $transition-base;
 
   h3 {
     margin: 0 0 6px;
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     font-weight: $font-weight-bold;
     color: $gray-900;
   }
 
   &:hover {
-    border-color: $primary;
     background: $white;
   }
 
   &--selected {
-    border-color: $primary;
+    border-color: var(--orion-primary);
     background: $white;
-    box-shadow: 0 0 0 4px rgba($primary, 0.1);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, .04);
   }
 }
 
 .plan-price {
   margin: 0 0 4px;
   font-weight: $font-weight-semibold;
-  color: $primary;
+  color: var(--orion-primary);
 }
 
 .plan-desc {
   margin: 0;
   color: $text-muted;
-  font-size: 0.88rem;
+  font-size: .85rem;
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -332,7 +449,7 @@ section {
 
   .form-check-label {
     color: $gray-700;
-    font-size: 0.92rem;
+    font-size: .88rem;
   }
 }
 
@@ -342,7 +459,7 @@ section {
 .wizard-nav {
   display: flex;
   gap: $spacing-md;
-  margin-top: 30px;
+  margin-top: 26px;
 
   .btn-register {
     margin-top: 0;
@@ -351,13 +468,16 @@ section {
 
 .btn-secondary {
   flex: 0 0 auto;
-  padding: 14px 24px;
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
+  padding: 0 24px;
+  height: 50px;
+  font-size: .82rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
   color: $gray-700;
   background: $gray-100;
-  border: $border-width-md solid $gray-200;
-  border-radius: $border-radius-lg;
+  border: none;
+  border-radius: 50px;
   cursor: pointer;
   transition: all $transition-base;
 
@@ -398,14 +518,13 @@ section {
 .step-number {
   width: 28px;
   height: 28px;
-  background: rgba($primary, 0.12);
+  background: rgba(0, 0, 0, .06);
   color: $gray-800;
   border-radius: 50%;
   @include flex-center;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: .85rem;
   flex-shrink: 0;
-  border: 2px solid rgba($primary, 0.3);
 }
 
 // Pending Approval Styles
@@ -449,85 +568,12 @@ section {
   50% { opacity: 1; transform: scale(1.06); }
 }
 
-// Responsive Design
-// Tablet and Below
-@media (max-width: 991px) {
-  .register-container {
-    flex-direction: column;
-    position: relative;
-    overflow-y: auto;
-  }
-
-  .register-branding {
-    flex: 0 0 auto;
-    width: 100%;
-    min-width: unset;
-    padding: 40px 30px;
-    min-height: auto;
-  }
-
-  .register-form-container {
-    flex: 0 0 auto;
-    width: 100%;
-    padding: 40px 30px;
-  }
-
-  .brand-logo {
-    height: 60px;
-  }
-
-  .brand-title {
-    font-size: 2rem;
-  }
-
-  .brand-features {
-    display: none;
-  }
-
-  .branding-footer {
-    position: relative;
-    bottom: auto;
-    margin-top: 20px;
-  }
-}
-
-// Mobile
+// ========================================
+// RESPONSIVE DESIGN
+// ========================================
 @include respond-to('sm') {
-  .register-branding {
-    padding: 30px 20px;
-  }
-
-  .brand-logo {
-    height: 50px;
-  }
-
-  .brand-title {
-    font-size: 1.75rem;
-  }
-
-  .brand-tagline {
-    font-size: 0.95rem;
-    margin-bottom: 20px;
-  }
-
-  .register-form-container {
-    padding: 30px 20px;
-  }
-
-  .register-form-wrapper {
-    max-width: 100%;
-  }
-
   .form-header h2 {
-    font-size: $font-size-2xl;
-  }
-
-  .input-wrapper .form-control {
-    padding: 12px 14px 12px 44px;
-  }
-
-  .btn-register {
-    padding: 12px 20px;
+    font-size: 1.3rem;
   }
 
   .row {
@@ -536,24 +582,5 @@ section {
 
   .col-md-6 {
     width: 100%;
-  }
-}
-
-// Very Small Screens
-@include respond-to('xs') {
-  .register-branding {
-    padding: 25px 15px;
-  }
-
-  .brand-title {
-    font-size: $font-size-2xl;
-  }
-
-  .register-form-container {
-    padding: 25px 15px;
-  }
-
-  .form-header h2 {
-    font-size: 1.35rem;
   }
 }
