@@ -17,6 +17,10 @@
 $e360-navy:  #063a5c;
 $e360-blue:  #0778ba;
 $e360-green: #4ea41b;
+// A muted, deeper olive-green derived from $e360-green (not a generic
+// unrelated "army green") so the text-link hover state reads as part of
+// the same palette as the panel's navy→green gradient, not a clash.
+$military-green: #3f5f2a;
 
 :host {
   display: block;
@@ -67,8 +71,8 @@ section {
     top: 50%;
     right: 58%;
     transform: translateY(-50%);
-    width: 2200px;
-    height: 2200px;
+    width: 1150px;
+    height: 1150px;
     border-radius: 50%;
     background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
     z-index: 0;
@@ -130,12 +134,12 @@ section {
 }
 
 .e360-login-panel__logo {
-  height: 46px;
+  height: 64px;
   width: auto;
   align-self: flex-start;
   background: $white;
   border-radius: 12px;
-  padding: 8px 14px;
+  padding: 10px 18px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, .18);
 
   @include respond-to('lg') { align-self: center; }
@@ -183,9 +187,9 @@ section {
 }
 
 .e360-login-logo-box {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
   border: 1px solid $gray-200;
   display: flex;
   align-items: center;
@@ -194,8 +198,8 @@ section {
 }
 
 .e360-login-logo {
-  width: 28px;
-  height: 28px;
+  width: 40px;
+  height: 40px;
   object-fit: contain;
 }
 
@@ -413,15 +417,19 @@ section {
 }
 
 .forgot-link {
-  color: var(--orion-primary);
+  color: $gray-900;
   font-size: .78rem;
   font-weight: $font-weight-medium;
   text-decoration: none;
-  transition: opacity $transition-base;
+  padding: 2px 8px;
+  margin: -2px -8px;
+  border-radius: 6px;
+  transition: background $transition-base, color $transition-base;
 
   &:hover {
-    opacity: .75;
-    text-decoration: underline;
+    background: $military-green;
+    color: $white;
+    text-decoration: none;
   }
 }
 
@@ -473,14 +481,18 @@ section {
   }
 
   a {
-    color: var(--orion-primary);
+    color: $gray-900;
     font-weight: $font-weight-semibold;
     text-decoration: none;
-    transition: opacity $transition-base;
+    padding: 2px 8px;
+    margin: -2px -8px;
+    border-radius: 6px;
+    transition: background $transition-base, color $transition-base;
 
     &:hover {
-      opacity: .75;
-      text-decoration: underline;
+      background: $military-green;
+      color: $white;
+      text-decoration: none;
     }
   }
 }
@@ -489,11 +501,15 @@ section {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  color: $gray-500;
-  transition: color $transition-base;
+  color: $gray-900;
+  padding: 2px 8px;
+  margin: -2px -8px;
+  border-radius: 6px;
+  transition: background $transition-base, color $transition-base;
 
   &:hover {
-    color: var(--orion-primary);
+    background: $military-green;
+    color: $white;
   }
 }
 
@@ -601,9 +617,13 @@ section {
 
   a {
     font-size: .73rem;
-    color: #a0aec0;
+    color: $gray-900;
     text-decoration: none;
-    &:hover { color: var(--orion-primary); text-decoration: underline; }
+    padding: 2px 6px;
+    margin: -2px -6px;
+    border-radius: 5px;
+    transition: background $transition-base, color $transition-base;
+    &:hover { background: $military-green; color: $white; text-decoration: none; }
   }
 
   span { color: $gray-200; font-size: .7rem; }
