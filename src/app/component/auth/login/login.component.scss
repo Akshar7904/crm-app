@@ -39,21 +39,43 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  padding: 40px 20px;
+  gap: 16px;
+  padding: 24px 20px;
   background: $gray-50;
 }
 
 .e360-login-card {
   position: relative;
   width: 100%;
-  max-width: 800px;
-  min-height: 440px;
+  max-width: 1300px;
+  min-height: 84vh;
   background: $white;
   border-radius: 24px;
   box-shadow: 0 25px 60px rgba(6, 58, 92, .18);
   overflow: hidden;
   display: flex;
+
+  // The oversized circle is what actually gives the panel its soft curved
+  // edge (rather than a flat diagonal line) — a huge circle whose right
+  // edge lands exactly at the panel/form-zone boundary, so only a gentle
+  // arc of it is ever visible within the card's height. Same construction
+  // as the reference "auth-switch" card's :before, just in E360 colors and
+  // scaled down for this card's proportions.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 58%;
+    transform: translateY(-50%);
+    width: 2200px;
+    height: 2200px;
+    border-radius: 50%;
+    background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
+    z-index: 0;
+    pointer-events: none;
+
+    @include respond-to('lg') { display: none; }
+  }
 
   @include respond-to('lg') {
     flex-direction: column;
@@ -62,15 +84,19 @@ section {
 }
 
 // ── Left: static brand panel ────────────────────────────────────────────
+// No background of its own on desktop — the card's ::before circle (behind
+// this panel in stacking order) shows through and provides the color/curve.
+// An opaque background here would just paint over the circle entirely.
 .e360-login-panel {
   position: relative;
+  z-index: 1;
   flex: 0 0 42%;
   overflow: hidden;
-  background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
 
   @include respond-to('lg') {
     flex: 0 0 auto;
     padding: 36px 24px 30px;
+    background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
   }
 }
 
@@ -136,7 +162,10 @@ section {
 
 // ── Right: form zone ─────────────────────────────────────────────────────
 .e360-login-form-zone {
+  position: relative;
+  z-index: 1;
   flex: 1;
+  background: $white;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -181,6 +210,19 @@ section {
 .login-form-wrapper {
   width: 100%;
   max-width: 320px;
+}
+
+// Each wizard step (email / company picker / password / MFA) is a fresh
+// DOM node inserted by *ngIf, so a plain CSS animation on it replays on
+// every step switch — the "switching effect" that was previously just an
+// instant swap with no transition at all.
+@keyframes stepPanelIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-panel {
+  animation: stepPanelIn .35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 // Form Header
@@ -250,32 +292,44 @@ section {
 }
 
 // Input Wrapper — pill-shaped, IMPALA-style
+// Icon-in-pill construction: a grid with a narrow icon column and a wide
+// input column, matching the reference component's .input-field — cleaner
+// than absolutely-positioning the icon over the input.
+//
+// Visible state system — every field shows one of four states, not just
+// focus: rest, hover (affordance before you even click in), focus (brand
+// ring), and validation (error/success once touched). This used to be
+// wired up in the template ([class.is-invalid] etc.) but had no matching
+// CSS after the redesign, so invalid/valid fields rendered with zero
+// visual difference from a normal one.
 .input-wrapper {
   position: relative;
+  display: grid;
+  grid-template-columns: 15% 85%;
+  align-items: center;
+  height: 42px;
+  padding: 0 6px;
+  border-radius: 42px;
+  background: $gray-50;
+  border: 1.5px solid transparent;
+  transition: background $transition-base, box-shadow $transition-base, border-color $transition-base;
 
   i {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+    text-align: center;
     color: $gray-400;
     font-size: .95rem;
     transition: color $transition-base;
-    z-index: 1;
   }
 
   .form-control {
-    height: 42px;
-    padding: 0 14px 0 38px;
+    height: 100%;
+    padding: 0 10px 0 0;
     font-size: .85rem;
     border: none;
-    border-radius: 42px;
-    background: $gray-50;
-    transition: background $transition-base, box-shadow $transition-base;
+    border-radius: 0;
+    background: transparent;
 
     &:focus {
-      background: $white;
-      box-shadow: 0 0 0 2px var(--orion-primary);
       outline: none;
     }
 
@@ -284,14 +338,63 @@ section {
     }
 
     &:disabled {
-      background: $bg-disabled;
       cursor: not-allowed;
     }
+  }
+
+  // Hover — a cue that the field is interactive, visible before focus.
+  &:hover:not(:focus-within) {
+    background: $gray-100;
+  }
+
+  &:focus-within {
+    background: $white;
+    box-shadow: 0 0 0 2px var(--orion-primary);
   }
 
   &:focus-within i {
     color: var(--orion-primary);
   }
+
+  // Error state — red ring + tinted background, wins over hover/focus.
+  &.is-invalid {
+    background: #fef2f2;
+    border-color: $danger;
+
+    i { color: $danger; }
+
+    &:focus-within {
+      box-shadow: 0 0 0 2px $danger;
+    }
+  }
+
+  // Success state — green ring + a checkmark badge on the right.
+  &.is-valid {
+    border-color: #10b981;
+
+    i:first-child { color: #10b981; }
+  }
+}
+
+.field-status-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #10b981 !important;
+  font-size: .9rem !important;
+  pointer-events: none;
+}
+
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: .74rem;
+  color: $danger;
+
+  i { font-size: .8rem; }
 }
 
 // Code Input
@@ -386,6 +489,12 @@ section {
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  color: $gray-500;
+  transition: color $transition-base;
+
+  &:hover {
+    color: var(--orion-primary);
+  }
 }
 
 .resend-text {
@@ -507,10 +616,6 @@ section {
 @include respond-to('sm') {
   .form-header h2 {
     font-size: 1.4rem;
-  }
-
-  .input-wrapper .form-control {
-    padding-left: 42px;
   }
 
   .form-options {

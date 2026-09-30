@@ -34,6 +34,7 @@
 
         <!-- ── STEP 1: EMAIL ── -->
         <ng-container *ngIf="!state.loginSuccess && state.step === 'email'">
+        <div class="step-panel">
           <div class="form-header">
             <h2>Welcome Back</h2>
             <p>Enter your email to get started</p>
@@ -46,14 +47,17 @@
           <form #emailForm="ngForm" (ngSubmit)="lookupEmail(emailForm)" class="login-form">
             <div class="form-group">
               <label for="email">Email Address</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper"
+                [class.is-invalid]="email.invalid && email.touched"
+                [class.is-valid]="email.valid && email.touched">
                 <i class="bi bi-envelope"></i>
                 <input #email="ngModel" ngModel type="email" name="email" id="email" class="form-control"
-                  placeholder="Enter your email" required
-                  [disabled]="state.dataState === DataState.LOADING"
-                  [class.is-invalid]="email.invalid && email.touched">
+                  placeholder="Enter your email" required email
+                  [disabled]="state.dataState === DataState.LOADING">
+                <i class="bi bi-check-circle-fill field-status-icon" *ngIf="email.valid && email.touched"></i>
               </div>
               <div class="form-error" *ngIf="email.invalid && email.touched">
+                <i class="bi bi-exclamation-circle"></i>
                 <span *ngIf="email.errors?.['required']">This field is required.</span>
                 <span *ngIf="email.errors?.['email']">Please enter a valid email address.</span>
               </div>
@@ -78,10 +82,12 @@
               <a routerLink="/legal/ip">IP &amp; Copyright</a>
             </div>
           </div>
+        </div>
         </ng-container>
 
         <!-- ── STEP 2: COMPANY PICKER ── -->
         <ng-container *ngIf="!state.loginSuccess && state.step === 'company'">
+        <div class="step-panel">
           <div class="form-header">
             <h2>Select Company</h2>
             <p>This email belongs to multiple companies</p>
@@ -106,10 +112,12 @@
           <div class="form-footer">
             <p><a (click)="backToEmail()" class="back-link"><i class="bi bi-arrow-left me-1"></i>Back</a></p>
           </div>
+        </div>
         </ng-container>
 
         <!-- ── STEP 3: PASSWORD ── -->
         <ng-container *ngIf="!state.loginSuccess && state.step === 'password'">
+        <div class="step-panel">
           <div class="form-header">
             <div *ngIf="state.selectedCompany" class="selected-company-badge">
               <i class="bi bi-building me-1"></i>
@@ -126,14 +134,14 @@
           <form #loginForm="ngForm" (ngSubmit)="login(loginForm)" class="login-form">
             <div class="form-group">
               <label for="password">Password</label>
-              <div class="input-wrapper">
+              <div class="input-wrapper" [class.is-invalid]="password.invalid && password.touched">
                 <i class="bi bi-lock"></i>
                 <input #password="ngModel" ngModel type="password" name="password" id="password" class="form-control"
                   placeholder="Enter your password" required
-                  [disabled]="state.dataState === DataState.LOADING"
-                  [class.is-invalid]="password.invalid && password.touched">
+                  [disabled]="state.dataState === DataState.LOADING">
               </div>
               <div class="form-error" *ngIf="password.invalid && password.touched">
+                <i class="bi bi-exclamation-circle"></i>
                 <span *ngIf="password.errors?.['required']">This field is required.</span>
               </div>
             </div>
@@ -156,10 +164,12 @@
           <div class="form-footer">
             <p><a (click)="backToEmail()" class="back-link"><i class="bi bi-arrow-left me-1"></i>Back</a></p>
           </div>
+        </div>
         </ng-container>
 
         <!-- ── MFA STEP ── -->
         <ng-container *ngIf="state.isUsingMfa && state.step === 'mfa'">
+        <div class="step-panel">
           <div class="form-header">
             <div class="mfa-icon"><i class="bi bi-shield-lock"></i></div>
             <h2>Two-Factor Authentication</h2>
@@ -194,6 +204,7 @@
             <p class="resend-text" *ngIf="state.mfaType !== 'EMAIL'">Open your authenticator app (Google Authenticator, Authy, etc.) and enter the current code.</p>
             <p class="resend-text" *ngIf="state.mfaType === 'EMAIL'">Check your inbox — the code was just emailed to you.</p>
           </div>
+        </div>
         </ng-container>
 
         </div>

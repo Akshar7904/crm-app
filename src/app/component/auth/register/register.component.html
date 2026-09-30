@@ -60,37 +60,58 @@
           <div *ngIf="currentStep === 1">
             <div class="form-group" *ngIf="accountType === 'COMPANY'">
               <label>Company Name</label>
-              <input type="text" class="form-control" [(ngModel)]="form.companyName" name="companyName" required>
+              <div class="input-wrapper">
+                <i class="bi bi-building"></i>
+                <input type="text" class="form-control" [(ngModel)]="form.companyName" name="companyName" required>
+              </div>
             </div>
             <div class="row">
               <div class="col-md-6">
                 <div class="form-group">
                   <label>Name</label>
-                  <input type="text" class="form-control" [(ngModel)]="form.firstName" name="firstName" required>
+                  <div class="input-wrapper">
+                    <i class="bi bi-person"></i>
+                    <input type="text" class="form-control" [(ngModel)]="form.firstName" name="firstName" required>
+                  </div>
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label>Surname</label>
-                  <input type="text" class="form-control" [(ngModel)]="form.lastName" name="lastName" required>
+                  <div class="input-wrapper">
+                    <i class="bi bi-person"></i>
+                    <input type="text" class="form-control" [(ngModel)]="form.lastName" name="lastName" required>
+                  </div>
                 </div>
               </div>
             </div>
             <div class="form-group">
               <label>Email</label>
-              <input type="email" class="form-control" [(ngModel)]="form.email" name="email" required>
+              <div class="input-wrapper">
+                <i class="bi bi-envelope"></i>
+                <input type="email" class="form-control" [(ngModel)]="form.email" name="email" required>
+              </div>
             </div>
             <div class="form-group">
               <label>Mobile</label>
-              <input type="tel" class="form-control" [(ngModel)]="form.mobile" name="mobile" required>
+              <div class="input-wrapper">
+                <i class="bi bi-telephone"></i>
+                <input type="tel" class="form-control" [(ngModel)]="form.mobile" name="mobile" required>
+              </div>
             </div>
             <div class="form-group">
               <label>Password</label>
-              <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required minlength="8">
+              <div class="input-wrapper">
+                <i class="bi bi-lock"></i>
+                <input type="password" class="form-control" [(ngModel)]="form.password" name="password" required minlength="8">
+              </div>
             </div>
             <div class="form-group">
               <label>Confirm Password</label>
-              <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPassword" required>
+              <div class="input-wrapper">
+                <i class="bi bi-lock"></i>
+                <input type="password" class="form-control" [(ngModel)]="form.confirmPassword" name="confirmPassword" required>
+              </div>
             </div>
             <p class="text-muted small">You'll be able to add company details, address and more from your profile once you're signed in.</p>
           </div>
@@ -139,8 +160,7 @@
 
     </div>
     </div>
+    <p class="e360-register-footer-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
   </div>
-
-  <p class="e360-register-footer-copy">&copy; 2026 Enterprise360 by Silver Spectrum Solutions (PTY) LTD</p>
 
 </section>

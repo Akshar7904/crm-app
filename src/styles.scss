@@ -220,6 +220,7 @@
 // ==================== BASE STYLES ====================
 
 body {
+  margin: 0;
   background-color: var(--bg-body, $bg-body);
   font-family: $font-family-base;
   color: var(--text-primary, $text-primary);

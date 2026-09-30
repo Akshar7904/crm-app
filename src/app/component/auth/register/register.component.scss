@@ -36,21 +36,39 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  padding: 40px 20px;
+  gap: 16px;
+  padding: 24px 20px;
   background: $gray-50;
 }
 
 .e360-register-card {
   position: relative;
   width: 100%;
-  max-width: 900px;
-  min-height: 560px;
+  max-width: 1300px;
+  min-height: 84vh;
   background: $white;
   border-radius: 24px;
   box-shadow: 0 25px 60px rgba(6, 58, 92, .18);
   overflow: hidden;
   display: flex;
+
+  // The oversized circle gives the panel its soft curved edge (instead of
+  // a flat diagonal line) — same construction as login.component.scss.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 62%;
+    transform: translateY(-50%);
+    width: 2200px;
+    height: 2200px;
+    border-radius: 50%;
+    background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
+    z-index: 0;
+    pointer-events: none;
+
+    @include respond-to('lg') { display: none; }
+  }
 
   @include respond-to('lg') {
     flex-direction: column;
@@ -59,15 +77,18 @@ section {
 }
 
 // ── Left: static brand panel ────────────────────────────────────────────
+// No background of its own on desktop — the card's ::before circle (behind
+// this panel in stacking order) shows through and provides the color/curve.
 .e360-register-panel {
   position: relative;
+  z-index: 1;
   flex: 0 0 38%;
   overflow: hidden;
-  background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
 
   @include respond-to('lg') {
     flex: 0 0 auto;
     padding: 36px 24px 30px;
+    background: linear-gradient(-45deg, $e360-navy 0%, $e360-green 100%);
   }
 }
 
@@ -133,7 +154,10 @@ section {
 
 // ── Right: form zone ─────────────────────────────────────────────────────
 .e360-register-form-zone {
+  position: relative;
+  z-index: 1;
   flex: 1;
+  background: $white;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -246,29 +270,54 @@ section {
   }
 }
 
-.form-control,
-.form-select {
+// Icon-in-pill construction: a grid with a narrow icon column and a wide
+// input column — matches login.component.scss's .input-wrapper.
+.input-wrapper {
+  display: grid;
+  grid-template-columns: 15% 85%;
+  align-items: center;
   height: 40px;
-  padding: 0 14px;
-  font-size: .82rem;
-  border: none;
+  padding: 0 6px;
   border-radius: 40px;
   background: $gray-50;
   transition: background $transition-base, box-shadow $transition-base;
 
-  &:focus {
+  i {
+    text-align: center;
+    color: $gray-400;
+    font-size: .88rem;
+    transition: color $transition-base;
+  }
+
+  .form-control,
+  .form-select {
+    height: 100%;
+    padding: 0 10px 0 0;
+    font-size: .82rem;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $gray-400;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
+
+  &:focus-within {
     background: $white;
     box-shadow: 0 0 0 2px var(--orion-primary);
-    outline: none;
   }
 
-  &::placeholder {
-    color: $gray-400;
-  }
-
-  &:disabled {
-    background: $bg-disabled;
-    cursor: not-allowed;
+  &:focus-within i {
+    color: var(--orion-primary);
   }
 }
 
