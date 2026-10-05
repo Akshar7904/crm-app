@@ -48,10 +48,22 @@
           <small class="text-muted d-block">Published Tender Document</small>
           <span *ngIf="!tender.attachmentFileName">No document uploaded</span>
           <button *ngIf="tender.attachmentFileName" class="btn btn-sm btn-link p-0 published-doc-link" (click)="downloadAttachment()">{{ tender.attachmentFileName }}</button>
-          <label class="btn btn-sm btn-outline-secondary ms-2 mb-0" *ngIf="isManagerOrAbove">
-            {{ tender.attachmentFileName ? 'Replace' : 'Upload' }}
-            <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
-          </label>
+          <ng-container *ngIf="isManagerOrAbove">
+            <label class="btn btn-sm btn-outline-secondary ms-2 mb-0">
+              {{ tender.attachmentFileName ? 'Replace' : 'Upload' }}
+              <input type="file" hidden (change)="onAttachmentSelected($event)" [disabled]="uploadingAttachment">
+            </label>
+            <ng-container *ngIf="tender.attachmentFileName">
+              <ng-container *ngIf="!confirmingDeleteAttachment; else confirmDeleteAttachmentTpl">
+                <button class="btn btn-sm btn-outline-danger ms-2" (click)="confirmDeleteAttachment()" title="Delete"><i class="bi bi-trash"></i></button>
+              </ng-container>
+              <ng-template #confirmDeleteAttachmentTpl>
+                <span class="ms-2 small text-muted">Delete this document?</span>
+                <button class="btn btn-sm btn-danger ms-2" [disabled]="deletingAttachment" (click)="executeDeleteAttachment()">Delete</button>
+                <button class="btn btn-sm btn-outline-secondary ms-1" [disabled]="deletingAttachment" (click)="cancelDeleteAttachment()">Cancel</button>
+              </ng-template>
+            </ng-container>
+          </ng-container>
         </div>
         <div class="col-md-4"><small class="text-muted d-block">Tender Type</small>{{ tender.tenderType || '—' }}</div>
         <div class="col-md-4"><small class="text-muted d-block">Tender Source</small>{{ tender.tenderSource || '—' }}</div>
@@ -654,7 +666,10 @@
       <div class="upload-modal-body">
         <div class="mb-3">
           <label class="form-label">Category</label>
-          <input class="form-control" [(ngModel)]="bidDocumentForm.category" placeholder="e.g. Executive & Bid Response">
+          <select class="form-select" [(ngModel)]="bidDocumentForm.category">
+            <option value="" disabled>Select a category</option>
+            <option *ngFor="let c of bidDocumentCategories" [value]="c">{{ c }}</option>
+          </select>
         </div>
         <div class="mb-3">
           <label class="form-label">Display Name</label>
@@ -676,7 +691,7 @@
       <div class="upload-modal-footer">
         <button class="btn btn-outline-secondary" (click)="closeBidDocumentModal()" [disabled]="savingBidDocument">Cancel</button>
         <button class="btn btn-primary" (click)="submitBidDocument()"
-                [disabled]="savingBidDocument || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
+                [disabled]="savingBidDocument || !bidDocumentForm.category || (bidDocumentModalMode === 'add' && !bidDocumentFile)">
           Save
         </button>
       </div>

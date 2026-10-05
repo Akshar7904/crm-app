@@ -10,7 +10,7 @@
   <div class="banner-actions" *ngIf="companyId && isAdmin">
     <!-- Add new document — dropdown of all types (backend upserts on same type) -->
     <div class="dropdown" *ngIf="policyTypes.length > 0">
-      <button class="btn-banner dropdown-toggle" data-bs-toggle="dropdown">
+      <button class="btn-banner dropdown-toggle" data-bs-toggle="dropdown" data-bs-strategy="fixed">
         <i class="bi bi-plus-circle me-1"></i>Add Company Document
       </button>
       <ul class="dropdown-menu dropdown-menu-end">

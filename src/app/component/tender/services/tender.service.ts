@@ -49,6 +49,10 @@ export class TenderService {
     return this.http.get(`${this.base}/${id}/attachment`, { responseType: 'blob' });
   }
 
+  deleteAttachment(id: number): Observable<Tender> {
+    return this.http.delete<any>(`${this.base}/${id}/attachment`).pipe(map(r => r.data.tender));
+  }
+
   updateGoNoGo(id: number, body: { goNoGoOwnerId?: number; goNoGoOwnerName?: string; goNoGoReason?: string; goNoGoDecision: string }): Observable<Tender> {
     return this.http.put<any>(`${this.base}/${id}/go-no-go`, body).pipe(map(r => r.data.tender));
   }

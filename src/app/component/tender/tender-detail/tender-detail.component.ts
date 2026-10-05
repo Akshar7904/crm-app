@@ -194,6 +194,36 @@ export class TenderDetailComponent implements OnInit {
     });
   }
 
+  confirmingDeleteAttachment = false;
+  deletingAttachment = false;
+
+  confirmDeleteAttachment(): void {
+    this.confirmingDeleteAttachment = true;
+  }
+
+  cancelDeleteAttachment(): void {
+    this.confirmingDeleteAttachment = false;
+  }
+
+  executeDeleteAttachment(): void {
+    if (!this.tender) return;
+    this.deletingAttachment = true;
+    this.tenderService.deleteAttachment(this.tender.id).subscribe({
+      next: t => {
+        // The backend omits null fields from JSON (@JsonInclude NON_NULL), so a plain
+        // spread-merge would leave the stale attachment fields in place — clear them explicitly.
+        this.tender = { ...this.tender, ...t, attachmentFileName: undefined, attachmentContentType: undefined };
+        this.deletingAttachment = false;
+        this.confirmingDeleteAttachment = false;
+        this.notification.onDefault('Attachment removed.');
+      },
+      error: () => {
+        this.deletingAttachment = false;
+        this.notification.onError('Failed to remove attachment.');
+      }
+    });
+  }
+
   // ── JV Partners ────────────────────────────────────────────────────────
   showJvPartnerModal = false;
   editingJvPartnerId: number | null = null;
@@ -493,6 +523,8 @@ export class TenderDetailComponent implements OnInit {
   savingBidDocument = false;
   replacingBidDocumentId: number | null = null;
 
+  readonly bidDocumentCategories = ['Technical', 'Mandatory', 'Functionality', 'Commercial', 'Other'];
+
   private emptyBidDocumentForm() {
     return { category: '', displayName: '', description: '' };
   }
@@ -670,7 +702,7 @@ export class TenderDetailComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `tender-bid-${this.tender!.tenderReference || this.tender!.id}.pdf`;
+        a.download = `tender-bid-${this.tender!.tenderReference || this.tender!.id}.zip`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 10000);
       },
